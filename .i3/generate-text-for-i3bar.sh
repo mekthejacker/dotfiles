@@ -17,10 +17,9 @@ timeout_max=10
 
 # GMail username and password are taken from here
 . ~/.env/private.sh
-zenity --info --text "$GMAIL_USERNAME"
+
 # Tabulation and spaces in output of the script are just to have a nice view
 #   while testing this script in a terminal and are not neccesary.
-
 possible_blocks="active_window_name
                  free_space
                  mpd_state
