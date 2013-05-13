@@ -1,0 +1,8 @@
+#xrandr --output VGA1 --mode `xrandr | \
+#  sed -nr '/VGA1 c/{N;s/.*\n\s+(\S+)\s+.*/\1/p}'`
+
+cat ~/.mpd/mpd.conf.common > ~/.mpd/mpd.conf
+[ -e ~/.mpd/mpd.conf.$HOSTNAME ] && cat ~/.mpd/mpd.conf.$HOSTNAME >> \
+	~/.mpd/mpd.conf
+xrdb ~/.Xresources
+xset +fp /usr/share/fonts/terminus && xset fp rehash

@@ -1,0 +1,226 @@
+# i3 config file (v4)
+#
+# Please see http://i3wm.org/docs/userguide.html for a complete reference!
+#
+# To get a config file with the same key positions, but for your current
+# layout, use the i3-config-wizard
+#
+
+# font for window titles. ISO 10646 = Unicode
+# font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
+font xft:terminus 12
+
+## Keybindings
+set $mod Mod4
+
+## Use Mouse+$mod to drag floating windows to their wanted position
+floating_modifier $mod
+
+## Change focus ijkl ↑←↓→
+bindcode $mod+31 focus up
+bindcode $mod+44 focus left
+bindcode $mod+45 focus down
+bindcode $mod+46 focus right
+
+## Move focused window
+bindcode $mod+Shift+31 move up
+bindcode $mod+Shift+44 move left
+bindcode $mod+Shift+45 move down
+bindcode $mod+Shift+46 move right
+
+## Split in horizontal orientation [h]
+bindcode $mod+43 split h 
+## Split in vertical orientation [v]
+bindcode $mod+55 split v
+## Change container layout (stacked, tabbed, default)
+bindsym $mod+q layout stacking
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout default
+## In stacked/tabbed windows cursor may wrap in cycle
+force_focus_wrapping yes
+
+## Toggle tiling / floating
+bindsym $mod+space floating toggle
+## Enter fullscreen mode for the focused container
+bindsym $mod+f fullscreen
+## Kill focused window
+bindsym $mod+c kill
+
+## Focus the parent container [u]
+bindcode $mod+30 focus parent
+## Focus the child container [m]
+bindcode $mod+58 focus child
+
+## Focus last floating/tiling container
+# bindsym $mod+g focus mode_toggle
+
+## Focus to next output to the right [l]
+bindcode $mod+Control+46 focus output right
+## Focus to next output to the right [j]
+bindcode $mod+Control+44 focus output left
+
+## Reload the configuration file
+bindsym $mod+Shift+r reload
+## Restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+bindsym $mod+Control+r restart
+bindsym $mod+Control+q exit
+bindsym $mod+Control+Shift+q exec "~/scripts/xorg.conf_chooser.sh"
+
+## Resize window (you can also use the mouse for that)
+mode "resize" {
+        bindcode 31   resize grow height 10 px or 10 ppt
+        bindcode 44   resize shrink width 10 px or 10 ppt
+        bindcode 45   resize shrink height 10 px or 10 ppt
+        bindcode 46   resize grow width 10 px or 10 ppt
+        ## Back to normal: Enter or Escape
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+}
+bindsym $mod+x mode "resize"
+
+
+## Enter
+bindsym $mod+Return exec urxvtc
+## R
+## One-command urxvtc instance, it is replacement for dmenu (also see ~/.bashrc)
+bindsym $mod+r exec --no-startup-id /bin/bash -c 'export ONE_COMMAND_SHELL=t && urxvtc -name one_command_shell'
+## S
+bindcode $mod+39 exec --no-startup-id ". ~/scripts/screenshot.sh"
+bindcode --release $mod+Shift+39 exec --no-startup-id ". ~/scripts/screenshot.sh -area"
+# 66 is control (they are swapped with capslock on my keyboard)
+bindcode --release $mod+66+39 exec --no-startup-id ". ~/scripts/screenshot.sh -delay"
+
+## F2 
+## `eval` is to make path to socket absolute
+bindcode $mod+68 exec --no-startup-id eval mpc toggle
+## F3
+bindcode $mod+69 exec --no-startup-id "~/scripts/add2playlist.sh"
+bindcode $mod+Shift+69 exec --no-startup-id "~/scripts/add2playlist.sh -c"
+## F4
+bindcode $mod+70 exec --no-startup-id amixer set Master toggle
+## F5
+bindcode $mod+71 exec --no-startup-id amixer set Master 1%-
+bindcode $mod+Control+71 exec --no-startup-id xbacklight -dec 5
+## F6
+bindcode $mod+72 exec --no-startup-id eval mpc volume -1
+## F7
+bindcode $mod+73 exec --no-startup-id eval mpc volume +1
+## F8
+bindcode $mod+74 exec --no-startup-id amixer set Master 1%+
+bindcode $mod+Control+74 exec --no-startup-id xbacklight -inc 5
+## F9
+bindcode $mod+75 exec --no-startup-id eval mpc prev
+## F10
+bindcode $mod+76 exec --no-startup-id eval mpc next
+## F11
+bindcode $mod+95 exec --no-startup-id eject
+bindcode $mod+Shift+95 exec --no-startup-id eject -t
+## F12
+bindcode $mod+96 exec --no-startup-id i3lock
+
+
+## Switch to workspace and launch related application.
+bindsym $mod+1 workspace 1: Main
+bindsym $mod+2 exec --no-startup-id "i3-msg workspace 2: Firefox && { pgrep -u $USER firefox &>/dev/null || firefox; }"
+bindsym $mod+3 exec --no-startup-id "i3-msg workspace 3: Thunar && { pgrep -u $USER thunar &>/dev/null || thunar; }"
+bindsym $mod+4 exec --no-startup-id "i3-msg workspace 4: Emacs && { pgrep -u $USER emacsclient &>/dev/null || emacsclient -c; }"
+bindsym $mod+5 workspace 5: Misc
+bindsym $mod+6 workspace 6: IM
+bindsym $mod+7 workspace 7: Wine
+bindsym $mod+8 exec --no-startup-id "i3-msg workspace 8: GIMP && { pgrep -u $USER gimp &>/dev/null || gimp; }"
+bindsym $mod+9 exec --no-startup-id "i3-msg workspace 9: MPD && { pgrep -u $USER ncmpcpp &>/dev/null || urxvt -name ncmpcpp -e ncmpcpp; }"
+bindsym $mod+0 workspace Outer\ space
+bindcode $mod+20 workspace Mail
+
+## Set 10-th workspace to appear on big monitor
+workspace "Outer space" output VGA1
+
+## Move focused container to workspace
+bindsym $mod+Shift+1 move container to workspace 1: Main
+bindsym $mod+Shift+2 move container to workspace 2: Firefox
+bindsym $mod+Shift+3 move container to workspace 3: Thunar
+bindsym $mod+Shift+4 move container to workspace 4: Emacs
+bindsym $mod+Shift+5 move container to workspace 5: Misc
+bindsym $mod+Shift+6 move container to workspace 6: IM
+bindsym $mod+Shift+7 move container to workspace 7: Wine
+bindsym $mod+Shift+8 move container to workspace 8: GIMP
+bindsym $mod+Shift+9 move container to workspace 9: MPD
+bindsym $mod+Shift+0 move container to workspace Outer\ space
+## - (minus/hyphen key)
+bindcode $mod+Shift+20 move container to workspace Mail
+
+## Assigning windows to workspaces
+assign [class="Gnome-system-monitor"] → "1: Main"
+assign [class="Firefox"] → "2: Firefox"
+assign [class="Thunar"] → "3: Thunar"
+assign [class="Emacs"] → "4: Emacs"
+assign [class="^libreoffice.*"] → "5: Misc"
+assign [class="Meld"] → "5: Misc"
+assign [class="Pidgin"] → "6: IM"
+assign [class="Skype"] → "6: IM"
+assign [class="Ts3client"] → "6: IM"
+assign [class="Wine"] → "7: Wine"
+assign [class="Gimp"] → "8: GIMP"
+assign [class="URxvt" instance="ncmpcpp"] → "9: MPD"
+assign [class="Thunderbird"] → Mail
+
+## Arbitrary commands for specific windows
+# for_window [class="MPlayer"] floating enable
+# for_window [class="mplayer2"] floating enable
+for_window [class="URxvt" instance="one_command_shell"] floating enable
+
+
+## This executes every reload
+# exec_always --no-startup-id "~/.i3/set_keyboard.sh"
+## And this once at the start
+exec --no-startup-id "~/.i3/autostart.sh"
+
+## Window border style
+new_window 1pixel
+new_float 1pixel
+
+# hide_edge_borders both
+
+## class                  border  backgr. text    indicator
+# client.focused          #4c7899 #285577 #ffffff #2e9ef4
+# client.focused_inactive #333333 #5f676a #ffffff #484e50
+# client.unfocused        #333333 #222222 #888888 #292d2e
+# client.urgent           #2f343a #900000 #ffffff #900000
+
+## class				border  backgr. text    indicator
+client.focused          #ad7fa8 #75507b #ffffff #ad7fa8
+client.focused_inactive #555753 #3c3c3c #ffffff #ad7fa8
+client.unfocused        #555753 #3c3c3c #888888 #ad7fa8
+client.urgent           #ad7fa8 #ad7fa8 #ffffff #ff0000
+
+bar {
+	# verbose yes
+	position top
+	tray_output none
+	workspace_buttons yes
+	status_command ". ~/.i3/generate-text-for-i3bar.sh"
+	colors {
+        background #3c3c3c
+        statusline #bbbbbb
+
+        ##.                  border  backgr  text
+		# focused_workspace  #4c7899 #285577 #ffffff
+		# active_workspace   #333333 #5f676a #ffffff
+		# inactive_workspace #333333 #222222 #888888
+		# urgent_workspace   #2f343a #900000 #ffffff
+
+		focused_workspace	#ad7fa8 #75507b #ffffff
+		active_workspace	#75507b #ad7fa8 #ffffff
+		inactive_workspace	#3c3c3c #3c3c3c #aaaaaa
+		urgent_workspace	#df5757 #c22f2f #ffffff
+    }
+}
+
+# # big monitor: everything
+# bar {
+# 	## Useful for presentations
+# 	mode hide
+#    ## The display is connected either via HDMI or via DisplayPort
+#    output HDMI2
+#    output DP2
+# }

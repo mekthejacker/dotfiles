@@ -1,0 +1,44 @@
+# About differences between MPlayer and MPlayer2 see official comparsion
+#    http://www.mplayer2.org/differences/
+
+[default]
+# Common options
+mixer-channel="PCM Cent"
+alang=ja,jpn,en,eng,de,deu,ru,rus
+subcp=enca:ru:en
+#autosub=no
+
+[hdmi]
+profile-desc="For output on big plasma"
+vo=vdpau
+vc=ffmpeg12vdpau,ffwmv3vdpau,ffvc1vdpau,ffh264vdpau,ffodivxvdpau,
+vf-clr=yes
+ao=alsa:device=hw=1.7
+#ao=alsa:device=hw=hdmi
+#ao=alsa:device=spdif
+#ac=hwac3,hwdts,hwmpa,
+fs=yes
+
+[fast]
+vfm=ffmpeg
+lavdopts=lowres=1:fast:skiploopfilter=all
+
+[fb]
+profile-desc="For playing on framebuffer w/o X"
+vo=directfb:buffermode=triple
+monitoraspect=16:9
+fs=yes
+
+[interlaced_bluray]
+vo=vdpau:sharpen=.5:denoise=1:deint=4:chroma-deint:pullup:colorspace=0
+
+# [protocol.dvdnav]
+#vc=ffmpeg12,
+#mouse-movements=yes
+#nocache=yes
+
+[home]
+vo=vdpau
+
+[fanetbook]
+vo=gl
