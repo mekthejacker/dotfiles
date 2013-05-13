@@ -2,7 +2,7 @@
 
 #### Features of this config
 
-* it is set up to use `urxvtc` instead of `dmenu`, which cannot switch locale for itself to english, cannot use aliases, cannot… it’s just ugliness itself;
+* it is set up to use `urxvtc` instead of `dmenu`, which cannot switch locale for itself to english, cannot use aliases, cannot… it is just ugliness itself;
 * launches bound application when switching on an empty workspace;
 * has a set of [scripts](https://github.com/deterenkelt/scripts) bound to keys;
 * uses json output produced by [bash script](generate-text-for-i3bar) to feed i3bar, its output is profile-based and may contain data, produced by the varoius functions
@@ -17,6 +17,9 @@
       ![disk_space_extremely_low](img/disk_space_extremely_low.png) – extremely low value of free space.
 
   * music player daemon (MPD) state;
+
+      ![mpd_playing](img/mpd_playing.png) – when MPD is playing.
+
   * battery status;
 
       ![charging](img/bat_charging.png) – when power cords is plugged.
