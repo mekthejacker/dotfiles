@@ -187,11 +187,11 @@ new_float 1pixel
 # client.unfocused        #333333 #222222 #888888 #292d2e
 # client.urgent           #2f343a #900000 #ffffff #900000
 
-## class				border  backgr. text    indicator
-client.focused          #ad7fa8 #75507b #ffffff #ad7fa8
-client.focused_inactive #555753 #3c3c3c #ffffff #ad7fa8
-client.unfocused        #555753 #3c3c3c #888888 #ad7fa8
-client.urgent           #ad7fa8 #ad7fa8 #ffffff #ff0000
+## class                  border  backgr. text    indicator
+client.focused            #ad7fa8 #75507b #ffffff #ad7fa8
+client.focused_inactive   #555753 #3c3c3c #ffffff #ad7fa8
+client.unfocused          #555753 #3c3c3c #888888 #ad7fa8
+client.urgent             #ad7fa8 #ad7fa8 #ffffff #ff0000
 
 bar {
 	# verbose yes

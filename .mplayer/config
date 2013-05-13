@@ -1,4 +1,4 @@
-# About differences between MPlayer and MPlayer2 see official comparsion
+# About differences between MPlayer and MPlayer2 see official comparison
 #    http://www.mplayer2.org/differences/
 
 [default]
@@ -6,7 +6,7 @@
 mixer-channel="PCM Cent"
 alang=ja,jpn,en,eng,de,deu,ru,rus
 subcp=enca:ru:en
-#autosub=no
+autosub=no
 
 [hdmi]
 profile-desc="For output on big plasma"

@@ -20,6 +20,8 @@ timeout_max=10
 
 # Tabulation and spaces in output of the script are just to have a nice view
 #   while testing this script in a terminal and are not neccesary.
+
+# gmail depends on internet_status
 possible_blocks="active_window_name
                  free_space
                  mpd_state
@@ -49,15 +51,15 @@ esac
 
 unset func_list internet status
 # Never used ---^^^^^^^^^^^^^^^
-bar_template='${comma:-}\n\t['
+bar='${comma:-}\n\t['
 # Since comma is unset for first time, its line will be empty
 for block in $possible_blocks; do
 	[ "${profile//*$block*/}" ] || {
 		func_list="$func_list get_$block"
-		bar_template="$bar_template"'\n\t${'$block':-}'
+		bar="$bar"'\n\t${'$block':-}'
 	}
 done
-bar_template="$bar_template\n\t]"
+bar="$bar\n\t]"
 
 # Some functions may generate empty line if no indicator needed.
 
@@ -261,7 +263,7 @@ get_gmail() {
 				return 1
 			}
 			echo "$gmail_server_reply" | grep Error &>/dev/null && {
-				# invalid user data or other break.
+				# invalid user data or other fault.
 				gmail='{ "full_text": "E✉",
 \t  "color": "'$red'",
 \t  "separator":false },'
@@ -314,7 +316,7 @@ echo '{"version":1}[' && while true; do
 	for func in $func_list; do
 		$func
 	done
-	eval echo -e \"${bar_template//\\/\\\\}\" || exit 1
+	eval echo -e \"${bar//\\/\\\\}\" || exit 1
 	comma=','
 	sleep 1;
 	[ $((++timeout_step)) -gt $timeout_max ] && timeout_step=1

@@ -13,6 +13,11 @@ for opt in autocd cdspell dirspell dotglob extglob globstar no_empty_cmd_complet
 	shopt -s $opt
 done
 
+pushd ~/bashrc >/dev/null
+hostnamerc=${HOSTNAME%.*}.sh
+[ -f $hostnamerc ] && [ -r $hostnamerc ] && . $hostnamerc
+popd >/dev/null
+
 # Testing ur PAM
 #ulimit -S -n 8192
 # Setting the ‘soft’ limit of maximum open files.
@@ -49,12 +54,6 @@ alias emc="emacsclient -c"
 alias td="todo -A "
 alias tdD="todo -D "
 alias deploy="~/repos/system/root/ext_scripts/deploy_configuration.sh "
-
-
-pushd ~/bashrc >/dev/null
-hostnamerc=${HOSTNAME%.*}.sh
-[ -f $hostnamerc ] && [ -r $hostnamerc ] && . $hostnamerc
-popd >/dev/null
 
 [[ $- = *i* ]] || return
 [ ! -v DISPLAY -a "`tty`" = /dev/tty2 ] && {

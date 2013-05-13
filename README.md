@@ -21,7 +21,7 @@ This is how `pstree` looks that way
 
 ========
 ### URxvt and bash 
-URxvt may use _resources_ from [~/.Xdefaults](.Xdefaults) or via certain X RESOURCE_MANAGER, managed by `xrdb` utility, which can load user’s [~/.Xresources](.Xresources) file to update resource base (look also at [~/.xinitrc](.xinitrc) where `xrdb` is calling). By default it will look for ~/.Xdefaults then in resources of the root window. The difference between these files is
+URxvt may use _resources_ from `~/.Xdefaults` or via certain X RESOURCE_MANAGER, managed by `xrdb` utility, which can load user’s [~/.Xresources](.Xresources) file to update resource base (look also at [~/.xinitrc](.xinitrc) where `xrdb` is calling). By default it will look for ~/.Xdefaults then in resources of the root window. The difference between these files is
 
 ~/.Xdefaults
 * is obsolete;
