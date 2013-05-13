@@ -22,17 +22,17 @@
 
   * battery status;
 
-      ![charging](img/bat_charging.png) – when power cords is plugged.
+      ![bat_charging](img/bat_charging.png) – when power cords is plugged.
 
-      ![discharging](img/bat_discharging.png) – when battery is used up.
+      ![bat_discharging](img/bat_discharging.png) – when battery is used up.
 
-      ![fading](img/bat_fading.png) – each block has 5 stages of fading, which gives 25 states with 5 blocks on the screen.
+      ![bat_fading](img/bat_fading.png) – each block has 5 stages of fading, which gives 25 states with 5 blocks on the screen.
 
-      ![low_level](img/bat_low_level.png) – at low level
+      ![bat_low_level](img/bat_low_level.png) – at low level
 
-      ![extremely_low_level](img/bat_extremely_low_level.png) – battery is about to be completely discharged, but mine after two years of almost daily usage could give **30 minutes** of idle state. Script throws a confirmation to shutdown, which can be declined.
+      ![bat_extremely_low_level](img/bat_extremely_low_level.png) – battery is about to be completely discharged, but mine after two years of almost daily usage could give **30 minutes** of idle state. Script throws a confirmation to shutdown, which can be declined.
 
-      ![ejected](img/bat_ejected.png) – when battery is ejected.
+      ![bat_ejected](img/bat_ejected.png) – when battery is ejected.
 
   * internet status;
   * gmail status
