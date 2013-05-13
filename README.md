@@ -13,6 +13,7 @@ Generally, there are two ways launching X – using a display manager (DM) or `s
 4. After X is up, `xinit` launches [~/.xinitrc](.xinitrc) file, and all the commands from there. Window manager (WM) is also intended to run from there. 
 
 This is how `pstree` looks that way
+
 ![pstree output](img/pstree.png)
 
 #### Via DM
