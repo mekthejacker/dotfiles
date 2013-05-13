@@ -21,14 +21,15 @@ This is how `pstree` looks that way
 
 ========
 ### URxvt and bash 
-URxvt may use [~/.Xdefaults](.Xdefaults) or [~/.Xresources](.Xresources) file, by default it will look for ~/.Xresources, then ~/.Xdefaults. The difference between these files is
+URxvt may use _resources_ from [~/.Xdefaults](.Xdefaults) or via certain X RESOURCE_MANAGER, managed by `xrdb` utility, which can load user’s [~/.Xresources](.Xresources) file to update resource base (look also at [~/.xinitrc](.xinitrc) where `xrdb` is calling). By default it will look for ~/.Xdefaults then in resources of the root window. The difference between these files is
 
 ~/.Xdefaults
 * is obsolete;
-* AFAIR, does not support non-local X clients.
+* AFAIR, is just a file and nothing more;
+* and does not support non-local X clients.
 
 ~/.Xresources
-* is a modern way to set options on a WM_CLASS basis;
+* is a modern way to set resources on a WM_CLASS basis;
 * is also used for setting per-user X display options, like dpi.
 
-when bash starts it tries to source `/etc/profile`, then `~/.bash_profile`, `~/.bash_login` or `~/.profile`, usually `~/.bash_profile` is present and [~/.bashrc](.bashrc) is sourced from there. To customize keybindings [~/.inputrc](.inputrc) is used (See also `/etc/inputrc`). With these files, and also using urxvtd and urxvtc one can get terminal as light as a feather and have same keybindings as in preffered editor.
+when bash starts, it tries to source `/etc/profile`, then `~/.bash_profile`, `~/.bash_login` or `~/.profile`, usually `~/.bash_profile` is present and [~/.bashrc](.bashrc) is sourced from there. To customize keybindings [~/.inputrc](.inputrc) is used (See also `/etc/inputrc`). With these files, and also using urxvtd and urxvtc one can get terminal as light as a feather and have same keybindings as in preffered editor.
