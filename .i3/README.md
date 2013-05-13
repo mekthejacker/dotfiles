@@ -5,9 +5,8 @@
 * it is set up to use `urxvtc` instead of `dmenu`, which cannot switch locale for itself to english, cannot use aliases, cannot… it’s just ugliness itself;
 * launches bound application when switching on an empty workspace;
 * has a set of [scripts](https://github.com/deterenkelt/scripts) bound to keys;
-* uses json output produced by [bash script](generate-text-for-i3bar) to feed i3bar, and this output
-  * is profile-based;
-  and may contain data produced by the following modules
+* uses json output produced by [bash script](generate-text-for-i3bar) to feed i3bar, its output is profile-based and may contain data, produced by the varoius functions
+
   * active window name, which i3 is lacking;
   * free and total space per partition (partition list is editable)
 
