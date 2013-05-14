@@ -262,7 +262,8 @@ get_gmail() {
 \t  "separator":false },'
 				return 1
 			}
-			echo "$gmail_server_reply" | grep Error &>/dev/null && {
+			echo "$gmail_server_reply" | \
+				sed -r 's~^<H2>Error [0-9]{3}</H2>$~&~;T;Q1' &>/dev/null || {
 				# invalid user data or other fault.
 				gmail='{ "full_text": "E✉",
 \t  "color": "'$red'",
