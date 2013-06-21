@@ -128,7 +128,7 @@ bindsym $mod+5 workspace 5: Misc
 bindsym $mod+6 workspace 6: IM
 bindsym $mod+7 workspace 7: Wine
 bindsym $mod+8 exec --no-startup-id "i3-msg workspace 8: GIMP && { pgrep -u $USER gimp &>/dev/null || gimp; }"
-bindsym $mod+9 exec --no-startup-id "i3-msg workspace 9: MPD && { pgrep -u $USER ncmpcpp &>/dev/null || urxvt -name ncmpcpp -e ncmpcpp; }"
+bindsym $mod+9 exec --no-startup-id "i3-msg workspace 9: MPD && { pgrep -u $USER ncmpcpp &>/dev/null || urxvtc -name ncmpcpp -e ncmpcpp; }"
 bindsym $mod+0 workspace Outer\ space
 bindcode $mod+20 workspace Mail
 
