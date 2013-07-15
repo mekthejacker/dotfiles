@@ -90,14 +90,17 @@ bindcode --release $mod+Shift+39 exec --no-startup-id ". ~/scripts/screenshot.sh
 # 66 is control (they are swapped with capslock on my keyboard)
 bindcode --release $mod+66+39 exec --no-startup-id ". ~/scripts/screenshot.sh -delay"
 
-## F2 
+## F1
 ## `eval` is to make path to socket absolute
-bindcode $mod+68 exec --no-startup-id eval mpc toggle
+bindcode $mod+67 exec --no-startup-id eval mpc toggle
+## F2 
+bindcode $mod+68 exec --no-startup-id "~/scripts/add2playlist.sh"
+bindcode $mod+Shift+68 exec --no-startup-id "~/scripts/add2playlist.sh -c"
 ## F3
-bindcode $mod+69 exec --no-startup-id "~/scripts/add2playlist.sh"
-bindcode $mod+Shift+69 exec --no-startup-id "~/scripts/add2playlist.sh -c"
+bindcode $mod+69 exec --no-startup-id amixer set Master toggle
 ## F4
-bindcode $mod+70 exec --no-startup-id amixer set Master toggle
+## See ‘amixer scontrols | $PAGER’ for a complete list of controls
+bindcode $mod+70 exec --no-startup-id "amixer sset 'Capture',0 toggle"
 ## F5
 bindcode $mod+71 exec --no-startup-id amixer set Master 1%-
 bindcode $mod+Control+71 exec --no-startup-id xbacklight -dec 5

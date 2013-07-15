@@ -25,6 +25,7 @@ timeout_max=10
 possible_blocks="active_window_name
                  free_space
                  mpd_state
+                 mic_state
                  battery_status
                  internet_status
                  gmail
@@ -34,6 +35,7 @@ case $HOSTNAME in
 	fanetbook)
 		profile="active_window_name
 		         mpd_state
+                 mic_state
 		         battery_status
 		         internet_status
 		         gmail
@@ -43,6 +45,7 @@ case $HOSTNAME in
 		profile="active_window_name
 		         free_space
 		         mpd_state
+                 mic_state
 		         internet_status
 		         gmail
 		         nice_date"
@@ -116,8 +119,16 @@ get_mpd_state() {
 	unset mpd_caught_playing mpd_state
 	mpc |& sed '2s/playing//;T;Q1' &>/dev/null || {
 		mpd_caught_playing=t # this uses in get_gmail
-		mpd_state='{ "full_text": "♬",\n\t  "separator":false },'
+		mpd_state='{ "full_text": "♬",\n\t  "separator": false },'
 	}
+}
+
+get_mic_state() {
+	unset mic_state
+	amixer get 'Capture',0 |& sed '$s/on]$/&/;T;Q1' &>/dev/null \
+		&& mic_state="{ \"full_text\": \"⍉\",
+\t  \"color\": \"$red\",
+\t  \"separator\": false },"
 }
 
 get_battery_status() {
