@@ -1,7 +1,7 @@
-;; default xemacs configuration directory
+;; Default xemacs configuration directory
 (defconst toc:emacs-config-dir "~/.emacs.d/" "")
 
-;; utility finction to auto-load my package configurations
+;; Utility finction to auto-load my package configurations
 (defun toc:load-config-file (filelist)
   (dolist (file filelist)
     (load (expand-file-name 
@@ -10,13 +10,12 @@
      ))
 
 (custom-set-variables
-  ;; custom-set-variables was added by Custom.
+  ;; Custom-set-variables was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
  '(Buffer-menu-use-header-line nil)
  '(column-number-mode t)
-
  '(desktop-base-file-name ".desktop")
  '(desktop-base-lock-name ".desktop.lock")
  '(desktop-load-locked-desktop t)
@@ -24,7 +23,6 @@
  '(desktop-save t)
  '(desktop-save-mode t)
  '(eshell-highlight-prompt nil)
-
  '(fringe-mode (quote (0)) nil (fringe))
  '(global-hl-line-mode t)
  '(ibuffer-modified-char 43)
@@ -51,7 +49,7 @@
  '(word-wrap t))
 
 (custom-set-faces
-  ;; custom-set-faces was added by Custom.
+  ;; Custom-set-faces was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.
   ;; Your init file should contain only one such instance.
   ;; If there is more than one, they won't work right.
@@ -112,23 +110,21 @@
  '(trailing-whitespace ((((class color) (background dark)) (:background "#eeeeee" :foreground "#eeeeee")))))
 
 
-;; after copy Ctrl+c in X11 apps, you can paste by `yank' in emacs
+;; After copy Ctrl+c in X11 apps, you can paste by `yank' in emacs
 (setq x-select-enable-clipboard t)
-;; after mouse selection in X11, you can paste by `yank' in emacs
+;; After mouse selection in X11, you can paste by `yank' in emacs
 (setq x-select-enable-primary t)
 
-
-;; disable VCS-stuff
+;; Disable VCS-stuff
 (setq vc-handled-backends ())
 
-;; load my configuration files
+;; Load my configuration files
 (toc:load-config-file '("php-mode.el"))
 ;; M-j hook to rebound keybinding from C-mode back
 (add-hook 'php-mode-hook (lambda () (define-key php-mode-map (kbd "M-j") 'backward-char)))
 (add-hook 'php-mode-hook (lambda () (define-key php-mode-map (kbd "C-.") 'rotate-windows)))
 (add-hook 'nxml-mode-hook (lambda () (define-key nxml-mode-map (kbd "M-h") 'beginning-of-line)))
 (toc:load-config-file '("textile-mode.el"))  
-
 
 ;; Load code snippets, shortcuts etc.
 (load "~/.emacs.d/little_things/shortcuts.el")
@@ -138,21 +134,21 @@
 ;;(load "~/.emacs.d/geben-0.26/dbgp.el")
 ;;(load "~/.emacs.d/geben-0.26/geben.el")
 
-;; prevent default init load
+;; Prevent default init load
 (setq inhibit-default-init 1)
 
-;; disable auto breaking lines
+;; Disable auto breaking lines
 (setq auto-fill-mode -1)
 
-;; loading GEBEN
+;; Load GEBEN
 ;;(autoload 'geben "geben" "PHP Debugger on Emacs" t)
 
-;; enabling line numbers
+;; Enabling line numbers
 (global-linum-mode 1)
 
-;; enabling 80-column margin 'rule or 'shading
- (setq fci-style 'shading)
- (require 'fill-column-indicator)
+;; Enabling 80-column margin 'rule or 'shading
+(setq fci-style 'shading)
+(require 'fill-column-indicator)
 (fci-mode 1)
 
 ;; (add-hook 'php-mode-hook 'font-lock-add-keywords) ;;(font-lock-add-keywords nil '(("^[^\n]\\{80\\}\\(.*\\)$" 1 font-lock-warning-face t)))

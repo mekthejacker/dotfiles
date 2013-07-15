@@ -2,22 +2,22 @@
 ;; CODE SNIPPETS
 ;;
 
-;; tabs
+;; Tabs
 ;;(setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
 ;;(setq indent-tabs-mode nil)
 (setq tab-width 4)
 
-;; understroke-like cursor mode
+;; Understroke-like cursor mode
 (setq-default cursor-type 'hbar)
 
-;; remove idiotic yes-or-no dialogues 
+;; Remove idiotic yes-or-no dialogues 
 (fset 'yes-or-no-p 'y-or-n-p)
 
-;; disabling toolbar
+;; Disabling toolbar
 (tool-bar-mode -1)
 
-;;Дублирование строки одной командой.
+;; Immidiate copypaste of a whole string
 ;(defun my-copy-line ()
 ;  (interactive)
 ;  (kill-ring-save (line-beginning-position) (line-end-position))
@@ -26,15 +26,14 @@
 ;  (cua-paste nil))
 ;;(global-set-key [(alt d)] 'my-copy-line)
 
-;;Новая строка.
-;;(defun my-new-line ()
-;;  (interactive)
-;; (end-of-line)
-;; (newline-and-indent))
-;;(global-set-key [(alt o)] 'my-new-line)
+;; New line
+;(defun my-new-line ()
+;  (interactive)
+; (end-of-line)
+; (newline-and-indent))
+;(global-set-key [(alt o)] 'my-new-line)
 
-;;Комментарии.
-;;Удобное комментирование и разкомментирование либо одной строки, либо замакированного блока, используя одну и ту же команду.
+;; Comments selected line or region
 (defun my-comment-or-uncomment-region (arg)
   (interactive "*P")
   (comment-normalize-vars)
@@ -43,10 +42,10 @@
   (comment-dwim arg)))
 (global-unset-key (kbd "C-/"))
 (global-set-key (kbd "C-/") 'my-comment-or-uncomment-region)
-;; При этом мне очень важно, чтобы знаки комментариев учитывали актуальный отступ строки. Для этого делаем:
+;; Comment symbols respect indentation
 (setq comment-style 'indent)
 
-;;Этот прибамбас облегчает на порядок написание SGML/HTML/XML тегов.
+;; That should make easier typing HTML/XML/SGML tags
 (defun html-surround-region-with-closing-tag (tag-name beg end)
   (interactive "sTag name: \nr")
   (insert "</" tag-name ">")
@@ -54,9 +53,9 @@
   (goto-char (+ end 2 (length tag-name)))
   )
 (global-set-key [(control >)] 'html-surround-region-with-closing-tag)
-;;Жмём control-> и даём название тега без знаков '<' и '>'. Всё осталное Emacs сделает сам. 
+;; Press Control then put tag name w/o parenteses.
 
-;;Этот прибамбас облегчает на порядок написание SGML/HTML/XML тегов.
+;; That should make easier typing HTML/XML/SGML tags
 (defun html-surround-region-with-tag (tag-name1 beg end)
   (interactive "sTag name: \nr")
   (insert "<" tag-name1 ">")
@@ -64,11 +63,9 @@
   (goto-char (+ end 2 (length tag-name1)))
   )
 (global-set-key [(control <)] 'html-surround-region-with-tag)
-;;Жмём control-< и даём название тега без знаков '<' и '>'. Всё осталное Emacs сделает сам. 
+;; Press C-< and put tag name w/o parenteses.
 
-
-;;Поиск парной скобки.
-;;Мне дико нравился в своё время поиск парной скобки в Vim по нажатию %. Поэтому решил сделать подобное и в Emacs. Вот что получилось:
+;; Seeking for a pair to partentesis (C-p).
 (defun my-match-paren (arg)
   (interactive "p")
   (cond ((looking-at "\\s\(")
@@ -94,41 +91,37 @@
 ;;Перекодировка при открытии 
 ;;(setq unify-8859-on-decoding-mode 't)
 
-;;Суть такая: биндишь это на шорткат, и оно скрывает все окна, которые начинаются на звездочку. Если ты начинаешь с аргумента, то тебя будет спрашивать про закрытие каждого из буфферов, ответы y/n.
+;; This closes all windows which titles start with an asterisk.
 (defun close-annoying-windows(&optional verbose)
-   (interactive "P")
-   (let ((blist (buffer-list)))
+  (interactive "P")
+  (let ((blist (buffer-list)))
+	(while blist
+	  (and
+	   (= ?* (aref (buffer-name (car blist)) 0))
+	   (get-buffer-window (buffer-name (car blist)))
+	   (or (not verbose) (y-or-n-p (concat "Kill the window of " (buffer-name (car blist)) " buffer?")))
+	   (or verbose (not (equal (car blist) (current-buffer))))
+   (delete-window (get-buffer-window (car blist))))
+	  (setq blist (cdr blist)))))
 
-(while blist
-  (and
-    (= ?* (aref (buffer-name (car blist)) 0))
-    (get-buffer-window (buffer-name (car blist)))
-    (or (not verbose) (y-or-n-p (concat "Kill the window of " (buffer-name (car blist)) " buffer?")))
-    (or verbose (not (equal (car blist) (current-buffer))))
-    (delete-window (get-buffer-window (car blist))))
-  (setq blist (cdr blist)))))
 
-
-;; This is for rotating switching windows while switching them. 
-;;
+;; This is for rotating windows while switching them.
 (defun rotate-windows ()
-   (interactive)
-   (let ((this-buffer (buffer-name)))
-
-(other-window -1)
-(let ((that-buffer (buffer-name)))
-  (switch-to-buffer this-buffer)
-  (other-window 1)
-  (switch-to-buffer that-buffer)
-  (other-window -1))))
+  (interactive)
+  (let ((this-buffer (buffer-name)))
+	(other-window -1)
+	(let ((that-buffer (buffer-name)))
+	  (switch-to-buffer this-buffer)
+	  (other-window 1)
+	  (switch-to-buffer that-buffer)
+	  (other-window -1))))
 
 
 ;; ido buffers or something
-;; Конфигурации(там реквайры на пакеты, которые есть на емаксовики):
 (setq ido-enable-flex-matching t)
 (setq ido-everywhere t)
 (setq ido-use-filename-at-point nil)
-;; disable auto searching for files unless called explicitly
+;; Disable auto searching for files unless called explicitly
 (setq ido-auto-merge-delay-time 99999)
 (ido-mode 1)
 ;; (require 'ido-preview)
@@ -158,7 +151,7 @@
 
 (setq initial-major-mode 'emacs-lisp-mode) ;elisp mode for scratch
 
-;; move to Line:column 
+;; Move to Line:column 
 (defadvice goto-line (around goto-column activate)
   "Allow a specification of LINE:COLUMN instead /home/www/site12/htof just COLUMN.
 Just :COLUMN moves to the specified column on the current line.
@@ -169,7 +162,7 @@ LINE alone still moves to the beginning of the specified line (like LINE:0)."
                   (if (and (stringp line)
                            (string-match "\\`\\([0-9]*\\):\\([0-9]*\\)\\'" line))
                       (prog1
-                        (match-string 2 line)
+						  (match-string 2 line)
                         (setq line (match-string 1 line)))
                     nil))))
     (if (stringp column)
@@ -179,9 +172,9 @@ LINE alone still moves to the beginning of the specified line (like LINE:0)."
     (if (stringp line)
         (setq line (if (= (length line) 0)
                        (if buffer
-                         (save-excursion
-                           (set-buffer buffer)
-                           (line-number-at-pos))
+						   (save-excursion
+							 (set-buffer buffer)
+							 (line-number-at-pos))
                          nil)
                      (string-to-int line))))
     (if line

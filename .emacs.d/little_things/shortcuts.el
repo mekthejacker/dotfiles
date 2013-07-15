@@ -1,20 +1,19 @@
 ;;
 ;; SHORTCUTS
+;; Examples:
 ;; (global-set-key (kbd "key") 'function)
 ;; (global-unset-key (kbd "C-_"))
 ;;
 
-;; common
-(global-set-key (kbd "C-s")     'save-buffer)               ;; Сохранить.
-;(global-set-key (kbd "C-S")     'write-file)               ;; Сохранить как…
-(global-set-key (kbd "C-a")     'save-some-buffers)         ;; Сохранение всех несохранённых буферов на диск.
-;(global-set-key (kbd "C-q")     'save-buffers-kill-emacs)  ;; Сохранение всех несохранённых буферов на диск и выход из среды Emacs.
-(global-set-key (kbd "C-q")     'delete-frame)              ;; закрывает текущий фрейм Emacs
+(global-set-key (kbd "C-s")     'save-buffer)               ;; Save
+;(global-set-key (kbd "C-S")     'write-file)               ;; Save as…
+(global-set-key (kbd "C-a")     'save-some-buffers)         ;; Save all unsaved
+(global-set-key (kbd "C-q")     'delete-frame)              ;; Close current frame
 (global-unset-key (kbd "C-x C-q"))
-(global-set-key (kbd "C-x C-q") 'save-buffers-kill-emacs);; вырубает весь Emacs
-(global-set-key (kbd "C-x C-z") 'suspend-emacs)             ;; Это как C-z из шелла
-(global-set-key (kbd "C-b")     'list-buffers)              ;; Отображение списка всех буферов.
-(global-set-key (kbd "M-w")     'kill-buffer)               ;; Уничтожение буфера (по умолчанию текущего).
+(global-set-key (kbd "C-x C-q") 'save-buffers-kill-emacs)   ;; Save all unsaved buffers and quit emacs
+(global-set-key (kbd "C-x C-z") 'suspend-emacs)             ;; Like C-z from the terminal
+(global-set-key (kbd "C-b")     'list-buffers)
+(global-set-key (kbd "M-w")     'kill-buffer)
 (global-set-key (kbd "C-l")     'goto-line)
 (global-set-key (kbd "C-`")     'close-annoying-windows)
 (global-unset-key (kbd "C-."))
@@ -22,7 +21,7 @@
 (global-set-key (kbd "C-,")     'other-window)
 (global-set-key (kbd "C-.")     'rotate-windows)
 
-;; navigation
+;; Navigation
 (global-set-key (kbd "M-i") 'previous-line)
 (global-set-key (kbd "M-k") 'next-line)
 (global-set-key (kbd "M-l") 'forward-char)
@@ -41,8 +40,8 @@
 (global-set-key (kbd "M-L") 'windmove-right)
 (global-set-key (kbd "M-J") 'windmove-left)
 
-;; editing
-;; disable annoying ‘set fill-column to’ misspelling C-x C-f
+;; Editing
+;; Disable annoying ‘set fill-column to’ while mistyping C-x C-f
 (global-unset-key (kbd "C-x f"))
 (global-set-key (kbd "M-;") 'backward-delete-char)
 (global-set-key (kbd "M-:") 'backward-kill-word) 
@@ -57,7 +56,7 @@
     ;;(global-set-key (kbd "M-[") 'beginning-of-paragraph)
     ;;(global-set-key (kbd "M-]") 'end-of-paragraph)
 
-;; search    
+;; Search    
 (global-set-key (kbd "C-f") 'isearch-forward)
 ;(global-set-key (kbd "") 'isearch-backward)
     (global-set-key (kbd "C-F") 'isearch-forward-regexp)
