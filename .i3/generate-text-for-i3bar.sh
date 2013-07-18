@@ -3,8 +3,9 @@
 # generate-text-for-i3bar.sh
 # A replacement for i3status written in bash.
 
-# Shebang here is just for testing in your terminal emulator, not for calling
-#   like executable in your i3 config, where it must be _sourced_ from.
+# Shebang here is just for you to check the JSON output for syntax errors, 
+#   not for running as executable in your i3 config, 
+#   where it must be _sourced_ from.
 
 # Colors for output
 red='#ee1010'
@@ -12,43 +13,44 @@ yellow='#edd400'
 green='#8ae234'
 white='#ffffff'
 orange='#e07a1f'
-timeout_step=0
-timeout_max=10
+timeout_step=0 # counts seconds till timeout_max
+timeout_max=10 # the actual timeout is one second; timeout_max introduces
+               # a period which functions may rely on; functions have their own
+               # local timeouts, ‘wait_time’ variable.
 
-# GMail username and password are taken from here
+# GMAIL_USERNAME and GMAIL_PASSWORD are taken from here
 . ~/.env/private.sh
 
 # Tabulation and spaces in output of the script are just to have a nice view
 #   while testing this script in a terminal and are not neccesary.
 
-# gmail depends on internet_status
-possible_blocks="active_window_name
-                 free_space
-                 mpd_state
-                 mic_state
-                 battery_status
-                 internet_status
-                 gmail
-                 nice_date"
+# 1. Let’s call each element of the status bar ‘a block’.
+# 2. Then each block is consisted of a variable which will contain related JSON
+#    stuff and a function that generates that JSON. Functions are named after
+#    the variables, but also have ‘get_’ prefix.
+# 3. The ‘blocks’ array defines the list of blocks which will be used to compile
+#    the bar string; the index defines the priority of each block, i.e. will it 
+#    appear first and on the left (lower index) or last and on the right 
+#    (highest index).
+# 4. What is actually shown on the bar is defined by the $bar variable, which
+#    contains a string of _variable names_, in other words, block names. This
+#    string evaluates at runtime each time after all functions in func_list 
+#    are done.
+# NB: ‘gmail’ depends on ‘internet_status’.
+blocks=(
+	[00]=active_window_name
+    [10]=mpd_state
+    [20]=mic_state
+    [30]=internet_status
+    [40]=gmail
+    [50]=nice_date )
 
 case $HOSTNAME in
 	fanetbook)
-		profile="active_window_name
-		         mpd_state
-                 mic_state
-		         battery_status
-		         internet_status
-		         gmail
-		         nice_date"
+		blocks[49]=battery_status
 		;;
 	*)
-		profile="active_window_name
-		         free_space
-		         mpd_state
-                 mic_state
-		         internet_status
-		         gmail
-		         nice_date"
+		blocks[1]=free_space
 		;;
 esac
 
@@ -56,11 +58,9 @@ unset func_list internet status
 # Never used ---^^^^^^^^^^^^^^^
 bar='${comma:-}\n\t['
 # Since comma is unset for first time, its line will be empty
-for block in $possible_blocks; do
-	[ "${profile//*$block*/}" ] || {
-		func_list="$func_list get_$block"
-		bar="$bar"'\n\t${'$block':-}'
-	}
+for block in ${blocks[@]}; do
+	func_list="$func_list get_$block"
+	bar="$bar"'\n\t${'$block':-}'
 done
 bar="$bar\n\t]"
 
@@ -295,7 +295,7 @@ get_gmail() {
 			}
 			[ "$letters_unread" -gt ${old_letters_unread:-0} ] && {
 				[ -v mpd_caught_playing ] && mpc pause >/dev/null
-				mplayer2 ~/.env/Tutturuu_v2.wav        >/dev/null
+				aplay ~/.env/Tutturuu_v2.wav           >/dev/null
 				[ -v mpd_caught_playing ] && mpc play  >/dev/null
 			}
 			old_letters_unread=$letters_unread
