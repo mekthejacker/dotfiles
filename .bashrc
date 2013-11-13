@@ -13,6 +13,7 @@ for opt in autocd cdspell dirspell dotglob extglob globstar no_empty_cmd_complet
 	shopt -s $opt
 done
 
+unalias -a
 pushd ~/bashrc >/dev/null
 hostnamerc=${HOSTNAME%.*}.sh
 [ -f $hostnamerc ] && [ -r $hostnamerc ] && . $hostnamerc
@@ -23,6 +24,7 @@ popd >/dev/null
 # Setting the ‘soft’ limit of maximum open files.
 ulimit -Sn 4096
 
+export EIX_LIMIT=0
 export LESS="$LESS -x4"
 export PATH="$PATH:~/assembling/android-sdk-linux/platform-tools/:~/assembling/android-sdk-linux/tools/:/usr/games/bin/"
 export EDITOR="emacsclient -c -nw" # emacs -new -bg \"#333\"
@@ -34,7 +36,7 @@ export PS1="\[\e[01;34m\]┎ \w\n┖ \
     [ \u = root ] && echo -n \"\[\e[01;31m\]\"; \
 } || echo -n \"\[\e[01;37m\]\u \"\`\
 \[\e[01;32m\]at \h \
-\[\e[01;34m\]\$\[\e[00m\] "
+\[\e[01;34m\]\\$\[\e[00m\] "
 eval export MPD_HOST="~/.mpd/socket"
 export REPOS_DIR=$HOME/repos
 
@@ -50,10 +52,11 @@ export REPOS_DIR=$HOME/repos
 #
 alias e="$EDITOR"
 alias ec="emacsclient -c -nw"
-alias emc="emacsclient -c"
+alias emc="emacsclient"
 alias td="todo -A "
 alias tdD="todo -D "
-alias deploy="~/repos/system/root/ext_scripts/deploy_configuration.sh "
+alias tmux="tmux -uL $USER"
+alias deploy="/root/deploy_configuration.sh "
 
 [[ $- = *i* ]] || return
 [ ! -v DISPLAY -a "`tty`" = /dev/tty2 ] && {
