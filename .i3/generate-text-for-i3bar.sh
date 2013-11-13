@@ -54,8 +54,7 @@ case $HOSTNAME in
 		;;
 esac
 
-unset func_list internet status
-# Never used ---^^^^^^^^^^^^^^^
+unset func_list
 bar='${comma:-}\n\t['
 # Since comma is unset for first time, its line will be empty
 for block in ${blocks[@]}; do

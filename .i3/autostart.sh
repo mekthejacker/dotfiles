@@ -104,6 +104,7 @@ case $HOSTNAME in
 esac
 pointer_control enable
 
+
 for app in $startup_apps; do
 	pgrep "\<$app\>" >/dev/null || (nohup $app & ) &
 done

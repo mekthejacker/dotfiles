@@ -55,9 +55,9 @@ bindcode $mod+58 focus child
 # bindsym $mod+g focus mode_toggle
 
 ## Focus to next output to the right [l]
-bindcode $mod+Control+46 focus output right
+bindcode $mod+Control+47 focus output right
 ## Focus to next output to the right [j]
-bindcode $mod+Control+44 focus output left
+bindcode $mod+Control+43 focus output left
 
 ## Reload the configuration file
 bindsym $mod+Shift+r reload
@@ -86,8 +86,9 @@ bindsym $mod+Return exec urxvtc
 bindsym $mod+r exec --no-startup-id /bin/bash -c 'export ONE_COMMAND_SHELL=t && urxvtc -name one_command_shell'
 ## S
 bindcode $mod+39 exec --no-startup-id ". ~/scripts/screenshot.sh"
+## Shift+S
 bindcode --release $mod+Shift+39 exec --no-startup-id ". ~/scripts/screenshot.sh -area"
-# 66 is control (they are swapped with capslock on my keyboard)
+## Ctrl+S // 66 is actually control (they are swapped with capslock on my keyboard)
 bindcode --release $mod+66+39 exec --no-startup-id ". ~/scripts/screenshot.sh -delay"
 
 ## F1
@@ -119,7 +120,7 @@ bindcode $mod+76 exec --no-startup-id eval mpc next
 bindcode $mod+95 exec --no-startup-id eject
 bindcode $mod+Shift+95 exec --no-startup-id eject -t
 ## F12
-bindcode $mod+96 exec --no-startup-id i3lock
+bindcode $mod+Control+46 exec --no-startup-id i3lock
 
 
 ## Switch to workspace and launch related application.
@@ -129,7 +130,7 @@ bindsym $mod+3 exec --no-startup-id "i3-msg workspace 3: Thunar && { pgrep -u $U
 bindsym $mod+4 exec --no-startup-id "i3-msg workspace 4: Emacs && { pgrep -u $USER emacsclient &>/dev/null || emacsclient -c; }"
 bindsym $mod+5 workspace 5: Misc
 bindsym $mod+6 workspace 6: IM
-bindsym $mod+7 workspace 7: Wine
+bindsym $mod+7 workspace 7: Games
 bindsym $mod+8 exec --no-startup-id "i3-msg workspace 8: GIMP && { pgrep -u $USER gimp &>/dev/null || gimp; }"
 bindsym $mod+9 exec --no-startup-id "i3-msg workspace 9: MPD && { pgrep -u $USER ncmpcpp &>/dev/null || urxvtc -name ncmpcpp -e ncmpcpp; }"
 bindsym $mod+0 workspace Outer\ space
@@ -145,7 +146,7 @@ bindsym $mod+Shift+3 move container to workspace 3: Thunar
 bindsym $mod+Shift+4 move container to workspace 4: Emacs
 bindsym $mod+Shift+5 move container to workspace 5: Misc
 bindsym $mod+Shift+6 move container to workspace 6: IM
-bindsym $mod+Shift+7 move container to workspace 7: Wine
+bindsym $mod+Shift+7 move container to workspace 7: Games
 bindsym $mod+Shift+8 move container to workspace 8: GIMP
 bindsym $mod+Shift+9 move container to workspace 9: MPD
 bindsym $mod+Shift+0 move container to workspace Outer\ space
@@ -162,7 +163,9 @@ assign [class="Meld"] → "5: Misc"
 assign [class="Pidgin"] → "6: IM"
 assign [class="Skype"] → "6: IM"
 assign [class="Ts3client"] → "6: IM"
-assign [class="Wine"] → "7: Wine"
+assign [class="Wine"] → "7: Games"
+assign [class="Steam"] → "7: Games" 
+assign [class="hl2_linux"] → "7: Games" 
 assign [class="Gimp"] → "8: GIMP"
 assign [class="URxvt" instance="ncmpcpp"] → "9: MPD"
 assign [class="Thunderbird"] → Mail
