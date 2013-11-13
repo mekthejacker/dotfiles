@@ -12,7 +12,7 @@ autosub=no
 profile-desc="For output on big plasma"
 vo=vdpau
 vc=ffmpeg12vdpau,ffwmv3vdpau,ffvc1vdpau,ffh264vdpau,ffodivxvdpau,
-vf-clr=yes
+#vf-clr=yes
 ## For this type of ALSA device specification see
 ## cat /proc/asound/devices
 ao=alsa:device=hw=1.7
