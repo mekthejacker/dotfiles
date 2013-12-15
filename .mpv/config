@@ -3,29 +3,27 @@
 
 [default]
 # Common options
-mixer-channel="PCM Cent"
+# unneeded since mpv has softvol
+#mixer-channel="PCM Cent"
 alang=ja,jpn,en,eng,de,deu,ru,rus
 subcp=enca:ru:en
 autosub=no
+softvol=yes
+screenshot-template=%n_%F
 
 [hdmi]
 profile-desc="For output on big plasma"
 vo=vdpau
-vc=ffmpeg12vdpau,ffwmv3vdpau,ffvc1vdpau,ffh264vdpau,ffodivxvdpau,
-#vf-clr=yes
+hwdec=vdpau
 ## For this type of ALSA device specification see
 ## cat /proc/asound/devices
-ao=alsa:device=hw=1.7
+ao=alsa:device=[hw:1,7]
 ## For this type of ALSA device specification see
 ## `aplay -L`
 #ao=alsa:device=spdif
 #ao=alsa:device=hw=hdmi
 ####ac=hwac3,hwdts,hwmpa,
 fs=yes
-
-[fast]
-vfm=ffmpeg
-lavdopts=lowres=1:fast:skiploopfilter=all
 
 [fb]
 profile-desc="For playing on framebuffer w/o X"
@@ -34,15 +32,15 @@ monitoraspect=16:9
 fs=yes
 
 [interlaced_bluray]
-vo=vdpau:sharpen=.5:denoise=1:deint=4:chroma-deint:pullup:colorspace=0
+vo=vdpau:sharpen=.5:denoise=1:deint=4:chroma-deint:pullup
 
 [protocol.dvdnav]
-vc=ffmpeg12,
 mouse-movements=yes
-nocache=yes
+#nocache=yes
 
 [home]
 vo=vdpau
+hwdec=vdpau
 
 [fanetbook]
-vo=gl
+vo=opengl
