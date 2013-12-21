@@ -9,11 +9,22 @@
 # past this point for scp and rcp, and it's important to refrain from
 # outputting anything in those cases.
 
-for opt in autocd cdspell dirspell dotglob extglob globstar no_empty_cmd_completion; do
+for opt in autocd cdspell dirspell dotglob extglob globstar \
+	no_empty_cmd_completion; do
 	shopt -s $opt
 done
-
+for completion_module in eix eselect gentoo git iptables layman man smartctl \
+	ssh strace sysctl taskset tmux udisks; do 
+	eselect bashcomp enable $completion_module &>/dev/null
+done
+unset opt completion_module
+# man bash says that non-login shells do not source /etc/profile and 
+#   ~/.bash_profile. My shells are non-login, however, they have PATH set
+#   and thery sourcing ~/.bash_profile (which is sourcing this file 
+#   in its turn). A miracle.
+. /etc/profile.d/bash-completion.sh
 unalias -a
+
 pushd ~/bashrc >/dev/null
 hostnamerc=${HOSTNAME%.*}.sh
 [ -f $hostnamerc ] && [ -r $hostnamerc ] && . $hostnamerc
@@ -25,9 +36,10 @@ popd >/dev/null
 ulimit -Sn 4096
 
 export EIX_LIMIT=0
-export LESS="$LESS -x4"
-export PATH="$PATH:~/assembling/android-sdk-linux/platform-tools/:~/assembling/android-sdk-linux/tools/:/usr/games/bin/"
 export EDITOR="emacsclient -c -nw" # emacs -new -bg \"#333\"
+export LESS="$LESS -x4"
+export MPD_HOST=$HOME/.mpd/socket
+export PATH="$PATH:~/assembling/android-sdk-linux/platform-tools/:~/assembling/android-sdk-linux/tools/:/usr/games/bin/"
 export PS1="\[\e[01;34m\]┎ \w\n┖ \
 \`echo \"scale=2; \$(cut -d' ' -f2 </proc/loadavg) /\
     \$(grep ^processor </proc/cpuinfo | wc -l)\" | bc\` \
@@ -37,7 +49,6 @@ export PS1="\[\e[01;34m\]┎ \w\n┖ \
 } || echo -n \"\[\e[01;37m\]\u \"\`\
 \[\e[01;32m\]at \h \
 \[\e[01;34m\]\\$\[\e[00m\] "
-eval export MPD_HOST="~/.mpd/socket"
 export REPOS_DIR=$HOME/repos
 
 ## Aliases caveats and hints:
@@ -53,9 +64,10 @@ export REPOS_DIR=$HOME/repos
 alias e="$EDITOR"
 alias ec="emacsclient -c -nw"
 alias emc="emacsclient"
+alias ls="ls --color=auto"
 alias td="todo -A "
 alias tdD="todo -D "
-alias tmux="tmux -uL $USER"
+alias tmux="tmux -u -f ~/.tmux/config -S $HOME/.tmux.socket"
 alias deploy="/root/deploy_configuration.sh "
 
 [[ $- = *i* ]] || return
@@ -75,4 +87,35 @@ one_command_execute() {
 	PS1=
 	bind -x '"\C-m":"one_command_execute"'
 	# bind -x '"^[":"exit"'
+}
+
+# Compresses all png files >1M in CWD
+compress_screenshot() {
+	crush() {
+		which pngcrush &>/dev/null && {
+			pngcrush -reduce "$1" "/tmp/$1"
+			mv "/tmp/$1" "$1"
+		}
+	# which convert &>/dev/null && [ -v JPEG_CONVERSION ] && {
+	# 	convert "$shot" -quality $JPEG_CONVERSION "${shot%.*}.jpg"
+	# 	rm "$shot"
+	# }
+	}
+	export -f crush
+	find -iname "*.png" -size +1M -printf "%f\n" | parallel --eta crush
+	export -nf crush
+}
+
+
+# Copies MPD playlist to a specified folder.
+# $1 — path to playlist file (~/.mpd/playlists/…)
+# $2 — where to copy
+copy_playlist() {
+	[ -f "$1" ] && [ -d "$2" ] && [ -w "$2" ] && {
+		eval mpd_library_path="`sed -nr 's/^\s*music_directory\s+"(.*)"/\1/p'\
+		                   ~/.mpd/mpd.conf`"
+		while read filepath; do
+			cp -v  "$mpd_library_path/$filepath" "$2"
+		done < "$1"
+	} || echo -e 'Usage:\ncopy_playlist <playlist file> <directory to copy to>'
 }
