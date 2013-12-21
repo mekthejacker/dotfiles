@@ -1,0 +1,9 @@
+interface: wlan0
+promiscuous: yes
+hide-destination: yes
+show-totals: no
+# Use-bytes affect only the bar!
+use-bytes: yes
+# 80 Mbit/sec
+max-bandwidth: 80M
+filter-code: not ether host ff:ff:ff:ff:ff:f8

@@ -216,11 +216,16 @@ get_battery_status() {
 						--ok-label "Shutdown" \
 						--cancel-label "NO, WAIT")
 					[ $charge_now -eq 0 ] && [ $? -ne 1 ] && {
-						/sbin/shutdown -h now  &>/dev/null || \
+						/sbin/shutdown -h now  &>/dev/null || {
 							zenity --warning \
-							       --text 'Cannot call shutdown. Please,\
- shutdown the system yourself!' &&
-						sleep 600
+							    --text 'Cannot call shutdown. 
+Please, shutdown the system yourself!'
+							# If the script cannot call shutdown itself,
+							#   it must at least try to save the energy
+							#   going to sleep for 20 minutes (by that time it
+							#   will be probably exhausted).
+							sleep 1200
+						}
 					}
 				fi
 				# [ -v journal ] && \

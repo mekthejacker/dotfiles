@@ -67,7 +67,7 @@ alias emc="emacsclient"
 alias ls="ls --color=auto"
 alias td="todo -A "
 alias tdD="todo -D "
-alias tmux="tmux -u -f ~/.tmux/config -S $HOME/.tmux.socket"
+alias tmux="tmux -u -f ~/.tmux/config -S $HOME/.tmux/socket"
 alias deploy="/root/deploy_configuration.sh "
 
 [[ $- = *i* ]] || return

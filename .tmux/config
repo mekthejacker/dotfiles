@@ -29,11 +29,12 @@ bind Space last-window
 bind 2 split-window -v
 bind 3 split-window -h
 bind 4 command-prompt "rename-window '%%'"
-bind r source-file ~/.tmux.conf \; \
+bind r respawn-window
+bind R source-file ~/.tmux/config \; \
         display-message "Sourcing done."
 
 set -g set-titles on
-set -g set-titles-string '#H'
+set -g set-titles-string 'tmux@#H:"#W"'
 
 set -g status-bg '#181818'
 set -g status-fg '#aaaaaa'

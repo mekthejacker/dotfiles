@@ -1,0 +1,9 @@
+interface: eth0
+promiscuous: yes
+hide-destination: yes
+show-totals: no
+# Use-bytes affects only the bar!
+use-bytes: yes
+# 1 Gbit/sec
+max-bandwidth: 1000M
+filter-code: not ether host ff:ff:ff:ff:ff:f8

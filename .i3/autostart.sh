@@ -9,7 +9,7 @@
 hsetroot -fill ~/.env/wallpaper.png
 
 ## Load my ssh identities
-. ~/scripts/ssh-load.sh
+[ "$1" = stop_after_main_workspace ] || . ~/scripts/ssh-load.sh
 
 pointer_control() {
 	[ -v pointer_devices ] || pointer_devices=$(xinput --list |\
@@ -35,22 +35,35 @@ wait_for_program () {
     done
 }
 
-urxvtd -q -o -f
+sudo /usr/bin/killall iftop
+pgrep urxvtd || urxvtd -q -o -f
+tmux="tmux -u -f $HOME/.tmux/config -S $HOME/.tmux/socket"
+pgrep -u $USER -f '^tmux.*$' &>/dev/null || $tmux \
+		new -dn root su \; \
+		set remain-on-exit on \; \
+		neww -n wa-a \; \
+		set remain-on-exit on
 pointer_control disable
+
+# Getting screen dimensions.
+# This assumes the first screen listed is the main in use.
+read width height  <<< `xrandr | \
+     sed -nr 's/^\s+([0-9]+)x([0-9]+).*\*.*/\1\n\2/p;T;Q0'`
+
 case $HOSTNAME in
 	fanetbook)
 		urxvtc -hold -name 'htop' -title "htop" -e htop
-		urxvtc -hold -name 'Das Terminal'
-		urxvtc -hold -name 'Das zweite Terminal'
-
-		# Getting screen dimensions.
-		# This assumes the first screen listed is the main in use.
-		read width height  <<< `xrandr | \
-		  sed -nr 's/^\s+([0-9]+)x([0-9]+).*\*.*/\1\n\2/p;T;Q0'`
-
-		xte "mousemove $(( $width/2 ))  36" 
+		xte "mousemove $(( width/2 ))  $(( height/2 ))" 
 		xte 'mouseclick 1'
 		i3-msg layout tabbed
+
+		for iface_config in `ls ~/.iftop/$HOSTNAME.*`; do
+			urxvtc -hold -title ${iface_config##*.} \
+				-e sudo /usr/sbin/iftop -c "$iface_config"
+		done
+		urxvtc
+		urxvtc
+		urxvtc -hold -title tmux -e $tmux attach \; find-window -N root
 
 		startup_apps="thunar mpd"
 		pgrep mpdscribble >/dev/null || \
@@ -58,43 +71,60 @@ case $HOSTNAME in
 		pgrep ncmpcpp >/dev/null || urxvtc -name ncmpcpp -e ncmpcpp
 		;;
 	*)
-		urxvtc -hold -name 'Das Terminal'
-		urxvtc -hold -name 'Das zweite Terminal'
-		# Now we have two terminals |_|_|
-
-		# Getting screen dimensions.
-		# This assumes the first screen listed is the main in use.
-		read width height  <<< `xrandr | \
-		  sed -nr 's/^\s+([0-9]+)x([0-9]+).*\*.*/\1\n\2/p;T;Q0'`
-		xte "mousemove $(( $width/4 ))  $(( $height/2 ))"
-		# Now, if focus follows mouse as it is by default in i3, cursor points
-		#   at the center of left terminal and focused it.
-		i3-msg split h
-		gnome-system-monitor &
-		wait_for_program
-		i3-msg layout tabbed
-		i3-msg move left
-		# Assume that height of the bar is about 25px, 
-		#   and it is placed at the top.
-		xte "mousemove $(( 3*$width/8 ))  36" 
-		xte 'mouseclick 1'
+		urxvtc 
 		i3-msg split v
-		urxvtc -hold -name 'htop' -title "htop" -e htop
+		urxvtc -hold -title 'htop' -e htop
+ 		# Now we have two terminals   ÷
 
-		xte "mousemove $(( $width/4 ))  $(( $height/4 ))" 
+		# Move cursor near to the center of the lower urxvtc with htop
+ 		xte "mousemove $(( width/2 ))  $(( 3*height/4 ))"
+		# Focus it
+ 		xte 'mouseclick 1'
+ 		i3-msg split h
+		iface_configs=(`ls ~/.iftop/$HOSTNAME.*`)
+		[ ${#iface_configs} -gt 1 ] && iftops_need_their_own_container=t
+		for ((i=0; i<${#iface_configs[@]}; i++)); do
+			urxvtc -hold -title ${iface_configs[$i]##*.} \
+				-e sudo /usr/sbin/iftop -c "${iface_configs[$i]}"
+			[ $i -eq 0 ] && [ -v iftops_need_their_own_container ] && \
+				i3-msg split h
+		done
+		[ -v iftops_need_their_own_container ] && {
+			xte "mousemove $(( 9*width/16 )) $(( 3*height/4 ))"
+			xte 'mouseclick 1'
+			i3-msg layout tabbed			
+		}
+
+		# Moving cursor to the upper empty urxvtc and raise it to ≈5/6 
+		#   of the height
+		xte "mousemove $(( width/2 ))  $(( height/4 ))" 
 		xte 'mouseclick 1'
-		i3-msg focus child
-		i3-msg resize grow height 20 px or 20 ppt
-
-		xte "mousemove $(( 7*$width/8 )) $(( $height/2 ))"
+		i3-msg resize grow height 30 px or 30 ppt
 		i3-msg split h
-		urxvtc -hold -name 'Das Root Terminal'
 		urxvtc
-		xte 'mouseclick 1' 
-		xte 'str su' 
-		xte 'key Return' 
+		# Now in upper hald we have two terminals, too ⋅|⋅
+		# Splitting left upper urxvtc
+		xte "mousemove $(( width/4 )) $(( height/2 ))"
+		xte 'mouseclick 1'
+		i3-msg split h
 		i3-msg layout tabbed
+		urxvtc
 
+		xte "mousemove $(( 3*width/4 )) $(( height/2 ))"
+		xte 'mouseclick 1'
+		i3-msg split h
+		i3-msg layout tabbed
+		urxvtc
+		urxvtc -hold -title tmux -e $tmux attach \; find-window -N root
+ 		xte "mousemove $(( 11*width/12 )) $(( height/2 ))"
+ 		xte 'mouseclick 1'
+
+		# This is for calling via hotkey in ~/.i3/config to test without
+		#   restarting WM.
+		[ "$1" = stop_after_main_workspace ] && {
+			pointer_control enable
+			exit 0
+		}
 		startup_apps="firefox thunar mpd pidgin"
 		pgrep mpdscribble >/dev/null || \
 			mpdscribble --conf ~/.mpd/mpdscribble.conf
@@ -104,8 +134,6 @@ case $HOSTNAME in
 esac
 pointer_control enable
 
-
 for app in $startup_apps; do
 	pgrep "\<$app\>" >/dev/null || (nohup $app & ) &
 done
-exit 0

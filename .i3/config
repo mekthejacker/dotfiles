@@ -8,7 +8,7 @@
 
 # font for window titles. ISO 10646 = Unicode
 # font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
-font xft:terminus 12
+font xft:Terminus 12
 
 ## Keybindings
 set $mod Mod4
@@ -37,10 +37,10 @@ bindsym $mod+q layout stacking
 bindsym $mod+w layout tabbed
 bindsym $mod+e layout default
 ## In stacked/tabbed windows cursor may wrap in cycle
-force_focus_wrapping yes
+force_focus_wrapping no
 
 ## Toggle tiling / floating
-bindsym $mod+space floating toggle
+#bindsym $mod+space floating toggle
 ## Enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen
 ## Kill focused window
@@ -63,8 +63,10 @@ bindcode $mod+Control+43 focus output left
 bindsym $mod+Shift+r reload
 ## Restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
 bindsym $mod+Control+r restart
-bindsym $mod+Control+q exit
-bindsym $mod+Control+Shift+q exec "~/scripts/xorg.conf_chooser.sh"
+bindsym $mod+Control+q exec "sudo /usr/bin/killall iftop; i3-msg exit"
+bindsym $mod+Control+Shift+q exec "sudo /usr/bin/killall iftop; ~/scripts/xorg.conf_chooser.sh"
+
+bindsym $mod+Control+t exec "~/.i3/autostart.sh stop_after_main_workspace"
 
 ## Resize window (you can also use the mouse for that)
 mode "resize" {
@@ -89,7 +91,7 @@ bindcode $mod+39 exec --no-startup-id ". ~/scripts/screenshot.sh"
 ## Shift+S
 bindcode --release $mod+Shift+39 exec --no-startup-id ". ~/scripts/screenshot.sh -area"
 ## Ctrl+S // 66 is actually control (they are swapped with capslock on my keyboard)
-bindcode --release $mod+66+39 exec --no-startup-id ". ~/scripts/screenshot.sh -delay"
+bindcode --release $mod+Control+39 exec --no-startup-id ". ~/scripts/screenshot.sh -delay"
 
 ## F1
 ## `eval` is to make path to socket absolute
@@ -185,15 +187,27 @@ exec --no-startup-id "~/.i3/autostart.sh"
 new_window 1pixel
 new_float 1pixel
 
-# hide_edge_borders both
+hide_edge_borders both
+focus_follows_mouse no
 
-## class                  border  backgr. text    indicator
+# Default
+# class                   border  backgr. text    indicator
 # client.focused          #4c7899 #285577 #ffffff #2e9ef4
 # client.focused_inactive #333333 #5f676a #ffffff #484e50
 # client.unfocused        #333333 #222222 #888888 #292d2e
 # client.urgent           #2f343a #900000 #ffffff #900000
 
-## class                  border  backgr. text    indicator
+# # Commie colors
+# # dark red     9a0 000
+# # light red    e60 000
+# # dark yellow  d5b210
+# # light yellow fdd 116
+# client.focused            #e60000 #9a0000 #fdd216 #ff0000
+# client.focused_inactive   #555753 #3c3c3c #d5b210 #ad7fa8
+# client.unfocused          #555753 #3c3c3c #d5b210 #ad7fa8
+# client.urgent             #ad7fa8 #ad7fa8 #ffffff #ff0000
+
+# class                  border  backgr. text    indicator
 client.focused            #ad7fa8 #75507b #ffffff #ad7fa8
 client.focused_inactive   #555753 #3c3c3c #ffffff #ad7fa8
 client.unfocused          #555753 #3c3c3c #888888 #ad7fa8
@@ -206,19 +220,28 @@ bar {
 	workspace_buttons yes
 	status_command ". ~/.i3/generate-text-for-i3bar.sh"
 	colors {
-        background #3c3c3c
+		background #3c3c3c
         statusline #bbbbbb
-
-        ##.                  border  backgr  text
+		# Commie		
+		# statusline #d5b210
+		
+		# Default
+        #                    border  backgr  text
 		# focused_workspace  #4c7899 #285577 #ffffff
 		# active_workspace   #333333 #5f676a #ffffff
 		# inactive_workspace #333333 #222222 #888888
 		# urgent_workspace   #2f343a #900000 #ffffff
 
-		focused_workspace	#ad7fa8 #75507b #ffffff
-		active_workspace	#75507b #ad7fa8 #ffffff
-		inactive_workspace	#3c3c3c #3c3c3c #aaaaaa
-		urgent_workspace	#df5757 #c22f2f #ffffff
+		# Commie
+		# focused_workspace			 #e60000 #9a0000 #fdd116
+		# active_workspace			 #75507b #ad7fa8 #ffffff
+		# inactive_workspace		 #3c3c3c #3c3c3c #d5b210
+		# urgent_workspace			 #df5757 #c22f2f #ffffff
+
+		focused_workspace 		 #ad7fa8 #75507b #ffffff
+		active_workspace		 #75507b #ad7fa8 #ffffff
+		inactive_workspace		 #3c3c3c #3c3c3c #aaaaaa
+		urgent_workspace		 #df5757 #c22f2f #ffffff
     }
 }
 
