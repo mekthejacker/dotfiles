@@ -9,7 +9,10 @@ alang=ja,jpn,en,eng,de,deu,ru,rus
 subcp=enca:ru:en
 autosub=no
 softvol=yes
-screenshot-template=%n_%F
+screenshot-template=%F_%n
+screenshot-format=png
+screenshot-png-compression=0
+screenshot-jpeg-quality=92
 
 [hdmi]
 profile-desc="For output on big plasma"

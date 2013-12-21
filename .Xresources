@@ -1,6 +1,8 @@
 ! ~/.Xresources
-! This is comment
-! This is how options may be set
+!
+! This is a comment
+!
+! And this is how options may be set
 !	<WM_CLASS>.<optionname>: <value>
 !		Usually urxvt have ‘urxvt’ and ‘URxvt’ as its WM classes.
 !	 	WM_CLASS in the example above may be:

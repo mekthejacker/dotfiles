@@ -8,7 +8,7 @@ Generally, there are two ways launching X – using a display manager (DM) or `s
 
 #### Via ~/.bashrc and startx
 1. login via tty2;
-2. [~/.bashrc](.bashrc#L62) checks for DISPLAY variable and current tty, and, if DISPLAY is not set and tty is /dev/tty2, it launches startx and passes options to `X`;
+2. [~/.bashrc](.bashrc#L74) checks for DISPLAY variable and current tty, and, if DISPLAY is not set and tty is /dev/tty2, it launches startx and passes options to `X`;
 3. `startx` is actually a wrapper over `xinit` which in its turn launches `X` with passed options (the difference between startx and xinit is AFAIR, startx creates file with auth information for the X server automatically, so one shouldn’t worry about it);
 4. After X is up, `xinit` launches [~/.xinitrc](.xinitrc) file, and all the commands from there. Window manager (WM) is also intended to run from there. 
 
