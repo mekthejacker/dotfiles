@@ -8,9 +8,9 @@
 set -g base-index 1
 
 # Bind C-a for default prefix key
-set-option -g prefix C-a
+set-option -g prefix C-e
 unbind-key C-b
-bind-key C-a send-prefix
+bind-key C-e send-prefix
 
 # Rebinding movement keys, adding repeat mode to keys
 #   switching windows
@@ -21,17 +21,18 @@ unbind i
 unbind l
 unbind n
 unbind p
+unbind t
 unbind Space
 bind -r j previous-window
 bind -r l next-window
 bind Space last-window
-# Like in Emacs
-bind 2 split-window -v
-bind 3 split-window -h
-bind 4 command-prompt "rename-window '%%'"
+# Like in i3
+bind v split-window -v
+bind h split-window -h
+bind t command-prompt "rename-window '%%'"
 bind r respawn-window
 bind R source-file ~/.tmux/config \; \
-        display-message "Sourcing done."
+        display-message "Done sourcing ~/.tmux/config."
 
 set -g set-titles on
 set -g set-titles-string 'tmux@#H:"#W"'
