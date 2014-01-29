@@ -10,10 +10,10 @@
      ))
 
 (custom-set-variables
-  ;; Custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(Buffer-menu-use-header-line nil)
  '(column-number-mode t)
  '(desktop-base-file-name ".desktop")
@@ -48,12 +48,17 @@
  '(tool-bar-mode nil)
  '(word-wrap t))
 
+;; good old colors:
+;; bg: #2e3436
+;; fg: #d3d7cf
+;; variable name:  #729fcf
+;; string: #edd400
 (custom-set-faces
-  ;; Custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#2e3436" :foreground "#d3d7cf" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 118 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:inherit nil :stipple nil :background "#303030" :foreground "#d0d0d0" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 118 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
  '(bold ((t (:weight bold))))
  '(comint-highlight-prompt ((t (:foreground "blue blue"))))
  '(custom-button ((((type x w32 ns) (class color)) (:background "lightgrey" :foreground "black" :box (:line-width 1 :style released-button)))))
@@ -69,11 +74,11 @@
  '(fci-shading ((((class color) (min-colors 88) (background dark)) (:background "#555754"))))
  '(font-lock-builtin-face ((((class color) (min-colors 88) (background dark)) (:foreground "white" :weight bold))))
  '(font-lock-comment-face ((((class color) (min-colors 88) (background dark)) (:foreground "#888a85"))))
- '(font-lock-constant-face ((((class color) (min-colors 88) (background dark)) (:foreground "#d3d7cf" :weight bold))))
- '(font-lock-function-name-face ((((class color) (min-colors 88) (background dark)) (:foreground "#d3d7cf"))))
- '(font-lock-keyword-face ((((class color) (min-colors 88) (background dark)) (:foreground "#d3d7cf" :family "DejaVu Sans Mono Bold"))))
+ '(font-lock-constant-face ((((class color) (min-colors 88) (background dark)) (:foreground "#d0d0d0" :weight bold))))
+ '(font-lock-function-name-face ((((class color) (min-colors 88) (background dark)) (:foreground "#d0d0d0"))))
+ '(font-lock-keyword-face ((((class color) (min-colors 88) (background dark)) (:foreground "#d0d0d0" :family "DejaVu Sans Mono Bold"))))
  '(font-lock-negation-char-face ((t (:foreground "#9df43c"))))
- '(font-lock-preprocessor-face ((t (:inherit font-lock-builtin-face :foreground "#d3d7cf"))))
+ '(font-lock-preprocessor-face ((t (:inherit font-lock-builtin-face :foreground "#d0d0d0"))))
  '(font-lock-string-face ((((class color) (min-colors 88) (background dark)) (:foreground "#edd400"))))
  '(font-lock-variable-name-face ((t (:foreground "#729fcf"))))
  '(font-lock-warning-face ((((class color) (min-colors 88) (background dark)) (:foreground "#fcaf3e" :weight normal))))
@@ -83,7 +88,7 @@
  '(isearch ((((class color) (min-colors 88) (background light)) (:background "#254667" :foreground "#e2e2e2"))))
  '(italic ((t (:underline nil :slant italic))))
  '(lazy-highlight ((((class color) (min-colors 88) (background dark)) (:background "#75507b" :foreground "white"))))
- '(linum ((t (:inherit (shadow default) :background "#2e3436" :foreground "#6e6e6e" :box nil :height 120 :width normal))))
+ '(linum ((t (:inherit (shadow default) :background "#303030" :foreground "#6e6e6e" :box nil :height 120 :width normal))))
  '(nil ((t (:foreground "white" :weight normal))) t)
  '(nobreak-space ((((class color) (min-colors 88)) (:foreground "#d3d7cf" :box (:line-width 1 :color "cyan")))))
  '(nxml-attribute-local-name-face ((t (:foreground "#729fcf"))))

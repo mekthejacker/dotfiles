@@ -36,7 +36,7 @@ popd >/dev/null
 ulimit -Sn 4096
 
 export EIX_LIMIT=0
-export EDITOR="emacsclient -c -nw" # emacs -new -bg \"#333\"
+export EDITOR="emacsclient -c -nw"
 export LESS="$LESS -x4"
 export MPD_HOST=$HOME/.mpd/socket
 export PATH="$PATH:~/assembling/android-sdk-linux/platform-tools/:~/assembling/android-sdk-linux/tools/:/usr/games/bin/"
@@ -61,9 +61,8 @@ export REPOS_DIR=$HOME/repos
 #     alias third="echo some stuff # this is comment
 #                  echo lol second line # another comment"
 #
-alias e="$EDITOR"
 alias ec="emacsclient -c -nw"
-alias emc="emacsclient"
+alias emc="emacsclient -c -display $DISPLAY"
 alias ls="ls --color=auto"
 alias td="todo -A "
 alias tdD="todo -D "
