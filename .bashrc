@@ -5,9 +5,11 @@
 # that can't tolerate any output.  So make sure this doesn't display
 # anything or bad things will happen !
 
-# Test for an interactive shell.  There is no need to set anything
-# past this point for scp and rcp, and it's important to refrain from
-# outputting anything in those cases.
+# This is to dispose of old aliases and function definitions before
+#   (re-)sourcing new or rewritten ones.
+unalias -a
+unset -f `sed -nr "s/^\s*([-_a-zA-Z0-9]+)\(\)\s*\{.*$/\1/p" \
+          ~/.bashrc ~/bashrc/* 2>/dev/null`
 
 for opt in autocd cdspell dirspell dotglob extglob globstar \
 	no_empty_cmd_completion; do
@@ -20,14 +22,13 @@ done
 unset opt completion_module
 # man bash says that non-login shells do not source /etc/profile and 
 #   ~/.bash_profile. My shells are non-login, however, they have PATH set
-#   and thery sourcing ~/.bash_profile (which is sourcing this file 
+#   and they source ~/.bash_profile (which is sourcing this file 
 #   in its turn). A miracle.
 . /etc/profile.d/bash-completion.sh
-unalias -a
 
 pushd ~/bashrc >/dev/null
 hostnamerc=${HOSTNAME%.*}.sh
-[ -f $hostnamerc ] && [ -r $hostnamerc ] && . $hostnamerc
+[ -r $hostnamerc ] && . $hostnamerc
 popd >/dev/null
 
 # Testing ur PAM
@@ -39,7 +40,8 @@ export EIX_LIMIT=0
 export EDITOR="emacsclient -c -nw"
 export LESS="$LESS -x4"
 export MPD_HOST=$HOME/.mpd/socket
-export PATH="$PATH:~/assembling/android-sdk-linux/platform-tools/:~/assembling/android-sdk-linux/tools/:/usr/games/bin/"
+grep -qF '/assembling/' <<<"$PATH" \
+	|| export PATH="$PATH:~/assembling/android-sdk-linux/platform-tools/:~/assembling/android-sdk-linux/tools/:/usr/games/bin/"
 export PS1="\[\e[01;34m\]┎ \w\n┖ \
 \`echo \"scale=2; \$(cut -d' ' -f2 </proc/loadavg) /\
     \$(grep ^processor </proc/cpuinfo | wc -l)\" | bc\` \
@@ -52,14 +54,17 @@ export PS1="\[\e[01;34m\]┎ \w\n┖ \
 export REPOS_DIR=$HOME/repos
 
 ## Aliases caveats and hints:
-## 1. Any double quotes must be escaped
-#     alias first="echo \"naive example\""
-## 2. Any execution expression must be escaped or they will execute at the time 
-##    this file loads.
-#     alias second="for i in \`ls\`; do ls $i; done"
-## 3. Aliases can have multile lines
-#     alias third="echo some stuff # this is comment
-#                  echo lol second line # another comment"
+## 1. All innder double quotes must be escaped
+#     alias preservequotespls="echo \"naive example!\""
+## 2. Every call of subshell must be escaped or it will be executing 
+#     at the time this file loads.
+#     alias dontlistmyhomefolderpls="for i in \`ls\`; do ls $i; done"
+## 3. To prevent early expanding of variable names, one can use single
+#     quotes or escaping, or both if situation requires so.
+#     alias hisbashrcpls="sudo -u another_user /bin/bash -c 'nano \$HOME/.bashrc'"
+## 4. Aliases can have multiple lines
+#     alias plsplsplsdontbreak="echo some stuff # this is comment
+#                               echo lol second line # another comment"
 #
 alias ec="emacsclient -c -nw"
 alias emc="emacsclient -c -display $DISPLAY"
@@ -67,8 +72,11 @@ alias ls="ls --color=auto"
 alias td="todo -A "
 alias tdD="todo -D "
 alias tmux="tmux -u -f ~/.tmux/config -S $HOME/.tmux/socket"
-alias deploy="/root/deploy_configuration.sh "
+alias deploy="/root/scripts/deploy_configuration.sh "
 
+# Test for an interactive shell.  There is no need to set anything
+# past this point for scp and rcp, and it's important to refrain from
+# outputting anything in those cases.
 [[ $- = *i* ]] || return
 [ ! -v DISPLAY -a "`tty`" = /dev/tty2 ] && {
 	# W! startx IGNORES ~/.xserverrc options if something passed beyond -- !
@@ -78,7 +86,7 @@ alias deploy="/root/deploy_configuration.sh "
 
 # This is for one-command urxvt
 one_command_execute() {
-	(nohup $READLINE_LINE ) &
+	(nohup $READLINE_LINE) &
     exit
 }
 
@@ -117,4 +125,9 @@ copy_playlist() {
 			cp -v  "$mpd_library_path/$filepath" "$2"
 		done < "$1"
 	} || echo -e 'Usage:\ncopy_playlist <playlist file> <directory to copy to>'
+}
+
+# $1 — filename to fix figure dashes in
+fix_fdash() {
+	[ -w /tmp/c ] && sed -ri 's/^- (.*)$/‒ \1/g' /tmp/c
 }

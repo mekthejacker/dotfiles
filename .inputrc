@@ -48,24 +48,23 @@
 "\C- ": set-mark
 # ???
 "\C-x ": exchange-point-and-mark
-"^j": copy-region-as-kill
+"\C-j": copy-region-as-kill
 "\C-k": kill-region
 "\C-y": yank 
-
 
 "\C-l": clear-screen
 "\C-r": redraw-current-line
 
-"\ep": previous-history
-"\en": next-history
-"\eu": beginning-of-history
-"\em": end-of-history
+"\C-r": previous-history
+"\C-v": next-history
+#"\eu": beginning-of-history
+#"\em": end-of-history
 "\C-f": reverse-search-history
 #forward-search-history
 ## non-incremetal- ???
 #history-search-forward
 ## and -backward
-"\C-xp": shell-expand-line
+"\ee": shell-expand-line
 # history-expand-line
 ## ↓ M-TAB
 #dynamic-complete-history
@@ -74,7 +73,7 @@
 # "\C-q": operate-and-get-next
 
 # call $VISUAL, $EDITOR or ‘emacs’ and execute the result as a shell command
-"\C-e": edit-and-execute-command
+#"\C-e": edit-and-execute-command
 
 # (C-x C-r) re-read ~/.inputrc
-"\C-x\C-r": re-read-init-file
+"\er": re-read-init-file

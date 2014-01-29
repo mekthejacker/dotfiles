@@ -1,3 +1,4 @@
+/DefaultIMEngineFactory/en_US = 065d7b20-dda2-47fb-8f94-3306d9a25e56
 /FrontEnd/ChangeFactoryGlobally = false
 /FrontEnd/OnTheSpot = true
 /FrontEnd/SharedInputMethod = false
@@ -45,4 +46,4 @@
 /Panel/Gtk/ToolBar/ShowPropertyLabel = false
 /Panel/Gtk/ToolBar/ShowSetupIcon = true
 /Panel/Gtk/ToolBar/ShowStickIcon = false
-/UpdateTimeStamp = 1385229342:614334
+/UpdateTimeStamp = 1389770824:102935
