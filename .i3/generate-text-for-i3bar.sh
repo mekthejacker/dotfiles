@@ -26,11 +26,11 @@ timeout_max=10 # the actual timeout is one second; timeout_max introduces
 
 # 1. Let’s call each element of the status bar ‘a block’.
 # 2. Then each block is consisted of a variable which will contain related JSON
-#    stuff and a function that generates that JSON. Functions are named after
-#    the variables, but also have ‘get_’ prefix.
+#    stuff and a function generating that JSON. Functions are named after
+#    the variables, but have ‘get_’ prefix.
 # 3. The ‘blocks’ array defines the list of blocks which will be used to compile
-#    the bar string; the index defines the priority of each block, i.e. will it 
-#    appear first and on the left (lower index) or last and on the right 
+#    the bar string; index number defines the priority of each block, i.e. will
+#    it appear first and on the left (lower index) or last and on the right 
 #    (highest index).
 # 4. What is actually shown on the bar is defined by the $bar variable, which
 #    contains a string of _variable names_, in other words, block names. This
@@ -148,7 +148,7 @@ get_battery_status() {
 					# When charging, this shows how much
 					charge_now=`cat BAT1/charge_now`
 					# Strange values, used only for journal
-					# current_now=`cat BAT1/current_now`
+					## current_now=`cat BAT1/current_now`
 
 					steps_per_block=' ░▒▓█'
 					blocks_count=5
@@ -175,7 +175,7 @@ get_battery_status() {
 					bat_lt_minutes="${bat_lt_minutes}m"
 				bat_time_left=" ${bat_lt_hours:-}${bat_lt_minutes:-}"
 # W!
-# Write a journal of battery charge level till it is completely discharged. 
+# Write a journal of battery charge level till it’s completely discharged. 
 # Be sure _the filesystem_ you save journal on _is protected_ from power loss,
 #   e.g. has "data=journal,barrier=1" among mount opts for ext3/4, otherwise
 #   all discharging will be in vain.
@@ -216,14 +216,14 @@ get_battery_status() {
 						--ok-label "Shutdown" \
 						--cancel-label "NO, WAIT")
 					[ $charge_now -eq 0 ] && [ $? -ne 1 ] && {
-						/sbin/shutdown -h now  &>/dev/null || {
+						sudo /sbin/shutdown -h now  &>/dev/null || {
 							zenity --warning \
 							    --text 'Cannot call shutdown. 
 Please, shutdown the system yourself!'
 							# If the script cannot call shutdown itself,
 							#   it must at least try to save the energy
-							#   going to sleep for 20 minutes (by that time it
-							#   will be probably exhausted).
+							#   going to sleep for 20 minutes (by that time
+							#   the battery will be probably exhausted).
 							sleep 1200
 						}
 					}
@@ -248,16 +248,19 @@ get_internet_status() {
 	local wait_time=5
 	[ $timeout_step -eq 0 -o $((timeout_step % wait_time)) -eq 0 ] && {
 		unset has_internets
-		[ -e /dev/fd/${pingout:-abracadabra} ] && {
+		[ -p /dev/fd/$pingout ] && {
 			internets_checked=t
-			grep ' 0% packet loss' </dev/fd/$pingout &>/dev/null && \
+			grep -q ' 0% packet loss' </dev/fd/$pingout && \
 				has_internets=t
-			exec {pingout}>&-
+			exec {pingout}<&-
 		}
 		[ -v COPROC ] || {
 			# wait_time can be here 2×, 3× timeouts or more.
 			coproc ping -W $wait_time -q -n -c1 8.8.8.8
-			exec {pingout}>&${COPROC[0]}
+			# <& duplicates input file descriptors, 
+			# >& duplicates output file descriptors, They both work here.
+			# {braces} are important.
+			exec {pingout}<&${COPROC[0]}
 		}
 	}
 }
@@ -271,7 +274,7 @@ get_gmail() {
 			-su $GMAIL_USERNAME:$GMAIL_PASSWORD \
 		    https://mail.google.com/mail/feed/atom 2>/dev/null`
 			[ "$gmail_server_reply" ] || {
-				# mail.google.com is unaccessible
+				# Unable to connect to mail.google.com 
 				gmail='{ "full_text": "U✉",
 \t  "color": "'$orange'",
 \t  "separator":false },'
@@ -279,7 +282,7 @@ get_gmail() {
 			}
 			echo "$gmail_server_reply" | \
 				sed -r 's~^<H2>Error [0-9]{3}</H2>$~&~;T;Q1' &>/dev/null || {
-				# invalid user data or other fault.
+				# Invalid user data or other fault.
 				gmail='{ "full_text": "E✉",
 \t  "color": "'$red'",
 \t  "separator":false },'
@@ -288,7 +291,7 @@ get_gmail() {
 			letters_unread=`echo "$gmail_server_reply" |\
 			                sed -nr 's/<fullcount>([0-9]+)<.*/\1/p'`
 			[ "$letters_unread" -gt 0 ] && {
-				# Yay, new letter!
+				# Yay, a new letter!
 				gmail='{ "full_text": "'$letters_unread'",
 \t  "color": "'$green'",
 \t  "separator":false,
@@ -313,7 +316,7 @@ get_gmail() {
 }
 
 get_nice_date() {
-	# This is to fix declensional endings in russian locale.
+	# This is to fix declensional endings of months’ names in russian locale.
 	local wait_time=10
 	[ $timeout_step -eq 0 -o $((timeout_step % wait_time)) -eq 0 ] && {
 		nice_date=`date +'%A, %-d =%-m= %-H:%M' |\
@@ -332,7 +335,7 @@ echo '{"version":1}[' && while true; do
 	for func in $func_list; do
 		$func
 	done
-	eval echo -e \"${bar//\\/\\\\}\" || exit 1
+	eval echo -e \"${bar//\\/\\\\}\" || exit 3
 	comma=','
 	sleep 1;
 	[ $((++timeout_step)) -gt $timeout_max ] && timeout_step=1

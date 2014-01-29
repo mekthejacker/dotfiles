@@ -43,7 +43,7 @@
 
       ![new_letter](img/new_letter.png) – new unread letter. Also pauses mpd at the time of event and plays notification Tutturu~ sound.
 
-      ![server_unavailable](img/server_unavailable.png) – when gmail server is unaccessible.
+      ![server_unavailable](img/server_unavailable.png) – when gmail server is inaccessible.
 
       ![server_error](img/server_error.png) – server reply returned with an error.
 

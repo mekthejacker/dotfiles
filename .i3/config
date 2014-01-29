@@ -89,13 +89,14 @@ bindsym $mod+r exec --no-startup-id /bin/bash -c 'export ONE_COMMAND_SHELL=t && 
 ## S
 bindcode $mod+39 exec --no-startup-id ". ~/scripts/screenshot.sh"
 ## Shift+S
-bindcode --release $mod+Shift+39 exec --no-startup-id ". ~/scripts/screenshot.sh -area"
+bindcode --release $mod+Shift+39 exec --no-startup-id  "~/scripts/screenshot.sh -area"
 ## Ctrl+S // 66 is actually control (they are swapped with capslock on my keyboard)
-bindcode --release $mod+Control+39 exec --no-startup-id ". ~/scripts/screenshot.sh -delay"
-
+bindcode --release $mod+66+39 exec --no-startup-id "~/scripts/screenshot.sh -delay"
+## Ctrl+L i3lock
+bindcode $mod+Control+46 exec --no-startup-id i3lock
+#
 ## F1
-## `eval` is to make path to socket absolute
-bindcode $mod+67 exec --no-startup-id eval mpc toggle
+bindcode $mod+67 exec --no-startup-id mpc toggle
 ## F2 
 bindcode $mod+68 exec --no-startup-id "~/scripts/add2playlist.sh"
 bindcode $mod+Shift+68 exec --no-startup-id "~/scripts/add2playlist.sh -c"
@@ -122,19 +123,38 @@ bindcode $mod+76 exec --no-startup-id eval mpc next
 bindcode $mod+95 exec --no-startup-id eject
 bindcode $mod+Shift+95 exec --no-startup-id eject -t
 ## F12
-bindcode $mod+Control+46 exec --no-startup-id i3lock
+#bindcode $mod+96 exec --no-startup-id /bin/bash -c ""
 
+# G
+bindcode $mod+42 exec --no-startup-id "~/scripts/wallpaper_setter.sh -r"
+# B
+bindcode $mod+56 exec --no-startup-id "~/scripts/wallpaper_setter.sh -b -0.1"
+# Shift+B
+bindcode $mod+Shift+56 exec --no-startup-id "~/scripts/wallpaper_setter.sh -b +0.1"
+# N
+bindcode $mod+57 exec --no-startup-id "~/scripts/wallpaper_setter.sh -m"
+# <
+bindcode $mod+59 exec --no-startup-id "~/scripts/wallpaper_setter.sh -p"
+# >
+bindcode $mod+60  exec --no-startup-id "~/scripts/wallpaper_setter.sh -n"
+# Shift+>
+bindcode $mod+Shift+60  exec --no-startup-id "~/scripts/wallpaper_setter.sh -fn"
+# /
+bindcode $mod+61 exec --no-startup-id "~/scripts/wallpaper_setter.sh -k"
 
 ## Switch to workspace and launch related application.
 bindsym $mod+1 workspace 1: Main
-bindsym $mod+2 exec --no-startup-id "i3-msg workspace 2: Firefox && { pgrep -u $USER firefox &>/dev/null || firefox; }"
-bindsym $mod+3 exec --no-startup-id "i3-msg workspace 3: Thunar && { pgrep -u $USER thunar &>/dev/null || thunar; }"
-bindsym $mod+4 exec --no-startup-id "i3-msg workspace 4: Emacs && { pgrep -u $USER emacsclient &>/dev/null || emacsclient -c; }"
+bindsym $mod+2 exec --no-startup-id "i3-msg workspace 2: Firefox && { pgrep -u $UID firefox &>/dev/null || { firefox & } }"
+bindsym $mod+3 exec --no-startup-id "i3-msg workspace 3: Thunar && { pgrep -u $UID thunar &>/dev/null || { thunar & } }"
+# This is to distinguish emacsclient window running in X and those in terminals,
+#   i.e. to forbid creation more than one X window while there can be other
+#   emacsclients in terminals. See also ‘ec‘ and ‘emc’ aliases in ~/.bashrc.
+bindsym $mod+4 exec --no-startup-id "i3-msg workspace 4: Emacs && { pgrep -u $UID -f '^emacsclient -c -display' || { emacsclient -c -display $DISPLAY & } }"
 bindsym $mod+5 workspace 5: Misc
 bindsym $mod+6 workspace 6: IM
 bindsym $mod+7 workspace 7: Games
-bindsym $mod+8 exec --no-startup-id "i3-msg workspace 8: GIMP && { pgrep -u $USER gimp &>/dev/null || gimp; }"
-bindsym $mod+9 exec --no-startup-id "i3-msg workspace 9: MPD && { pgrep -u $USER ncmpcpp &>/dev/null || urxvtc -name ncmpcpp -e ncmpcpp; }"
+bindsym $mod+8 exec --no-startup-id "i3-msg workspace 8: GIMP && { pgrep -u $UID gimp &>/dev/null || { gimp & } }"
+bindsym $mod+9 exec --no-startup-id "i3-msg workspace 9: MPD && { pgrep -u $UID ncmpcpp &>/dev/null || { urxvtc -name ncmpcpp -e ncmpcpp & } }"
 bindsym $mod+0 workspace Outer\ space
 bindcode $mod+20 workspace Mail
 
@@ -156,7 +176,6 @@ bindsym $mod+Shift+0 move container to workspace Outer\ space
 bindcode $mod+Shift+20 move container to workspace Mail
 
 ## Assigning windows to workspaces
-assign [class="Gnome-system-monitor"] → "1: Main"
 assign [class="Firefox"] → "2: Firefox"
 assign [class="Thunar"] → "3: Thunar"
 assign [class="Emacs"] → "4: Emacs"

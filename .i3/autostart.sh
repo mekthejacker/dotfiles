@@ -2,14 +2,15 @@
 
 ## This script is called from ~/.i3/config with
 ##     exec ~/.i3/autstart.sh
-
 ~/.i3/set_keyboard.sh
-
-## i3 cannot set wallpaper by itself
-hsetroot -fill ~/.env/wallpaper.png
 
 ## Load my ssh identities
 [ "$1" = stop_after_main_workspace ] || . ~/scripts/ssh-load.sh
+
+# Check for two monitors and wacom.
+# xsetwacom --set <ID> MapToOuput WxH+0+0
+# W = 1st_screen_width/(2nd_screen_width/1st_screen_width)
+# H = ———"———
 
 pointer_control() {
 	[ -v pointer_devices ] || pointer_devices=$(xinput --list |\
@@ -38,25 +39,31 @@ wait_for_program () {
 sudo /usr/bin/killall iftop
 pgrep urxvtd || urxvtd -q -o -f
 tmux="tmux -u -f $HOME/.tmux/config -S $HOME/.tmux/socket"
-pgrep -u $USER -f '^tmux.*$' &>/dev/null || $tmux \
-		new -dn root su \; \
-		set remain-on-exit on \; \
-		neww -n wa-a \; \
-		set remain-on-exit on
+pgrep -u $UID -f '^tmux.*$' &>/dev/null || $tmux \
+	new -dn root su \; \
+	set remain-on-exit on \; \
+	neww -n root2 su \; \
+	set remain-on-exit on \; \
+	neww -n wa-a \; \
+	set remain-on-exit on \; \
+	select-window -t root
 pointer_control disable
 
 # Getting screen dimensions.
 # This assumes the first screen listed is the main in use.
 read width height  <<< `xrandr | \
-     sed -nr 's/^\s+([0-9]+)x([0-9]+).*\*.*/\1\n\2/p;T;Q0'`
+	sed -nr 's/^\s+([0-9]+)x([0-9]+).*\*.*/\1\n\2/p;T;Q0'`
+
+common_startup_apps=("thunar" "mpd")
 
 case $HOSTNAME in
 	fanetbook)
+		hsetroot -fill ~/.env/wallpaper.png
 		urxvtc -hold -name 'htop' -title "htop" -e htop
 		xte "mousemove $(( width/2 ))  $(( height/2 ))" 
 		xte 'mouseclick 1'
 		i3-msg layout tabbed
-
+		
 		for iface_config in `ls ~/.iftop/$HOSTNAME.*`; do
 			urxvtc -hold -title ${iface_config##*.} \
 				-e sudo /usr/sbin/iftop -c "$iface_config"
@@ -64,13 +71,15 @@ case $HOSTNAME in
 		urxvtc
 		urxvtc
 		urxvtc -hold -title tmux -e $tmux attach \; find-window -N root
-
-		startup_apps="thunar mpd"
-		pgrep mpdscribble >/dev/null || \
-			mpdscribble --conf ~/.mpd/mpdscribble.conf
-		pgrep ncmpcpp >/dev/null || urxvtc -name ncmpcpp -e ncmpcpp
+		
+		startup_apps=()
 		;;
 	*)
+		pgrep -u $UID -f 'wallpaper_setter.sh' \
+			&& ~/scripts/wallpaper_setter.sh -w \
+			|| { ~/scripts/wallpaper_setter.sh -B -0.3 \
+			   -e "i3-nagbar -m \"%m\" -b Restart \"%a\"" \
+			   -d /home/picts/watched & }
 		urxvtc 
 		i3-msg split v
 		urxvtc -hold -title 'htop' -e htop
@@ -115,7 +124,7 @@ case $HOSTNAME in
 		i3-msg split h
 		i3-msg layout tabbed
 		urxvtc
-		urxvtc -hold -title tmux -e $tmux attach \; find-window -N root
+		urxvtc -hold -title tmux -e $tmux attach
  		xte "mousemove $(( 11*width/12 )) $(( height/2 ))"
  		xte 'mouseclick 1'
 
@@ -125,15 +134,22 @@ case $HOSTNAME in
 			pointer_control enable
 			exit 0
 		}
-		startup_apps="firefox thunar mpd pidgin"
-		pgrep mpdscribble >/dev/null || \
-			mpdscribble --conf ~/.mpd/mpdscribble.conf
-		pgrep ncmpcpp >/dev/null || urxvtc -name ncmpcpp -e ncmpcpp
-		killall -HUP emacsclient && emacsclient -c &
+
+		startup_apps=("emacs --daemon" firefox pidgin "emacsclient -c")
 		;;
 esac
 pointer_control enable
 
-for app in $startup_apps; do
-	pgrep "\<$app\>" >/dev/null || (nohup $app & ) &
+killall -HUP emacsclient
+for app in "${common_startup_apps[@]}" "${startup_apps[@]}"; do
+	# { $app & } becasue otherwise ‘&’ will fork to background the whole string
+	#   including subshell created by the left part of ‘||’ statement.
+	pgrep -u $UID -f "\<$app\>" >/dev/null || { $app & }
 done
+
+until mpc &>/dev/null; do
+	sleep 1
+done
+pgrep -u $UID mpdscribble >/dev/null || \
+	mpdscribble --conf ~/.mpd/mpdscribble.conf
+pgrep -u $UID ncmpcpp >/dev/null || urxvtc -name ncmpcpp -e ncmpcpp
