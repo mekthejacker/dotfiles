@@ -3,6 +3,13 @@ dotfiles
 
 Configuration files for i3 window manager, Emacs, nano, bash, urxvt and other environment.
 
+<p align="center">
+<img src="img/jan_2014.png" alt="desktop" />
+<br/>
+<i>This is how my desktop looks like as of january 2014 —<br/>
+all windows are already opened from the start</i>
+</p>
+
 ### How X is started
 Generally, there are two ways launching X – using a display manager (DM) or `startx`. DM takes care about sessions, switching display between users, `consolekit` session and some other stuff. 
 
