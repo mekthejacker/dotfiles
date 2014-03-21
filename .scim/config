@@ -13,7 +13,7 @@
 /Hotkeys/FrontEnd/On = 
 /Hotkeys/FrontEnd/PreviousFactory = Control+Alt+Up,Shift+Control+KeyRelease+Control_L,Shift+Control+KeyRelease+Control_R
 /Hotkeys/FrontEnd/ShowFactoryMenu = Control+Alt+Right
-/Hotkeys/FrontEnd/Trigger = Control+space,Zenkaku_Hankaku,Hangul,Super+space
+/Hotkeys/FrontEnd/Trigger = Control+space
 /Hotkeys/FrontEnd/ValidKeyMask = Shift+Control+Alt+Meta+QuirkKanaRo
 /IMEngine/Anthy/ConversionMode = SingleSeg
 /IMEngine/Anthy/KanaLayoutFile = 
@@ -46,4 +46,4 @@
 /Panel/Gtk/ToolBar/ShowPropertyLabel = false
 /Panel/Gtk/ToolBar/ShowSetupIcon = true
 /Panel/Gtk/ToolBar/ShowStickIcon = false
-/UpdateTimeStamp = 1389770824:102935
+/UpdateTimeStamp = 1394518739:393015

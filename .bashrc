@@ -7,6 +7,7 @@
 
 # This is to dispose of old aliases and function definitions before
 #   (re-)sourcing new or rewritten ones.
+
 unalias -a
 unset -f `sed -nr "s/^\s*([-_a-zA-Z0-9]+)\(\)\s*\{.*$/\1/p" \
           ~/.bashrc ~/bashrc/* 2>/dev/null`
@@ -15,8 +16,8 @@ for opt in autocd cdspell dirspell dotglob extglob globstar \
 	no_empty_cmd_completion; do
 	shopt -s $opt
 done
-for completion_module in eix eselect gentoo git iptables layman man smartctl \
-	ssh strace sysctl taskset tmux udisks; do 
+for completion_module in eix eselect gentoo git gpg iptables layman man \
+	smartctl ssh strace sysctl taskset tmux udisks; do 
 	eselect bashcomp enable $completion_module &>/dev/null
 done
 unset opt completion_module
@@ -25,11 +26,6 @@ unset opt completion_module
 #   and they source ~/.bash_profile (which is sourcing this file 
 #   in its turn). A miracle.
 . /etc/profile.d/bash-completion.sh
-
-pushd ~/bashrc >/dev/null
-hostnamerc=${HOSTNAME%.*}.sh
-[ -r $hostnamerc ] && . $hostnamerc
-popd >/dev/null
 
 # Testing ur PAM
 #ulimit -S -n 8192
@@ -40,8 +36,10 @@ export EIX_LIMIT=0
 export EDITOR="emacsclient -c -nw"
 export LESS="$LESS -x4"
 export MPD_HOST=$HOME/.mpd/socket
-grep -qF '/assembling/' <<<"$PATH" \
-	|| export PATH="$PATH:~/assembling/android-sdk-linux/platform-tools/:~/assembling/android-sdk-linux/tools/:/usr/games/bin/"
+#grep -qF '/assembling/' <<<"$PATH" \
+#	|| export PATH="$PATH:~/assembling/android-sdk-linux/platform-tools/:~/assembling/android-sdk-linux/tools/"
+grep -qF '/usr/games/bin/' <<<"$PATH" \
+	|| export PATH="$PATH:/usr/games/bin/"
 export PS1="\[\e[01;34m\]┎ \w\n┖ \
 \`echo \"scale=2; \$(cut -d' ' -f2 </proc/loadavg) /\
     \$(grep ^processor </proc/cpuinfo | wc -l)\" | bc\` \
@@ -51,7 +49,6 @@ export PS1="\[\e[01;34m\]┎ \w\n┖ \
 } || echo -n \"\[\e[01;37m\]\u \"\`\
 \[\e[01;32m\]at \h \
 \[\e[01;34m\]\\$\[\e[00m\] "
-export REPOS_DIR=$HOME/repos
 
 ## Aliases caveats and hints:
 ## 1. All innder double quotes must be escaped
@@ -74,15 +71,23 @@ alias tdD="todo -D "
 alias tmux="tmux -u -f ~/.tmux/config -S $HOME/.tmux/socket"
 alias deploy="/root/scripts/deploy_configuration.sh "
 
+[ -v SSH_CLIENT ] && . ~/.preinit.sh
+
 # Test for an interactive shell.  There is no need to set anything
 # past this point for scp and rcp, and it's important to refrain from
 # outputting anything in those cases.
 [[ $- = *i* ]] || return
+
 [ ! -v DISPLAY -a "`tty`" = /dev/tty2 ] && {
 	# W! startx IGNORES ~/.xserverrc options if something passed beyond -- !
 	exec startx -- -config xorg.conf$(<~/.xorg.conf.suffix) -nolisten tcp &>~/x.log
 	rm ~/.xorg.conf.suffix &>/dev/null
 }
+
+pushd ~/bashrc >/dev/null
+hostnamerc=${HOSTNAME%.*}.sh
+[ -r $hostnamerc ] && . $hostnamerc
+popd >/dev/null
 
 # This is for one-command urxvt
 one_command_execute() {
@@ -112,7 +117,6 @@ compress_screenshot() {
 	find -iname "*.png" -size +1M -printf "%f\n" | parallel --eta crush
 	export -nf crush
 }
-
 
 # Copies MPD playlist to a specified folder.
 # $1 — path to playlist file (~/.mpd/playlists/…)

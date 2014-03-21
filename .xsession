@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Common part of ~/.xinitrc and ~/.xsession
-. ~/.preinit
+. ~/.preinit.sh
 
 # ~/.xsession do not need to run consolekit session, it should be already
 #   done by display manager.

@@ -2,9 +2,6 @@
 #set-option -g default-command "bash -l"
 #set-option -g default-path $HOME
 
-#set-option -g default-terminal "screen"
-# set-option -g default-terminal "screen-256color-bce"
-# set-option -g default-terminal "rxvt-unicode-256color"
 set-option -g default-terminal "screen-256color"
 
 # start window indexing at one instead of zero
@@ -12,7 +9,7 @@ set -g base-index 1
 
 # Bind C-a for default prefix key
 set-option -g prefix C-a
-unbind-key C-b
+#unbind-key C-b
 bind-key C-a send-prefix
 
 # Rebinding movement keys, adding repeat mode to keys
@@ -37,6 +34,7 @@ bind r respawn-window
 bind R source-file ~/.tmux/config \; \
         display-message "Done sourcing ~/.tmux/config."
 
+# X window title
 set -g set-titles on
 set -g set-titles-string 'tmux@#H:"#W"'
 

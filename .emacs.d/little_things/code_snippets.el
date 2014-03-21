@@ -185,3 +185,14 @@ LINE alone still moves to the beginning of the specified line (like LINE:0)."
           (when (< column limit)
             (beginning-of-line)
             (forward-char column))))))
+
+
+(defun my-list-buffers-vertical-split ()
+  "`list-buffers', but forcing a vertical split.
+    See `split-window-sensibly'."
+  (interactive)
+  (let ((split-width-threshold nil)
+        (split-height-threshold 0))
+    (call-interactively 'list-buffers)))
+;;
+(global-set-key [remap list-buffers] 'my-list-buffers-vertical-split)

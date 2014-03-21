@@ -132,10 +132,11 @@
 (toc:load-config-file '("textile-mode.el"))  
 
 ;; Load code snippets, shortcuts etc.
-(load "~/.emacs.d/little_things/shortcuts.el")
 (load "~/.emacs.d/little_things/code_snippets.el")
 (load "~/.emacs.d/little_things/fill-column-indicator.el")
 (load "~/.emacs.d/little_things/linum.el")
+;; must be after code_snippets, because there may be redefined functions
+(load "~/.emacs.d/little_things/shortcuts.el")
 ;;(load "~/.emacs.d/geben-0.26/dbgp.el")
 ;;(load "~/.emacs.d/geben-0.26/geben.el")
 

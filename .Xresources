@@ -44,9 +44,10 @@ URxvt.saveLines: 8192
 URxvt.secondaryWheel: true
 URxvt.cursorUnderline: false
 URxvt.font: xft:Terminus:autohint=true
-URxvt.transparent:   true
+URxvt.transparent: true
 URxvt.borderless: true
-URxvt.shading:       35
+URxvt.shading: 35
+URxvt.urgentOnBell: true
 !! scrollbar related stuff ↓
 URxvt.scrollBar_right: true
 URxvt.scrollstyle: plain
@@ -56,10 +57,10 @@ URxvt.scrollstyle: plain
 !
 !! These characters are used as delimiters for double-click word selection 
 !! by default, but may be overriden
-!URxvt.cutchars: `\"'&()*,;<=>?@[]^{|}
+URxvt.cutchars: `\"\'&()*,;<=>?@[]^{|}
 URxvt.perl-ext-common:default,matcher
-URxvt.urlLauncher:    firefox
-URxvt.underlineURLs:  true
+URxvt.urlLauncher: firefox -new-tab 
+URxvt.underlineURLs: true
 URxvt.matcher.button: 1 
 !selection.pattern-0: ( at .*? line \\d+)
 !selection.pattern-1: ^(/[^:]+):\
