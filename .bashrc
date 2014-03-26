@@ -135,3 +135,16 @@ copy_playlist() {
 fix_fdash() {
 	[ -w /tmp/c ] && sed -ri 's/^- (.*)$/‒ \1/g' /tmp/c
 }
+
+mount_box() {
+	gpg -qd --output /tmp/secrets ~/.davfs2/secrets
+	sudo /root/scripts/mount_box.sh $USER
+}
+
+umount_box() {
+	sudo /root/scripts/mount_box.sh $USER umount
+}
+
+umount_stick() {
+	sudo /usr/bin/killall -USR1 automount
+}

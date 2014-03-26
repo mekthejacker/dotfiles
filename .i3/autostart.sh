@@ -39,7 +39,8 @@ wait_for_program () {
 # Cleaning before new session.
 # That’s strange, Emacs runned from autostart script hangs after session 
 #   is closed, but is okay if it was started via /etc/init.d/emacs.user
-killall emacs emacsclient
+pkill -9 emacs 
+pkill -9 emacsclient
 sudo /usr/bin/killall iftop
 
 # Applications that need to be started before layout setting: urxvtd and tmux
@@ -140,19 +141,16 @@ case $HOSTNAME in
 esac
 pointer_control enable
 
-# Common apps: thunar and mpd
-pgrep -u $UID thunar >/dev/null || { (nohup thunar) & }
-
-until mpc &>/dev/null; do
-	sleep 1
-done
-pgrep -u $UID mpdscribble >/dev/null || \
-	mpdscribble --conf ~/.mpd/mpdscribble.conf
-pgrep -u $UID ncmpcpp >/dev/null || urxvtc -name ncmpcpp -e ncmpcpp
-
-for app in "${startup_apps[@]}"; do
+# Some configs decrypted at ~/bin/run_app.sh
+for app in "mpd thunar ${startup_apps[@]}"; do
 	# { … & } becasue otherwise ‘&’ will fork to background the whole string
 	#   including subshell created by the left part of ‘||’ statement.
 	# (nohup $app) actuallyy needed only for emacs as daemon
 	pgrep -u $UID -f "^$app\>" >/dev/null || { (nohup $app) & }
 done
+
+until mpc &>/dev/null; do
+	sleep 1
+done
+mpdscribble
+pgrep -u $UID ncmpcpp >/dev/null || urxvtc -name ncmpcpp -e ncmpcpp

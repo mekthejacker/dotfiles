@@ -18,8 +18,9 @@ timeout_max=10 # the actual timeout is one second; timeout_max introduces
                # a period which functions may rely on; functions have their own
                # local timeouts, ‘wait_time’ variable.
 
-# GMAIL_USERNAME and GMAIL_PASSWORD are taken from here
-. ~/.env/private.sh
+# Decrypt Gmail authentication data
+eval `gpg -qd ~/.env/private_data.sh.gpg 2>/dev/null \
+      | grep -E '^GMAIL_(USERNAME|PASSWORD)'`
 
 # Tabulation and spaces in output of the script are just to have a nice view
 #   while testing this script in a terminal and are not neccesary.
@@ -39,11 +40,12 @@ timeout_max=10 # the actual timeout is one second; timeout_max introduces
 # NB: ‘gmail’ depends on ‘internet_status’.
 blocks=(
 	[00]=active_window_name
-    [10]=mpd_state
-    [20]=mic_state
-    [30]=internet_status
-    [40]=gmail
-    [50]=nice_date )
+	[10]=mpd_state
+	[20]=mic_state
+	[30]=internet_status
+	[40]=gmail
+	[50]=nice_date 
+)
 
 case $HOSTNAME in
 	fanetbook)
@@ -56,7 +58,7 @@ esac
 
 unset func_list
 bar='${comma:-}\n\t['
-# Since comma is unset for first time, its line will be empty
+# Since comma isn’t set for the first time, its line will be empty
 for block in ${blocks[@]}; do
 	func_list="$func_list get_$block"
 	bar="$bar"'\n\t${'$block':-}'
@@ -216,7 +218,7 @@ get_battery_status() {
 						--ok-label "Shutdown" \
 						--cancel-label "NO, WAIT")
 					[ $charge_now -eq 0 ] && [ $? -ne 1 ] && {
-						sudo /sbin/shutdown -h now  &>/dev/null || {
+						shutdown -h now &>/dev/null || { # ~/bin/
 							zenity --warning \
 							    --text 'Cannot call shutdown. 
 Please, shutdown the system yourself!'

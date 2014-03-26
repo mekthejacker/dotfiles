@@ -10,6 +10,5 @@
 # In case of troubles: http://forums.gentoo.org/viewtopic-t-858965-highlight-.html
 exec ck-launch-session \
 	 dbus-launch --sh-syntax --exit-with-session \
-	 ssh-agent \
 	 i3 &>/dev/null
 #	 i3 -V -d all >~/.i3/stdout 2>~/.i3/stderr
