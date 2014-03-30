@@ -81,8 +81,8 @@ case ${0##*/} in
 		run_app /usr/bin/mpd 
 		;;
 	mpdscribble)
-		gpg -qd --output /tmp/decrypted/mpdscribble.conf ~/.mpdscribble/mpdscribble.conf.gpg
-		run_app mpdscribble
+		run_app mpdscribble \
+			~/.mpdscribble/mpdscribble.conf.gpg
 		;;
 	pidgin)
 		run_app /usr/bin/pidgin \
