@@ -13,10 +13,12 @@ yellow='#edd400'
 green='#8ae234'
 white='#ffffff'
 orange='#e07a1f'
+brown='#b16161'
+blue='#729fcf'
 timeout_step=0 # counts seconds till timeout_max
-timeout_max=10 # the actual timeout is one second; timeout_max introduces
-               # a period which functions may rely on; functions have their own
-               # local timeouts, ‘wait_time’ variable.
+timeout_max=30 # the actual timeout is one second; timeout_max introduces
+               # a period functions may rely on; functions have their own
+               # local timeouts, “wait_time” variable.
 
 # Decrypt Gmail authentication data
 eval `gpg -qd ~/.env/private_data.sh.gpg 2>/dev/null \
@@ -51,8 +53,9 @@ case $HOSTNAME in
 	fanetbook)
 		blocks[49]=battery_status
 		;;
-	*)
+	home)
 		blocks[1]=free_space
+		blocks[41]=schedule
 		;;
 esac
 
@@ -60,10 +63,10 @@ unset func_list
 bar='${comma:-}\n\t['
 # Since comma isn’t set for the first time, its line will be empty
 for block in ${blocks[@]}; do
-	func_list="$func_list get_$block"
-	bar="$bar"'\n\t${'$block':-}'
+	func_list+=" get_$block"
+	bar+='\n\t${'$block':-}'
 done
-bar="$bar\n\t]"
+bar+="\n\t]"
 
 # Some functions may generate empty line if no indicator needed.
 
@@ -85,15 +88,22 @@ get_active_window_name() {
 get_free_space() {
 	local wait_time=10
 	[ $timeout_step -eq 0 -o $((timeout_step % wait_time)) -eq 0 ] && {
-		mountpoints="/home / /usr"
-		yellow_point="5"
-		red_point="1"
+		mountpoints='/home / /usr'
+		yellow_point='5'
+		red_point='1'
 		unset free_space
 		for mountpoint in $mountpoints; do
 		# We look for an existed mount point which is in use and not bound.
-			sed -nr 's~^\S+\s+'$mountpoint'\s+\S+\s+(\S+)\s.*~\1~p' \
-				/proc/mounts | grep -v bind &>/dev/null || continue
-			read total free <<< `df -BG -P "$mountpoint" |\
+			sed -nr "s~^\S+\s+$mountpoint\s+\S+\s+(\S+)\s.*~\1~p" \
+				/proc/mounts | grep -qv bind \
+			&& local present_mpoints[${#present_mpoints[@]}]="$mountpoint"
+		done
+		[ -v present_mpoints ] && for ((i=0; i<${#present_mpoints[@]}; i++)); do
+			[ $i -lt $((${#present_mpoints[@]}-1)) ] \
+				&& local separating_comma=',' \
+				|| unset separating_comma # This comma appears between blocks
+			                              #   showing mountpoints.
+			read total free <<< `df -BG -P "${present_mpoints[$i]}" |\
 			  sed -rn '$ s/^\S+\s+([0-9]+)G\s+\S+\s+([0-9]+)G.*$/\1\n\2/p'`
 			# Cause this function can generate multiple blocks, an empty line
 			#   may appear before first generated block.
@@ -108,11 +118,12 @@ get_free_space() {
 \t  \"separator\":false, 
 \t  \"separator_block_width\":0 }"
  			free_space="$free_space,
-\t{ \"full_text\": \"…$total at $mountpoint\",
+\t{ \"full_text\": \"/$total at ${present_mpoints[$i]}$separating_comma\",
 \t  \"separator\": false }"
-			local inner_comma=','
+			local inner_comma=',' # This comma is a part of json and divides
+			                      #   {blocks} of code.
 		done
-		free_space="$free_space,"
+		[ "$free_space" ] && free_space="$free_space," # buuug >_< inner comma doesn't append itself at the end
 	}
 }
 
@@ -133,7 +144,7 @@ get_mic_state() {
 }
 
 get_battery_status() {
-	local wait_time=10
+	local wait_time=30
 	[ $timeout_step -eq 0 -o $((timeout_step % wait_time)) -eq 0 ] && {
 		unset battery_status journal debug blocks offset next_block \
 		      bat_time_left bat_ejected
@@ -282,16 +293,16 @@ get_gmail() {
 \t  "separator":false },'
 				return 1
 			}
-			echo "$gmail_server_reply" | \
-				sed -r 's~^<H2>Error [0-9]{3}</H2>$~&~;T;Q1' &>/dev/null || {
+			sed -r 's~^<H2>Error [0-9]{3}</H2>$~&~;T;Q1' \
+				&>/dev/null <<<"$gmail_server_reply" || {
 				# Invalid user data or other fault.
 				gmail='{ "full_text": "E✉",
 \t  "color": "'$red'",
 \t  "separator":false },'
 				return 1
 			}
-			letters_unread=`echo "$gmail_server_reply" |\
-			                sed -nr 's/<fullcount>([0-9]+)<.*/\1/p'`
+			letters_unread=`sed -nr 's/.*<fullcount>([0-9]+)<.*/\1/p' \
+			                <<<"$gmail_server_reply"`
 			[ "$letters_unread" -gt 0 ] && {
 				# Yay, a new letter!
 				gmail='{ "full_text": "'$letters_unread'",
@@ -317,12 +328,54 @@ get_gmail() {
 	}
 }
 
+get_schedule() {
+	local wait_time=30
+	[ $timeout_step -eq 0 -o $((timeout_step % wait_time)) -eq 0 ] && {
+		unset schedule
+		# Error: Received EOF from statusline process
+		# read dayofweek dayofmonth hour < <(date "+%A %d %H")
+		local date_t=`date "+%A %-d %-H"`
+		local dayofweek=${date_t%% *}
+		local dayofmonth_t=${date_t#* }
+		local dayofmonth=${dayofmonth_t% *}
+		local hour=${date_t##* }
+		case "$dayofweek" in
+			# If ~/watered hasn’t been `touch`ed within 1/2/3 days…
+			Понедельник|Четверг)
+				[ "`find $HOME/ -maxdepth 1 -name watered -mtime -1 2>/dev/null`" ] \
+					|| schedule='{ "full_text": "✼",
+\t  "color": "'$green'",
+\t  "separator": false },'
+				;;
+			Вторник|Пятница)
+				[ "`find ~/ -maxdepth 1 -name watered -mtime -2 2>/dev/null`" ] \
+					|| schedule='{ "full_text": "✼",
+\t  "color": "'$yellow'",
+\t  "separator": false },'
+				;;
+			Среда|Суббота)
+				[ "`find ~/ -maxdepth 1 -name watered -mtime -3 2>/dev/null`" ] \
+					|| schedule='{ "full_text": "✼",
+\t  "color": "'$brown'",
+\t  "separator": false },'
+				;;
+		esac
+		[[ "$dayofmonth" =~ ^[0-9]+$ ]] && [ $dayofmonth -gt 20 ] \
+			&& [ -z "`find ~/ -maxdepth 1 -name sent -mtime -$((dayofmonth-20)) 2>/dev/null`" ] \
+			&& schedule="${schedule:+${schedule}\n}"'{ "full_text": "♒",
+\t  "color": "'$blue'",
+\t  "separator": false },'
+	}
+}
+
 get_nice_date() {
 	# This is to fix declensional endings of months’ names in russian locale.
 	local wait_time=10
 	[ $timeout_step -eq 0 -o $((timeout_step % wait_time)) -eq 0 ] && {
-		nice_date=`date +'%A, %-d =%-m= %-H:%M' |\
-	           sed 's/=1=/января/;   s/=2=/февраля/;
+		# Why %b is “июня”, but “июл”? >_>
+		# nice_date=`date +'%A, %-d %b %-H:%M'`
+		nice_date=`date +'%A, %-d =%-m= %-H:%M' \
+	         | sed 's/=1=/января/;   s/=2=/февраля/;
 	                s/=3=/марта/;    s/=4=/апреля/;
 	                s/=5=/мая/;      s/=6=/июня/;
 	                s/=7=/июля/;     s/=8=/августа/;

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Common part of ~/.xinitrc and ~/.xsession
-. ~/.preinit.sh
+. ~/.preload.sh
 # For ck-launch-session to work the following options must be set
 # CONFIG_USB_SUSPEND=y		← Required for properly shutting down and powering
 #                               USB hubs, and external USB HDD.

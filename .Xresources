@@ -36,7 +36,7 @@ URxvt.scrollTtyOutput: false
 URxvt.scrollTtyKeypress: true
 URxvt.scrollWithBuffer: true
 URxvt.loginShell: false
-URxvt.saveLines: 8192
+URxvt.saveLines: 3000
 !
 !-- Look and feel
 !
@@ -105,3 +105,5 @@ URxvt.underlineColor: #75507B
 !throughColor: #8080f0
 !highlightColor: #f0f0f0
 !highlightTextColor: #000000
+
+one_command_shell*geometry: 70x1

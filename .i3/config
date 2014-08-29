@@ -40,7 +40,7 @@ bindsym $mod+e layout default
 force_focus_wrapping no
 
 ## Toggle tiling / floating
-#bindsym $mod+space floating toggle
+bindsym $mod+space floating toggle
 ## Enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen
 ## Kill focused window
@@ -54,16 +54,17 @@ bindcode $mod+58 focus child
 ## Focus last floating/tiling container
 # bindsym $mod+g focus mode_toggle
 
-## Focus to next output to the right [l]
-bindcode $mod+Control+47 focus output right
-## Focus to next output to the right [j]
-bindcode $mod+Control+43 focus output left
+## Focus to next output to the left [u]
+bindcode $mod+Control+30 focus output left
+## Focus to next output to the right [o]
+bindcode $mod+Control+32 focus output right
+
 
 ## Reload the configuration file
 bindsym $mod+Shift+r reload
 ## Restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
 bindsym $mod+Control+r restart
-bindsym $mod+Control+q exec "sudo /usr/bin/killall iftop; i3-msg exit"
+bindsym $mod+Control+q exec "sudo /usr/bin/killall iftop; rm -rf /tmp/decrypted; i3-msg exit"
 bindsym $mod+Control+Shift+q exec "sudo /usr/bin/killall iftop; ~/scripts/xorg.conf_chooser.sh"
 
 bindsym $mod+Control+t exec "~/.i3/autostart.sh stop_after_main_workspace"
@@ -88,14 +89,18 @@ bindsym $mod+x mode "resize"
 ## Enter
 bindsym $mod+Return exec urxvtc
 ## R
-## One-command urxvtc instance, it is replacement for dmenu (also see ~/.bashrc)
+## One-command urxvtc instance, it is replacement for dmenu (also see ~/.bashrc and ~/.Xresources)
 bindsym $mod+r exec --no-startup-id /bin/bash -c 'export ONE_COMMAND_SHELL=t && urxvtc -name one_command_shell'
 ## S
 bindcode $mod+39 exec --no-startup-id ". ~/scripts/screenshot.sh"
 ## Shift+S
 bindcode --release $mod+Shift+39 exec --no-startup-id  "~/scripts/screenshot.sh -area"
+## Alt+Shift+S
+bindcode --release $mod+Mod1+Shift+39 exec --no-startup-id  "~/scripts/screenshot.sh -area -indexed"
 ## Ctrl+S // 66 is actually control (they are swapped with capslock on my keyboard)
 bindcode --release $mod+66+39 exec --no-startup-id "~/scripts/screenshot.sh -delay"
+## Alt+Ctrl+S // 66 is actually control (they are swapped with capslock on my keyboard)
+bindcode --release $mod+Mod1+66+39 exec --no-startup-id "~/scripts/screenshot.sh -delay -indexed"
 ## Ctrl+L i3lock
 bindcode $mod+Control+46 exec --no-startup-id i3lock
 #
@@ -103,7 +108,7 @@ bindcode $mod+Control+46 exec --no-startup-id i3lock
 bindcode $mod+67 exec --no-startup-id mpc toggle
 ## F2 
 bindcode $mod+68 exec --no-startup-id "~/scripts/add2playlist.sh"
-bindcode $mod+Shift+68 exec --no-startup-id "~/scripts/add2playlist.sh -c"
+bindcode $mod+Shift+68 exec --no-startup-id "~/scripts/add2playlist.sh -c" # create new
 ## F3
 bindcode $mod+69 exec --no-startup-id amixer set Master toggle
 ## F4
@@ -129,21 +134,21 @@ bindcode $mod+Shift+95 exec --no-startup-id eject -t
 ## F12
 #bindcode $mod+96 exec --no-startup-id /bin/bash -c ""
 
-# G
-bindcode $mod+42 exec --no-startup-id "~/scripts/wallpaper_setter.sh -r"
-# B
-bindcode $mod+56 exec --no-startup-id "~/scripts/wallpaper_setter.sh -b -0.1"
-# Shift+B
-bindcode $mod+Shift+56 exec --no-startup-id "~/scripts/wallpaper_setter.sh -b +0.1"
-# N
-bindcode $mod+57 exec --no-startup-id "~/scripts/wallpaper_setter.sh -m"
-# <
-bindcode $mod+59 exec --no-startup-id "~/scripts/wallpaper_setter.sh -p"
-# >
-bindcode $mod+60  exec --no-startup-id "~/scripts/wallpaper_setter.sh -n"
-# Shift+>
+# G # restrict wallpapers to subdirectory
+bindcode $mod+42 exec --no-startup-id "~/scripts/wallpaper_setter.sh -r" 
+# B # decrease brightness
+bindcode $mod+56 exec --no-startup-id "~/scripts/wallpaper_setter.sh -b -0.1" 
+# Shift+B # increase brightness
+bindcode $mod+Shift+56 exec --no-startup-id "~/scripts/wallpaper_setter.sh -b +0.1" 
+# N # change mode
+bindcode $mod+57 exec --no-startup-id "~/scripts/wallpaper_setter.sh -m" 
+# < # set previous
+bindcode $mod+59 exec --no-startup-id "~/scripts/wallpaper_setter.sh -p" 
+# > # set new
+bindcode $mod+60  exec --no-startup-id "~/scripts/wallpaper_setter.sh -n" 
+# Shift+> # force new
 bindcode $mod+Shift+60  exec --no-startup-id "~/scripts/wallpaper_setter.sh -fn"
-# /
+# / # keep
 bindcode $mod+61 exec --no-startup-id "~/scripts/wallpaper_setter.sh -k"
 
 ## Switch to workspace and launch related application.
@@ -153,13 +158,13 @@ bindsym $mod+3 exec --no-startup-id "i3-msg workspace 3: Thunar && { pgrep -u $U
 # This is to distinguish emacsclient window running in X and those in terminals,
 #   i.e. to forbid creation more than one X window while there can be other
 #   emacsclients in terminals. See also ‘ec‘ and ‘emc’ aliases in ~/.bashrc.
-bindsym $mod+4 exec --no-startup-id "i3-msg workspace 4: Emacs && { pgrep -u $UID -f '^emacsclient -c -display' || { emacsclient -c -display $DISPLAY & } }"
+bindsym $mod+4 exec --no-startup-id "i3-msg workspace 4: Emacs && { pgrep -u $UID -f '^emacsclient --al' || { emacsclient --alternate-editor= -c -display $DISPLAY & } }"
 bindsym $mod+5 workspace 5: Misc
 bindsym $mod+6 workspace 6: IM
 bindsym $mod+7 workspace 7: Games
 bindsym $mod+8 exec --no-startup-id "i3-msg workspace 8: GIMP && { pgrep -u $UID gimp &>/dev/null || { gimp & } }"
 bindsym $mod+9 exec --no-startup-id "i3-msg workspace 9: MPD && { pgrep -u $UID ncmpcpp &>/dev/null || { urxvtc -name ncmpcpp -e ncmpcpp & } }"
-bindsym $mod+0 workspace Outer\ space
+bindsym $mod+0 workspace Outer space
 bindcode $mod+20 workspace Mail
 
 ## Set 10-th workspace to appear on big monitor
@@ -175,7 +180,7 @@ bindsym $mod+Shift+6 move container to workspace 6: IM
 bindsym $mod+Shift+7 move container to workspace 7: Games
 bindsym $mod+Shift+8 move container to workspace 8: GIMP
 bindsym $mod+Shift+9 move container to workspace 9: MPD
-bindsym $mod+Shift+0 move container to workspace Outer\ space
+bindsym $mod+Shift+0 move container to workspace Outer space
 ## - (minus/hyphen key)
 bindcode $mod+Shift+20 move container to workspace Mail
 
@@ -184,7 +189,9 @@ assign [class="Firefox"] → "2: Firefox"
 assign [class="Thunar"] → "3: Thunar"
 assign [class="Emacs"] → "4: Emacs"
 assign [class="^libreoffice.*"] → "5: Misc"
-assign [class="Meld"] → "5: Misc"
+assign [class="^qemu.*"] → "5: Misc"
+assign [class="openshot"] → "5: Misc"
+assign [class="screenshot_preview"] → "5: Misc"
 assign [class="Pidgin"] → "6: IM"
 assign [class="Skype"] → "6: IM"
 assign [class="Ts3client"] → "6: IM"
@@ -196,13 +203,10 @@ assign [class="URxvt" instance="ncmpcpp"] → "9: MPD"
 assign [class="Thunderbird"] → Mail
 
 ## Arbitrary commands for specific windows
-# for_window [class="MPlayer"] floating enable
-# for_window [class="mplayer2"] floating enable
 for_window [class="URxvt" instance="one_command_shell"] floating enable
 
-
 ## This executes every reload
-# exec_always --no-startup-id "~/.i3/set_keyboard.sh"
+exec_always --no-startup-id "~/.i3/set_keyboard.sh"
 ## And this once at the start
 exec --no-startup-id "~/.i3/autostart.sh"
 
@@ -268,11 +272,10 @@ bar {
     }
 }
 
-# # big monitor: everything
-# bar {
-# 	## Useful for presentations
-# 	mode hide
-#    ## The display is connected either via HDMI or via DisplayPort
-#    output HDMI2
-#    output DP2
-# }
+ # # big monitor: everything
+ # bar {
+ # 	## Useful for presentations
+ # 	position top
+ #    ## The display is connected either via HDMI or via DisplayPort
+ #    output HDMI-0
+ # }

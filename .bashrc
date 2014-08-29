@@ -9,6 +9,9 @@
 #   (re-)sourcing new or rewritten ones.
 
 unalias -a
+# If I replace it with
+#     unset -f `declare -F | sed 's/^declare -f //g'`
+# won’t it break something that have been read from /etc/…?
 unset -f `sed -nr "s/^\s*([-_a-zA-Z0-9]+)\(\)\s*\{.*$/\1/p" \
           ~/.bashrc ~/bashrc/* 2>/dev/null`
 
@@ -40,7 +43,7 @@ export MPD_HOST=$HOME/.mpd/socket
 #	|| export PATH="$PATH:~/assembling/android-sdk-linux/platform-tools/:~/assembling/android-sdk-linux/tools/"
 grep -qF '/usr/games/bin/' <<<"$PATH" \
 	|| export PATH="$PATH:/usr/games/bin/"
-export PS1="\[\e[01;34m\]┎ \w\n┖ \
+export PS1="\[\e[01;34m\]┎ \w\n\[\e[01;34m\]┖ \
 \`echo \"scale=2; \$(cut -d' ' -f2 </proc/loadavg) /\
     \$(grep ^processor </proc/cpuinfo | wc -l)\" | bc\` \
 \[\e[01;32m\]\
@@ -63,20 +66,23 @@ export PS1="\[\e[01;34m\]┎ \w\n┖ \
 #     alias plsplsplsdontbreak="echo some stuff # this is comment
 #                               echo lol second line # another comment"
 #
+alias bc="bc -q"
 alias ec="emacsclient -c -nw"
 alias emc="emacsclient -c -display $DISPLAY"
+alias grep="grep --color=auto"
 alias ls="ls --color=auto"
+alias re=". ~/.bashrc" # re-source
 alias td="todo -A "
 alias tdD="todo -D "
 alias tmux="tmux -u -f ~/.tmux/config -S $HOME/.tmux/socket"
 alias deploy="/root/scripts/deploy_configuration.sh "
 
-[ -v SSH_CLIENT ] && . ~/.preinit.sh
+#[ -v SSH_CLIENT ] && . ~/.preload.sh
 
 # Test for an interactive shell.  There is no need to set anything
 # past this point for scp and rcp, and it's important to refrain from
 # outputting anything in those cases.
-[[ $- = *i* ]] || return
+[[ $- = *i* ]] || return 0
 
 [ ! -v DISPLAY -a "`tty`" = /dev/tty2 ] && {
 	# W! startx IGNORES ~/.xserverrc options if something passed beyond -- !
@@ -91,14 +97,40 @@ popd >/dev/null
 
 # This is for one-command urxvt
 one_command_execute() {
+	exec &>/dev/null
+	# TAB completion puts an extra space after the command.
+	READLINE_LINE=${READLINE_LINE%%+([[:space:]])}
+	until [ -v all_aliases_expanded ]; do # recursive alias expansion
+		# Tabulation cahracter may be used in user’s aliases.
+		local first_word=${READLINE_LINE%%[[:space:]]*}
+		[ "$first_word" = "$old_first_word" ] && break # to prevent a loop
+		alias -p | grep -q "^alias $first_word='.*'$" && {
+			local cmd=`alias -p | sed -nr "s/^alias $first_word='(.*)'$/\1/p"`
+			# escape all special characters in the expanded alias is more
+			#   consuming, than just stripping its name and combining
+			#   a new string.
+			READLINE_LINE=${READLINE_LINE/#$first_word/}
+			READLINE_LINE="$cmd $READLINE_LINE"
+			local old_first_word="$first_word"
+		} || local all_aliases_expanded=t
+	done
 	(nohup $READLINE_LINE) &
-    exit
+	local c=0
+	until [ $((c++)) -eq 3 ]; do
+		xdotool search --onlyvisible --pid $! &>/dev/null && break
+		sleep 1
+	done
+	exit
 }
 
 [ -v ONE_COMMAND_SHELL ] && {
-	PS1=
+	PS1='\[\e[01;37m\](☞°ヮ°)☞\[\e[00m\] '
+	## This doesn’t work now, so I have to use default binding C-M-e to
+	##   expand aliases before they’ll go to nohup.
+	# shopt -s expand_aliases # actually, this may be needed only inside
+	#                         # of the subshell
+	# bind shell-expand-line
 	bind -x '"\C-m":"one_command_execute"'
-	# bind -x '"^[":"exit"'
 }
 
 # Compresses all png files >1M in CWD
@@ -126,6 +158,7 @@ copy_playlist() {
 		eval mpd_library_path="`sed -nr 's/^\s*music_directory\s+"(.*)"/\1/p'\
 		                   ~/.mpd/mpd.conf`"
 		while read filepath; do
+			filepath="${filepath/$mpd_library_path/}"
 			cp -v  "$mpd_library_path/$filepath" "$2"
 		done < "$1"
 	} || echo -e 'Usage:\ncopy_playlist <playlist file> <directory to copy to>'
@@ -137,12 +170,12 @@ fix_fdash() {
 }
 
 mount_box() {
-	gpg -qd --output /tmp/secrets ~/.davfs2/secrets
-	sudo /root/scripts/mount_box.sh $USER
+	gpg -qd --output /tmp/decrypted/secrets.`date +%s` ~/.davfs2/secrets.gpg
+	sudo /root/scripts/mount_box.sh $USER &
 }
 
 umount_box() {
-	sudo /root/scripts/mount_box.sh $USER umount
+	sudo /root/scripts/mount_box.sh $USER umount &
 }
 
 umount_stick() {

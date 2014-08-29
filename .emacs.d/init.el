@@ -22,6 +22,7 @@
  '(desktop-path (quote ("~/.emacs.d/")))
  '(desktop-save t)
  '(desktop-save-mode t)
+ '(ediff-split-window-function (quote split-window-horizontally))
  '(eshell-highlight-prompt nil)
  '(fringe-mode (quote (0)) nil (fringe))
  '(global-hl-line-mode t)
@@ -37,6 +38,7 @@
  '(n-back-allowed-match-types (quote (word color position)))
  '(n-back-level 2)
  '(ourcomments-ido-ctrl-tab t)
+ '(package-archives (quote (("gnu" . "http://elpa.gnu.org/packages/") ("marmalade" . "http://marmalade-repo.org/packages/") ("melpa" . "http://melpa.milkbox.net/packages/"))))
  '(popcmp-completion-style (quote emacs-default))
  '(scalable-fonts-allowed t)
  '(scroll-bar-mode (quote left))
@@ -114,6 +116,17 @@
  '(textile-link-face ((t (:foreground "#729fcf"))))
  '(trailing-whitespace ((((class color) (background dark)) (:background "#eeeeee" :foreground "#eeeeee")))))
 
+;; settings for smooth-scrolling.el
+(setq scroll-conservatively 10000
+	  scroll-preserve-screen-position 1
+	  ;; redisplay-dont-pause t
+	  ;; scroll-margin 1
+	  ;; scroll-step 1
+)
+
+;;(turn-off-auto-fill)
+(auto-fill-mode -1)
+(remove-hook 'text-mode-hook 'turn-on-auto-fill)
 
 ;; After copy Ctrl+c in X11 apps, you can paste by `yank' in emacs
 (setq x-select-enable-clipboard t)
@@ -125,10 +138,13 @@
 
 ;; Load my configuration files
 (toc:load-config-file '("php-mode.el"))
+(require 'site-gentoo)
+
 ;; M-j hook to rebound keybinding from C-mode back
 (add-hook 'php-mode-hook (lambda () (define-key php-mode-map (kbd "M-j") 'backward-char)))
 (add-hook 'php-mode-hook (lambda () (define-key php-mode-map (kbd "C-.") 'rotate-windows)))
 (add-hook 'nxml-mode-hook (lambda () (define-key nxml-mode-map (kbd "M-h") 'beginning-of-line)))
+(add-hook 'nroff-mode-hook (lambda () (define-key php-mode-map (kbd "C-j") 'clipboard-kill-ring-save)))
 (toc:load-config-file '("textile-mode.el"))  
 
 ;; Load code snippets, shortcuts etc.
@@ -169,3 +185,5 @@
   ;; 	(load
   ;; 	 (expand-file-name "~/.emacs.d/elpa/package.el"))
   ;; (package-initialize)) 
+
+;; C-j to force ido-mode accept what was entered

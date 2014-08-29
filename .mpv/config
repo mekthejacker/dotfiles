@@ -1,18 +1,32 @@
-# About differences between MPlayer and MPlayer2 see official comparison
-#    http://www.mplayer2.org/differences/
+# For mpv from git at Juny 2014
 
+# Options that are common for any profile
 [default]
-# Common options
-# unneeded since mpv has softvol
-#mixer-channel="PCM Cent"
+osc=no
 alang=ja,jpn,en,eng,de,deu,ru,rus
-subcp=enca:ru:en
-autosub=no
+sub-codepage=enca:ru:en
+# Sub loading is done via watch.sh
+sub-auto=no
 softvol=yes
 screenshot-template=%F_%n
 screenshot-format=png
+# Compressing screenshots while mpv runs is slow,
+#   so compressing is done after with watch.sh
 screenshot-png-compression=0
+# Just in case I will need jpeg some day.
 screenshot-jpeg-quality=92
+volume=40
+#sub-ass=no
+osd-duration=3000
+osd-font=''
+# default: 45 px at Height==720px
+osd-font-size=30 
+sub-text-font='Linux Biolinum'
+sub-text-font-size=50
+# 0ms after window goes fullscreen
+cursor-autohide=0
+cursor-autohide-fs-only=yes
+save-position-on-quit=yes
 
 [hdmi]
 profile-desc="For output on big plasma"
@@ -21,8 +35,7 @@ hwdec=vdpau
 ## For this type of ALSA device specification see
 ## cat /proc/asound/devices
 ao=alsa:device=[hw:1,7]
-## For this type of ALSA device specification see
-## `aplay -L`
+## And for this type see `aplay -L`
 #ao=alsa:device=spdif
 #ao=alsa:device=hw=hdmi
 ####ac=hwac3,hwdts,hwmpa,
@@ -38,7 +51,7 @@ fs=yes
 vo=vdpau:sharpen=.5:denoise=1:deint=4:chroma-deint:pullup
 
 [protocol.dvdnav]
-mouse-movements=yes
+input-cursor=yes
 #nocache=yes
 
 [home]

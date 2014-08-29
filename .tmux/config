@@ -3,7 +3,8 @@
 #set-option -g default-path $HOME
 
 set-option -g default-terminal "screen-256color"
-
+# Sane scrolling
+set -g terminal-overrides 'xterm*:smcup@:rmcup@'
 # start window indexing at one instead of zero
 set -g base-index 1
 
@@ -45,10 +46,11 @@ set -g status-left ''
 set -g status-right ''
 set -g status-utf8 on
 
-# Msg display time
+# Msg display time 2 sec
 set -g display-time 2000
-set -g history-limit 8192
-set -g message-bg colour3
+# History limit for scrollback buffer _in lines_
+set -g history-limit 3000
+set -g message-bg colour3 # dark yellow
 set -g message-command-bg colour3
 
 setw -g utf8 on
