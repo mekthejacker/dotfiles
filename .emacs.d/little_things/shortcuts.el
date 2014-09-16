@@ -8,7 +8,7 @@
 ;; C-. will not work in terminal because C-. combination will produce 
 ;; <ASCII code of . -64>. ASCII code for . is 46 
 ;; and 46-64=-18 which is invalid.
-
+;(global-set-key (kbd "TAB") 'self-insert-command)
 (global-set-key (kbd "C-s")     'save-buffer)               ;; Save
 ;(global-set-key (kbd "C-S")     'write-file)               ;; Save as…
 (global-set-key (kbd "C-a")     'save-some-buffers)         ;; Save all unsaved

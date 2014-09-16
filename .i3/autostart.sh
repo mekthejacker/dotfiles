@@ -18,6 +18,10 @@ pointer_control() {
 	for dev in $pointer_devices; do xinput --$1 $dev; done
 }
 
+		# xrandr --output $PRIMARY_OUTPUT --primary
+		# xte "mousemove $(( WIDTH/2 ))  $(( HEIGHT/2 ))"
+		# xte 'mouseclick 1'
+
 # Wait for the last command sent to background to create a window
 wait_for_program () {
 	local c=0; until [ $((++c)) -eq 15 ]; do
@@ -30,10 +34,10 @@ wait_for_program () {
 # Cleaning before new session.
 # This is a well-known bug, emacsclient cannot connect to the daemon after X
 #   have been restarted.
-# Though, it works in a gentoo-way: via init scripts, 
+# Though, it works in a gentoo-way: via init scripts,
 #   like ‘/etc/init.d/emacs.username’.
-# This gives us the last solution: to run it from tmux session, if we want 
-#   to keep our configuration away from messing with system configuration, 
+# This gives us the last solution: to run it from tmux session, if we want
+#   to keep our configuration away from messing with system configuration,
 #   be it init scripts or whatever.
 #   pkill -9 emacsclient
 pkill -9 emacsclient
@@ -41,9 +45,9 @@ pkill -9 emacsclient
 # Because we can close terminals holding root's iftops, but not them.
 sudo /usr/bin/killall iftop
 
-# Applications that need to be started before layout setting: 
+# Applications that need to be started before layout setting:
 #   urxvtd, tmux and emacs daemon in tmux.
-# Substitute line: 
+# Substitute line:
 	# neww -n wa-a "{ (nohup emacs --daemon &>/dev/null) & } && /bin/bash " \; \
 #   is useless since emacsclient running from here still fails to connect to
 #   Emacs because it tries to do that while applications are messing around
@@ -98,13 +102,12 @@ case $HOSTNAME in
 		urxvtc
 		i3-msg split v
 		urxvtc -hold -title 'htop' -e htop
- 		# Now we have two terminals   ÷
-
+		# Now we have two terminals   ÷
 		# Move cursor near to the center of the lower urxvtc with htop
- 		xte "mousemove $(( WIDTH/2 ))  $(( 3*HEIGHT/4 ))"
+		xte "mousemove $(( WIDTH/2 ))  $(( 3*HEIGHT/4 ))"
 		# Focus it
- 		xte 'mouseclick 1'
- 		i3-msg split h
+		xte 'mouseclick 1'
+		i3-msg split h
 		iface_configs=(`ls ~/.iftop/$HOSTNAME.*`)
 		[ ${#iface_configs} -gt 1 ] && iftops_need_their_own_container=t
 		for ((i=0; i<${#iface_configs[@]}; i++)); do
@@ -121,7 +124,7 @@ case $HOSTNAME in
 
 		# Moving cursor to the upper empty urxvtc and raise it to ≈5/6
 		#   of the height
-		xte "mousemove $(( WIDTH/2 ))  $(( HEIGHT/4 ))" 
+		xte "mousemove $(( WIDTH/2 ))  $(( HEIGHT/4 ))"
 		xte 'mouseclick 1'
 		i3-msg resize grow height 30 px or 30 ppt
 		i3-msg split h
@@ -140,8 +143,8 @@ case $HOSTNAME in
 		i3-msg layout tabbed
 		urxvtc
 		urxvtc -hold -title tmux -e $tmux attach
- 		xte "mousemove $(( 11*WIDTH/12 )) $(( HEIGHT/2 ))"
- 		xte 'mouseclick 1'
+		xte "mousemove $(( 11*WIDTH/12 )) $(( HEIGHT/2 ))"
+		xte 'mouseclick 1'
 
 		# This is for calling via hotkey in ~/.i3/config to test without
 		#   restarting WM.

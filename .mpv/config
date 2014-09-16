@@ -2,7 +2,9 @@
 
 # Options that are common for any profile
 [default]
+# No on-screen controller buttons
 osc=no
+# Audio track languages
 alang=ja,jpn,en,eng,de,deu,ru,rus
 sub-codepage=enca:ru:en
 # Sub loading is done via watch.sh
@@ -15,7 +17,7 @@ screenshot-format=png
 screenshot-png-compression=0
 # Just in case I will need jpeg some day.
 screenshot-jpeg-quality=92
-volume=40
+volume=50
 #sub-ass=no
 osd-duration=3000
 osd-font=''

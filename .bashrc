@@ -20,13 +20,13 @@ for opt in autocd cdspell dirspell dotglob extglob globstar \
 	shopt -s $opt
 done
 for completion_module in eix eselect gentoo git gpg iptables layman man \
-	smartctl ssh strace sysctl taskset tmux udisks; do 
+	smartctl ssh strace sysctl taskset tmux udisks; do
 	eselect bashcomp enable $completion_module &>/dev/null
 done
 unset opt completion_module
-# man bash says that non-login shells do not source /etc/profile and 
+# man bash says that non-login shells do not source /etc/profile and
 #   ~/.bash_profile. My shells are non-login, however, they have PATH set
-#   and they source ~/.bash_profile (which is sourcing this file 
+#   and they source ~/.bash_profile (which is sourcing this file
 #   in its turn). A miracle.
 . /etc/profile.d/bash-completion.sh
 
@@ -56,7 +56,7 @@ export PS1="\[\e[01;34m\]┎ \w\n\[\e[01;34m\]┖ \
 ## Aliases caveats and hints:
 ## 1. All innder double quotes must be escaped
 #     alias preservequotespls="echo \"naive example!\""
-## 2. Every call of subshell must be escaped or it will be executing 
+## 2. Every call of subshell must be escaped or it will be executing
 #     at the time this file loads.
 #     alias dontlistmyhomefolderpls="for i in \`ls\`; do ls $i; done"
 ## 3. To prevent early expanding of variable names, one can use single
@@ -86,8 +86,10 @@ alias deploy="/root/scripts/deploy_configuration.sh "
 
 [ ! -v DISPLAY -a "`tty`" = /dev/tty2 ] && {
 	# W! startx IGNORES ~/.xserverrc options if something passed beyond -- !
-	exec startx -- -config xorg.conf$(<~/.xorg.conf.suffix) -nolisten tcp &>~/x.log
-	rm ~/.xorg.conf.suffix &>/dev/null
+	exec startx -- -nolisten tcp &>~/x.log # /etc/X11/xorg.conf
+	# This was needed when I used to switch between configs.
+	# exec startx -- -config xorg.conf$(<~/.xorg.conf.suffix) -nolisten tcp &>~/x.log
+	# rm ~/.xorg.conf.suffix &>/dev/null
 }
 
 pushd ~/bashrc >/dev/null
@@ -176,8 +178,4 @@ mount_box() {
 
 umount_box() {
 	sudo /root/scripts/mount_box.sh $USER umount &
-}
-
-umount_stick() {
-	sudo /usr/bin/killall -USR1 automount
 }

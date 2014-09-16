@@ -68,9 +68,9 @@ run_app() {
 # NB: only actual binaries with absolute paths here!
 case ${0##*/} in
 	firefox)
-		[ -e /usr/bin/firefox ] \
-			&& firefox=/usr/bin/firefox \
-			|| firefox=/usr/bin/firefox-bin
+		[ -e /usr/bin/firefox-bin ] \
+			&& firefox=/usr/bin/firefox-bin \
+			|| firefox=/usr/bin/firefox
 		if pgrep -f $firefox &>/dev/null; then
 			# zenity --info --text="$*"
 			# $@ is not a plain link, but firefox understands it.

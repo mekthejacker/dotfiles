@@ -26,6 +26,7 @@
  '(eshell-highlight-prompt nil)
  '(fringe-mode (quote (0)) nil (fringe))
  '(global-hl-line-mode t)
+ '(global-whitespace-mode t)
  '(ibuffer-modified-char 43)
  '(ibuffer-read-only-char 215)
  '(indent-tabs-mode t)
@@ -43,12 +44,18 @@
  '(scalable-fonts-allowed t)
  '(scroll-bar-mode (quote left))
  '(show-paren-mode t)
+ '(show-trailing-whitespace t)
  '(tab-always-indent (quote complete))
  '(tab-stop-list (quote (4 8 12 16 20 24 28 32 36 40 44 48 52 56 58)))
  '(text-mode-hook (quote (turn-on-auto-fill text-mode-hook-identify)))
  '(text-scale-mode-step 1.0)
  '(tool-bar-mode nil)
- '(word-wrap t))
+ '(whitespace-display-mappings (quote ((space-mark 32 [45] [46]) (space-mark 160 [43] [95]) (newline-mark 10 [4347 10]) (tab-mark 9 [9002 9135 9135 9135] [9552 9]))))
+ '(whitespace-global-modes t)
+ '(whitespace-line-column 10000)
+ '(whitespace-style (quote (face tabs spaces trailing newline indentation empty space-mark tab-mark newline-mark)))
+ '(word-wrap t)
+ '(x-stretch-cursor t))
 
 ;; good old colors:
 ;; bg: #2e3436
@@ -114,14 +121,23 @@
  '(textile-h3-face ((t (:height 1.1))))
  '(textile-image-face ((t (:foreground "palegreen"))))
  '(textile-link-face ((t (:foreground "#729fcf"))))
- '(trailing-whitespace ((((class color) (background dark)) (:background "#eeeeee" :foreground "#eeeeee")))))
+ '(trailing-whitespace ((t (:background "powder blue" :foreground "white smoke"))))
+ '(whitespace-empty ((t (:background "powder blue"))))
+ '(whitespace-hspace ((t (:foreground "grey10"))))
+ '(whitespace-indentation ((t (:foreground "grey10"))))
+ '(whitespace-newline ((t (:foreground "grey10" :weight bold))))
+ '(whitespace-space ((t (:foreground "grey10"))))
+ '(whitespace-space-after-tab ((t (:foreground "grey10"))))
+ '(whitespace-space-before-tab ((t (:foreground "grey10"))))
+ '(whitespace-tab ((t (:foreground "grey10"))))
+ '(whitespace-trailing ((t (:background "powder blue" :foreground "white smoke")))))
 
 ;; settings for smooth-scrolling.el
 (setq scroll-conservatively 10000
-	  scroll-preserve-screen-position 1
-	  ;; redisplay-dont-pause t
-	  ;; scroll-margin 1
-	  ;; scroll-step 1
+      scroll-preserve-screen-position 1
+      ;; redisplay-dont-pause t
+      ;; scroll-margin 1
+      ;; scroll-step 1
 )
 
 ;;(turn-off-auto-fill)
@@ -145,7 +161,7 @@
 (add-hook 'php-mode-hook (lambda () (define-key php-mode-map (kbd "C-.") 'rotate-windows)))
 (add-hook 'nxml-mode-hook (lambda () (define-key nxml-mode-map (kbd "M-h") 'beginning-of-line)))
 (add-hook 'nroff-mode-hook (lambda () (define-key php-mode-map (kbd "C-j") 'clipboard-kill-ring-save)))
-(toc:load-config-file '("textile-mode.el"))  
+(toc:load-config-file '("textile-mode.el"))
 
 ;; Load code snippets, shortcuts etc.
 (load "~/.emacs.d/little_things/code_snippets.el")

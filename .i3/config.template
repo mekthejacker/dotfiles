@@ -29,7 +29,7 @@ bindcode $mod+Shift+45 move down
 bindcode $mod+Shift+46 move right
 
 ## Split in horizontal orientation [h]
-bindcode $mod+43 split h 
+bindcode $mod+43 split h
 ## Split in vertical orientation [v]
 bindcode $mod+55 split v
 ## Change container layout (stacked, tabbed, default)
@@ -51,22 +51,21 @@ bindcode $mod+30 focus parent
 ## Focus the child container [m]
 bindcode $mod+58 focus child
 
-## Focus last floating/tiling container
-# bindsym $mod+g focus mode_toggle
+## Focus last floating/tiled container
+bindsym $mod+Shift+space focus mode_toggle
 
 ## Focus to next output to the left [u]
 bindcode $mod+Control+30 focus output left
 ## Focus to next output to the right [o]
 bindcode $mod+Control+32 focus output right
 
-
 ## Reload the configuration file
 bindsym $mod+Shift+r reload
 ## Restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
 bindsym $mod+Control+r restart
 bindsym $mod+Control+q exec "sudo /usr/bin/killall iftop; rm -rf /tmp/decrypted; i3-msg exit"
-bindsym $mod+Control+Shift+q exec "sudo /usr/bin/killall iftop; ~/scripts/xorg.conf_chooser.sh"
-
+# To choose other xorg.conf when X will start again.
+# bindsym $mod+Control+Shift+q exec "sudo /usr/bin/killall iftop; ~/scripts/xorg.conf_chooser.sh"
 bindsym $mod+Control+t exec "~/.i3/autostart.sh stop_after_main_workspace"
 
 # How to make it work?
@@ -75,13 +74,13 @@ bindsym $mod+Control+t exec "~/.i3/autostart.sh stop_after_main_workspace"
 
 ## Resize window (you can also use the mouse for that)
 mode "resize" {
-        bindcode 31   resize grow height 10 px or 10 ppt
-        bindcode 44   resize shrink width 10 px or 10 ppt
-        bindcode 45   resize shrink height 10 px or 10 ppt
-        bindcode 46   resize grow width 10 px or 10 ppt
-        ## Back to normal: Enter or Escape
-        bindsym Return mode "default"
-        bindsym Escape mode "default"
+	bindcode 31   resize grow height 10 px or 10 ppt
+	bindcode 44   resize shrink width 10 px or 10 ppt
+	bindcode 45   resize shrink height 10 px or 10 ppt
+	bindcode 46   resize grow width 10 px or 10 ppt
+	## Back to normal: Enter or Escape
+	bindsym Return mode "default"
+	bindsym Escape mode "default"
 }
 bindsym $mod+x mode "resize"
 
@@ -106,7 +105,7 @@ bindcode $mod+Control+46 exec --no-startup-id i3lock
 #
 ## F1
 bindcode $mod+67 exec --no-startup-id mpc toggle
-## F2 
+## F2
 bindcode $mod+68 exec --no-startup-id "~/scripts/add2playlist.sh"
 bindcode $mod+Shift+68 exec --no-startup-id "~/scripts/add2playlist.sh -c" # create new
 ## F3
@@ -135,72 +134,80 @@ bindcode $mod+Shift+95 exec --no-startup-id eject -t
 #bindcode $mod+96 exec --no-startup-id /bin/bash -c ""
 
 # G # restrict wallpapers to subdirectory
-bindcode $mod+42 exec --no-startup-id "~/scripts/wallpaper_setter.sh -r" 
+bindcode $mod+42 exec --no-startup-id "~/scripts/wallpaper_setter.sh -r"
 # B # decrease brightness
-bindcode $mod+56 exec --no-startup-id "~/scripts/wallpaper_setter.sh -b -0.1" 
+bindcode $mod+56 exec --no-startup-id "~/scripts/wallpaper_setter.sh -b -0.1"
 # Shift+B # increase brightness
-bindcode $mod+Shift+56 exec --no-startup-id "~/scripts/wallpaper_setter.sh -b +0.1" 
+bindcode $mod+Shift+56 exec --no-startup-id "~/scripts/wallpaper_setter.sh -b +0.1"
 # N # change mode
-bindcode $mod+57 exec --no-startup-id "~/scripts/wallpaper_setter.sh -m" 
+bindcode $mod+57 exec --no-startup-id "~/scripts/wallpaper_setter.sh -m"
 # < # set previous
-bindcode $mod+59 exec --no-startup-id "~/scripts/wallpaper_setter.sh -p" 
+bindcode $mod+59 exec --no-startup-id "~/scripts/wallpaper_setter.sh -p"
 # > # set new
-bindcode $mod+60  exec --no-startup-id "~/scripts/wallpaper_setter.sh -n" 
+bindcode $mod+60  exec --no-startup-id "~/scripts/wallpaper_setter.sh -n"
 # Shift+> # force new
 bindcode $mod+Shift+60  exec --no-startup-id "~/scripts/wallpaper_setter.sh -fn"
 # / # keep
 bindcode $mod+61 exec --no-startup-id "~/scripts/wallpaper_setter.sh -k"
 
 ## Switch to workspace and launch related application.
-bindsym $mod+1 workspace 1: Main
-bindsym $mod+2 exec --no-startup-id "i3-msg workspace 2: Firefox && { pgrep -u $UID firefox &>/dev/null || { firefox & } }"
-bindsym $mod+3 exec --no-startup-id "i3-msg workspace 3: Thunar && { pgrep -u $UID thunar &>/dev/null || { thunar & } }"
+bindsym $mod+1 workspace 1:Main
+bindsym $mod+2 exec --no-startup-id "i3-msg workspace 2:Firefox && { pgrep -u $UID firefox &>/dev/null || { firefox & } }"
+bindsym $mod+3 exec --no-startup-id "i3-msg workspace 3:Thunar && { pgrep -u $UID thunar &>/dev/null || { thunar & } }"
 # This is to distinguish emacsclient window running in X and those in terminals,
 #   i.e. to forbid creation more than one X window while there can be other
 #   emacsclients in terminals. See also ‘ec‘ and ‘emc’ aliases in ~/.bashrc.
-bindsym $mod+4 exec --no-startup-id "i3-msg workspace 4: Emacs && { pgrep -u $UID -f '^emacsclient --al' || { emacsclient --alternate-editor= -c -display $DISPLAY & } }"
-bindsym $mod+5 workspace 5: Misc
-bindsym $mod+6 workspace 6: IM
-bindsym $mod+7 workspace 7: Games
-bindsym $mod+8 exec --no-startup-id "i3-msg workspace 8: GIMP && { pgrep -u $UID gimp &>/dev/null || { gimp & } }"
-bindsym $mod+9 exec --no-startup-id "i3-msg workspace 9: MPD && { pgrep -u $UID ncmpcpp &>/dev/null || { urxvtc -name ncmpcpp -e ncmpcpp & } }"
+bindsym $mod+4 exec --no-startup-id "i3-msg workspace 4:Emacs && { pgrep -u $UID -f '^emacsclient --al' || { emacsclient --alternate-editor= -c -display $DISPLAY & } }"
+bindsym $mod+5 workspace 5:Misc
+bindsym $mod+6 workspace 6:IM
+bindsym $mod+7 workspace 7:Games
+bindsym $mod+8 exec --no-startup-id "i3-msg workspace 8:GIMP && { pgrep -u $UID gimp &>/dev/null || { gimp & } }"
+bindsym $mod+9 exec --no-startup-id "i3-msg workspace 9:MPD && { pgrep -u $UID ncmpcpp &>/dev/null || { urxvtc -name ncmpcpp -e ncmpcpp & } }"
 bindsym $mod+0 workspace Outer space
 bindcode $mod+20 workspace Mail
 
-## Set 10-th workspace to appear on big monitor
-workspace "Outer space" output VGA1
+workspace "1:Main"        output PRIMARY_OUTPUT
+workspace "2:Firefox"     output PRIMARY_OUTPUT
+workspace "3:Thunar"      output PRIMARY_OUTPUT
+workspace "4:Emacs"       output PRIMARY_OUTPUT
+workspace "5:Misc"        output PRIMARY_OUTPUT
+workspace "6:IM"          output PRIMARY_OUTPUT
+workspace "7:Games"       output PRIMARY_OUTPUT
+workspace "8:GIMP"        output PRIMARY_OUTPUT
+workspace "9:MPD"         output PRIMARY_OUTPUT
+workspace "0:Outer_space" output SLAVE_OUTPUT_1
 
 ## Move focused container to workspace
-bindsym $mod+Shift+1 move container to workspace 1: Main
-bindsym $mod+Shift+2 move container to workspace 2: Firefox
-bindsym $mod+Shift+3 move container to workspace 3: Thunar
-bindsym $mod+Shift+4 move container to workspace 4: Emacs
-bindsym $mod+Shift+5 move container to workspace 5: Misc
-bindsym $mod+Shift+6 move container to workspace 6: IM
-bindsym $mod+Shift+7 move container to workspace 7: Games
-bindsym $mod+Shift+8 move container to workspace 8: GIMP
-bindsym $mod+Shift+9 move container to workspace 9: MPD
-bindsym $mod+Shift+0 move container to workspace Outer space
+bindsym $mod+Shift+1 move container to workspace 1:Main
+bindsym $mod+Shift+2 move container to workspace 2:Firefox
+bindsym $mod+Shift+3 move container to workspace 3:Thunar
+bindsym $mod+Shift+4 move container to workspace 4:Emacs
+bindsym $mod+Shift+5 move container to workspace 5:Misc
+bindsym $mod+Shift+6 move container to workspace 6:IM
+bindsym $mod+Shift+7 move container to workspace 7:Games
+bindsym $mod+Shift+8 move container to workspace 8:GIMP
+bindsym $mod+Shift+9 move container to workspace 9:MPD
+bindsym $mod+Shift+0 move container to workspace 0:"Outer_space"
 ## - (minus/hyphen key)
 bindcode $mod+Shift+20 move container to workspace Mail
 
 ## Assigning windows to workspaces
-assign [class="Firefox"] → "2: Firefox"
-assign [class="Thunar"] → "3: Thunar"
-assign [class="Emacs"] → "4: Emacs"
-assign [class="^libreoffice.*"] → "5: Misc"
-assign [class="^qemu.*"] → "5: Misc"
-assign [class="openshot"] → "5: Misc"
-assign [class="screenshot_preview"] → "5: Misc"
-assign [class="Pidgin"] → "6: IM"
-assign [class="Skype"] → "6: IM"
-assign [class="Ts3client"] → "6: IM"
-assign [class="Wine"] → "7: Games"
-assign [class="Steam"] → "7: Games" 
-assign [class="hl2_linux"] → "7: Games" 
-assign [class="Gimp"] → "8: GIMP"
-assign [class="URxvt" instance="ncmpcpp"] → "9: MPD"
-assign [class="Thunderbird"] → Mail
+assign [class="Firefox"] → "2:Firefox"
+assign [class="Thunar"] → "3:Thunar"
+assign [class="Emacs"] → "4:Emacs"
+assign [class="^libreoffice.*"] → "5:Misc"
+assign [class="^qemu.*"] → "5:Misc"
+assign [class="openshot"] → "5:Misc"
+assign [class="screenshot_preview"] → "5:Misc"
+assign [class="Pidgin"] → "6:IM"
+assign [class="Skype"] → "6:IM"
+assign [class="Ts3client"] → "6:IM"
+assign [class="Wine"] → "7:Games"
+assign [class="Steam"] → "7:Games"
+assign [class="hl2_linux"] → "7:Games"
+assign [class="Gimp"] → "8:GIMP"
+assign [class="URxvt" instance="ncmpcpp"] → "9:MPD"
+assign [class="Thunderbird"] → "0:Outer_space"
 
 ## Arbitrary commands for specific windows
 for_window [class="URxvt" instance="one_command_shell"] floating enable
@@ -218,11 +225,11 @@ hide_edge_borders both
 focus_follows_mouse no
 
 # Default
-# class                   border  backgr. text    indicator
-# client.focused          #4c7899 #285577 #ffffff #2e9ef4
-# client.focused_inactive #333333 #5f676a #ffffff #484e50
-# client.unfocused        #333333 #222222 #888888 #292d2e
-# client.urgent           #2f343a #900000 #ffffff #900000
+# class                     border  backgr. text    indicator
+# client.focused            #4c7899 #285577 #ffffff #2e9ef4
+# client.focused_inactive   #333333 #5f676a #ffffff #484e50
+# client.unfocused          #333333 #222222 #888888 #292d2e
+# client.urgent             #2f343a #900000 #ffffff #900000
 
 # # Commie colors
 # # dark red     9a0 000
@@ -234,48 +241,49 @@ focus_follows_mouse no
 # client.unfocused          #555753 #3c3c3c #d5b210 #ad7fa8
 # client.urgent             #ad7fa8 #ad7fa8 #ffffff #ff0000
 
-# class                  border  backgr. text    indicator
-client.focused            #ad7fa8 #75507b #ffffff #ad7fa8
-client.focused_inactive   #555753 #3c3c3c #ffffff #ad7fa8
-client.unfocused          #555753 #3c3c3c #888888 #ad7fa8
-client.urgent             #ad7fa8 #ad7fa8 #ffffff #ff0000
+# class                     border  backgr. text    indicator
+client.focused              #ad7fa8 #75507b #ffffff #ad7fa8
+client.focused_inactive     #555753 #3c3c3c #ffffff #ad7fa8
+client.unfocused            #555753 #3c3c3c #888888 #ad7fa8
+client.urgent               #ad7fa8 #ad7fa8 #ffffff #ff0000
 
 bar {
 	# verbose yes
+	output PRIMARY_OUTPUT
 	position top
 	tray_output none
 	workspace_buttons yes
+	strip_workspace_numbers yes
 	status_command ". ~/.i3/generate_json_for_i3bar.sh"
 	colors {
 		background #3c3c3c
-        statusline #bbbbbb
-		# Commie		
+		statusline #bbbbbb
+		# Commie
 		# statusline #d5b210
-		
+
 		# Default
-        #                    border  backgr  text
+		#                    border  backgr  text
 		# focused_workspace  #4c7899 #285577 #ffffff
 		# active_workspace   #333333 #5f676a #ffffff
 		# inactive_workspace #333333 #222222 #888888
 		# urgent_workspace   #2f343a #900000 #ffffff
 
 		# Commie
-		# focused_workspace			 #e60000 #9a0000 #fdd116
-		# active_workspace			 #75507b #ad7fa8 #ffffff
-		# inactive_workspace		 #3c3c3c #3c3c3c #d5b210
-		# urgent_workspace			 #df5757 #c22f2f #ffffff
+		# focused_workspace  #e60000 #9a0000 #fdd116
+		# active_workspace   #75507b #ad7fa8 #ffffff
+		# inactive_workspace #3c3c3c #3c3c3c #d5b210
+		# urgent_workspace   #df5757 #c22f2f #ffffff
 
-		focused_workspace 		 #ad7fa8 #75507b #ffffff
-		active_workspace		 #75507b #ad7fa8 #ffffff
-		inactive_workspace		 #3c3c3c #3c3c3c #aaaaaa
-		urgent_workspace		 #df5757 #c22f2f #ffffff
-    }
+		focused_workspace    #ad7fa8 #75507b #ffffff
+		active_workspace     #75507b #ad7fa8 #ffffff
+		inactive_workspace   #3c3c3c #3c3c3c #aaaaaa
+		urgent_workspace     #df5757 #c22f2f #ffffff
+	}
 }
 
- # # big monitor: everything
- # bar {
- # 	## Useful for presentations
- # 	position top
- #    ## The display is connected either via HDMI or via DisplayPort
- #    output HDMI-0
- # }
+# bar {
+# 	output HDMI-0
+# 	position top
+# 	workspace_buttons yes
+# 	status_command ". ~/.i3/generate_json_for_i3bar.sh"
+# }

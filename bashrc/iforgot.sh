@@ -427,11 +427,11 @@ iforgot-last-argument-passed-to-shell() {
 
 iforgot-qemu-create-image() {
 cat <<EOF
-	qemu-img create -f qcow2 -o \
-		compat=1.1,\
-		cluster_size=512,\
-		preallocation=metadata,\
-		lazy_refcounts=on \
+	qemu-img create -f qcow2 -o
+		compat=1.1,
+		cluster_size=512,
+		preallocation=metadata,
+		lazy_refcounts=on
 	<filename> <size>
 EOF
 }
