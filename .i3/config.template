@@ -207,7 +207,7 @@ assign [class="Steam"] → "7:Games"
 assign [class="hl2_linux"] → "7:Games"
 assign [class="Gimp"] → "8:GIMP"
 assign [class="URxvt" instance="ncmpcpp"] → "9:MPD"
-assign [class="Thunderbird"] → "0:Outer_space"
+assign [class="mpv" instance="big_screen"] → "0:Outer_space"
 
 ## Arbitrary commands for specific windows
 for_window [class="URxvt" instance="one_command_shell"] floating enable
