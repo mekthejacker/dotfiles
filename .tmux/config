@@ -37,7 +37,7 @@ bind R source-file ~/.tmux/config \; \
 
 # X window title
 set -g set-titles on
-set -g set-titles-string 'tmux@#H:"#W"'
+set -g set-titles-string 'tmux^#H'
 
 set -g status-bg '#181818'
 set -g status-fg '#aaaaaa'
@@ -48,7 +48,7 @@ set -g status-utf8 on
 
 # Msg display time 2 sec
 set -g display-time 2000
-# History limit for scrollback buffer _in lines_
+# History limit for scrollback buffer in lines_
 set -g history-limit 3000
 set -g message-bg colour3 # dark yellow
 set -g message-command-bg colour3
@@ -56,7 +56,7 @@ set -g message-command-bg colour3
 setw -g utf8 on
 
 setw -g window-status-format '#I:#W'
-setw -g window-status-current-format '#I:#W'
+setw -g window-status-current-format '#I:#T'
 
 # Smell british scent around here…
 # Also see ~/.Xresources for colour palette.
