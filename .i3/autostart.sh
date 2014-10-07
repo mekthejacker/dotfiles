@@ -3,13 +3,11 @@
 # autostart.sh
 # This script is called from ~/.i3/config with ‘exec ~/.i3/autstart.sh’
 
-# set -x
-# exec &>~/autostart.log
-
-# Check for two monitors and wacom.
-# xsetwacom --set <ID> MapToOuput WxH+0+0
-# W = 1st_screen_width/(2nd_screen_width/1st_screen_width)
-# H = ———"———
+[ "${ENV_DEBUG/*a*/}" ] || {
+	exec &>/tmp/envlogs/autostart
+	date
+	set -x
+}
 
 # Temporarily disable pointer while setting layout
 pointer_control() {
@@ -17,10 +15,6 @@ pointer_control() {
 		| sed -nr '/Virtual\score.*pointer/ !s/.*id=([0-9]+)\s+\[slave\s+pointer.*/\1/p')
 	for dev in $pointer_devices; do xinput --$1 $dev; done
 }
-
-		# xrandr --output $PRIMARY_OUTPUT --primary
-		# xte "mousemove $(( WIDTH/2 ))  $(( HEIGHT/2 ))"
-		# xte 'mouseclick 1'
 
 # Wait for the last command sent to background to create a window
 wait_for_program () {
@@ -42,7 +36,7 @@ wait_for_program () {
 #   pkill -9 emacsclient
 pkill -9 emacsclient
 
-# Because we can close terminals holding root's iftops, but not them.
+# Because we can close terminals holding root’s iftops, but not them.
 sudo /usr/bin/killall iftop
 
 # Applications that need to be started before layout setting:
@@ -71,7 +65,7 @@ pgrep -u $UID -f '^tmux.*$' &>/dev/null || $tmux \
 
 pointer_control disable
 
-# WIDTH and HEIGHT were set in the ~/.preinit.sh
+# WIDTH and HEIGHT were set in the ~/preload.sh
 case $HOSTNAME in
 	fanetbook)
 		hsetroot -fill ~/.env/wallpaper.png
@@ -158,11 +152,11 @@ case $HOSTNAME in
 		# But if daemon runs from here, it will fail after X restart ;_;
 		# Crapissimo: neither -a, nor -a '', -a "", -a $'\000' do not work.
 		startup_apps=(firefox pidgin) #  "emacsclient --alternate-editor= -c -display $DISPLAY")
+		# ↖ These apps are to be killed gracefully by ~/.i3/on_quit.sh
 		;;
 esac
 pointer_control enable
 
-#set -x
 # Some configs decrypted at ~/bin/run_app.sh
 for app in mpd thunar "${startup_apps[@]}"; do
 	# { … & } becasue otherwise ‘&’ will fork to background the whole string

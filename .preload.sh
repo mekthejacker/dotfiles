@@ -5,9 +5,11 @@
 # It starts deamons needed to be started before the window manager.
 # ~/.bashrc runs this script for ssh clients.
 
-set -x
-exec &>~/preload.log
-date
+[ "${ENV_DEBUG/*p*/}" ] || {
+	exec &>/tmp/envlogs/preload
+	date
+	set -x
+}
 
 # Starting zenity progress window to be aware when lags come from
 #   if they appear.

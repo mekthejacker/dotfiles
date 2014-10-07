@@ -15,6 +15,18 @@ unalias -a
 unset -f `sed -nr "s/^\s*([-_a-zA-Z0-9]+)\(\)\s*\{.*$/\1/p" \
           ~/.bashrc ~/bashrc/* 2>/dev/null`
 
+[ -d /tmp/envlogs ] || mkdir -m 700 /tmp/envlogs # /tmp should be on tmpfs
+# code     file               logfile (under /tmp/envlogs/)
+# x    /usr/bin/X          x (just for the mention, it’s always present)
+# p    ~/.preload.sh       preload
+# i    /usr/bin/i3         i3.stdout + i3.stderr
+# g    ~/.i3/g…_for_i3bar  gentext4i3bar
+# a    ~/.i3/autostart.sh  autostart
+# r    ~/bin/run_app.sh    runapp_<app_name>
+# q    ~/.i3/on_quit.sh    on_quit
+# -    prevents the variable to be empty
+export ENV_DEBUG=-p
+
 for opt in autocd cdspell dirspell dotglob extglob globstar \
 	no_empty_cmd_completion; do
 	shopt -s $opt
@@ -86,9 +98,9 @@ alias deploy="/root/scripts/deploy_configuration.sh "
 
 [ ! -v DISPLAY -a "`tty`" = /dev/tty2 ] && {
 	# W! startx IGNORES ~/.xserverrc options if something passed beyond -- !
-	exec startx -- -nolisten tcp &>~/x.log # /etc/X11/xorg.conf
+	exec startx -- -nolisten tcp &>/tmp/envlogs/x # /etc/X11/xorg.conf as config
 	# This was needed when I used to switch between configs.
-	# exec startx -- -config xorg.conf$(<~/.xorg.conf.suffix) -nolisten tcp &>~/x.log
+	# exec startx -- -config xorg.conf$(<~/.xorg.conf.suffix) -nolisten tcp &>/tmp/envlogs/x
 	# rm ~/.xorg.conf.suffix &>/dev/null
 }
 

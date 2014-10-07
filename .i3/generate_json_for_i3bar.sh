@@ -3,9 +3,11 @@
 # generate-text-for-i3bar.sh
 # A replacement for i3status written in bash.
 
-# Shebang here is just for you to check the JSON output for syntax errors, 
-#   not for running as executable in your i3 config, 
+# Shebang here is just for you to check the JSON output for syntax errors,
+#   not for running as executable in your i3 config,
 #   where it must be _sourced_ from.
+
+[ "${ENV_DEBUG/*g*/}" ] || exec 2>/tmp/envlogs/gentext4i3bar
 
 # Colors for output
 red='#ee1010'

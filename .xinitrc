@@ -8,7 +8,9 @@
 # CONFIG_IDE=n				← This breaks both udev and udisks.
 # CONFIG_AUDITSYSCALL=y		← gdm requires it(?)
 # In case of troubles: http://forums.gentoo.org/viewtopic-t-858965-highlight-.html
-exec ck-launch-session \
-	 dbus-launch --sh-syntax --exit-with-session \
-	 i3 &>/dev/null
-#	 i3 -V -d all >~/.i3/stdout 2>~/.i3/stderr
+
+[ "${ENV_DEBUG/*i*/}" ] \
+	&& i3_cmdline='i3 &>/dev/null' \
+	|| i3_cmdline='i3 -V -d all >/tmp/envlogs/i3.stdout 2>/tmp/envlogs/i3.stderr'
+
+eval exec ck-launch-session dbus-launch --sh-syntax --exit-with-session $i3_cmdline

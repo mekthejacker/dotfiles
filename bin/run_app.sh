@@ -93,8 +93,15 @@ run_app() {
 	}
 }
 
-# NB: only actual binaries with absolute paths here!
-case ${0##*/} in
+app_name=${0##*/}
+[ "${ENV_DEBUG/*r*/}" ] || {
+	elog=/tmp/envlogs/runapp_$app_name
+	exec &>$elog
+	set -x
+}
+
+case $app_name in
+	# NB: only actual binaries with absolute paths here!
 	firefox)
 		[ -e /usr/bin/firefox-bin ] \
 			&& firefox=/usr/bin/firefox-bin \
