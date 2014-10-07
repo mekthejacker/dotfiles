@@ -1,7 +1,6 @@
 [ -v DISPLAY ] && {
 	xhost +si:localuser:sszb > /dev/null
-	export WINEPREFIX=/home/sszb/.wine
-	export WINEARCH=win32
+	# export WINEARCH=win32
 	export WINEDEBUG="-all"
 	# In order to get output use
 	#     WINEDEBUG=warn wine …
@@ -12,11 +11,19 @@
 	export __GL_SYNC_TO_VBLANK=0
 	export __GL_YIELD="NOTHING"
 	export SDL_AUDIODRIVER=alsa
-	alias wine='LANG=ru_RU.UTF-8 sudo -u sszb -H /usr/bin/wine'
-	alias winetricks='sudo -u sszb -H /usr/bin/winetricks --optout'
-	alias winecfg='sudo -u sszb -H /usr/bin/winecfg'
-	alias regedit='sudo -u sszb -H /usr/bin/regedit'
-	alias kill-semaphores="for i in $(ipcs -s |sed -rn 's/.*\s([0-9]+)\s+sszb.*/\1/p'); do ipcrm -s $i; done"
+# LANG=ru_RU.UTF-8
+	_32_env='WINEARCH=win32 WINEPREFIX=/home/sszb/.wine'
+	_64_env='WINEARCH=win64 WINEPREFIX=/home/sszb/.wine64'
+
+	alias wine="$_32_env  sudo -u sszb -H /usr/bin/wine"
+	alias winetricks="$_32_env  sudo -u sszb -H /usr/bin/winetricks --optout"
+	alias winecfg="$_32_env  sudo -u sszb -H /usr/bin/winecfg"
+	alias regedit="$_32_env  sudo -u sszb -H /usr/bin/regedit"
+	alias wine64="$_64_env  sudo -u sszb -H /usr/bin/wine64"
+	alias winetricks64="$_64_env  sudo -u sszb -H /usr/bin/winetricks --optout"
+	alias winecfg64="$_64_env  sudo -u sszb -H /usr/bin/winecfg"
+	alias regedit64="$_64_env  sudo -u sszb -H /usr/bin/regedit"
+	alias kill-semaphores="for i in $(ipcs -s | sed -rn 's/.*\s([0-9]+)\s+sszb.*/\1/p'); do ipcrm -s $i; done"
 	# Apps
 	#   alias borderlands="WINEDLLOVERRIDES=mmdevapi wine /home/sszb/.wine/drive_c/Games/Borderlands/Binaries/Borderlands.exe"
 	#   alias ac="wine /home/sszb/.wine/drive_c/Program\ Files/Ubisoft/Assassin\'s\ Creed/AssassinsCreed_Game.exe &"
@@ -31,14 +38,20 @@
 	alias steam="taskset -c 1-3 steam"
 	alias zeus="pushd /home/games/Poseidon; wine Zeus.exe; popd"
 	alias hegemony="wine /home/games/Hegemony\ Gold\ -\ Wars\ of\ Ancient\ Greece/Hegemony\ Gold.exe"
-	alias banished="pushd /home/gamefiles/Banished; WINEARCH=win64 WINEPREFIX=/home/sszb/.wine64 wine Banished.exe; popd"
+	alias banished="pushd /home/gamefiles/Banished; wine64 Banished.exe; popd"
 	alias minimetro="$HOME/assembling/minimetro/MiniMetro*x86_64"
 
 	alias killsteam="pkill -9 -f 'hl2.*'; pkill -9 -f steam"
 	alias killsszb='sudo -u sszb /usr/bin/killall -9 -u sszb'
 
+	set_wineprefix64() {
+		eval $_64_env  set_wineprefix
+	}
+
 	# $1 == '--setoptonly' (optional) — quit after setting options
 	set_wineprefix() {
+		[ -v WINEARCH ] || local WINEARCH=win32
+		[ -v WINEPREFIX ] || local WINEPREFIX=/home/sszb/.wine
 		# Maybe some day it will work…
 		# shopt -s expand_aliases
 		local w='\e[00;37m'
@@ -143,6 +156,6 @@ EOF
 
 
 # If ‘steam servers are too busy (error 2)’ after ‘completing installation’ freezes on 0 or 1%,
-#   this is wine issue. Reinstall
+#   this is probably a wine issue. Try to reinstall
 #   http://www.microsoft.com/en-us/download/details.aspx?id=21835
 #   http://www.microsoft.com/en-us/download/details.aspx?id=30679

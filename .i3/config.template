@@ -4,7 +4,6 @@
 #
 # To get a config file with the same key positions, but for your current
 # layout, use the i3-config-wizard
-#
 
 # font for window titles. ISO 10646 = Unicode
 # font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
@@ -12,11 +11,7 @@ font xft:Terminus 12
 
 ## Keybindings
 set $mod Mod4
-
-## Use Mouse+$mod to drag floating windows to their wanted position
-floating_modifier $mod
-
-## Change focus ijkl ↑←↓→
+## Focus: ijkl  ->  ↑←↓→
 bindcode $mod+31 focus up
 bindcode $mod+44 focus left
 bindcode $mod+45 focus down
@@ -27,48 +22,48 @@ bindcode $mod+Shift+31 move up
 bindcode $mod+Shift+44 move left
 bindcode $mod+Shift+45 move down
 bindcode $mod+Shift+46 move right
-
-## Split in horizontal orientation [h]
-bindcode $mod+43 split h
-## Split in vertical orientation [v]
-bindcode $mod+55 split v
 ## Change container layout (stacked, tabbed, default)
 bindsym $mod+q layout stacking
 bindsym $mod+w layout tabbed
 bindsym $mod+e layout default
 ## In stacked/tabbed windows cursor may wrap in cycle
 force_focus_wrapping no
+## u     Focus the parent container
+bindcode $mod+30 focus parent
+## m     Focus the child container
+bindcode $mod+58 focus child
+## h     Split in horizontal orientation
+bindcode $mod+43 split h
+## v     Split in vertical orientation
+bindcode $mod+55 split v
 
-## Toggle tiling / floating
+## Mouse+$mod to drag floating windows to their wanted position
+floating_modifier $mod
+## SPC	Toggle tiling / floating
 bindsym $mod+space floating toggle
-## Enter fullscreen mode for the focused container
+## S-SPC  Focus last floating/tiled container
+bindsym $mod+Shift+space focus mode_toggle
+## f    Enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen
-## Kill focused window
+## c    Kill focused window
 bindsym $mod+c kill
 
-## Focus the parent container [u]
-bindcode $mod+30 focus parent
-## Focus the child container [m]
-bindcode $mod+58 focus child
-
-## Focus last floating/tiled container
-bindsym $mod+Shift+space focus mode_toggle
-
-## Focus to next output to the left [u]
+## C-u   Focus to next output to the left
 bindcode $mod+Control+30 focus output left
-## Focus to next output to the right [o]
+## C-o   Focus to next output to the right [o]
 bindcode $mod+Control+32 focus output right
 
-## Reload the configuration file
+## S-r  Reload configuration file
 bindsym $mod+Shift+r reload
-## Restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+## C-r  Restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
 bindsym $mod+Control+r restart
-bindsym $mod+Control+q exec "sudo /usr/bin/killall iftop; rm -rf /tmp/decrypted; i3-msg exit"
-# To choose other xorg.conf when X will start again.
+## C-q  Quit
+bindsym $mod+Control+q exec "~/.i3/on_quit.sh"
 # bindsym $mod+Control+Shift+q exec "sudo /usr/bin/killall iftop; ~/scripts/xorg.conf_chooser.sh"
+## C-t  To choose other xorg.conf when X will start again.
 bindsym $mod+Control+t exec "~/.i3/autostart.sh stop_after_main_workspace"
 
-# How to make it work?
+## How to make it work?
 #bindsym $mod+Control_L+y exec "zenity --info --text=CONTROL_L"
 #bindsym $mod+Control_R+y exec "zenity --info --text=CONTROL_R"
 
@@ -82,27 +77,30 @@ mode "resize" {
 	bindsym Return mode "default"
 	bindsym Escape mode "default"
 }
+## x	Resize
 bindsym $mod+x mode "resize"
 
 
-## Enter
+## RET
 bindsym $mod+Return exec urxvtc
-## R
+## r
 ## One-command urxvtc instance, it is replacement for dmenu (also see ~/.bashrc and ~/.Xresources)
 bindsym $mod+r exec --no-startup-id /bin/bash -c 'export ONE_COMMAND_SHELL=t && urxvtc -name one_command_shell'
-## S
+## s
 bindcode $mod+39 exec --no-startup-id ". ~/scripts/screenshot.sh"
-## Shift+S
+## S-s
 bindcode --release $mod+Shift+39 exec --no-startup-id  "~/scripts/screenshot.sh -area"
-## Alt+Shift+S
+## A-S-s
 bindcode --release $mod+Mod1+Shift+39 exec --no-startup-id  "~/scripts/screenshot.sh -area -indexed"
-## Ctrl+S // 66 is actually control (they are swapped with capslock on my keyboard)
+## C-s
+##       66 is actually control (they are swapped with capslock on my keyboard)
 bindcode --release $mod+66+39 exec --no-startup-id "~/scripts/screenshot.sh -delay"
-## Alt+Ctrl+S // 66 is actually control (they are swapped with capslock on my keyboard)
+## A-C-s
+##       66 is actually control (they are swapped with capslock on my keyboard)
 bindcode --release $mod+Mod1+66+39 exec --no-startup-id "~/scripts/screenshot.sh -delay -indexed"
-## Ctrl+L i3lock
+## C-l i3lock
 bindcode $mod+Control+46 exec --no-startup-id i3lock
-#
+##
 ## F1
 bindcode $mod+67 exec --no-startup-id mpc toggle
 ## F2
@@ -133,30 +131,31 @@ bindcode $mod+Shift+95 exec --no-startup-id eject -t
 ## F12
 #bindcode $mod+96 exec --no-startup-id /bin/bash -c ""
 
-# G # restrict wallpapers to subdirectory
+## g     Restrict wallpapers to subdirectory
 bindcode $mod+42 exec --no-startup-id "~/scripts/wallpaper_setter.sh -r"
-# B # decrease brightness
+## b     Decrease brightness
 bindcode $mod+56 exec --no-startup-id "~/scripts/wallpaper_setter.sh -b -0.1"
-# Shift+B # increase brightness
+## S-b   Increase brightness
 bindcode $mod+Shift+56 exec --no-startup-id "~/scripts/wallpaper_setter.sh -b +0.1"
-# N # change mode
+## n     Change mode
 bindcode $mod+57 exec --no-startup-id "~/scripts/wallpaper_setter.sh -m"
-# < # set previous
+## ,     Set previous (<)
 bindcode $mod+59 exec --no-startup-id "~/scripts/wallpaper_setter.sh -p"
-# > # set new
+## .     Set new (>)
 bindcode $mod+60  exec --no-startup-id "~/scripts/wallpaper_setter.sh -n"
-# Shift+> # force new
+## S-.   Force new (--|>)
 bindcode $mod+Shift+60  exec --no-startup-id "~/scripts/wallpaper_setter.sh -fn"
-# / # keep
+## /     Keep
 bindcode $mod+61 exec --no-startup-id "~/scripts/wallpaper_setter.sh -k"
 
 ## Switch to workspace and launch related application.
 bindsym $mod+1 workspace 1:Main
 bindsym $mod+2 exec --no-startup-id "i3-msg workspace 2:Firefox && { pgrep -u $UID firefox &>/dev/null || { firefox & } }"
 bindsym $mod+3 exec --no-startup-id "i3-msg workspace 3:Thunar && { pgrep -u $UID thunar &>/dev/null || { thunar & } }"
-# This is to distinguish emacsclient window running in X and those in terminals,
-#   i.e. to forbid creation more than one X window while there can be other
-#   emacsclients in terminals. See also ‘ec‘ and ‘emc’ aliases in ~/.bashrc.
+## This is to distinguish emacsclient window running in X and those in
+##   terminals, i.e. to forbid creation more than one X window while there can
+##   be other emacsclients in terminals. See also ‘ec‘ and ‘emc’ aliases
+##   in ~/.bashrc.
 bindsym $mod+4 exec --no-startup-id "i3-msg workspace 4:Emacs && { pgrep -u $UID -f '^emacsclient --al' || { emacsclient --alternate-editor= -c -display $DISPLAY & } }"
 bindsym $mod+5 workspace 5:Misc
 bindsym $mod+6 workspace 6:IM
@@ -164,7 +163,7 @@ bindsym $mod+7 workspace 7:Games
 bindsym $mod+8 exec --no-startup-id "i3-msg workspace 8:GIMP && { pgrep -u $UID gimp &>/dev/null || { gimp & } }"
 bindsym $mod+9 exec --no-startup-id "i3-msg workspace 9:MPD && { pgrep -u $UID ncmpcpp &>/dev/null || { urxvtc -name ncmpcpp -e ncmpcpp & } }"
 bindsym $mod+0 workspace Outer space
-bindcode $mod+20 workspace Mail
+# bindcode $mod+20 workspace Mail
 
 workspace "1:Main"        output PRIMARY_OUTPUT
 workspace "2:Firefox"     output PRIMARY_OUTPUT
@@ -188,8 +187,8 @@ bindsym $mod+Shift+7 move container to workspace 7:Games
 bindsym $mod+Shift+8 move container to workspace 8:GIMP
 bindsym $mod+Shift+9 move container to workspace 9:MPD
 bindsym $mod+Shift+0 move container to workspace 0:"Outer_space"
-## - (minus/hyphen key)
-bindcode $mod+Shift+20 move container to workspace Mail
+## -	(minus/hyphen key)
+# bindcode $mod+Shift+20 move container to workspace Mail
 
 ## Assigning windows to workspaces
 assign [class="Firefox"] → "2:Firefox"
@@ -224,24 +223,14 @@ new_float 1pixel
 hide_edge_borders both
 focus_follows_mouse no
 
-# Default
-# class                     border  backgr. text    indicator
+## Default
+## class                    border  backgr. text    indicator
 # client.focused            #4c7899 #285577 #ffffff #2e9ef4
 # client.focused_inactive   #333333 #5f676a #ffffff #484e50
 # client.unfocused          #333333 #222222 #888888 #292d2e
 # client.urgent             #2f343a #900000 #ffffff #900000
 
-# # Commie colors
-# # dark red     9a0 000
-# # light red    e60 000
-# # dark yellow  d5b210
-# # light yellow fdd 116
-# client.focused            #e60000 #9a0000 #fdd216 #ff0000
-# client.focused_inactive   #555753 #3c3c3c #d5b210 #ad7fa8
-# client.unfocused          #555753 #3c3c3c #d5b210 #ad7fa8
-# client.urgent             #ad7fa8 #ad7fa8 #ffffff #ff0000
-
-# class                     border  backgr. text    indicator
+## class                    border  backgr. text    indicator
 client.focused              #ad7fa8 #75507b #ffffff #ad7fa8
 client.focused_inactive     #555753 #3c3c3c #ffffff #ad7fa8
 client.unfocused            #555753 #3c3c3c #888888 #ad7fa8
@@ -258,22 +247,6 @@ bar {
 	colors {
 		background #3c3c3c
 		statusline #bbbbbb
-		# Commie
-		# statusline #d5b210
-
-		# Default
-		#                    border  backgr  text
-		# focused_workspace  #4c7899 #285577 #ffffff
-		# active_workspace   #333333 #5f676a #ffffff
-		# inactive_workspace #333333 #222222 #888888
-		# urgent_workspace   #2f343a #900000 #ffffff
-
-		# Commie
-		# focused_workspace  #e60000 #9a0000 #fdd116
-		# active_workspace   #75507b #ad7fa8 #ffffff
-		# inactive_workspace #3c3c3c #3c3c3c #d5b210
-		# urgent_workspace   #df5757 #c22f2f #ffffff
-
 		focused_workspace    #ad7fa8 #75507b #ffffff
 		active_workspace     #75507b #ad7fa8 #ffffff
 		inactive_workspace   #3c3c3c #3c3c3c #aaaaaa
@@ -285,5 +258,4 @@ bar {
 # 	output HDMI-0
 # 	position top
 # 	workspace_buttons yes
-# 	status_command ". ~/.i3/generate_json_for_i3bar.sh"
 # }

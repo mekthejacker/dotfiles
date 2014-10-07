@@ -68,7 +68,7 @@ export PS1="\[\e[01;34m\]┎ \w\n\[\e[01;34m\]┖ \
 #
 alias bc="bc -q"
 alias ec="emacsclient -c -nw"
-alias emc="emacsclient -c -display $DISPLAY"
+alias erc="emacsclient ~/.bashrc"
 alias grep="grep --color=auto"
 alias ls="ls --color=auto"
 alias re=". ~/.bashrc" # re-source

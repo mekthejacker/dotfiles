@@ -33,11 +33,11 @@ eval `gpg -qd ~/.env/private_data.sh.gpg 2>/dev/null \
 #    the variables, but have ‘get_’ prefix.
 # 3. The ‘blocks’ array defines the list of blocks which will be used to compile
 #    the bar string; index number defines the priority of each block, i.e. will
-#    it appear first and on the left (lower index) or last and on the right 
+#    it appear first and on the left (lower index) or last and on the right
 #    (highest index).
 # 4. What is actually shown on the bar is defined by the $bar variable, which
 #    contains a string of _variable names_, in other words, block names. This
-#    string evaluates at runtime each time after all functions in func_list 
+#    string evaluates at runtime each time after all functions in func_list
 #    are done.
 # NB: ‘gmail’ depends on ‘internet_status’.
 blocks=(
@@ -46,7 +46,7 @@ blocks=(
 	[20]=mic_state
 	[30]=internet_status
 	[40]=gmail
-	[50]=nice_date 
+	[50]=nice_date
 )
 
 case $HOSTNAME in
@@ -115,7 +115,7 @@ get_free_space() {
 				free_space="$free_space,\n\t  \"color\": \"$yellow\""
 			fi
 			free_space="$free_space,
-\t  \"separator\":false, 
+\t  \"separator\":false,
 \t  \"separator_block_width\":0 }"
  			free_space="$free_space,
 \t{ \"full_text\": \"/$total at ${present_mpoints[$i]}$separating_comma\",
@@ -188,7 +188,7 @@ get_battery_status() {
 					bat_lt_minutes="${bat_lt_minutes}m"
 				bat_time_left=" ${bat_lt_hours:-}${bat_lt_minutes:-}"
 # W!
-# Write a journal of battery charge level till it’s completely discharged. 
+# Write a journal of battery charge level till it’s completely discharged.
 # Be sure _the filesystem_ you save journal on _is protected_ from power loss,
 #   e.g. has "data=journal,barrier=1" among mount opts for ext3/4, otherwise
 #   all discharging will be in vain.
@@ -219,19 +219,19 @@ get_battery_status() {
 				elif [ $level -gt 1 ]; then
 					color=$orange
 				else
-					# Battery level is about to 0 
+					# Battery is about to be discharged completely → 0
 					# (but still can work for 30 min in idle for me)
 					color=$red
 					# Throw a message about shutdown and try to perform it.
 					$(zenity --question --timeout=5 \
 						--text 'Battery level is low.\nIt’s time to\
  shutdown soon.' \
-						--ok-label "Shutdown" \
-						--cancel-label "NO, WAIT")
+						--ok-label 'Shutdown' \
+						--cancel-label 'NO, WAIT')
 					[ $charge_now -eq 0 ] && [ $? -ne 1 ] && {
 						shutdown -h now &>/dev/null || { # ~/bin/
 							zenity --warning \
-							    --text 'Cannot call shutdown. 
+							    --text 'Cannot call shutdown.
 Please, shutdown the system yourself!'
 							# If the script cannot call shutdown itself,
 							#   it must at least try to save the energy
@@ -270,7 +270,7 @@ get_internet_status() {
 		[ -v COPROC ] || {
 			# wait_time can be here 2×, 3× timeouts or more.
 			coproc ping -W $wait_time -q -n -c1 8.8.8.8
-			# <& duplicates input file descriptors, 
+			# <& duplicates input file descriptors,
 			# >& duplicates output file descriptors, They both work here.
 			# {braces} are important.
 			exec {pingout}<&${COPROC[0]}
@@ -287,7 +287,7 @@ get_gmail() {
 			-su $GMAIL_USERNAME:$GMAIL_PASSWORD \
 		    https://mail.google.com/mail/feed/atom 2>/dev/null`
 			[ "$gmail_server_reply" ] || {
-				# Unable to connect to mail.google.com 
+				# Unable to connect to mail.google.com
 				gmail='{ "full_text": "U✉",
 \t  "color": "'$orange'",
 \t  "separator":false },'
