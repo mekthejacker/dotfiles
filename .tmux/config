@@ -37,7 +37,9 @@ bind R source-file ~/.tmux/config \; \
 
 # X window title
 set -g set-titles on
-set -g set-titles-string 'tmux^#H'
+set -g set-titles-string 'tmux^#{host}'
+
+set -g set-clipboard on
 
 set -g status-bg '#181818'
 set -g status-fg '#aaaaaa'
@@ -55,22 +57,13 @@ set -g message-command-bg colour3
 
 setw -g utf8 on
 
-setw -g window-status-format '#I:#W'
-setw -g window-status-current-format '#I:#T'
+setw -g window-status-format '#{window_index}:#{window_name}'
+setw -g window-status-current-format '#{window_index}:#{pane_title}'
 
 # Smell british scent around here…
 # Also see ~/.Xresources for colour palette.
-setw -g window-status-current-bg '#aaaaaa'
-setw -g window-status-current-fg '#101010'
-
-setw -g window-status-last-bg colour8
-setw -g window-status-last-fg '#101010'
-
-setw -g window-status-bell-bg colour1
-setw -g window-status-bell-fg colour7
-
-setw -g window-status-activity-bg colour7
-setw -g window-status-activity-fg colour5
-
-setw -g window-status-content-bg colour5
-setw -g window-status-content-fg colour7
+setw -g window-status-current-style 'bg=#aaaaaa,fg=#101010'
+setw -g window-status-last-style 'bg=colour8,fg=#101010'
+setw -g window-status-bell-style 'bg=colour1,fg=colour7'
+setw -g window-status-activity-style 'bg=colour7,fg=colour5'
+setw -g window-status-content-style 'bg=colour5,fg=colour7'
