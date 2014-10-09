@@ -43,15 +43,32 @@ floating_modifier $mod
 bindsym $mod+space floating toggle
 ## S-SPC  Focus last floating/tiled container
 bindsym $mod+Shift+space focus mode_toggle
-## f    Enter fullscreen mode for the focused container
-bindsym $mod+f fullscreen
-## c    Kill focused window
-bindsym $mod+c kill
 
 ## C-u   Focus to next output to the left
 bindcode $mod+Control+30 focus output left
 ## C-o   Focus to next output to the right [o]
 bindcode $mod+Control+32 focus output right
+
+## f    Enter fullscreen mode for the focused container
+bindsym $mod+f fullscreen
+## c    Kill focused window
+bindsym $mod+c kill
+## Resize window (you can also use the mouse for that)
+mode "resize" {
+	bindcode 31   resize grow height 10 px or 10 ppt
+	bindcode 44   resize shrink width 10 px or 10 ppt
+	bindcode 45   resize shrink height 10 px or 10 ppt
+	bindcode 46   resize grow width 10 px or 10 ppt
+	## Back to normal: Enter or Escape
+	bindsym Return mode "default"
+	bindsym Escape mode "default"
+}
+## x	Resize
+bindsym $mod+x mode "resize"
+## `	Back and forth
+bindcode $mod+49 workspace back_and_forth
+## S-`
+bindcode $mod+Shift+49 move container to workspace back_and_forth
 
 ## S-r  Reload configuration file
 bindsym $mod+Shift+r reload
@@ -66,20 +83,6 @@ bindsym $mod+Control+t exec "~/.i3/autostart.sh stop_after_main_workspace"
 ## How to make it work?
 #bindsym $mod+Control_L+y exec "zenity --info --text=CONTROL_L"
 #bindsym $mod+Control_R+y exec "zenity --info --text=CONTROL_R"
-
-## Resize window (you can also use the mouse for that)
-mode "resize" {
-	bindcode 31   resize grow height 10 px or 10 ppt
-	bindcode 44   resize shrink width 10 px or 10 ppt
-	bindcode 45   resize shrink height 10 px or 10 ppt
-	bindcode 46   resize grow width 10 px or 10 ppt
-	## Back to normal: Enter or Escape
-	bindsym Return mode "default"
-	bindsym Escape mode "default"
-}
-## x	Resize
-bindsym $mod+x mode "resize"
-
 
 ## RET
 bindsym $mod+Return exec urxvtc
