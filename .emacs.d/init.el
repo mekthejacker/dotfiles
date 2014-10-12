@@ -161,6 +161,7 @@
 (add-hook 'php-mode-hook (lambda () (define-key php-mode-map (kbd "C-.") 'rotate-windows)))
 (add-hook 'nxml-mode-hook (lambda () (define-key nxml-mode-map (kbd "M-h") 'beginning-of-line)))
 (add-hook 'nroff-mode-hook (lambda () (define-key php-mode-map (kbd "C-j") 'clipboard-kill-ring-save)))
+(add-hook 'c-mode-hook (lambda () (define-key c-mode-map (kbd "M-j") 'backward-char)))
 (toc:load-config-file '("textile-mode.el"))
 
 ;; Load code snippets, shortcuts etc.
