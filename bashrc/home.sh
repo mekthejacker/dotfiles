@@ -20,7 +20,7 @@ alias wa-a='~/scripts/watch.sh \
             --bashrc=$HOME/bashrc/mplayer.sh \
             --last-ep \
             -d /home/video/anime/ \
-            -s "season - disk disc cd part pt dvd" \
+            -s "season %keyword disk disc cd part pt dvd" \
             -S /home/picts/watched/ \
             --screenshot-dir-skel="macro,misc"'
 #            -d /old_home/video/anime/ \
@@ -33,7 +33,7 @@ function wa-ap() {
         --bashrc=$HOME/bashrc/mplayer.sh \
         --last-ep \
         -d /home/video/anime/ \
-        -s "season - disk disc cd part pt dvd" \
+        -s "season %keyword disk disc cd part pt dvd" \
         -S /home/picts/watched/ \
         --screenshot-dir-skel="macro,misc" $@
     xrandr --output HDMI-0 --off
