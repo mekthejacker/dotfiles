@@ -515,3 +515,13 @@ cat <<EOF
 	       -threads 0 -s 640x360 output.mp4
 EOF
 }
+
+iforgot-image-conversion() {
+cat <<EOF
+	ffmpeg  -y -framerate 1/5 -pattern_type glob \
+	        -i "file_name_000*.png" \
+	        -c:v libvpx -r 1 -pix_fmt yuv420p out.webm
+
+https://trac.ffmpeg.org/wiki/Create%20a%20video%20slideshow%20from%20images
+EOF
+}
