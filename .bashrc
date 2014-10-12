@@ -28,12 +28,12 @@ unset -f `sed -nr "s/^\s*([-_a-zA-Z0-9]+)\(\)\s*\{.*$/\1/p" \
 export ENV_DEBUG=-p
 
 for opt in autocd cdspell dirspell dotglob extglob globstar \
-	no_empty_cmd_completion; do
-	shopt -s $opt
+    no_empty_cmd_completion; do
+    shopt -s $opt
 done
 for completion_module in eix eselect gentoo git gpg iptables layman man \
-	smartctl ssh strace sysctl taskset tmux udisks; do
-	eselect bashcomp enable $completion_module &>/dev/null
+    smartctl ssh strace sysctl taskset tmux udisks; do
+    eselect bashcomp enable $completion_module &>/dev/null
 done
 unset opt completion_module
 # man bash says that non-login shells do not source /etc/profile and
@@ -147,8 +147,14 @@ one_command_execute() {
 	bind -x '"\C-m":"one_command_execute"'
 }
 
-# Compresses all png files >1M in CWD
+# Compresses all png files in CWD
+# $1 — minimum size, under which no compression shall be done
+#      If not set 1M (1MiB) is the default.
 compress_screenshot() {
+	[ "$1" ] && {
+		[[ "$1" =~ ^[0-9]+[KMG]$ ]] && min_size=${1/K/k} \
+			||{ echo "The parameter should conform to that pattern: [0-9]+[KMG]." >&2; return 3; }
+	}|| min_size=1M
 	crush() {
 		which pngcrush &>/dev/null && {
 			pngcrush -reduce "$1" "/tmp/$1"
@@ -160,7 +166,7 @@ compress_screenshot() {
 	# }
 	}
 	export -f crush
-	find -iname "*.png" -size +1M -printf "%f\n" | parallel --eta crush
+	find -iname "*.png" -size +$min_size -printf "%f\n" | parallel --eta crush
 	export -nf crush
 }
 
