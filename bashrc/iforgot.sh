@@ -525,3 +525,16 @@ cat <<EOF
 https://trac.ffmpeg.org/wiki/Create%20a%20video%20slideshow%20from%20images
 EOF
 }
+
+iforcot-clean-gentoo() {
+cat <<EOF
+	# Remove unnecessary packages
+	1. emerge -av --depclean
+	# …distfiles except matching by exact installed version
+	    and those downloaded earlier than two days ago.
+	    2w [eeks] 3m [onth] also accepted.
+	2. eclean-dist -d -t2d
+	# Remove binary packages
+	3. eclean packages
+EOF
+}

@@ -59,10 +59,11 @@ export PS1="\[\e[01;34m\]┎ \w\n\[\e[01;34m\]┖ \
 \`echo \"scale=2; \$(cut -d' ' -f2 </proc/loadavg) /\
     \$(grep ^processor </proc/cpuinfo | wc -l)\" | bc\` \
 \[\e[01;32m\]\
-\`[ \u = \"$ME\" ] || { \
-    [ \u = root ] && echo -n \"\[\e[01;31m\]\"; \
-} || echo -n \"\[\e[01;37m\]\u \"\`\
-\[\e[01;32m\]at \h \
+\`[ \u = \"$ME\" ] \
+    ||{ [ \u = root ] && echo -n \"\[\e[01;31m\]\"; } \
+|| echo -n \"\[\e[01;37m\]\u \"\`\
+\[\e[01;32m\]\
+at \h \
 \[\e[01;34m\]\\$\[\e[00m\] "
 
 ## Aliases caveats and hints:
