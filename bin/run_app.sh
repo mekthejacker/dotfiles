@@ -16,21 +16,35 @@
 #      in order to make this hack work transparently for any shell or program
 #      invoking the command that is supposed to call the binary.
 
-# $1 — absolute path to the actual binary
-# $2..n — absolute paths to files with private information.
-#         These files supposed to reside in repository and have .gpg extension.
+# Avoiding spontaneous SCIM bug.
+#gpg="GTK_IM_MODULE= QT_IM_MODULE= gpg" # That’s strange, but this won’t work.
+
+# Some apps tend to alter files a little while the user data haven’t change
+nuisance_apps="firefox|firefox-bin"
+# Ignore such changes that are smaller or equal to ↓↓↓, in bytes.
+max_change_size_to_ignore=10
+# Ignore the setting above and always ask, if the size of an encrypted file
+#   has reduced.
+#ALWAYS_ASK_IF_SMALLER=t
+
+# $1 — absolute path to the actual binary
+# $2..n — absolute paths to the *.gpg files with private information, that lay
+#     in same folder as their non-encrypted counterparts should be. In my
+#     repository, *.gpg files in $HOME are actually symbolic links to the
+#    ‘general’ repository.
 run_app() {
 	which "$1" >/dev/null && {
 		local app=$1
 		shift 1
-		for file in "$@"; do
-			[ -e "$file" ] && {
-				files[${#files[@]}]="$file"
-				tmpfile="/tmp/decrypted/${file##*/}"
+		for gpgfile in "$@"; do
+			[ -e "$gpgfile" ] && {
+				gpgfiles[${#gpgfiles[@]}]="$gpgfile"
+				tmpfile="/tmp/decrypted/${gpgfile##*/}"
 				tmpfile="${tmpfile%.gpg}"
 				tmpfiles[${#tmpfiles[@]}]="$tmpfile"
-				gpg -qd --output "$tmpfile" --yes "$file"
+				GTK_IM_MODULE= QT_IM_MODULE= gpg -qd --output "$tmpfile" --yes "$gpgfile"
 				lastmods[${#lastmods[@]}]=`stat -c %Y "$tmpfile"`
+				ln -sf "$tmpfile" "${gpgfile%.gpg}"
 			}
 		done
 
@@ -44,50 +58,57 @@ run_app() {
 		# Some apps are meant to be running in the background, like mpd, so
 		#   no && { errormsg && exit; } here
 		pgrep -axf "^$app$" || $app
-		for ((i=0; i<${#files[@]}; i++)); do
+		for ((i=0; i<${#tmpfiles[@]}; i++)); do
 			[ ${lastmods[$i]} -lt "`stat -c %Y "${tmpfiles[i]}"`" ] && modified=t
 		done
 		[ -v modified ] && {
-			for ((i=0; i<${#files[@]}; i++)); do
+			for ((i=0; i<${#gpgfiles[@]}; i++)); do
 				unset dont_update
 				#   batch, sign & encrypt                   hidden-recipient
-				gpg --batch -se --output ${tmpfiles[i]}.gpg --yes -R *$ME_FOR_GPG ${tmpfiles[i]} 2>$elog \
+				GTK_IM_MODULE= QT_IM_MODULE= gpg --batch -se --output ${tmpfiles[i]}.gpg --yes -R *$ME_FOR_GPG ${tmpfiles[i]} &>>$elog \
 					|| i3-nagbar -m "GPG couldn’t encrypt ${tmpfiles[i]##*/}. See $elog for details."
-				local old_size=`stat -Lc %s "${files[i]}"` # dereference symlinks!
+				local old_size=`stat -Lc %s "${gpgfiles[i]}"` # dereference symlinks!
 				local new_size=`stat -c %s "${tmpfiles[i]}.gpg"`
 				[[ "$old_size" =~ ^[0-9]+$ ]] && [[ "$new_size" =~ ^[0-9]+$ ]] || {
-					i3-nagbar -m "Couldn’t compute file sizes for ${tmpfiles[i]##*/}.gpg ($new_size) and ${files[i]##*/} ($old_size)."
+					i3-nagbar -m "Couldn’t compute file sizes for ${tmpfiles[i]##*/}.gpg ($new_size) and ${gpgfiles[i]##*/} ($old_size)."
 					exit 6
 				}
 
 				local d=+$((new_size-old_size))
 
-				# Firefox tends to alter files a little for no reason :D
-				[ "$app_name" = firefox -o "$app_name" = firefox-bin ] \
-					&& [ "${d//[+-]/}" -lt 11 ] \
+				# Some apps tend to alter files a little for no reason :D
+				[[ "$app_name" =~ @($nuisance_apps) ]] \
+					&& [ "${d//[+-]/}" -le $max_change_size_to_ignore ] \
 					&& local dont_update=t
-				[ $new_size -lt $old_size ] && {
-					zenity --question --no-wrap --text "$app_name file $tmpfile has changed, but seem to have lower size.\n\nOLD_SIZE: $((old_size/1024)) KiB   NEW_SIZE: $((new_size/1024)) KiB, ${d/+-/-} B change.\n\nDo you want to replace it in the repository?" \
-					       --ok-label='Replace' --cancel-label='Keep old' || local dont_update=t
+				[ -v ALWAYS_ASK_IF_SMALLER -a $new_size -lt $old_size ] && {
+					Xdialog --title "Private data update" \
+						--backtitle "$app_name file $tmpfile has changed" \
+						--no-wrap --ok-label=Replace --cancel-label='Keep old' \
+						--yesno "And the size seem to have been reduced.
+
+OLD_SIZE: $((old_size/1024)) KiB   NEW_SIZE: $((new_size/1024)) KiB, ${d/+-/-} B change.
+
+Do you want to replace it in the repository?" 0x0 \
+						&& unset dont_update || local dont_update=t
 				}
 				[ -v dont_update ] || {
-					cp ${tmpfiles[i]}.gpg ${files[i]} # not mv! mv erases symlinks.
-					[ "`file --mime-type ${files[i]} | sed -nr 's/.*\s(\S+)/\1/p'`" = inode/symlink ] || {
-						i3-nagbar -m "${files[i]} is not a symlink! Will exit nao."
+					cp ${tmpfiles[i]}.gpg ${gpgfiles[i]} # not mv! mv erases symlinks.
+					[ "`file --mime-type ${gpgfiles[i]} | sed -nr 's/.*\s(\S+)/\1/p'`" = inode/symlink ] || {
+						i3-nagbar -m "${gpgfiles[i]} is not a symlink! Will exit nao."
 						exit 7
 					}
 					pushd ~/repos/general
-					git add ${files[i]#/} 2>>$elog && {
-						git commit -m "Updated ${files[i]##*/} for $app_name ${d/+-/-} B." 2>>$elog \
+					git add ${gpgfiles[i]#/} 2>>$elog && {
+						git commit -m "Updated ${gpgfiles[i]##*/} for $app_name ${d/+-/-} B." 2>>$elog \
 							&& git push 2>>$elog \
-							|| i3-nagbar -m "Couldn’t push ${files[i]##*/} for $app_name. See $elog for details."
+							|| i3-nagbar -m "Couldn’t push ${gpgfiles[i]##*/} for $app_name. See $elog for details."
 						[ 1 -eq 1 ]
-					}|| i3-nagbar -m "Couldn’t add ${files[i]##*/} for $app_name. See $elog for details."
+					}|| i3-nagbar -m "Couldn’t add ${gpgfiles[i]##*/} for $app_name. See $elog for details."
 					popd
 				}
 			done
 		}
-		for ((i=0; i<${#files[@]}; i++)); do
+		for ((i=0; i<${#gpgfiles[@]}; i++)); do
 			rm ${tmpfiles[i]} ${tmpfiles[i]}.gpg
 		done
 	}
@@ -96,6 +117,7 @@ run_app() {
 app_name=${0##*/}
 [ "${ENV_DEBUG/*r*/}" ] || {
 	elog=/tmp/envlogs/runapp_$app_name
+	echo -n >$elog
 	exec &>$elog
 	set -x
 }
@@ -107,7 +129,7 @@ case $app_name in
 			&& firefox=/usr/bin/firefox-bin \
 			|| firefox=/usr/bin/firefox
 		if pgrep -f $firefox &>/dev/null; then
-			# zenity --info --text="$*"
+			# Xdialog --msgbox "$*" 0x0
 			# $@ is not a plain link, but firefox understands it.
 			$firefox -new-tab "$@"
 		else
@@ -117,10 +139,11 @@ case $app_name in
 		fi
 		;;
 	mpd)
-		gpg -qd --yes --output /tmp/decrypted/mpd.conf.common ~/.mpd/mpd.conf.common.gpg
-		cat /tmp/decrypted/mpd.conf.common > /tmp/decrypted/mpd.conf
+		GTK_IM_MODULE= QT_IM_MODULE= gpg -qd --yes --output /tmp/decrypted/mpd.conf.common ~/.mpd/mpd.conf.common.gpg
+		sed "s/USER/$USER/g" /tmp/decrypted/mpd.conf.common > /tmp/decrypted/mpd.conf
 		[ -e ~/.mpd/mpd.conf.$HOSTNAME ] && cat ~/.mpd/mpd.conf.$HOSTNAME \
 			>> /tmp/decrypted/mpd.conf
+		ln -sf /tmp/decrypted/mpd.conf ~/.mpd/mpd.conf
 		run_app /usr/bin/mpd
 		;;
 	mpdscribble)
@@ -130,10 +153,10 @@ case $app_name in
 		run_app /usr/bin/mpdscribble \
 			~/.mpdscribble/mpdscribble.conf.gpg
 		;;
-	pidgin)
-		run_app /usr/bin/pidgin \
-			~/.purple/accounts.xml.gpg
-		;;
+#	pidgin)
+#		run_app /usr/bin/pidgin \
+#			~/.purple/accounts.xml.gpg
+#		;;
 	shutdown)
 		~/.i3/on_quit.sh
 		kill -HUP `pgrep gpg-agent` # clear cache
