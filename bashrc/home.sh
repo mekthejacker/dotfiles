@@ -3,6 +3,7 @@
 . ffmpeg.sh
 . ssh.sh
 . wine.sh
+. vm.sh
 
 # Watering plants and sending water meter data.
 # See "schedule" block in ~/.i3/generate_json_for_i3bar.sh
@@ -15,38 +16,30 @@ alias rt="urxvtc -title rtorrent -hold \
 
 [ "${MANPATH//*watch.sh*/}" ] \
 	&& export MANPATH="$HOME/.watch.sh/:$MANPATH"
-alias wa-a='~/scripts/watch.sh \
-            -A -e -m "--fs" \
-            --bashrc=$HOME/bashrc/mplayer.sh \
-            --last-ep \
-            -d /home/video/anime/ \
-            -s "season %keyword disk disc cd part pt dvd" \
-            -S /home/picts/watched/ \
-            --screenshot-dir-skel="macro,misc"'
-#            -d /old_home/video/anime/ \
+alias wa='~/scripts/watch.sh \
+          -A -e -m "--fs --save-position-on-quit --profile=$HOSTNAME" \
+          --last-ep \
+          --remember-sub-and-audio-delay \
+          -s "season %keyword disk disc cd part pt dvd" \
+          -S /home/picts/screens/ \
+          --screenshot-dir-skel="macro,misc"'
+alias wa-a="wa -d /home/video/anime"
+alias wa-f="wa -d /home/video/films"
+alias wa-s="wa -d /home/video/serials"
 
 # For output on plasma tv, see also ~/.i3/config.template
-function wa-ap() {
+wap() {
+	local variant=$1; shift
 	xrandr --output HDMI-0 --mode 1920x1080 --right-of DVI-I-0
-    ~/scripts/watch.sh \
-        -A -e -m "--x11-name big_screen --profile=hdmi" \
-        --bashrc=$HOME/bashrc/mplayer.sh \
-        --last-ep \
-        -d /home/video/anime/ \
-        -s "season %keyword disk disc cd part pt dvd" \
-        -S /home/picts/watched/ \
-        --screenshot-dir-skel="macro,misc" $@
+	wa-$variant -m "--x11-name big_screen --profile=hdmi" $@
     xrandr --output HDMI-0 --off
+	# Switch back from the workspace bound to the output with plasma
+	i3-msg workspace back_and_forth
 }
+alias wap-a="wap a"
+alias wap-f="wap f"
+alias wap-s="wap s"
 
-alias wa-f='~/scripts/watch.sh \
-            -A -e -m "--fs" \
-            --bashrc=$HOME/bashrc/mplayer.sh \
-            --last-ep \
-            -d /home/video/films/ \
-            -s "season - disk disc cd part pt dvd" \
-            -S /home/picts/watched/ \
-            --screenshot-dir-skel="macro,misc"'
 
 alias sync_fanetbook="sudo -u git /root/scripts/manual_sync.sh fanetbook all"
 alias sync_external_hdd="sudo /root/scripts/manual_sync.sh rescue all"
@@ -64,17 +57,16 @@ alias detach_hdd="sudo /etc/udev/rules.d/rescue_mount.sh sud" # sync-umount-deta
 #alias spicec="spicec --hotkeys 'toggle-fullscreen=shift+f11,release-cursor=shift+f12'"
 # ~/bin/qemu-shell/qmp-shell
 # (QEMU) change ide0-cd ~/path/to/iso.iso
-alias qemu-graphic="qemu-kvm -daemonize -enable-kvm \
+alias qemu-graphic="qemu-system-x86_64 -daemonize -enable-kvm \
 	-cpu host \
 	-boot order=dc \
-	-no-frame -no-quit "
+	-no-frame -no-quit " # -sdl
 
-alias qemu-nographic="qemu-kvm  -enable-kvm \
+alias qemu-nographic="qemu-system-x86_64  -enable-kvm \
 	-cpu host \
 	-smp 1,cores=1,threads=1 \
 	-boot order=dc \
-	-m 1024 \
-	-no-frame"
+	-m 1024"
 #-vga qxl -spice addr=127.0.0.1,port=5900,disable-ticketing
 alias vm-i="qemu-nographic -serial stdio \
 	-name 'initramfs,process=initramfs' \
@@ -86,26 +78,31 @@ alias vm-i="qemu-nographic -serial stdio \
 #	&& spicec -h 127.0.0.1 -p 5900 -t 'QEMU_initramfs' \
 #	; pkill -9 -f qemu
 
+# spice += seamless_migration?
 alias vm-d="qemu-graphic	-smp 1,cores=1,threads=1 -m 1024 \
 	-vga qxl -spice addr=127.0.0.1,port=5901,disable-ticketing \
+	-qmp unix:$HOME/qmp-sock-vmdebean,server,nowait \
 	-name 'Debean,process=vm-debean' \
 	-drive file=$HOME/vm_debean.img,if=virtio \
 	-netdev vde,id=taputapu,sock=/tmp/vde.ctl \
 		-device virtio-net-pci,netdev=taputapu,mac=DE:BE:AD:EB:EA:DE"
 alias vm-dc='spicec -h 127.0.0.1 -p 5901 -t QEMU_Debean'
+alias vm-dq='~/bin/qemu-shell/qmp-shell ~/qmp-sock-vmdebean'
 
 alias vm-f="qemu-graphic	-smp 1,cores=1,threads=1 -m 1024 \
 	-vga qxl -spice addr=127.0.0.1,port=5902,disable-ticketing \
+	-qmp unix:$HOME/qmp-sock-vmfeedawra,server,nowait \
 	-name 'Feedawra,process=vm-feedawra' \
 	-drive file=$HOME/vm_feedawra.img,if=virtio \
 	-netdev vde,id=taputapu,sock=/tmp/vde.ctl \
 		-device virtio-net-pci,netdev=taputapu,mac=FE:ED:AF:EE:DA:FE"
 alias vm-fc='spicec -h 127.0.0.1 -p 5902 -t QEMU_Feedawra'
+alias vm-fq='~/bin/qemu-shell/qmp-shell ~/qmp-sock-vmfeedawra'
 
 # ,if=virtio
 alias vm-w="qemu-graphic	-smp 1,cores=2,threads=1 -m 3072 \
 	-vga qxl -spice addr=192.168.0.1,port=5903,disable-ticketing \
-	-qmp unix:./qmp-sock,server,nowait \
+	-qmp unix:$HOME/qmp-sock-shindaws,server,nowait \
 	-name 'Win_XP,process=vm-winxp' -rtc base=localtime -usbdevice tablet \
 	-drive file=$HOME/vm_winxp.img,if=ide,boot=on \
 -drive file=$HOME/fake.qcow2,if=virtio \
@@ -113,3 +110,4 @@ alias vm-w="qemu-graphic	-smp 1,cores=2,threads=1 -m 3072 \
 	-netdev vde,id=taputapu,sock=/tmp/vde.ctl \
 		-device virtio-net-pci,netdev=taputapu,mac=11:11:11:11:11:11"
 alias vm-wc='spicec -h 192.168.0.1 -p 5903 -t QEMU_WinXP'
+alias vm-wq='~/bin/qemu-shell/qmp-shell ~/qmp-sock-shindaws'
