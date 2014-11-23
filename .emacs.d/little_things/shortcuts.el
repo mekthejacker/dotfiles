@@ -5,8 +5,8 @@
 ;; (global-unset-key (kbd "C-_"))
 ;;
 
-;; C-. will not work in terminal because C-. combination will produce 
-;; <ASCII code of . -64>. ASCII code for . is 46 
+;; C-. will not work in terminal because C-. combination will produce
+;; <ASCII code of . -64>. ASCII code for . is 46
 ;; and 46-64=-18 which is invalid.
 ;(global-set-key (kbd "TAB") 'self-insert-command)
 (global-set-key (kbd "C-s")     'save-buffer)               ;; Save
@@ -41,9 +41,9 @@
 (global-set-key (kbd "M-J") 'windmove-left)
 ;;
 (global-unset-key (kbd "C-,"))
-(global-unset-key (kbd "C-o")) 
-(global-set-key (kbd "C-o") 'other-window) 
-(global-set-key (kbd "C-,") 'rotate-windows) 
+(global-unset-key (kbd "C-o"))
+(global-set-key (kbd "C-o") 'other-window)
+(global-set-key (kbd "C-,") 'rotate-windows)
 
 ;; Editing
 ;; Disable annoying ‘set fill-column to’ while mistyping C-x C-f
@@ -51,8 +51,8 @@
 (global-set-key (kbd "M-SPC") 'set-mark-command)
 (global-unset-key (kbd "C-x f"))
 (global-set-key (kbd "M-;") 'backward-delete-char)
-(global-set-key (kbd "M-:") 'backward-kill-word) 
-(global-set-key (kbd "C-z" ) 'undo) 
+(global-set-key (kbd "M-:") 'backward-kill-word)
+(global-set-key (kbd "C-z" ) 'undo)
 (global-set-key (kbd "C-S-z") 'repeat-complex-command)
 (global-set-key (kbd "C-k") 'clipboard-kill-region)
 (global-unset-key (kbd "C-j"))
@@ -63,7 +63,7 @@
     ;;(global-set-key (kbd "M-[") 'beginning-of-paragraph)
     ;;(global-set-key (kbd "M-]") 'end-of-paragraph)
 
-;; Search    
+;; Search
 (global-set-key (kbd "C-f") 'isearch-forward)
 ;(global-set-key (kbd "") 'isearch-backward)
     (global-set-key (kbd "C-F") 'isearch-forward-regexp)
@@ -75,5 +75,3 @@
 ;;(global-set-key (kbd "") ')
 ;;(global-set-key (kbd "") ')
 ;;(global-set-key (kbd "") ')
-
-

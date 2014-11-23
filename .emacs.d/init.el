@@ -4,7 +4,7 @@
 ;; Utility finction to auto-load my package configurations
 (defun toc:load-config-file (filelist)
   (dolist (file filelist)
-    (load (expand-file-name 
+    (load (expand-file-name
            (concat toc:emacs-config-dir file)))
      (message "Loaded config file:%s" file)
      ))
@@ -85,7 +85,7 @@
  '(font-lock-comment-face ((((class color) (min-colors 88) (background dark)) (:foreground "#888a85"))))
  '(font-lock-constant-face ((((class color) (min-colors 88) (background dark)) (:foreground "#d0d0d0" :weight bold))))
  '(font-lock-function-name-face ((((class color) (min-colors 88) (background dark)) (:foreground "#d0d0d0"))))
- '(font-lock-keyword-face ((((class color) (min-colors 88) (background dark)) (:foreground "#d0d0d0" :family "DejaVu Sans Mono Bold"))))
+ '(font-lock-keyword-face ((t (:foreground "#d0d0d0" :weight bold :family "DejaVu Sans Mono"))))
  '(font-lock-negation-char-face ((t (:foreground "#9df43c"))))
  '(font-lock-preprocessor-face ((t (:inherit font-lock-builtin-face :foreground "#d0d0d0"))))
  '(font-lock-string-face ((((class color) (min-colors 88) (background dark)) (:foreground "#edd400"))))

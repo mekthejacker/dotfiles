@@ -196,3 +196,57 @@ LINE alone still moves to the beginning of the specified line (like LINE:0)."
     (call-interactively 'list-buffers)))
 ;;
 (global-set-key [remap list-buffers] 'my-list-buffers-vertical-split)
+
+;; Make combinations from the other layout work (C-ч и → C-x b)
+;; Execute it with
+;; M-x reverse-input-method RET russian-computer RET
+(require 'cl)
+;;
+(defun reverse-input-method (input-method)
+    "Build the reverse mapping of single letters from INPUT-METHOD."
+    (interactive
+     (list (read-input-method-name "Use input method (default current): ")))
+    (if (and input-method (symbolp input-method))
+        (setq input-method (symbol-name input-method)))
+    (let ((current current-input-method)
+          (modifiers '(nil (control) (meta) (control meta))))
+      (when input-method
+        (activate-input-method input-method))
+      (when (and current-input-method quail-keyboard-layout)
+        (dolist (map (cdr (quail-map)))
+          (let* ((to (car map))
+                 (from (quail-get-translation
+                        (cadr map) (char-to-string to) 1)))
+            (when (and (characterp from) (characterp to))
+              (dolist (mod modifiers)
+                (define-key local-function-key-map
+                  (vector (append mod (list from)))
+                  (vector (append mod (list to)))))))))
+      (when input-method
+        (activate-input-method current))))
+;;
+(defun my/-is-interactive-frame-available ()
+  (and (not noninteractive)
+       (not (and (daemonp)
+                 (null (cdr (frame-list)))
+                 (eq (selected-frame) terminal-frame)))))
+;;
+(defmacro* my/-exec-after-interactive-frame-available ((&rest captures) &rest body)
+  (declare (indent defun))
+  `(if (my/-is-interactive-frame-available)
+       (progn ,@body)
+     (lexical-let (,@(mapcar #'(lambda (c) (list c c)) captures))
+       (add-hook 'after-make-frame-functions
+                 #'(lambda (frame)
+                     (with-selected-frame frame
+                       ,@body))))))
+;;
+;;
+(my/-exec-after-interactive-frame-available ()
+                 (reverse-input-method "russian-computer")
+                 (setq read-passwd-map
+                       (let ((map read-passwd-map))
+                         (set-keymap-parent map minibuffer-local-map)
+                         (define-key map [return] #'exit-minibuffer)
+                         (define-key map [backspace] #'delete-backward-char)
+                         map)))
