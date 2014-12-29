@@ -20,8 +20,8 @@ iforgot() {
 iforgot-restart-daemons-from-the-runlevel-i-am-in() {
 echo 'USE CAREFUL.'
 cat <<"EOF"
-	for i in `rc-update | sed -rn 's/[ ]+([^ ]+) \| '"runlevel"'.*/\1/p'`; do 
-		/etc/init.d/$i restart 
+	for i in `rc-update | sed -rn 's/[ ]+([^ ]+) \| '"runlevel"'.*/\1/p'`; do
+		/etc/init.d/$i restart
 	done
 EOF
 }
@@ -41,13 +41,14 @@ iforgot-mount-options-for-my-flash-stick() {
 }
 
 iforgot-uname-opts() {
-	for i in a s n r v m p i o; do 
+	for i in a s n r v m p i o; do
         echo -e "\t-$i\t`uname -$i`"
     done
 }
 
 iforgot-check-gcc-options() {
 	set -x
+	gcc -Q -march=atom --help=target | grep fpmath
 	gcc -Q --help=optimizers | grep enable
 	set +x
 }
@@ -70,7 +71,7 @@ iforgot-android-screenshot-via-sdk() {
 
 iforgot-load-all-possible-sensors-modules() {
 cat <<"EOF"
-	for i in `modprobe -l | sed -rn 's|.*/hwmon/([^/]+)$|\1|p'`; do 
+	for i in `modprobe -l | sed -rn 's|.*/hwmon/([^/]+)$|\1|p'`; do
 		modprobe $i
 	done
 EOF
@@ -95,7 +96,7 @@ EOF
 
 iforgot-read-via-x0() {
 cat <<"EOF"
-	while IFS= read -r -d $'\0'; do 
+	while IFS= read -r -d $'\0'; do
 		echo "$REPLY"
 	done <  <(find -type f -print0)
 
@@ -133,7 +134,7 @@ iforgot-how-to-trace-and-debug() {
 cat <<EOF
 	# Trace library and system calls:
 	strace -p PID
-	ltrace -p PID 
+	ltrace -p PID
 	# Look for opened files of process with pid PID
 	ls -l /proc/PID/fd/*
 	# Kill a process to see its core
@@ -150,7 +151,7 @@ EOF
 iforgot-git-new-repo() {
 cat <<"EOF"
 	git init
-	git remote add origin git@example.com:project_team.git 
+	git remote add origin git@example.com:project_team.git
                           ssh://git@example.com:port/reponame.git
     git add .
 	git commit -m "fgsfds"
@@ -161,7 +162,7 @@ EOF
 iforgot-select-figlet-font-for-me() {
 cat <<"EOF"
 	echo '' > ~/cool_fonts
-	for i in `ls /usr/share/figlet/*flf`; do 
+	for i in `ls /usr/share/figlet/*flf`; do
 		clear
 		echo $i
 		figlet -f $i -c 12345
@@ -175,7 +176,7 @@ EOF
 
 iforgot-draw-me-cool-figlet-fonts() {
 cat <<"EOF"
-	for i in `cat ~/cool_fonts`; do 
+	for i in `cat ~/cool_fonts`; do
 		echo $i
 		figlet -f $i -c 12345
 		figlet -f $i -c 67890
@@ -251,15 +252,15 @@ Num  Test_Description    Status                  Remaining  LifeTime(hours)  LBA
 
 badblocks -vs -b512 /dev/sda 1670581106 1670581106
 
-    -v – verbose, -s shows progress, -b is block size, 512 since 1670581106 is 
-  an LBA, i.e. sector address and sectors are usually are 512 bytes long. 
+    -v – verbose, -s shows progress, -b is block size, 512 since 1670581106 is
+  an LBA, i.e. sector address and sectors are usually are 512 bytes long.
   First address is the end of the range where badblocks seek, and the last one
-  points at the start of the range. Also there are useful -n and -w options 
-  which mutually exclude themselves – -n safely rewrites block’s contents, 
-  -w rewrites it with binary patterns and causes data loss. By default 
+  points at the start of the range. Also there are useful -n and -w options
+  which mutually exclude themselves – -n safely rewrites block’s contents,
+  -w rewrites it with binary patterns and causes data loss. By default
   badblocks does only read-only check (that works for me).
 
-    If it confirms the sector is truly bad, then we need to get the address 
+    If it confirms the sector is truly bad, then we need to get the address
   in blocks on your partition, the offset, an pass it as the number of block
   as your filesystem understands, usually it is multiple of 512, e.g. 4096.
 
@@ -271,7 +272,7 @@ fdisk /dev/sda
 /dev/sda3       104952645   109161674     2104515   83  Linux
 /dev/sda4       109162496  1953525167   922181336   83  Linux
 
-    So, the problem LBA belongs to /dev/sda4, now get the offset on that 
+    So, the problem LBA belongs to /dev/sda4, now get the offset on that
 partition.
 
 echo 'scale=3;(1690581106-109162496)/8' | bc
@@ -294,7 +295,7 @@ umount /<mountpoint for partiton with bad LBA>
 e2fsck -l /tmp/bb_list /dev/sdX
 
     If e2fsck called with -L option instead of -l, the passed file will rewrite
-  all the list of badblocks contained in the filesystem. That list can be 
+  all the list of badblocks contained in the filesystem. That list can be
   checked with
 
 dumpe2fs -b /dev/sda4
@@ -306,7 +307,7 @@ EOF
 iforgot-wifi-connect() {
 cat <<"EOF"
     iwconfig wlan0 \
-                   essid <point name> \ 
+                   essid <point name> \
                    mode managed       \
                    key s: <password>
 
@@ -351,26 +352,26 @@ iforgot-emoji-drawing() {
 cat <<"EOF"
 ▽△　▲▼    sankaku
 ☆★＊      hoshi
-〆        shime    
-米※       kome    
-益        yaku   
+〆        shime
+米※       kome
+益        yaku
 
 ⚈д⚈ ⌕…⌕ °ヮ° ´Д` ╭(＾▽＾)╯ /(⌃ o ⌃)\ ╰(^◊^)╮ ◜(◙д◙)◝
 
-キタ━━━(゜∀゜)━━━!!!!!   ‘It’s here’, Kitaa!, a general expression 
+キタ━━━(゜∀゜)━━━!!!!!   ‘It’s here’, Kitaa!, a general expression
                         of excitement that something has appeared
                         or happened or ‘I came’.
 (・∀・)~mO               Flash of intuition
 m9(・∀・)                NO U
-ヽ(°Д°)ﾉ  
-(╬♉益♉)ﾉ 
-Ԍ──┤ﾕ(#◣д◢) 
-(☞ﾟヮﾟ)☞                 
+ヽ(°Д°)ﾉ
+(╬♉益♉)ﾉ
+Ԍ──┤ﾕ(#◣д◢)
+(☞ﾟヮﾟ)☞
 ( `-´)>	                Salute
 (*ﾟﾉOﾟ)<ｵｵｵｵｫｫｫｫｫｫｫｰｰｰｰｰｲ!	Calling out, "Ooooi!"
 Σ(゜д゜;)	            Shocked
 (*´Д`)ﾊｧﾊｧ               Erotic stirring, haa haa
-(ﾟДﾟ;≡;ﾟДﾟ)              
+(ﾟДﾟ;≡;ﾟДﾟ)
 （･∀･)つ⑩
 щ(ﾟДﾟщ)(屮ﾟДﾟ)屮          Come on
 （・Ａ・)                ‘That’s bad’
@@ -466,7 +467,7 @@ cat<<"EOF"
 EOF
 }
 
-iforgot-ascii-escapes(){
+iforgot-shell-colours(){
 cat<<EOF
 	There are only 8 colors in general. From man terminfo:
 	Color     #define         Value   RGB
@@ -495,12 +496,13 @@ emulator. You can change them with \e]4;NUMBER;#RRGGBB\a (where NUMBER is
 the terminal color number (0–7 for light colors, 8–15 for bright colors)
 and #RRGGBB is a hexadecimal RGB color value) if your terminal supports
 that sequence (reference: ctlseqs). —http://unix.stackexchange.com/a/1772/10075
+See also http://misc.flogisoft.com/bash/tip_colors_and_formatting
 EOF
 }
 
 iforgot-webm-conversion() {
 cat <<"EOF"
-	ffmpeg -i input.mov \
+	ffmpeg -threads 4 -i input.mov \
 	       -acodec libvorbis -ac 2 -b:a 192k -ar 44100 \
 	       -b:v 1000k -s 640x360 output.webm
 EOF
@@ -508,7 +510,7 @@ EOF
 
 iforgot-x264-conversion() {
 cat <<EOF
-	ffmpeg -i input.mov \
+	ffmpeg -threads 4 -i input.mov \
 	       -acodec libfaac -b:a 96k \
 	       -vcodec libx264 -vpre slower -vpre main \
 	       -level 21 -refs 2 -b:v 345k -bt 345k \
@@ -518,15 +520,15 @@ EOF
 
 iforgot-image-conversion() {
 cat <<EOF
-	ffmpeg  -y -framerate 1/5 -pattern_type glob \
-	        -i "file_name_000*.png" \
+	ffmpeg  -y -threads 4 -pattern_type glob \
+	        -framerate 1/5 -i "file_name_000*.png" \
 	        -c:v libvpx -r 1 -pix_fmt yuv420p out.webm
 
 https://trac.ffmpeg.org/wiki/Create%20a%20video%20slideshow%20from%20images
 EOF
 }
 
-iforcot-clean-gentoo() {
+iforgot-clean-gentoo() {
 cat <<EOF
 	# Remove unnecessary packages
 	1. emerge -av --depclean
@@ -537,4 +539,100 @@ cat <<EOF
 	# Remove binary packages
 	3. eclean packages
 EOF
+}
+
+iforgot-cut-video-with-ffmpeg() {
+cat <<EOF
+	ffmpeg -y -threads 8 -i in.webm -ss 00:00:01 -t 00:02:22 -async 1 -b:v 500k out.webm
+
++crop
+	-filter:v "crop=WIDTH:HEIGHT:X_OFFSET:Y_OFFSET"
+EOF
+}
+
+iforgot-catenate-video-with-ffmpeg() {
+cat <<EOF
+	find . -iname "part*.webm" | sort >files
+	ffmpeg -y -threads 8 -f concat -i files -c copy -async 1 out.webm
+EOF
+}
+
+iforgot-create-video-from-image-sequence-with-ffmpeg() {
+echo 'ffmpeg -y -framerate 1/5 -pattern_type glob_sequence -i "./[Commie] Psycho-Pass 2 - 08 [A844F60A]_%*.png" -c:v libvpx -b:v 500k -r 30 -pix_fmt yuv420p out.webm && mpv out.webm'
+
+echo Actually, someday they should fix -pattern_type glob and '*.png' and '%d'
+}
+
+iforgot-record-my-desktop() {
+	set -x
+	man -P"less -p'^\s*X11 grabbing'" ffmpeg
+	set +x
+}
+
+iforgot-check-own-process-memory() {
+cat <<EOF
+	pmap from procps.
+	# pmap -d `pidof X`
+	Writeable — this is it.
+EOF
+}
+
+iforgot-commie-check-whats-up() {
+	echo -e "\t.blame <what>"
+}
+
+iforgot-firefox-settings() {
+cat <<EOF
+    media.autoplay.enabled = true
+         .gstreamer.enabled = true
+    browser.cache.disk = false
+    browser.padlock.urlbar_background = 0
+    mousewheel.acceleration.factor = 1
+    mousewheel.default.delta_multiplier_y = 270
+    network.standard-url.escape-utf8 = false
+    browser.download.manager.showAlertOnComplete = false
+                            .closeWhenDone = true
+                            .showWhenStarting = false
+To check:
+    about:cache
+    about:cache?device=memory
+EOF
+}
+
+
+iforgot-mpv-crunchyroll-streaming() {
+	# requires ffmpeg to be compiled with networking and rtmp
+	echo 'mpv --ytdl http://www.crunchyroll.com/parasyte-the-maxim-/episode-1-metamorphosis-662583'
+}
+
+
+iforgot-audio-recording() {
+cat <<EOF
+Record:
+	arecord -f cd -t wav `date +s`.wav
+
+Conversion to MP3 VBR
+     ffmpeg -i 19122014.wav -codec:a libmp3lame -qscale:a 9 output.mp3
+                                                          ^
+                                                      lame quality
+
+ lame    Avg    b/rate range  ffmpeg
+option  kbit/s     kbit/s     option
+
+-b 320   320      320 CBR     -b:a 320k (non VBR. NB this is 32KB/s, or its max)
+-V 0     245      220-260     -q:a 0 (NB this is VBR from 22 to 26 KB/s)
+-V 1     225      190-250     -q:a 1
+-V 2     190      170-210     -q:a 2
+-V 3     175      150-195     -q:a 3
+-V 4     165      140-185     -q:a 4
+-V 5     130      120-150     -q:a 5
+-V 6     115      100-130     -q:a 6
+-V 7     100       80-120     -q:a 7
+-V 8      85       70-105     -q:a 8
+-V 9      65        45-85     -q:a 9
+EOF
+}
+
+iforgot-wcpe-station-time-zone-difference() {
+	-8
 }
