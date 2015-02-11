@@ -55,13 +55,14 @@ URxvt.scrollstyle: plain
 !
 !-- Perl stuff: URL matching etc.
 !
-!! These characters are used as delimiters for double-click word selection 
+!! These characters are used as delimiters for double-click word selection
 !! by default, but may be overriden
 URxvt.cutchars: `\"\'&()*,;<=>?@[]^{|}
 URxvt.perl-ext-common:default,matcher
-URxvt.urlLauncher: firefox -new-tab 
+URxvt.urlLauncher: palemoon -new-tab
 URxvt.underlineURLs: true
-URxvt.matcher.button: 1 
+! NB: 2 = middle mouse button (that will run urls instead of selecting text)
+URxvt.matcher.button: 2
 !selection.pattern-0: ( at .*? line \\d+)
 !selection.pattern-1: ^(/[^:]+):\
 !selection-autotransform.0: s/^([^:[:space:]]+):(\\d+):?$/:e \\Q$1\\E\\x0d:$2\\x0d/
