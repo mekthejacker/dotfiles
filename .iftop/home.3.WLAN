@@ -5,5 +5,5 @@ show-totals: no
 # Use-bytes affect only the bar!
 use-bytes: yes
 # 80 Mbit/sec
-max-bandwidth: 80M
+max-bandwidth: 150M
 filter-code: not ether host ff:ff:ff:ff:ff:f8

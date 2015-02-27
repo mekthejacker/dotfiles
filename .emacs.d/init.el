@@ -50,7 +50,7 @@
  '(text-mode-hook (quote (turn-on-auto-fill text-mode-hook-identify)))
  '(text-scale-mode-step 1.0)
  '(tool-bar-mode nil)
- '(whitespace-display-mappings (quote ((space-mark 32 [32] [46]) (space-mark 160 [43] [95]) (newline-mark 10 [4347 10]) (tab-mark 9 [9002 9135 9135 9135] [9552 9]))))
+ '(whitespace-display-mappings (quote ((space-mark 32 [32] [46]) (space-mark 160 [43] [95]) (newline-mark 10 [4347 10]) (tab-mark 9 [9002 8213 8213 8213] [9552 9])))) ;9135
  '(whitespace-global-modes t)
  '(whitespace-line-column 10000)
  '(whitespace-style (quote (face tabs spaces trailing newline indentation empty space-mark tab-mark newline-mark)))
@@ -85,7 +85,7 @@
  '(font-lock-comment-face ((((class color) (min-colors 88) (background dark)) (:foreground "#888a85"))))
  '(font-lock-constant-face ((((class color) (min-colors 88) (background dark)) (:foreground "#d0d0d0" :weight bold))))
  '(font-lock-function-name-face ((((class color) (min-colors 88) (background dark)) (:foreground "#d0d0d0"))))
- '(font-lock-keyword-face ((t (:foreground "#d0d0d0" :weight bold :family "DejaVu Sans Mono"))))
+ '(font-lock-keyword-face ((t (:foreground "#d0d0d0" :weight bold))))
  '(font-lock-negation-char-face ((t (:foreground "#9df43c"))))
  '(font-lock-preprocessor-face ((t (:inherit font-lock-builtin-face :foreground "#d0d0d0"))))
  '(font-lock-string-face ((((class color) (min-colors 88) (background dark)) (:foreground "#edd400"))))
@@ -130,7 +130,24 @@
  '(whitespace-space-after-tab ((t (:foreground "grey10"))))
  '(whitespace-space-before-tab ((t (:foreground "grey10"))))
  '(whitespace-tab ((t (:foreground "grey10"))))
- '(whitespace-trailing ((t (:background "powder blue" :foreground "white smoke")))))
+ '(whitespace-trailing ((t (:background "powder blue" :foreground "white smoke"))))
+  '(ediff-current-diff-A ((t (:background "pale green" :foreground "firebrick"))))
+ '(ediff-current-diff-Ancestor ((t (:background "VioletRed" :foreground "Black"))))
+ '(ediff-current-diff-B ((t (:background "Yellow" :foreground "DarkOrchid"))))
+ '(ediff-current-diff-C ((t (:background "Pink" :foreground "Navy"))))
+ '(ediff-even-diff-A ((t (:background "light grey" :foreground "Black"))))
+ '(ediff-even-diff-Ancestor ((t (:background "Grey" :foreground "White"))))
+ '(ediff-even-diff-B ((t (:background "Grey" :foreground "White"))))
+ '(ediff-even-diff-C ((t (:background "light grey" :foreground "Black"))))
+ '(ediff-fine-diff-A ((t (:background "sky blue" :foreground "Navy"))))
+ '(ediff-fine-diff-Ancestor ((t (:background "Green" :foreground "Black"))))
+ '(ediff-fine-diff-B ((t (:background "cyan" :foreground "Black"))))
+ '(ediff-fine-diff-C ((t (:background "Turquoise" :foreground "Black"))))
+ '(ediff-odd-diff-A ((t (:background "Grey" :foreground "White"))))
+ '(ediff-odd-diff-Ancestor ((t (:background "gray40" :foreground "cyan3"))))
+ '(ediff-odd-diff-B ((t (:background "light grey" :foreground "Black"))))
+ '(ediff-odd-diff-C ((t (:background "Grey" :foreground "White"))))
+)
 
 ;; settings for smooth-scrolling.el
 (setq scroll-conservatively 10000
@@ -170,6 +187,7 @@
 (load "~/.emacs.d/little_things/linum.el")
 ;; must be after code_snippets, because there may be redefined functions
 (load "~/.emacs.d/little_things/shortcuts.el")
+(load "~/.emacs.d/little_things/pcre2el.el")
 ;;(load "~/.emacs.d/geben-0.26/dbgp.el")
 ;;(load "~/.emacs.d/geben-0.26/geben.el")
 
@@ -193,14 +211,29 @@
 ;; (add-hook 'php-mode-hook 'font-lock-add-keywords) ;;(font-lock-add-keywords nil '(("^[^\n]\\{80\\}\\(.*\\)$" 1 font-lock-warning-face t)))
 
 
-;;; This was installed by package-install.el.
-;;; This provides support for the package system and
-;;; interfacing with ELPA, the package archive.
-;;; Move this code earlier if you want to reference
-;;; packages in your .emacs.
-;; (when
-  ;; 	(load
-  ;; 	 (expand-file-name "~/.emacs.d/elpa/package.el"))
-  ;; (package-initialize)) 
+;; This was installed by package-install.el.
+;; This provides support for the package system and
+;; interfacing with ELPA, the package archive.
+;; Move this code earlier if you want to reference
+;; packages in your .emacs.
+; (when
+  ; 	(load
+  ; 	 (expand-file-name "~/.emacs.d/elpa/package.el"))
+  ; (package-initialize))
 
-;; C-j to force ido-mode accept what was entered
+; C-j to force ido-mode accept what was entered
+
+;; ediff
+;; Don’t use separate frame (aka window in normal, i.e. X interpretation).
+(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+;; Restore how it was before ediff
+   (add-hook 'ediff-load-hook
+             (lambda ()
+               (add-hook 'ediff-before-setup-hook
+                         (lambda ()
+                           (setq ediff-saved-window-configuration (current-window-configuration))))
+               (let ((restore-window-configuration
+                      (lambda ()
+                        (set-window-configuration ediff-saved-window-configuration))))
+                 (add-hook 'ediff-quit-hook restore-window-configuration 'append)
+                 (add-hook 'ediff-suspend-hook restore-window-configuration 'append))))

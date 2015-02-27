@@ -3,13 +3,15 @@
 # autostart.sh
 # This script is called from ~/.i3/config with ‘exec ~/.i3/autstart.sh’
 
-[ "${ENV_DEBUG/*a*/}" ] || {
+#[ "${ENV_DEBUG/*a*/}" ] || {
+true && {
 	exec &>/tmp/envlogs/autostart
 	date
 	set -x
 }
 
 # Temporarily disable pointer while setting layout
+# $1 == <enable|disable>
 pointer_control() {
 	[ -v pointer_devices ] || pointer_devices=$(xinput --list \
 		| sed -nr '/Virtual\score.*pointer/ !s/.*id=([0-9]+)\s+\[slave\s+pointer.*/\1/p')
@@ -53,7 +55,12 @@ sudo /usr/bin/killall iftop
 #   and independently of X is to run daemon via init scripts >_>
 pgrep urxvtd || urxvtd -q -o -f
 tmux="tmux -u -f $HOME/.tmux/config -S $HOME/.tmux/socket"
-pgrep -u $UID -f '^tmux.*$' &>/dev/null || $tmux \
+if pgrep -u $UID -f '^tmux.*$' &>/dev/null; then
+	for pane in `$tmux list-windows -t0 | sed -r 's/^([0-9]+):.*/\1/g'`; do
+		$tmux send -t 0:$pane C-c
+		$tmux send -t 0:$pane export\ DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS" ENTER
+	done
+else $tmux \
 	new -d su \; \
 	set remain-on-exit on \; \
 	neww su \; \
@@ -62,10 +69,11 @@ pgrep -u $UID -f '^tmux.*$' &>/dev/null || $tmux \
 # Another user termianl in tmux
 #	neww -n wa-a \; \
 #	set remain-on-exit on \; \
+fi
 
 pointer_control disable
 
-# WIDTH and HEIGHT were set in the ~/preload.sh
+# WIDTH and HEIGHT were set in the ~/.preload.sh
 case $HOSTNAME in
 	fanetbook)
 		hsetroot -fill ~/.env/wallpaper.png
@@ -88,20 +96,32 @@ case $HOSTNAME in
 		pgrep -u $UID -f "^bash $HOME/scripts/wallpaper_setter.sh -B" \
 			|| { ~/scripts/wallpaper_setter.sh -B -0.3 \
 			   -e "i3-nagbar -m \"%m\" -b Restart \"%a\"" \
-			   -d /home/picts/watched & }
+			   -d /home/picts/screens & }
 		# Urxvtc windows must appear after wallpaper is set, due to their
 		#   fake transparency.
 		~/scripts/wallpaper_setter.sh -w
 
-		urxvtc
+		urxvtc --title 'Todo list' -e watch -t -n15 cat -n ~/todo
+# ┌────┐
+# │    │
+# │    │
+# └────┘
 		i3-msg split v
 		urxvtc -hold -title 'htop' -e htop
-		# Now we have two terminals   ÷
-		# Move cursor near to the center of the lower urxvtc with htop
+# ╔════╗
+# ║    ║
+# ╟────╢
+# ║    ║
+# ╚════╝
+		# Move cursor near the center of the lower urxvtc with htop
 		xte "mousemove $(( WIDTH/2 ))  $(( 3*HEIGHT/4 ))"
-		# Focus it
-		xte 'mouseclick 1'
+		xte 'mouseclick 1'  # …and focus it.
 		i3-msg split h
+# ╔═════╗ # ╔═══════╗
+# ║     ║ # ║       ║
+# ╟─────╢ # ╠━━━┯━━━╣
+# ║  ⋅  ║ # ║   │   ║
+# ╚═════╝ # ╚═══╧═══╝
 		iface_configs=(`ls ~/.iftop/$HOSTNAME.*`)
 		[ ${#iface_configs} -gt 1 ] && iftops_need_their_own_container=t
 		for ((i=0; i<${#iface_configs[@]}; i++)); do
@@ -110,27 +130,53 @@ case $HOSTNAME in
 			[ $i -eq 0 ] && [ -v iftops_need_their_own_container ] && \
 				i3-msg split h
 		done
+# ╔═════════════════╗
+# ║                 ║
+# ╠━━━━━━━━┳━━┯━━┯━━╣
+# ║        ┃  │  │  ║  (Possible variation if there are 3 htop configs)
+# ╚════════╩══╧══╧══╝
 		[ -v iftops_need_their_own_container ] && {
 			xte "mousemove $(( 9*WIDTH/16 )) $(( 3*HEIGHT/4 ))"
 			xte 'mouseclick 1'
 			i3-msg layout tabbed
 		}
-
-		# Moving cursor to the upper empty urxvtc and raise it to ≈5/6
-		#   of the height
+# ╔═════════════════╗ # ╔═════════════════╗
+# ║                 ║ # ║                 ║
+# ║                 ║ # ║                 ║
+# ╠━━━━━━━━┳━━┯━━┯━━╣ # ╠━━━━━━━━┳━━━━━━━━╣
+# ║        ┃⋅ │  │  ║ # ║        ┃––+––+––║  ← tabs
+# ║        ┃  │  │  ║ # ║        ┃        ║
+# ╚════════╩══╧══╧══╝ # ╚════════╩════════╝
 		xte "mousemove $(( WIDTH/2 ))  $(( HEIGHT/4 ))"
 		xte 'mouseclick 1'
+		# raise upper empty urxvtc up to ≈5/6 of the height
 		i3-msg resize grow height 30 px or 30 ppt
 		i3-msg split h
 		urxvtc
-		# Now in upper hald we have two terminals, too ⋅|⋅
-		# Splitting left upper urxvtc
+# ╔═════════════════╗ # ╔════════╤════════╗
+# ║        ⋅        ║ # ║        │        ║
+# ║                 ║ # ║        │        ║
+# ╠━━━━━━━━┳━━━━━━━━╣ # ║        │        ║
+# ║        ┃––+––+––║ # ║        │        ║
+# ║        ┃        ║ # ╠━━━━━━━━╈━━━━━━━━╣
+# ╚════════╩════════╝ # ║        ┃––+––+––║
+                      # ║        ┃        ║
+                      # ╚════════╩════════╝
 		xte "mousemove $(( WIDTH/4 )) $(( HEIGHT/2 ))"
 		xte 'mouseclick 1'
 		i3-msg split h
 		i3-msg layout tabbed
 		urxvtc
-
+		urxvtc
+# ╔════════╤════════╗ # ╔════════╦════════╗
+# ║        │        ║ # ║––+––+––┃        ║
+# ║        │        ║ # ║        ┃        ║
+# ║   ⋅    │        ║ # ║        ┃        ║
+# ║        │        ║ # ║        ┃        ║
+# ╠━━━━━━━━╈━━━━━━━━╣ # ╠━━━━━━━━╋━━━━━━━━╣
+# ║        ┃––+––+––║ # ║        ┃––+––+––║
+# ║        ┃        ║ # ║        ┃        ║
+# ╚════════╩════════╝ # ╚════════╩════════╝
 		xte "mousemove $(( 3*WIDTH/4 )) $(( HEIGHT/2 ))"
 		xte 'mouseclick 1'
 		i3-msg split h
@@ -139,7 +185,15 @@ case $HOSTNAME in
 		urxvtc -hold -title tmux -e $tmux attach
 		xte "mousemove $(( 11*WIDTH/12 )) $(( HEIGHT/2 ))"
 		xte 'mouseclick 1'
-
+# ╔════════╦════════╗ # ╔════════╦════════╗
+# ║––+––+––┃        ║ # ║––+––+––┃––+––+––║
+# ║        ┃        ║ # ║        ┃        ║
+# ║        ┃   ⋅    ║ # ║        ┃        ║
+# ║        ┃        ║ # ║        ┃--+--+  ║ ← tmux panes
+# ╠━━━━━━━━╋━━━━━━━━╣ # ╠━━━━━━━━╋━━━━━━━━╣
+# ║        ┃––+––+––║ # ║        ┃––+––+––║
+# ║        ┃        ║ # ║        ┃        ║
+# ╚════════╩════════╝ # ╚════════╩════════╝
 		# This is for calling via hotkey in ~/.i3/config to test without
 		#   restarting WM.
 		[ "$1" = stop_after_main_workspace ] && {
@@ -151,14 +205,22 @@ case $HOSTNAME in
 		#   and it will start emacs daemon and will connect to it.
 		# But if daemon runs from here, it will fail after X restart ;_;
 		# Crapissimo: neither -a, nor -a '', -a "", -a $'\000' do not work.
-		startup_apps=(firefox pidgin) #  "emacsclient --alternate-editor= -c -display $DISPLAY")
+		#  "emacsclient --alternate-editor= -c -display $DISPLAY")
+		startup_apps=(pidgin geeqie palemoon)
 		# ↖ These apps are to be killed gracefully by ~/.i3/on_quit.sh
 		;;
 esac
 pointer_control enable
 
+startup_apps[${#startup_apps[@]}]='mpd'
+startup_apps[${#startup_apps[@]}]='thunar'
+
 # Some configs decrypted at ~/bin/run_app.sh
-for app in mpd thunar "${startup_apps[@]}"; do
+for app in "${startup_apps[@]}"; do
+
+	# Switch to its workspace to take off urgency hint
+#	workspace="`sed -nr "s/^bindcode.*exec.*i3-msg\s+workspace\s+([0-9]*:?\S+)\s+.*pgrep\s+-u\s+\\\\\\$UID\s+$app.*\\\$/\1/p" ~/.i3/config`"
+
 	# { … & } becasue otherwise ‘&’ will fork to background the whole string
 	#   including subshell created by the left part of ‘||’ statement.
 	# (nohup $app) actuallyy needed only for emacs as daemon
@@ -169,3 +231,9 @@ done
 until mpc &>/dev/null; do  sleep 1;  done
 pgrep -xu $UID mpdscribble || mpdscribble
 pgrep -xu $UID ncmpcpp >/dev/null || urxvtc -name ncmpcpp -e ncmpcpp
+
+crontab -l | grep -qF 'wallpaper_setter.sh' || {
+	echo '*/10 * * * * ~/scripts/wallpaper_setter.sh -qn' \
+		>/var/spool/cron/crontabs/$ME \
+		|| notify-send -t 4000 "${0##*/}" "Couldn’t set crontab file."
+}

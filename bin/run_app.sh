@@ -19,10 +19,12 @@
 # Avoiding spontaneous SCIM bug.
 #gpg="GTK_IM_MODULE= QT_IM_MODULE= gpg" # That’s strange, but this won’t work.
 
+shopt -s extglob
+
 # Some apps tend to alter files a little while the user data haven’t change
-nuisance_apps="firefox|firefox-bin"
+nuisance_apps="firefox|firefox-bin|palemoon"
 # Ignore such changes that are smaller or equal to ↓↓↓, in bytes.
-max_change_size_to_ignore=10
+max_change_size_to_ignore=15
 # Ignore the setting above and always ask, if the size of an encrypted file
 #   has reduced.
 #ALWAYS_ASK_IF_SMALLER=t
@@ -35,6 +37,10 @@ max_change_size_to_ignore=10
 run_app() {
 	which "$1" >/dev/null && {
 		local app=$1
+		[[ "$app" =~ ^.*/.*$ ]] || {
+			echo "This function must be given an absolute path to an actual binary, like /usr/bin/… or so." >&2
+			exit 4
+		}
 		shift 1
 		for gpgfile in "$@"; do
 			[ -e "$gpgfile" ] && {
@@ -49,7 +55,7 @@ run_app() {
 		done
 
 		while pgrep -xf "^bash ${0##*/}$"; do
-			sleep 1;
+			sleep 1
 			[ $((i++)) -gt 5 ] && break
 		done
 		# Testing if actual app is still/already running
@@ -57,7 +63,7 @@ run_app() {
 		# x is not necessary since pattern is enclosed in ^$, but to be sure.
 		# Some apps are meant to be running in the background, like mpd, so
 		#   no && { errormsg && exit; } here
-		pgrep -axf "^$app$" || $app
+		pgrep -axf "^$app$" || "$app"
 		for ((i=0; i<${#tmpfiles[@]}; i++)); do
 			[ ${lastmods[$i]} -lt "`stat -c %Y "${tmpfiles[i]}"`" ] && modified=t
 		done
@@ -71,13 +77,13 @@ run_app() {
 				local new_size=`stat -c %s "${tmpfiles[i]}.gpg"`
 				[[ "$old_size" =~ ^[0-9]+$ ]] && [[ "$new_size" =~ ^[0-9]+$ ]] || {
 					i3-nagbar -m "Couldn’t compute file sizes for ${tmpfiles[i]##*/}.gpg ($new_size) and ${gpgfiles[i]##*/} ($old_size)."
-					exit 6
+					exit 5
 				}
 
 				local d=+$((new_size-old_size))
 
 				# Some apps tend to alter files a little for no reason :D
-				[[ "$app_name" =~ @($nuisance_apps) ]] \
+				[[ "$app_name" == @($nuisance_apps) ]] \
 					&& [ "${d//[+-]/}" -le $max_change_size_to_ignore ] \
 					&& local dont_update=t
 				[ -v ALWAYS_ASK_IF_SMALLER -a $new_size -lt $old_size ] && {
@@ -92,18 +98,20 @@ Do you want to replace it in the repository?" 0x0 \
 						&& unset dont_update || local dont_update=t
 				}
 				[ -v dont_update ] || {
-					cp ${tmpfiles[i]}.gpg ${gpgfiles[i]} # not mv! mv erases symlinks.
-					[ "`file --mime-type ${gpgfiles[i]} | sed -nr 's/.*\s(\S+)/\1/p'`" = inode/symlink ] || {
+					cp "${tmpfiles[i]}.gpg" "${gpgfiles[i]}" # not mv! mv erases symlinks.
+					[ "`file --mime-type "${gpgfiles[i]}" | sed -nr 's/.*\s(\S+)/\1/p'`" = inode/symlink ] || {
 						i3-nagbar -m "${gpgfiles[i]} is not a symlink! Will exit nao."
-						exit 7
+						exit 6
 					}
 					pushd ~/repos/general
-					git add ${gpgfiles[i]#/} 2>>$elog && {
+					git stash
+					git add "${gpgfiles[i]#/}" 2>>$elog && {
 						git commit -m "Updated ${gpgfiles[i]##*/} for $app_name ${d/+-/-} B." 2>>$elog \
-							&& git push 2>>$elog \
-							|| i3-nagbar -m "Couldn’t push ${gpgfiles[i]##*/} for $app_name. See $elog for details."
-						[ 1 -eq 1 ]
+							&& git push 2>>$elog # \
+#							↑ ↑ || i3-nagbar -m "Couldn’t push ${gpgfiles[i]##*/} for $app_name. See $elog for details."
+						:
 					}|| i3-nagbar -m "Couldn’t add ${gpgfiles[i]##*/} for $app_name. See $elog for details."
+					git stash pop
 					popd
 				}
 			done
@@ -116,11 +124,15 @@ Do you want to replace it in the repository?" 0x0 \
 
 app_name=${0##*/}
 [ "${ENV_DEBUG/*r*/}" ] || {
-	elog=/tmp/envlogs/runapp_$app_name
-	echo -n >$elog
+	elog="/tmp/envlogs/runapp_$app_name"
+	echo >$elog
 	exec &>$elog
 	set -x
 }
+# IIRC, output from certain commands has to be redirected explicitly,
+#   hence >>$elog presence after commands. But this may mess usual
+#   case when running this script
+[ -f "$elog" ] || elog=/dev/null
 
 case $app_name in
 	# NB: only actual binaries with absolute paths here!
@@ -138,6 +150,35 @@ case $app_name in
 				~/.mozilla/firefox/profile.default/signons.sqlite.gpg
 		fi
 		;;
+	palemoon)
+		if pgrep -f /usr/bin/palemoon &>/dev/null; then
+			# Xdialog --msgbox "$*" 0x0
+			# $@ is not a plain link, but firefox understands it.
+			/usr/bin/palemoon -new-tab "$@"
+		else
+			run_app /usr/bin/palemoon \
+				"$HOME/.moonchild productions/pale moon/profile.default/key3.db.gpg" \
+				"$HOME/.moonchild productions/pale moon/profile.default/signons.sqlite.gpg"
+		fi
+		;;
+	geeqie)
+		# This entry is only to work around the drawbacks of interface:
+		#  - you can’t select several files and click a bookmark in Sort
+		#    manager to move them — it’ll only copy the first selected file;
+		#  - if you select several files and explicitly choose to move them
+		#    by selecting the command from the RMB menu, bookmarks there aren’t
+		#    what Sort manager had. To keep them intact, let’s replace the
+		#    [bookmarks] section in the history file (which is actually
+		#    another config file) to reflect current condition of [sort_manager].
+		sed -ri '/\[sort_manager]/,/^$/ {
+		             s/^(\s*|\[sort_manager])$/&/;t;H
+		         }
+		         /\[bookmarks]/,/^$/ {
+		             /\[bookmarks]/!d
+		             G;s/\n\n/\n/;s/$/\n/
+		         }' ~/.config/geeqie/history
+		run_app /usr/bin/geeqie
+		;;
 	mpd)
 		GTK_IM_MODULE= QT_IM_MODULE= gpg -qd --yes --output /tmp/decrypted/mpd.conf.common ~/.mpd/mpd.conf.common.gpg
 		sed "s/USER/$USER/g" /tmp/decrypted/mpd.conf.common > /tmp/decrypted/mpd.conf
@@ -153,10 +194,11 @@ case $app_name in
 		run_app /usr/bin/mpdscribble \
 			~/.mpdscribble/mpdscribble.conf.gpg
 		;;
-#	pidgin)
+	pidgin)
+		run_app /usr/bin/pidgin
 #		run_app /usr/bin/pidgin \
 #			~/.purple/accounts.xml.gpg
-#		;;
+		;;
 	shutdown)
 		~/.i3/on_quit.sh
 		kill -HUP `pgrep gpg-agent` # clear cache

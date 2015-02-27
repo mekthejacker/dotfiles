@@ -593,6 +593,7 @@ cat <<EOF
     browser.download.manager.showAlertOnComplete = false
                             .closeWhenDone = true
                             .showWhenStarting = false
+    dom.storage.default_quota = 51200
 To check:
     about:cache
     about:cache?device=memory
@@ -635,4 +636,34 @@ EOF
 
 iforgot-wcpe-station-time-zone-difference() {
 	-8
+}
+
+iforgot-libreoffice-writer-images() {
+При добавлении изображений lowriter использует 90 dpi по умолчанию. Таким образом, импортируя SVG файл в гимп, необходимо установить соответствующее dpi и высчитать ширину картинки. Гимп предлагает ширину по умолчанию 1000px, но это даёт 282.24 мм ширины после импорта в libreoffice. Ширина же документа ЕСПД после вычета полей — 180мм. После импорта в lowriter в теле документа изображение будет выглядеть искорёженно даже при угаданном 100% масштабе, однако, если экспортировать документ в PDF с настройками lossless сжатия изображений, там оно будет выглдеть как надо.
+}
+iforgot-libreoffice-pdf-export() {
+	take off flag  embedding ODT when sending to potential employer.
+	set flag for PDF/A-1a, that format is for docs to be stored for a long term. Fonts are embedded.
+}
+
+iforgot-pdf-split() {
+	echo -e '\t$ gs -sDEVICE=pdfwrite -dNOPAUSE -dBATCH -dSAFER -dFirstPage=1
+-dLastPage=4 -sOutputFile=outputT4.pdf T4.pdf'
+}
+
+iforgot-pdf-grep() {
+	cat <<"EOF"
+	find /path -name '*.pdf' -exec sh -c 'pdftotext "{}" - | grep --with-filename --label="{}" --color "your pattern"' \;
+EOF
+}
+
+iforgot-ffmpeg-add-image-to-video() {
+	cat<<"EOF"
+	# Add five seconds of video
+	ffmpeg -loop 1 -f image2 -i image.png -r 30 -t 5 image.webm
+	# Create input file for ffmpeg
+	find -iname "*.webm" -printf "file '%p'\n" | sort >inp
+	# Catenating the files
+	ffmpeg -f concat -i inp -codec copy output.webm
+EOF
 }

@@ -6,13 +6,14 @@
 	#     WINEDEBUG=warn wine …
 	#   or
 	#     WINEDEBUG=warn+all wine …
-	# export LD_PRELOAD="/lib64/libpthread.so.0 /usr/lib64/libGL.so"
-	export __GL_THREADED_OPTIMIZATIONS=0 # May be set to 1 if game supports it
+#	export LD_PRELOAD="/lib32/libpthread.so.0 /usr/lib32/libGL.so"
+	export LD_PRELOAD="/lib64/libpthread.so.0 /usr/lib64/libGL.so"
+	export __GL_THREADED_OPTIMIZATIONS=1 # May be set to 1 if game supports it
 	export __GL_SYNC_TO_VBLANK=0
 	export __GL_YIELD="NOTHING"
 	export SDL_AUDIODRIVER=alsa
 # LANG=ru_RU.UTF-8
-	_32_env='WINEARCH=win32 WINEPREFIX=/home/sszb/.wine'
+	_32_env='LD_PRELOAD="/lib32/libpthread.so.0 /usr/lib32/libGL.so" WINEARCH=win32 WINEPREFIX=/home/sszb/.wine'
 	_64_env='WINEARCH=win64 WINEPREFIX=/home/sszb/.wine64'
 
 	alias wine="$_32_env  sudo -u sszb -H /usr/bin/wine"
@@ -83,9 +84,10 @@
 			[psm]=enabled # Set PixelShaderMode to enabled //disabled
 			[sound]=alsa # Set sound driver to ALSA //disabled,oss,coreaudio (mac)
 			[strictdrawordering]=enabled # //disabled (may make things faster), fixes severe glitches in DE:HR, Tombraider 2013, Metro 2033 etc.
-			[videomemorysize]=1024
+			[videomemorysize]=$((`nvidia-settings --query $DISPLAY/VideoRam | sed -nr '2s/.*\s([0-9]+)\.$/\1/p'`/1024)) # in MiB
 			[vsm]=hardware # Set VertexShaderMode to hardware
 		)
+		[ -v options[ddr] ] || exit 3 # enjoy your fglrx/nouveau/whatever
 		for option in "${!options[@]}"; do
 			value=${options[$option]}
 			echo -e "\n${w}---] $option$s=$value$s"

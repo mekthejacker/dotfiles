@@ -43,21 +43,23 @@ eval `gpg -qd ~/.env/private_data.sh.gpg 2>/dev/null \
 #    are done.
 # NB: ‘gmail’ depends on ‘internet_status’.
 blocks=(
-	[00]=active_window_name
-	[10]=mpd_state
-	[20]=mic_state
-	[30]=internet_status
-	[40]=gmail
-	[50]=nice_date
+	[10]=active_window_name
+	[20]=mpd_state
+	[30]=speakers_state
+	[31]=mic_state
+	[40]=internet_status
+	[50]=gmail
+	[60]=nice_date
 )
 
 case $HOSTNAME in
 	fanetbook)
-		blocks[49]=battery_status
+		blocks[1]=xkb_layout
+		blocks[59]=battery_status
 		;;
 	home)
-		blocks[1]=free_space
-		blocks[41]=schedule
+		blocks[11]=free_space
+		blocks[51]=schedule
 		;;
 esac
 
@@ -84,7 +86,25 @@ get_active_window_name() {
 	}
 	active_window_name='{ "full_text": "'"$title"'",
 \t  "align": "right",
-\t  "separator":false },'
+\t  "separator": false },'
+}
+
+get_xkb_layout() {
+	# When compiling my own xkb map via xkbcomp, I used the layout I made
+	#   with setxkbmap where Scroll Lock indicator was used to indicate
+	#   the current layout. But there’s no indicator on the tiny keyboard
+	#   I’ve bought recently, so this function is to substitute this lack.
+	#   Oh there was also a specific tool to print the current layout,
+	#   https://github.com/ierton/xkb-switch I dunno how reliable it is,
+	#   and since it’s not in repositories, I rather use xset.
+	local scroll_lock=`xset -q | sed -nr 's/.*Scroll Lock:\s+(\S+)\s*$/\1/p'`
+	[ "$scroll_lock" = on ] \
+		&& local scroll_lock=RUS \
+		|| local scroll_lock=ENG
+#\t  "color": "#00ff00",
+	xkb_layout='{ "full_text": "'"$scroll_lock"'",
+\t  "align": "right",
+\t  "separator": false },'
 }
 
 get_free_space() {
@@ -135,6 +155,14 @@ get_mpd_state() {
 		mpd_caught_playing=t # this uses in get_gmail
 		mpd_state='{ "full_text": "♬",\n\t  "separator": false },'
 	}
+}
+
+get_speakers_state() {
+	unset speakers_state
+	amixer get 'Master',0 |& sed '$s/on]$/&/;T;Q1' &>/dev/null \
+		&& speakers_state="{ \"full_text\": \"⊀\",
+\t  \"color\": \"$red\",
+\t  \"separator\": false },"
 }
 
 get_mic_state() {
@@ -225,16 +253,12 @@ get_battery_status() {
 					# (but still can work for 30 min in idle for me)
 					color=$red
 					# Throw a message about shutdown and try to perform it.
-					$(zenity --question --timeout=5 \
-						--text 'Battery level is low.\nIt’s time to\
- shutdown soon.' \
-						--ok-label 'Shutdown' \
-						--cancel-label 'NO, WAIT')
-					[ $charge_now -eq 0 ] && [ $? -ne 1 ] && {
-						shutdown -h now &>/dev/null || { # ~/bin/
-							zenity --warning \
-							    --text 'Cannot call shutdown.
-Please, shutdown the system yourself!'
+					$(Xdialog --timeout 5 \
+						--ok-label Shutdown --cancel-label 'NO, WAIT!' \
+						--yesno 'Battery level is low.\nIt’s time to shutdown soon.' 370x100)
+					[ $charge_now -eq 0 -a $? -eq 0 ] && {
+						shutdown &>/dev/null || { # ~/bin/shutdown
+							Xdialog --msgbox 'Shutdown returned with an error.\nYou have to do it manually!' 330x100
 							# If the script cannot call shutdown itself,
 							#   it must at least try to save the energy
 							#   going to sleep for 20 minutes (by that time
@@ -362,8 +386,8 @@ get_schedule() {
 \t  "separator": false },'
 				;;
 		esac
-		[[ "$dayofmonth" =~ ^[0-9]+$ ]] && [ $dayofmonth -gt 20 ] \
-			&& [ -z "`find ~/ -maxdepth 1 -name sent -mtime -$((dayofmonth-20)) 2>/dev/null`" ] \
+		[[ "$dayofmonth" =~ ^[0-9]+$ ]] && [ $dayofmonth -ge 15 ] \
+			&& [ -z "`find ~/ -maxdepth 1 -name sent -mtime -$((dayofmonth-14)) 2>/dev/null`" ] \
 			&& schedule="${schedule:+${schedule}\n}"'{ "full_text": "♒",
 \t  "color": "'$blue'",
 \t  "separator": false },'

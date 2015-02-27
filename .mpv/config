@@ -1,34 +1,42 @@
-# For mpv from git at Juny 2014
-
-# Options that are common for any profile
+## Options that are common for any profile
 [default]
-# No on-screen controller buttons
+## No on-screen controller buttons
 osc=no
-# Audio track languages
+## Audio track languages
 alang=ja,jpn,en,eng,de,deu,ru,rus
+## redraw subs at seeking
+demuxer-mkv-subtitle-preroll=yes
+## precise seeking helps Zehkul’s script
+hr-seek-demuxer-offset=5
+## Suppress status line messages.
+## mpv like to print a lot when spawned from coproc in watch.sh
+msg-level=all=info
 sub-codepage=enca:ru:en
-# Sub loading is done via watch.sh
+## Sub loading is done via watch.sh
 sub-auto=no
 softvol=yes
 screenshot-template=%F_%n
 screenshot-format=png
-# Compressing screenshots while mpv runs is slow,
-#   so compressing is done after with watch.sh
+## Compressing screenshots while mpv runs is slow,
+##   so compressing is done after with watch.sh
 screenshot-png-compression=0
-# Just in case I will need jpeg some day.
+## Just in case I will need jpeg some day.
 screenshot-jpeg-quality=92
 volume=50
 #sub-ass=no
 osd-duration=3000
-osd-font=''
-# default: 45 px at Height==720px
-osd-font-size=30 
-sub-text-font='Linux Biolinum'
+osd-fractions=yes
+#osd-font=''
+## default: 45 px at Height==720px
+osd-font-size=30
+## Disable ass subs for this to take effect
+sub-text-font='DejaVu Sans Mono'
 sub-text-font-size=50
-# 0ms after window goes fullscreen
+## 0ms after window goes fullscreen
 cursor-autohide=0
 cursor-autohide-fs-only=yes
-save-position-on-quit=yes
+## Too many unnecessary files. Enabled in wa alias in ~/bashrc/home.sh
+#save-position-on-quit=yes
 
 [hdmi]
 profile-desc="For output on big plasma"

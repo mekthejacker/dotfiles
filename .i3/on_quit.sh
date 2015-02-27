@@ -13,10 +13,10 @@
 # - erase /tmp/decrypted before exit, to be sure none of decrypted files are
 #   left when I’m not by the computer.
 
-[ "${ENV_DEBUG/*q*/}" ] || {
-	exec &>/tmp/envlogs/on_quit
+#[ "${ENV_DEBUG/*q*/}" ] || {
+#	exec &>/tmp/envlogs/on_quit
 	set -x
-}
+#}
 
 sudo /usr/bin/killall iftop
 
@@ -31,15 +31,17 @@ eval `sed -n "/case/,/esac/{    # inside the case statement
          :q1 Q
 		 }
 	  }"  ~/.i3/autostart.sh`
+# Eh-heh… this assumes anything launched from there was wrapped in ~/bin/run_app.sh…
 for app in ${startup_apps[@]}; do
-	# actual app, not bash wrapper, that must continue
-	pkill -xf "^/.*$app$"
+	# actual app, not bash wrapper, that must continue, NB -9 must be separated
+	pkill -9 -xf "^/.*$app$"
 done
-until [ -v ready_to_quit ]; do
-	ready_to_quit=t
-	for app in ${startup_apps[@]}; do
+until [ ${#startup_apps[@]} -eq 0 ]; do
+	number_of_apps=${#startup_apps[@]}
+	for ((i=0; i<number_of_apps; i++)); do
+		echo $i
 		# any process, including bash wrapper that must end gracefully
-		pgrep -f "$app" && unset ready_to_quit
+		pgrep -f "${startup_apps[i]}" || unset startup_apps[i]
 	done
 	sleep 1
 done

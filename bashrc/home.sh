@@ -11,30 +11,34 @@ alias wtr='touch ~/watered'
 alias snt='touch ~/sent'
 
 alias rt="urxvtc -title rtorrent -hold \
-                 -e /bin/bash -c 'chmod o+rw `tty` && \
-                    sudo -u rtorrent -H tmux -u -S /home/rtorrent/.tmux/socket attach' &"
+                 -e /bin/bash -c 'chmod o+rw `tty` \
+                    && sudo -u rtorrent -H tmux -u -S /home/rtorrent/.tmux/socket attach' &"
+alias rtstop='sudo -u rtorrent /usr/bin/pkill -STOP -xf /usr/bin/rtorrent'
+alias rtcont='sudo -u rtorrent /usr/bin/pkill -CONT -xf /usr/bin/rtorrent'
 
 [ "${MANPATH//*watch.sh*/}" ] \
 	&& export MANPATH="$HOME/.watch.sh/:$MANPATH"
-alias wa='~/scripts/watch.sh \
-          -A -e -m "--fs --save-position-on-quit --profile=$HOSTNAME" \
-          --last-ep \
-          --remember-sub-and-audio-delay \
-          -s "season %keyword disk disc cd part pt dvd" \
-          -S /home/picts/screens/ \
-          --screenshot-dir-skel="macro,misc"'
-alias wa-a="wa -d /home/video/anime"
-alias wa-f="wa -d /home/video/films"
-alias wa-s="wa -d /home/video/serials"
+wa() {
+	~/scripts/watch.sh \
+		--no-hints -e -m "--fs --save-position-on-quit --profile=$HOSTNAME" \
+		--last-ep \
+		--remember-sub-and-audio-delay \
+		-s "season %keyword disk disc cd part pt dvd" \
+		-S /home/picts/screens/ \
+		--screenshot-dir-skel="macro,misc" "$@"
+}
+wa-a() { wa -d /home/video/anime "$@"; }
+wa-f() { wa -d /home/video/films "$@"; }
+wa-s() { wa -d /home/video/serials "$@"; }
 
 # For output on plasma tv, see also ~/.i3/config.template
 wap() {
 	local variant=$1; shift
 	xrandr --output HDMI-0 --mode 1920x1080 --right-of DVI-I-0
-	wa-$variant -m "--x11-name big_screen --profile=hdmi" $@
+	wa-$variant -m "--x11-name big_screen --ionice-opts --profile=hdmi" $@
     xrandr --output HDMI-0 --off
 	# Switch back from the workspace bound to the output with plasma
-	i3-msg workspace back_and_forth
+	i3-msg workspace 0:Main
 }
 alias wap-a="wap a"
 alias wap-f="wap f"

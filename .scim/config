@@ -1,5 +1,6 @@
 /DefaultIMEngineFactory/en_US = 065d7b20-dda2-47fb-8f94-3306d9a25e56
 /FrontEnd/ChangeFactoryGlobally = false
+/FrontEnd/IMOpenedByDefault = false
 /FrontEnd/OnTheSpot = true
 /FrontEnd/SharedInputMethod = false
 /FrontEnd/Socket/ConfigReadOnly = false
@@ -20,6 +21,7 @@
 /IMEngine/Anthy/KeyTheme = Default
 /IMEngine/Anthy/KeyThemeFile = 
 /IMEngine/Anthy/NICOLALayoutFile = 
+/IMEngine/Anthy/PeriodStyle = Japanese
 /IMEngine/Anthy/PreeditStyle = Underline
 /IMEngine/Anthy/RomajiThemeFile = 
 /IMEngine/RawCode/Locales = default
@@ -46,4 +48,4 @@
 /Panel/Gtk/ToolBar/ShowPropertyLabel = false
 /Panel/Gtk/ToolBar/ShowSetupIcon = true
 /Panel/Gtk/ToolBar/ShowStickIcon = false
-/UpdateTimeStamp = 1406145013:916129
+/UpdateTimeStamp = 1424835757:166575

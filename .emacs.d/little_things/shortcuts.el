@@ -70,7 +70,8 @@
     (global-set-key (kbd "C-R") 'isearch-backward-regexp)
 (global-set-key (kbd "C-r") 'isearch-repeat-backward)
 (global-set-key (kbd "C-v") 'isearch-repeat-forward)
-(global-set-key (kbd "C-g") 'query-replace)
+;(global-set-key (kbd "C-g") 'query-replace)
+(global-set-key (kbd "C-g") 'pcre-query-replace-regexp)
 
 ;;(global-set-key (kbd "") ')
 ;;(global-set-key (kbd "") ')

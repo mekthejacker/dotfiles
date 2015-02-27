@@ -15,7 +15,10 @@ unalias -a
 unset -f `sed -nr "s/^\s*([-_a-zA-Z0-9]+)\(\)\s*\{.*$/\1/p" \
           ~/.bashrc ~/bashrc/* 2>/dev/null`
 
-[ -d /tmp/envlogs ] || mkdir -m 700 /tmp/envlogs # /tmp should be on tmpfs
+[ -v ENV_DEBUG ] || {
+	rm -rf /tmp/envlogs/* &>/dev/null
+	mkdir -m 700 /tmp/envlogs &>/dev/null # /tmp should be on tmpfs
+}
 # code     file               logfile (under /tmp/envlogs/)
 # x    /usr/bin/X          x (just for the mention, it’s always present)
 # p    ~/.preload.sh       preload
@@ -25,8 +28,7 @@ unset -f `sed -nr "s/^\s*([-_a-zA-Z0-9]+)\(\)\s*\{.*$/\1/p" \
 # r    ~/bin/run_app.sh    runapp_<app_name>
 # q    ~/.i3/on_quit.sh    on_quit
 # -    prevents the variable to be empty
-export ENV_DEBUG=-p
-
+export ENV_DEBUG=-pq
 for opt in autocd cdspell dirspell dotglob extglob globstar \
     no_empty_cmd_completion; do
     shopt -s $opt
@@ -46,7 +48,9 @@ unset opt completion_module
 #ulimit -S -n 8192
 # Setting the ‘soft’ limit of maximum open files.
 ulimit -Sn 4096
+set -b # report exit status of background jobs immediately
 
+export DEPLOY_EXCLUDE_DIRS="$HOME/.ssh|$HOME/.gnupg"
 export EIX_LIMIT=0
 export EDITOR="emacsclient -c -nw"
 export LESS="$LESS -x4"
@@ -78,15 +82,28 @@ at \h \
 ## 4. Aliases can have multiple lines
 #     alias plsplsplsdontbreak="echo some stuff # this is comment
 #                               echo lol second line # another comment"
-#
+
+# add to todo list
+a() { echo "$@" >> ~/todo; }
+# delete from todo list
+d() {
+    [ "$1" = '-' ] && echo -n >~/todo || {
+        for i in $@; do
+            [[ "$i" =~ ^[0-9]+$ ]] && sed -i $1d ~/todo
+        done
+    }
+}
 alias bc="bc -q"
 alias ec="emacsclient -c -nw"
-alias erc="emacsclient ~/.bashrc"
+alias erc="emacsclient -c -nw ~/.bashrc"
 alias grep="grep --color=auto"
+# pinentry doesn’t like scim
+alias gpg="GTK_IM_MODULE= QT_IM_MODULE= gpg"
 alias ls="ls --color=auto"
 alias re=". ~/.bashrc" # re-source
-alias td="todo -A "
-alias tdD="todo -D "
+spr="| curl -F 'sprunge=<-' http://sprunge.us" # add ?<lang> for line numbers
+#alias td="todo -A "
+#alias tdD="todo -D "
 alias tmux="tmux -u -f ~/.tmux/config -S $HOME/.tmux/socket"
 alias deploy="/root/scripts/deploy_configuration.sh "
 
@@ -99,7 +116,8 @@ alias deploy="/root/scripts/deploy_configuration.sh "
 
 [ ! -v DISPLAY -a "`tty`" = /dev/tty2 ] && {
 	# W! startx IGNORES ~/.xserverrc options if something passed beyond -- !
-	exec startx -- -nolisten tcp &>/tmp/envlogs/x # /etc/X11/xorg.conf as config
+	# This will use /etc/X11/xorg.conf as a default config
+	exec startx -- -nolisten tcp &>/tmp/envlogs/x # … -- -verbose 5 -logverbose=5
 	# This was needed when I used to switch between configs.
 	# exec startx -- -config xorg.conf$(<~/.xorg.conf.suffix) -nolisten tcp &>/tmp/envlogs/x
 	# rm ~/.xorg.conf.suffix &>/dev/null
@@ -175,13 +193,17 @@ compress_screenshot() {
 # $1 — path to playlist file (~/.mpd/playlists/…)
 # $2 — where to copy
 copy_playlist() {
-	[ -f "$1" ] && [ -d "$2" ] && [ -w "$2" ] && {
+	local playlist="$1"
+	local dest="$2"
+	[ -f "$HOME/.mpd/playlists/${playlist}.m3u" ] \
+		&& local playlist="$HOME/.mpd/playlists/${playlist}.m3u"
+	[ -f "$playlist" ] && [ -d "$dest" -a -w "$dest" ] && {
 		eval mpd_library_path="`sed -nr 's/^\s*music_directory\s+"(.*)"/\1/p'\
 		                   ~/.mpd/mpd.conf`"
 		while read filepath; do
 			filepath="${filepath/$mpd_library_path/}"
-			cp -v  "$mpd_library_path/$filepath" "$2"
-		done < "$1"
+			cp -v  "$mpd_library_path/$filepath" "$dest"
+		done < "$playlist"
 	} || echo -e 'Usage:\ncopy_playlist <playlist file> <directory to copy to>'
 }
 
@@ -197,4 +219,15 @@ mount_box() {
 
 umount_box() {
 	sudo /root/scripts/mount_box.sh $USER umount &
+}
+
+# TAKES:
+#     $1 — file name to upload.
+spr() {
+	[ -r "$1" ] || {
+		echo 'Pass a file name to paste.'
+		return 3
+	}
+	#firefox http://sprunge.us/aXZI?py#n-7
+	cat "$1" | curl -F 'sprunge=<-' http://sprunge.us
 }
