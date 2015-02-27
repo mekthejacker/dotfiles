@@ -667,3 +667,10 @@ iforgot-ffmpeg-add-image-to-video() {
 	ffmpeg -f concat -i inp -codec copy output.webm
 EOF
 }
+
+iforgot-voip-via-netcat() {
+	cat <<"EOF"
+	(read; echo; rec --buffer 17 -q -w -s -r 48000 -c 1 -t raw -)|netcat -u -l -p 8888|(read; play -w -s -r 48000 --buffer 17 -t raw -)
+	(echo; rec --buffer 17 -q -w -s -r 48000 -c 1 -t raw -)|netcat -u 192.168.1.1 8888|(read; play -w -s -r 48000 --buffer 17 -t raw -)
+EOF
+}
