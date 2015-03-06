@@ -16,12 +16,16 @@ alias rt="urxvtc -title rtorrent -hold \
 alias rtstop='sudo -u rtorrent /usr/bin/pkill -STOP -xf /usr/bin/rtorrent'
 alias rtcont='sudo -u rtorrent /usr/bin/pkill -CONT -xf /usr/bin/rtorrent'
 
+# For me, it’s easier to see new changes on a local setup.
 [ "${MANPATH//*watch.sh*/}" ] \
 	&& export MANPATH="$HOME/.watch.sh/:$MANPATH"
+# Enabling bash-completion for my aliases
+complete -F _watchsh wa-a wa-f wa-s wap-a wap-f wap-s
+#
 wa() {
 	~/scripts/watch.sh \
 		--no-hints -e -m "--fs --save-position-on-quit --profile=$HOSTNAME" \
-		--last-ep \
+		--last-ep --last-item-mark '.' \
 		--remember-sub-and-audio-delay \
 		-s "season %keyword disk disc cd part pt dvd" \
 		-S /home/picts/screens/ \

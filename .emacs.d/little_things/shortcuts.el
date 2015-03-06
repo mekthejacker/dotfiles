@@ -1,9 +1,8 @@
-;;
 ;; SHORTCUTS
 ;; Examples:
 ;; (global-set-key (kbd "key") 'function)
 ;; (global-unset-key (kbd "C-_"))
-;;
+
 
 ;; C-. will not work in terminal because C-. combination will produce
 ;; <ASCII code of . -64>. ASCII code for . is 46
@@ -20,6 +19,7 @@
 (global-set-key (kbd "M-w")     'kill-buffer)
 (global-set-key (kbd "C-l")     'goto-line)
 (global-set-key (kbd "C-`")     'close-annoying-windows)
+(global-set-key (kbd "C-h m")   'describe-mode)
 
 ;; Navigation
 (global-set-key (kbd "M-i") 'previous-line)

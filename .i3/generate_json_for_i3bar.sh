@@ -74,6 +74,15 @@ bar+="\n\t]"
 
 # Some functions may generate empty line if no indicator needed.
 
+# NOTE:
+#     Despite the fact it may seem useless to have, because all the important
+#       info you should be able to output in the window itself (also window
+#       titles while stacked/tabbed), and on small screens there may be
+#       not enough space for the title, but it’s here
+#         - just for it to be if it accidentally become needed;
+#         - if window lags and its output is grey screen or copy of what was
+#           on the previous workspace, this window title is the only way you
+#           can tell what actually this window is and where is belongs to.
 get_active_window_name() {
 	max_length=50
 	id=`xprop -root | sed -nr 's/^_NET_ACTIVE_WINDOW.*# (.*)$/\1/p'`

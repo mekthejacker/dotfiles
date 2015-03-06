@@ -594,6 +594,7 @@ cat <<EOF
                             .closeWhenDone = true
                             .showWhenStarting = false
     dom.storage.default_quota = 51200
+    browser.urlbar.clickSelectsAll = false
 To check:
     about:cache
     about:cache?device=memory

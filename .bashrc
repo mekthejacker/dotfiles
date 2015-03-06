@@ -34,7 +34,7 @@ for opt in autocd cdspell dirspell dotglob extglob globstar \
     shopt -s $opt
 done
 for completion_module in eix eselect gentoo git gpg iptables layman man \
-    smartctl ssh strace sysctl taskset tmux udisks; do
+    smartctl ssh strace sysctl taskset tmux udisks watchsh; do
     eselect bashcomp enable $completion_module &>/dev/null
 done
 unset opt completion_module
