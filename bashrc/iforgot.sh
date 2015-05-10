@@ -547,6 +547,11 @@ cat <<EOF
 
 +crop
 	-filter:v "crop=WIDTH:HEIGHT:X_OFFSET:Y_OFFSET"
+
+Webm issues: it ifnores -b:v -minrate -maxrate and -crf. Use -qmin and -qmax.
+	ffmpeg -y -threads 8 -async 1 \
+		-i /home/video/anime/\[ReinForce\]\ Ergo\ Proxy\ \(BDRip\ 1920x1080\ x264\ FLAC\)/\[ReinForce\]\ Ergo\ Proxy\ -\ 11\ \(BDRip\ 1920x1080\ x264\ FLAC\).mkv  -ss 00:00:00 \
+		-t 00:00:15.849 -b:v 12M -crf 4 -minrate 12M -maxrate 12M -qmin 0 -qmax 0 -vf scale=1280:720 /tmp/out.webm
 EOF
 }
 
@@ -586,18 +591,23 @@ cat <<EOF
     media.autoplay.enabled = true
          .gstreamer.enabled = true
     browser.cache.disk = false
-    browser.padlock.urlbar_background = 0
-    mousewheel.acceleration.factor = 1
-    mousewheel.default.delta_multiplier_y = 270
-    network.standard-url.escape-utf8 = false
-    browser.download.manager.showAlertOnComplete = false
+           .padlock.urlbar_background = 0
+           .urlbar.clickSelectsAll = false
+           .download.manager.showAlertOnComplete = false
                             .closeWhenDone = true
                             .showWhenStarting = false
+    mousewheel.acceleration.factor = 1
+              .default.delta_multiplier_y = 270
+    network.dns.disableIPv6 = true
+           .standard-url.escape-utf8 = false
     dom.storage.default_quota = 51200
-    browser.urlbar.clickSelectsAll = false
+
 To check:
     about:cache
     about:cache?device=memory
+
+In case of troubles with SWF
+   echo 'application/x-shockwave-flash       swf swfl' > .mime.types
 EOF
 }
 
@@ -640,8 +650,9 @@ iforgot-wcpe-station-time-zone-difference() {
 }
 
 iforgot-libreoffice-writer-images() {
-При добавлении изображений lowriter использует 90 dpi по умолчанию. Таким образом, импортируя SVG файл в гимп, необходимо установить соответствующее dpi и высчитать ширину картинки. Гимп предлагает ширину по умолчанию 1000px, но это даёт 282.24 мм ширины после импорта в libreoffice. Ширина же документа ЕСПД после вычета полей — 180мм. После импорта в lowriter в теле документа изображение будет выглядеть искорёженно даже при угаданном 100% масштабе, однако, если экспортировать документ в PDF с настройками lossless сжатия изображений, там оно будет выглдеть как надо.
+	When an image is inserted in a libreoffice writer document, lowriter uses 90 dpi by default. Thus, importing SVG file in GIMP it’s necesary to set corresponding dpi and count appropriate width according to that. GIMP advises 1000px width by default, but that gives 282.24 mm of width after import to libreoffice. ESPD doc width excluding fields is 180 mm. After import to lowriter, in the document body image will look awry even if you guess the 100 % scale right. But it only seems like it, after the export to PDF with lossless image compression it’ll look as it should.
 }
+
 iforgot-libreoffice-pdf-export() {
 	take off flag  embedding ODT when sending to potential employer.
 	set flag for PDF/A-1a, that format is for docs to be stored for a long term. Fonts are embedded.
@@ -674,4 +685,22 @@ iforgot-voip-via-netcat() {
 	(read; echo; rec --buffer 17 -q -w -s -r 48000 -c 1 -t raw -)|netcat -u -l -p 8888|(read; play -w -s -r 48000 --buffer 17 -t raw -)
 	(echo; rec --buffer 17 -q -w -s -r 48000 -c 1 -t raw -)|netcat -u 192.168.1.1 8888|(read; play -w -s -r 48000 --buffer 17 -t raw -)
 EOF
+}
+
+#removes *.desktop files
+iforgot-wine-clean-desktop() {
+	rm /home/sszb/.wine/drive_c/users/sszb/#msgctxt#directory#Desktop/*
+}
+
+iforgot-wget-mirror-site() {
+	cat <<"EOF"
+	wget --mirror --convert-links --adjust-extension --page-requisites --no-parent http://example.org'
+or shorter:
+	wget -mkEpnp http://example.org
+EOF
+}
+
+iforgot-wifi-why-it-doesnt-work() {
+	card is requiring CONFIG_CFG802011_WEXT=y
+	card is hw/soft bloced: rfkill list
 }
