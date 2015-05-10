@@ -29,7 +29,9 @@
  '(TeX-source-correlate-start-server t)
  '(TeX-view-program-selection (quote (((output-dvi style-pstricks) "dvips and gv") (output-dvi "xdvi") (output-pdf "zathura") (output-html "xdg-open"))))
  '(autopair-global-mode t)
+ '(case-fold-search nil)
  '(column-number-mode t)
+ '(delete-selection-mode t)
  '(desktop-base-file-name ".desktop")
  '(desktop-base-lock-name ".desktop.lock")
  '(desktop-load-locked-desktop t)
@@ -71,6 +73,7 @@
  '(whitespace-line-column 10000)
  '(whitespace-style (quote (face tabs spaces trailing newline indentation empty space-mark tab-mark newline-mark)))
  '(word-wrap t)
+ '(x-select-enable-primary nil)
  '(x-stretch-cursor t))
 
 ;; good old colors:
@@ -167,10 +170,10 @@
 
 ;; settings for smooth-scrolling.el
 (setq scroll-conservatively 10000
-      scroll-preserve-screen-position 1
-      ;; redisplay-dont-pause t
-      ;; scroll-margin 1
-      ;; scroll-step 1
+	scroll-preserve-screen-position 1
+	;; redisplay-dont-pause t
+	;; scroll-margin 1
+	;; scroll-step 1
 )
 
 ;;(turn-off-auto-fill)

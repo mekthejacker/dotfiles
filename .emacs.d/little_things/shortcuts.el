@@ -70,6 +70,9 @@
     (global-set-key (kbd "C-R") 'isearch-backward-regexp)
 (global-set-key (kbd "C-r") 'isearch-repeat-backward)
 (global-set-key (kbd "C-v") 'isearch-repeat-forward)
+; ↘ Use C-c i to toggle emacs’s case-fold-search ↘
+(global-set-key (kbd "M-s c") 'isearch-toggle-case-fold) ; switch case sensitiveness on/off
+
 ;(global-set-key (kbd "C-g") 'query-replace)
 (global-set-key (kbd "C-g") 'pcre-query-replace-regexp)
 
