@@ -1,4 +1,4 @@
-[B#should be sourced
+#should be sourced
 
 # preload.sh
 # This script is intended to be a common part of ~/.xinitrc and ~/.xsession.
@@ -73,7 +73,7 @@ export WIDTH HEIGHT # often being used in my own scripts later
 }
 
 # Autofs is laggy and slow.
-sudo /bin/umount $HOME/phone_card
+grep -qF "$HOME/phone_card" /proc/mounts && sudo /bin/umount $HOME/phone_card
 rm -f $HOME/phone_card
 mkdir -m700 $HOME/phone_card &>/dev/null
 c=0; until grep -q $HOME/phone_card /proc/mounts || {
@@ -108,7 +108,7 @@ done
 	cp -R ~/phone_card/.gnupg /tmp/decrypted/
 	ln -sf /tmp/decrypted/.gnupg $HOME/.gnupg
 	cp -R ~/phone_card/.ssh /tmp/decrypted/
-	ln -sf /tmp/decrypted/.gnupg $HOME/.gnupg
+#	ln -sf /tmp/decrypted/.ssh $HOME/.ssh
 	chmod -R a-rwx,u=rwX /tmp/decrypted
 	push_the_bar 'Unmounting flash card'
 	sudo /bin/umount $HOME/phone_card && rmdir ~/phone_card
@@ -190,11 +190,12 @@ xset s off
 push_the_bar 'Setting primary and slave outputs in ~/.i3/config'
 sed -r "s/PRIMARY_OUTPUT/$PRIMARY_OUTPUT/g" ~/.i3/config.template > ~/.i3/config
 for ((i=1; i<n; i++)); do
+	echo $DISPLAY
 	eval sed -ri "s/SLAVE_OUTPUT_$i/\$SLAVE_OUTPUT_$i/g" ~/.i3/config
-	eval xrandr --output "\$SLAVE_OUTPUT_$i" --off
+	eval xrandr --output \$SLAVE_OUTPUT_$i --off
 done
 
 echo "101" >$pipe
 exec {pipe_fd}<&-
 rm $pipe
-pkill -9 Xdialog
+pkill -9 -f Xdialog

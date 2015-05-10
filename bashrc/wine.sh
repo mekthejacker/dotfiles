@@ -35,13 +35,13 @@
 	alias audiosurf="pushd /home/games/AudioSurf && wine Launcher.exe && popd"
 	alias il2="pushd /home/games/IL2; wine il2fb.exe; popd"
 	alias arx="pushd /home/Games/Arx\ Fatalis/ ; ./arx -u/home/Games/Arx\ Fatalis/; popd"
-	alias hitman="pushd /home/sszb/.wine/drive_c/Games/Hitman_Blood_money; wine HitmanBloodMoney.exe; popd;"
+	alias hitman="pushd /home/sszb/.wine/drive_c/Games/Hitman_Blood_money; wine HitmanBloodMoney.exe; popd"
 	alias steam="taskset -c 1-3 steam"
 	alias zeus="pushd /home/games/Poseidon; wine Zeus.exe; popd"
 	alias hegemony="wine /home/games/Hegemony\ Gold\ -\ Wars\ of\ Ancient\ Greece/Hegemony\ Gold.exe"
 	alias banished="pushd /home/gamefiles/Banished; wine64 Banished.exe; popd"
 	alias minimetro="$HOME/assembling/minimetro/MiniMetro*x86_64"
-
+	alias teamviewer="pushd /home/soft_win/teamviewer_8_portable; wine TeamViewer.exe; popd"
 	alias killsteam="pkill -9 -f 'hl2.*'; pkill -9 -f steam"
 	alias killsszb='sudo -u sszb /usr/bin/killall -9 -u sszb'
 

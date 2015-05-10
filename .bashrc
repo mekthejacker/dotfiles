@@ -185,7 +185,7 @@ compress_screenshot() {
 	# }
 	}
 	export -f crush
-	find -iname "*.png" -size +$min_size -printf "%f\n" | parallel --eta crush
+	find  -iname "*.png" -size +$min_size -printf "%f\n" | parallel --eta crush
 	export -nf crush
 }
 
