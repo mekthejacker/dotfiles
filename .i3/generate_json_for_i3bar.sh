@@ -41,7 +41,6 @@ eval `gpg -qd ~/.env/private_data.sh.gpg 2>/dev/null \
 #    contains a string of _variable names_, in other words, block names. This
 #    string evaluates at runtime each time after all functions in func_list
 #    are done.
-# NB: ‘gmail’ depends on ‘internet_status’.
 blocks=(
 	[10]=active_window_name
 	[20]=mpd_state
@@ -297,14 +296,20 @@ get_internet_status() {
 	[ $timeout_step -eq 0 -o $((timeout_step % wait_time)) -eq 0 ] && {
 		unset has_internets
 		[ -p /dev/fd/$pingout ] && {
-			internets_checked=t
-			grep -q ' 0% packet loss' </dev/fd/$pingout && \
-				has_internets=t
+			grep -q ' 0% packet loss' </dev/fd/$pingout \
+				&& has_internets=t && {
+				internet_status='{ "full_text": "",
+\t  "separator":false },'
+			}||{
+				internet_status='{ "full_text": "∿",
+\t  "color": "'$red'",
+\t  "separator":false },'
+			}
 			exec {pingout}<&-
 		}
 		[ -v COPROC ] || {
 			# wait_time can be here 2×, 3× timeouts or more.
-			coproc ping -W $wait_time -q -n -c1 8.8.8.8
+			coproc ping -W $wait_time -q -n -c1 8.8.4.4
 			# <& duplicates input file descriptors,
 			# >& duplicates output file descriptors, They both work here.
 			# {braces} are important.
@@ -330,7 +335,7 @@ get_gmail() {
 			}
 			sed -r 's~^<H2>Error [0-9]{3}</H2>$~&~;T;Q1' \
 				&>/dev/null <<<"$gmail_server_reply" || {
-				# Invalid user data or other fault.
+				# Server reported invalid user data or other fault.
 				gmail='{ "full_text": "E✉",
 \t  "color": "'$red'",
 \t  "separator":false },'
@@ -354,11 +359,6 @@ get_gmail() {
 				[ -v mpd_caught_playing ] && mpc play  >/dev/null
 			}
 			old_letters_unread=$letters_unread
-		elif [ -v internets_checked ]; then
-			# …we truly have no internets.
-			gmail='{ "full_text": "U✉",
-\t  "color": "'$red'",
-\t  "separator":false },'
 		fi
 	}
 }
