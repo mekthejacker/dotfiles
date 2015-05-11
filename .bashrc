@@ -229,5 +229,6 @@ spr() {
 		return 3
 	}
 	#firefox http://sprunge.us/aXZI?py#n-7
-	cat "$1" | curl -F 'sprunge=<-' http://sprunge.us
+	curl -F 'sprunge=<-' http://sprunge.us <"$1" \
+		| perl -p -e 'chomp if eof' | xclip
 }
