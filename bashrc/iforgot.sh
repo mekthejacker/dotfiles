@@ -701,6 +701,9 @@ EOF
 }
 
 iforgot-wifi-why-it-doesnt-work() {
+cat <<"EOF"
 	card is requiring CONFIG_CFG802011_WEXT=y
 	card is hw/soft bloced: rfkill list
+	card is in wrong CRDA region: iw reg get/set <AA>
+EOF
 }
