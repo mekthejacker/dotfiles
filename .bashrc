@@ -53,7 +53,7 @@ set -b # report exit status of background jobs immediately
 export DEPLOY_EXCLUDE_DIRS="$HOME/.ssh|$HOME/.gnupg"
 export EIX_LIMIT=0
 export EDITOR="emacsclient -c -nw"
-export LESS="$LESS -x4"
+export LESS='-R -M --shift 5 -x4'
 export MPD_HOST=$HOME/.mpd/socket
 #grep -qF '/assembling/' <<<"$PATH" \
 #	|| export PATH="$PATH:~/assembling/android-sdk-linux/platform-tools/:~/assembling/android-sdk-linux/tools/"
@@ -95,6 +95,7 @@ d() {
 }
 alias bc="bc -q"
 alias ec="emacsclient -c -nw"
+alias emc="emacsclient"
 alias erc="emacsclient -c -nw ~/.bashrc"
 alias grep="grep --color=auto"
 # pinentry doesn’t like scim
@@ -166,69 +167,3 @@ one_command_execute() {
 	bind -x '"\C-m":"one_command_execute"'
 }
 
-# Compresses all png files in CWD
-# $1 — minimum size, under which no compression shall be done
-#      If not set 1M (1MiB) is the default.
-compress_screenshot() {
-	[ "$1" ] && {
-		[[ "$1" =~ ^[0-9]+[KMG]$ ]] && min_size=${1/K/k} \
-			||{ echo "The parameter should conform to that pattern: [0-9]+[KMG]." >&2; return 3; }
-	}|| min_size=1M
-	crush() {
-		which pngcrush &>/dev/null && {
-			pngcrush -reduce "$1" "/tmp/$1"
-			mv "/tmp/$1" "$1"
-		}
-	# which convert &>/dev/null && [ -v JPEG_CONVERSION ] && {
-	# 	convert "$shot" -quality $JPEG_CONVERSION "${shot%.*}.jpg"
-	# 	rm "$shot"
-	# }
-	}
-	export -f crush
-	find  -iname "*.png" -size +$min_size -printf "%f\n" | parallel --eta crush
-	export -nf crush
-}
-
-# Copies MPD playlist to a specified folder.
-# $1 — path to playlist file (~/.mpd/playlists/…)
-# $2 — where to copy
-copy_playlist() {
-	local playlist="$1"
-	local dest="$2"
-	[ -f "$HOME/.mpd/playlists/${playlist}.m3u" ] \
-		&& local playlist="$HOME/.mpd/playlists/${playlist}.m3u"
-	[ -f "$playlist" ] && [ -d "$dest" -a -w "$dest" ] && {
-		eval mpd_library_path="`sed -nr 's/^\s*music_directory\s+"(.*)"/\1/p'\
-		                   ~/.mpd/mpd.conf`"
-		while read filepath; do
-			filepath="${filepath/$mpd_library_path/}"
-			cp -v  "$mpd_library_path/$filepath" "$dest"
-		done < "$playlist"
-	} || echo -e 'Usage:\ncopy_playlist <playlist file> <directory to copy to>'
-}
-
-# $1 — filename to fix figure dashes in
-fix_fdash() {
-	[ -w /tmp/c ] && sed -ri 's/^- (.*)$/‒ \1/g' /tmp/c
-}
-
-mount_box() {
-	gpg -qd --output /tmp/decrypted/secrets.`date +%s` ~/.davfs2/secrets.gpg
-	sudo /root/scripts/mount_box.sh $USER &
-}
-
-umount_box() {
-	sudo /root/scripts/mount_box.sh $USER umount &
-}
-
-# TAKES:
-#     $1 — file name to upload.
-spr() {
-	[ -r "$1" ] || {
-		echo 'Pass a file name to paste.'
-		return 3
-	}
-	#firefox http://sprunge.us/aXZI?py#n-7
-	curl -F 'sprunge=<-' http://sprunge.us <"$1" \
-		| perl -p -e 'chomp if eof' | xclip
-}

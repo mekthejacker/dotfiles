@@ -112,14 +112,14 @@ bindcode $mod+69 exec --no-startup-id amixer set Master toggle
 ## See ‘amixer scontrols | $PAGER’ for a complete list of controls
 bindcode $mod+70 exec --no-startup-id "amixer sset 'Capture',0 toggle"
 ## F5
-bindcode $mod+71 exec --no-startup-id amixer set Master 1%-
+bindcode $mod+71 exec --no-startup-id amixer set Master 2%-
 bindcode $mod+Control+71 exec --no-startup-id xbacklight -dec 5
 ## F6
-bindcode $mod+72 exec --no-startup-id eval mpc volume -1
+bindcode $mod+72 exec --no-startup-id eval mpc volume -2
 ## F7
-bindcode $mod+73 exec --no-startup-id eval mpc volume +1
+bindcode $mod+73 exec --no-startup-id eval mpc volume +2
 ## F8
-bindcode $mod+74 exec --no-startup-id amixer set Master 1%+
+bindcode $mod+74 exec --no-startup-id amixer set Master 2%+
 bindcode $mod+Control+74 exec --no-startup-id xbacklight -inc 5
 ## F9
 bindcode $mod+75 exec --no-startup-id eval mpc prev
@@ -152,7 +152,7 @@ bindcode $mod+61 exec --no-startup-id "~/scripts/wallpaper_setter.sh -k"
 ## `
 bindcode $mod+49 workspace 0:Main
 ## 1
-bindcode $mod+10 exec --no-startup-id "i3-msg workspace 1:Pale moon && { pgrep -u $UID palemoon &>/dev/null || { palemoon & } }"
+bindcode $mod+10 exec --no-startup-id "i3-msg workspace 1:Firefox && { pgrep -u $UID firefox &>/dev/null || { firefox & } }"
 ## 2
 ## This is to distinguish emacsclient window running in X and those in
 ##   terminals, i.e. to forbid creation of more than one X window while there
@@ -180,7 +180,7 @@ bindcode $mod+19 workspace 10:Outer_space
 bindsym $mod+Tab workspace back_and_forth
 
 workspace 0:Main         output PRIMARY_OUTPUT
-workspace "1:Pale moon"      output PRIMARY_OUTPUT
+workspace 1:Firefox      output PRIMARY_OUTPUT
 workspace 2:Emacs        output PRIMARY_OUTPUT
 workspace 3:Thunar       output PRIMARY_OUTPUT
 workspace 4:Geeqie       output PRIMARY_OUTPUT
@@ -193,7 +193,7 @@ workspace 10:Outer_space  output SLAVE_OUTPUT_1
 
 ## Move focused container to workspace
 bindcode $mod+Shift+49 move container to workspace 0:Main
-bindcode $mod+Shift+10 move container to workspace "1:Pale moon"
+bindcode $mod+Shift+10 move container to workspace 1:Firefox
 bindcode $mod+Shift+11 move container to workspace 2:Emacs
 bindcode $mod+Shift+12 move container to workspace 3:Thunar
 bindcode $mod+Shift+13 move container to workspace 4:Geeqie
@@ -207,7 +207,7 @@ bindcode $mod+Shift+19 move container to workspace 10:Outer_space
 bindsym $mod+Shift+Tab move container to workspace back_and_forth
 
 ## Assigning windows to workspaces
-assign [class="Pale moon"] → "1:Pale moon"
+assign [class="Firefox"] → "1:Firefox"
 assign [class="Emacs"] → "2:Emacs"
 assign [class="Thunar"] → "3:Thunar"
 assign [class="Geeqie"] → "4:Geeqie"

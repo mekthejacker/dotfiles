@@ -108,3 +108,4 @@ URxvt.underlineColor: #75507B
 !highlightTextColor: #000000
 
 one_command_shell*geometry: 70x1
+!!mc_shell.font: xft:Gentium Basic:autohint=true:size=10

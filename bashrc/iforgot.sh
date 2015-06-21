@@ -588,20 +588,7 @@ iforgot-commie-check-whats-up() {
 
 iforgot-firefox-settings() {
 cat <<EOF
-    media.autoplay.enabled = true
-         .gstreamer.enabled = true
-    browser.cache.disk = false
-           .padlock.urlbar_background = 0
-           .urlbar.clickSelectsAll = false
-           .download.manager.showAlertOnComplete = false
-                            .closeWhenDone = true
-                            .showWhenStarting = false
-    mousewheel.acceleration.factor = 1
-              .default.delta_multiplier_y = 270
-    network.dns.disableIPv6 = true
-           .standard-url.escape-utf8 = false
-    dom.storage.default_quota = 51200
-
+See ~/.mozilla/profile.default/user.js
 To check:
     about:cache
     about:cache?device=memory

@@ -1,6 +1,6 @@
 interface: eth0
 promiscuous: yes
-hide-destination: yes
+hide-destination: no
 show-totals: no
 # Use-bytes affects only the bar!
 use-bytes: yes

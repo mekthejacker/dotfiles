@@ -1,58 +1,84 @@
 [ -v DISPLAY ] && {
+	# This setup uses a dummy user called sszb that holds all prefixes,
+	#   but in order for him to be able to show the windows on our X session,
+	#   he must be allowed to do this in the first place.
 	xhost +si:localuser:sszb > /dev/null
-	# export WINEARCH=win32
 	export WINEDEBUG="-all"
 	# In order to get output use
 	#     WINEDEBUG=warn wine …
 	#   or
 	#     WINEDEBUG=warn+all wine …
-#	export LD_PRELOAD="/lib32/libpthread.so.0 /usr/lib32/libGL.so"
-	export LD_PRELOAD="/lib64/libpthread.so.0 /usr/lib64/libGL.so"
 	export __GL_THREADED_OPTIMIZATIONS=1 # May be set to 1 if game supports it
 	export __GL_SYNC_TO_VBLANK=0
 	export __GL_YIELD="NOTHING"
 	export SDL_AUDIODRIVER=alsa
-# LANG=ru_RU.UTF-8
-	_32_env='LD_PRELOAD="/lib32/libpthread.so.0 /usr/lib32/libGL.so" WINEARCH=win32 WINEPREFIX=/home/sszb/.wine'
-	_64_env='WINEARCH=win64 WINEPREFIX=/home/sszb/.wine64'
 
-	alias wine="$_32_env  sudo -u sszb -H /usr/bin/wine"
-	alias winetricks="$_32_env  sudo -u sszb -H /usr/bin/winetricks --optout"
-	alias winecfg="$_32_env  sudo -u sszb -H /usr/bin/winecfg"
-	alias regedit="$_32_env  sudo -u sszb -H /usr/bin/regedit"
-	alias wine64="$_64_env  sudo -u sszb -H /usr/bin/wine64"
-	alias winetricks64="$_64_env  sudo -u sszb -H /usr/bin/winetricks --optout"
-	alias winecfg64="$_64_env  sudo -u sszb -H /usr/bin/winecfg"
-	alias regedit64="$_64_env  sudo -u sszb -H /usr/bin/regedit"
-	alias kill-semaphores="for i in $(ipcs -s | sed -rn 's/.*\s([0-9]+)\s+sszb.*/\1/p'); do ipcrm -s $i; done"
-	# Apps
-	#   alias borderlands="WINEDLLOVERRIDES=mmdevapi wine /home/sszb/.wine/drive_c/Games/Borderlands/Binaries/Borderlands.exe"
-	#   alias ac="wine /home/sszb/.wine/drive_c/Program\ Files/Ubisoft/Assassin\'s\ Creed/AssassinsCreed_Game.exe &"
-	alias alice='pushd /home/games/Alice
-	             cp linux_config config.cfg
-	             wine alice.exe
-	             popd'
-	alias audiosurf="pushd /home/games/AudioSurf && wine Launcher.exe && popd"
-	alias il2="pushd /home/games/IL2; wine il2fb.exe; popd"
-	alias arx="pushd /home/Games/Arx\ Fatalis/ ; ./arx -u/home/Games/Arx\ Fatalis/; popd"
-	alias hitman="pushd /home/sszb/.wine/drive_c/Games/Hitman_Blood_money; wine HitmanBloodMoney.exe; popd"
-	alias steam="taskset -c 1-3 steam"
-	alias zeus="pushd /home/games/Poseidon; wine Zeus.exe; popd"
-	alias hegemony="wine /home/games/Hegemony\ Gold\ -\ Wars\ of\ Ancient\ Greece/Hegemony\ Gold.exe"
-	alias banished="pushd /home/gamefiles/Banished; wine64 Banished.exe; popd"
-	alias minimetro="$HOME/assembling/minimetro/MiniMetro*x86_64"
-	alias teamviewer="pushd /home/soft_win/teamviewer_8_portable; wine TeamViewer.exe; popd"
+	# DESCRIPTION
+	#     This is general function to do all the jobs.
+	# TAKES
+	#     [$@] — list of arguments for wine, winetricks etc.
+	wine() {
+		local arch=32 binary _funcname
+		[ -v FUNCNAME[1] ] && _funcname=${FUNCNAME[1]} || _funcname=wine
+		case $_funcname in
+			wine)
+				binary='/usr/bin/wine' ;;
+			wine64)
+				binary='/usr/bin/wine64'; arch=64 ;;
+			winetricks64) arch=64 ;&
+			winetricks)
+				binary='/usr/bin/winetricks' ;;
+			winecfg64) arch=64 ;&
+			winecfg)
+				binary='/usr/bin/winecfg' ;;
+			regedit64) arch=64 ;&
+			regedit)
+				binary='/usr/bin/regedit' ;;
+			*)
+				echo 'I am not supposed to be run as this command.' >&2
+				return 3
+		esac
+		WINEARCH=win$arch WINEPREFIX=/home/sszb/.wine${arch//32/} sudo -u sszb -H $binary "$@"
+		# Clean emulated wine desktop from icons placed by programs
+		sudo -u sszb -H /bin/rm /home/sszb/.wine${arch//32/}/drive_c/users/sszb/#msgctxt#directory#Desktop/* \
+			/home/sszb/.wine${arch//32/}/drive_c/users/Public/#msgctxt#directory#Desktop/* 2>/dev/null
+	}
+	wine64() { wine "$@"; }
+	winetricks() { wine "$@"; }
+	winetricks64() { wine "$@"; }
+	winecfg() { wine "$@"; }
+	winecfg64() { wine "$@"; }
+	regedit() { wine "$@"; }
+	regedit64() { wine "$@"; }
+	#
 	alias killsteam="pkill -9 -f 'hl2.*'; pkill -9 -f steam"
 	alias killsszb='sudo -u sszb /usr/bin/killall -9 -u sszb'
+	alias kill-my-semaphores='for i in $(ipcs -s | sed -rn "s/.*\s([0-9]+)\s+'$USER'.*/\1/p"); do ipcrm -s $i; done;'
+	alias kill-sszb-semaphores="for i in $(ipcs -s | sed -rn 's/.*\s([0-9]+)\s+sszb.*/\1/p'); do ipcrm -s $i; done"
+	#
+	alias alice="pushd /home/games/Alice; cp linux_config config.cfg; wine alice.exe; popd"
+	alias arx="pushd /home/Games/Arx\ Fatalis/ ; ./arx -u/home/Games/Arx\ Fatalis/; popd"
+	alias audiosurf="pushd /home/games/audioslurp && wine Launcher.exe && popd"
+	alias banished="pushd /home/games/Banished; wine64 Banished.exe; popd"
+	alias hegemony="wine /home/games/Hegemony\ Gold\ -\ Wars\ of\ Ancient\ Greece/Hegemony\ Gold.exe"
+	alias hitman="pushd /home/sszb/.wine/drive_c/Games/Hitman_Blood_money; wine HitmanBloodMoney.exe; popd"
+	alias hl2-cm="pushd /home/games/steam/SteamApps/common/CM2013/; wine Launcher_EP0.EXE; popd"
+	alias hl2-ep1-cm="pushd /home/games/steam/SteamApps/common/CM2013/; wine Launcher_EP1.EXE; popd"
+	alias hl2-ep2-cm="pushd /home/games/steam/SteamApps/common/CM2013/; wine Launcher_EP2.EXE; popd"
+	alias hl2-cm-conf="pushd /home/games/steam/SteamApps/common/CM2013/; wine Configurator.EXE; popd"
+	alias il2="pushd /home/games/IL2; wine il2fb.exe; popd"
+	alias minimetro="$HOME/assembling/minimetro/MiniMetro*x86_64"
+	alias steam="taskset -c 1-3 steam"
+	alias teamviewer="pushd /home/soft_win/teamviewer_8_portable; wine TeamViewer.exe; popd"
+	alias zeus="pushd /home/games/Poseidon; wine Zeus.exe; popd"
 
-	set_wineprefix64() {
-		eval $_64_env  set_wineprefix
-	}
+	wineprefix-setup64() { wineprefix-setup "$@"; }
 
-	# $1 == '--setoptonly' (optional) — quit after setting options
-	set_wineprefix() {
-		[ -v WINEARCH ] || local WINEARCH=win32
-		[ -v WINEPREFIX ] || local WINEPREFIX=/home/sszb/.wine
+	# [$1] — '--setoptonly' = quit after setting options
+	wineprefix-setup() {
+		[ ${FUNCNAME[1]} = wineprefix-setup64 ] \
+			&& local WINEARCH=win32 WINEPREFIX=/home/sszb/.wine \
+			|| local WINEARCH=win64 WINEPREFIX=/home/sszb/.wine64
 		# Maybe some day it will work…
 		# shopt -s expand_aliases
 		local w='\e[00;37m'

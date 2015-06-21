@@ -41,7 +41,7 @@ until [ ${#startup_apps[@]} -eq 0 ]; do
 	for ((i=0; i<number_of_apps; i++)); do
 		echo $i
 		# any process, including bash wrapper that must end gracefully
-		pgrep -f "${startup_apps[i]}" || unset startup_apps[i]
+		pgrep -xf "^/.*${startup_apps[i]}$" || unset startup_apps[i]
 	done
 	sleep 1
 done

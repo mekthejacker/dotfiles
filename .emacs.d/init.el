@@ -200,6 +200,10 @@
 (add-hook 'c-mode-hook (lambda () (define-key c-mode-map (kbd "M-j") 'backward-char)))
 (toc:load-config-file '("textile-mode.el"))
 
+;; renpy
+(toc:load-config-file '("renpy.el"))
+(add-to-list 'auto-mode-alist '("\\.rpy\\'" . renpy-mode))
+
 ;; Load code snippets, shortcuts etc.
 (load "~/.emacs.d/little_things/code_snippets.el")
 (load "~/.emacs.d/little_things/fill-column-indicator.el")

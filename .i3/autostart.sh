@@ -210,7 +210,7 @@ case $HOSTNAME in
 		# But if daemon runs from here, it will fail after X restart ;_;
 		# Crapissimo: neither -a, nor -a '', -a "", -a $'\000' do not work.
 		#  "emacsclient --alternate-editor= -c -display $DISPLAY")
-		startup_apps=(pidgin geeqie palemoon)
+		startup_apps=(pidgin geeqie )
 		# ↖ These apps are to be killed gracefully by ~/.i3/on_quit.sh
 		;;
 esac
