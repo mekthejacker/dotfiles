@@ -102,7 +102,7 @@ bindcode $mod+27 exec --no-startup-id /bin/bash -c 'export ONE_COMMAND_SHELL=t &
 ##   Super, Alt, Shift, Control and S (the letter) keycodes, that is 7, but… it’s still
 ##   would be a pain to remember which modifier alternates what in conjunction with what.
 ##   So I’ve decided to use three keys for screen, window and area and use one modifier
-##   key to laternate one thing: delay, indexed format and JPEG.
+##   key to alternate one thing: delay, indexed format and JPEG.
 ##
 ## s (screen)
 bindcode --release $mod+39 exec --no-startup-id ". ~/scripts/screenshot.sh"
