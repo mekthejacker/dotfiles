@@ -16,12 +16,12 @@ sub-codepage=enca:ru:en
 sub-auto=no
 softvol=yes
 screenshot-template=%F_%n
-screenshot-format=png
+screenshot-format=jpg
 ## Compressing screenshots while mpv runs is slow,
 ##   so compressing is done after with watch.sh
-screenshot-png-compression=0
+#screenshot-png-compression=0
 ## Just in case I will need jpeg some day.
-screenshot-jpeg-quality=92
+screenshot-jpeg-quality=94
 volume=50
 #sub-ass=no
 osd-duration=3000

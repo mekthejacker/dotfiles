@@ -62,7 +62,7 @@
 	alias banished="pushd /home/games/Banished; wine64 Banished.exe; popd"
 	alias hegemony="wine /home/games/Hegemony\ Gold\ -\ Wars\ of\ Ancient\ Greece/Hegemony\ Gold.exe"
 	alias hitman="pushd /home/sszb/.wine/drive_c/Games/Hitman_Blood_money; wine HitmanBloodMoney.exe; popd"
-	alias hl2-cm="pushd /home/games/steam/SteamApps/common/CM2013/; wine Launcher_EP0.EXE; popd"
+	alias hl2-cm="pushd /home/games/steam/SteamApps/common/CM2013/; wine Launcher_EP0.EXE; popd;"
 	alias hl2-ep1-cm="pushd /home/games/steam/SteamApps/common/CM2013/; wine Launcher_EP1.EXE; popd"
 	alias hl2-ep2-cm="pushd /home/games/steam/SteamApps/common/CM2013/; wine Launcher_EP2.EXE; popd"
 	alias hl2-cm-conf="pushd /home/games/steam/SteamApps/common/CM2013/; wine Configurator.EXE; popd"

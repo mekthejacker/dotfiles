@@ -85,18 +85,43 @@ bindsym $mod+Return exec urxvtc
 ## r
 ## One-command urxvtc instance, it is replacement for dmenu (also see ~/.bashrc and ~/.Xresources)
 bindcode $mod+27 exec --no-startup-id /bin/bash -c 'export ONE_COMMAND_SHELL=t && urxvtc -name one_command_shell'
-## s
-bindcode $mod+39 exec --no-startup-id ". ~/scripts/screenshot.sh"
-## S-s
-bindcode --release $mod+Shift+39 exec --no-startup-id  "~/scripts/screenshot.sh -area"
-## A-S-s
-bindcode --release $mod+Mod1+Shift+39 exec --no-startup-id  "~/scripts/screenshot.sh -area -indexed"
-## C-s
-##       66 is actually control (they are swapped with capslock on my keyboard)
-bindcode --release $mod+66+39 exec --no-startup-id "~/scripts/screenshot.sh -delay"
-## A-C-s
-##       66 is actually control (they are swapped with capslock on my keyboard)
-bindcode --release $mod+Mod1+66+39 exec --no-startup-id "~/scripts/screenshot.sh -delay -indexed"
+
+### screenshot.sh block
+##
+## It is useful to take screenshots in the way to get rid of further processing in GIMP,
+##   i.e. take them in PNG or JPEG by desire, with or without delay, if it be PNG, shall
+##   it be full RGB or indexed colours? Taking all that into account I’ve written out
+##   the functions which will actually be in use, and that got me 6:
+##
+##   Fullscreen (PNG)
+##   Fullscreen (JPEG)
+##   Window (PNG only)  +delay
+##   Area (PNG only)    +indexed
+##
+## Thankfully, that fits the number of available keybindings for the left hand based on
+##   Super, Alt, Shift, Control and S (the letter) keycodes, that is 7, but… it’s still
+##   would be a pain to remember which modifier alternates what in conjunction with what.
+##   So I’ve decided to use three keys for screen, window and area and use one modifier
+##   key to laternate one thing: delay, indexed format and JPEG.
+##
+## s (screen)
+bindcode --release $mod+39 exec --no-startup-id ". ~/scripts/screenshot.sh"
+#bindcode --release $mod+Control+39 exec --no-startup-id ". ~/scripts/screenshot.sh -delay"
+#bindcode --release $mod+Shift+39 exec --no-startup-id ". ~/scripts/screenshot.sh -indexed"
+bindcode --release $mod+Mod1+39 exec --no-startup-id ". ~/scripts/screenshot.sh -jpeg"
+
+## a (window)
+bindcode --release $mod+38 exec --no-startup-id ". ~/scripts/screenshot.sh -window"
+bindcode --release $mod+Control+38 exec --no-startup-id ". ~/scripts/screenshot.sh -window -delay"
+#bindcode --release $mod+Shift+38 exec --no-startup-id ". ~/scripts/screenshot.sh -window -indexed"
+#bindcode --release $mod+Mod1+38 exec --no-startup-id ". ~/scripts/screenshot.sh -window -jpeg"
+
+## z (area)
+bindcode --release $mod+52 exec --no-startup-id ". ~/scripts/screenshot.sh -area"
+#bindcode --release $mod+Control+52 exec --no-startup-id ". ~/scripts/screenshot.sh -area -delay"
+bindcode --release $mod+Shift+52 exec --no-startup-id ". ~/scripts/screenshot.sh -area -indexed"
+#bindcode --release $mod+Mod1+52 exec --no-startup-id ". ~/scripts/screenshot.sh -area -jpeg"
+
 ## C-l → i3lock
 bindcode $mod+Control+46 exec --no-startup-id i3lock
 ##
@@ -263,12 +288,15 @@ client.urgent               #ad7fa8 #ad7fa8 #ffffff #ff0000
 
 bar {
 	# verbose yes
+	# separator_symbol ":|:"
 	output PRIMARY_OUTPUT
 	position top
 	tray_output none
 	workspace_buttons yes
 	strip_workspace_numbers yes
 	status_command ". ~/.i3/generate_json_for_i3bar.sh"
+	wheel_up_cmd nop
+	wheel_down_cmd nop
 	colors {
 		background #3c3c3c
 		statusline #bbbbbb

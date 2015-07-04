@@ -136,31 +136,31 @@ app_name=${0##*/}
 
 case $app_name in
 	# NB: only actual binaries with absolute paths here!
-	firefox)
-		[ -e /usr/bin/firefox-bin ] \
-			&& firefox=/usr/bin/firefox-bin \
-			|| firefox=/usr/bin/firefox
-		if pgrep -f $firefox &>/dev/null; then
-			# Xdialog --msgbox "$*" 0x0
-			# $@ is not a plain link, but firefox understands it.
-			$firefox -new-tab "$@"
-		else
-			run_app $firefox \
-				~/.mozilla/firefox/profile.default/key3.db.gpg \
-				~/.mozilla/firefox/profile.default/signons.sqlite.gpg
-		fi
-		;;
-	palemoon)
-		if pgrep -f /usr/bin/palemoon &>/dev/null; then
-			# Xdialog --msgbox "$*" 0x0
-			# $@ is not a plain link, but firefox understands it.
-			/usr/bin/palemoon -new-tab "$@"
-		else
-			run_app /usr/bin/palemoon \
-				"$HOME/.moonchild productions/pale moon/profile.default/key3.db.gpg" \
-				"$HOME/.moonchild productions/pale moon/profile.default/signons.sqlite.gpg"
-		fi
-		;;
+	# firefox)
+	# 	[ -e /usr/bin/firefox-bin ] \
+	# 		&& firefox=/usr/bin/firefox-bin \
+	# 		|| firefox=/usr/bin/firefox
+	# 	if pgrep -f $firefox &>/dev/null; then
+	# 		# Xdialog --msgbox "$*" 0x0
+	# 		# $@ is not a plain link, but firefox understands it.
+	# 		$firefox -new-tab "$@"
+	# 	else
+	# 		run_app $firefox \
+	# 			~/.mozilla/firefox/profile.default/key3.db.gpg \
+	# 			~/.mozilla/firefox/profile.default/signons.sqlite.gpg
+	# 	fi
+	# 	;;
+	# palemoon)
+	# 	if pgrep -f /usr/bin/palemoon &>/dev/null; then
+	# 		# Xdialog --msgbox "$*" 0x0
+	# 		# $@ is not a plain link, but firefox understands it.
+	# 		/usr/bin/palemoon -new-tab "$@"
+	# 	else
+	# 		run_app /usr/bin/palemoon \
+	# 			"$HOME/.moonchild productions/pale moon/profile.default/key3.db.gpg" \
+	# 			"$HOME/.moonchild productions/pale moon/profile.default/signons.sqlite.gpg"
+	# 	fi
+	# 	;;
 	geeqie)
 		# This entry is only to work around the drawbacks of interface:
 		#  - you can’t select several files and click a bookmark in Sort
