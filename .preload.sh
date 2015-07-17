@@ -1,6 +1,6 @@
 #should be sourced
 
-# preload.sh
+# .preload.sh
 # This script is intended to be a common part of ~/.xinitrc and ~/.xsession.
 # It starts deamons needed to be started before the window manager.
 # ~/.bashrc runs this script for ssh clients.
@@ -106,9 +106,7 @@ done
 
 	push_the_bar 'Copying GNUPG and SSH keys to the tmpfs'
 	cp -R ~/phone_card/.gnupg /tmp/decrypted/
-	ln -sf /tmp/decrypted/.gnupg $HOME/.gnupg
 	cp -R ~/phone_card/.ssh /tmp/decrypted/
-#	ln -sf /tmp/decrypted/.ssh $HOME/.ssh
 	chmod -R a-rwx,u=rwX /tmp/decrypted
 	push_the_bar 'Unmounting flash card'
 	sudo /bin/umount $HOME/phone_card && rmdir ~/phone_card
@@ -122,19 +120,12 @@ push_the_bar 'Loading keyboard settings' 33
 
 [ -v NO_KEYS ] || {
 	push_the_bar 'Checking gpg-agent'
-	# This file’s only purpose is to be sourced in ~/.bashrc if SSH_CLIENT
-	#   is set i.e. for remote logins via SSH. All shells running in currently
-	#   started X session will be satisfied by exporting these variables
-	#   right here in this file.
-	touch $HOME/.gnupg/agent-info
+	export GNUPGHOME=/tmp/decrypted/.gnupg
 	pgrep -u $UID gpg-agent || {
 		push_the_bar 'Starting gpg-agent'
-		gpg-agent --daemon \
-			--enable-ssh-support --write-env-file $HOME/.gnupg/agent-info
+		eval $(gpg-agent --daemon --use-standard-socket )
 	}
 	push_the_bar 'Exporting gpg-agent data'
-	# NB export. Output of write-env-file doesn’t produce that command.
-	export `< $HOME/.gnupg/agent-info`
 	export GPG_TTY=`tty`
 
 	## Loading SSH keys.
@@ -158,11 +149,11 @@ push_the_bar 'Loading keyboard settings' 33
 	push_the_bar 'Decrypting user name'
 	eval export `gpg -qd ~/.env/private_data.sh.gpg 2>/dev/null | grep -E '^ME'`
 
-	push_the_bar 'Decrypting Box account information'  # http://box.com
-	gpg -qd --output /tmp/decrypted/secrets.`date +%s` ~/.davfs2/secrets.gpg
-	{ ping -c3 8.8.8.8 &>/dev/null \
-		&& sudo /root/scripts/mount_box.sh $USER \
-		&& export BOX_MOUNTED=t; } &
+#	push_the_bar 'Decrypting Box account information'  # http://box.com
+#	gpg -qd --output /tmp/decrypted/secrets.`date +%s` ~/.davfs2/secrets.gpg
+#	{ ping -c3 8.8.8.8 &>/dev/null \
+#		&& sudo /root/scripts/mount_box.sh $USER \
+#		&& export BOX_MOUNTED=t; } &
 }
 
 # III. Setting the rest of X environment.
@@ -188,12 +179,7 @@ xset +fp /usr/share/fonts/terminus && xset fp rehash
 push_the_bar 'Disabling screensaver'
 xset s off
 push_the_bar 'Setting primary and slave outputs in ~/.i3/config'
-sed -r "s/PRIMARY_OUTPUT/$PRIMARY_OUTPUT/g" ~/.i3/config.template > ~/.i3/config
-for ((i=1; i<n; i++)); do
-	echo $DISPLAY
-	eval sed -ri "s/SLAVE_OUTPUT_$i/\$SLAVE_OUTPUT_$i/g" ~/.i3/config
-	eval xrandr --output \$SLAVE_OUTPUT_$i --off
-done
+~/.i3/update_config.sh --startup
 
 echo "101" >$pipe
 exec {pipe_fd}<&-
