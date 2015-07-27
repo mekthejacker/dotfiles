@@ -1,0 +1,61 @@
+/* ~/.mozilla/profile.default/chrome/userContent.css
+   For more examples see http://www.mozilla.org/unix/customizing.html */
+
+@namespace url(http://www.w3.org/1999/xhtml);
+
+body textarea {
+   font: medium -moz-fixed !important
+}
+
+
+@-moz-document domain("krautchan.net") {
+   .aa {font-family: monospace !important}
+}
+
+@-moz-document domain("iichan.hk") {
+   .reply {width: 100%}
+}
+
+@-moz-document domain("lurkmore.to") {
+	div#column-one {display:none !important}
+	div#content {margin:0 !important}
+}
+
+@-moz-document domain("myanimelist.net") {
+	#panel-right { display: none !important	}
+}
+
+@-moz-document domain("forum.easyelectronics.ru") {
+	body { font-family: "PT Sans" !important }
+}
+
+@-moz-document domain("nowere.net") {
+	a[href="/b/"] { display: none !important }
+	a[href="/cg/"] { display: none !important }
+}
+
+@-moz-document domain("slovari.yandex.ru") {
+/* hide unnecessary column on the left
+   this makes articles showing at the left edge of the screen, which is useful
+   when another window next to browser need to be opened*/
+/*	td.l-page__left { display: none !important }*/
+}
+
+@-moz-document domain("github.com") {
+	.highlight pre {tab-size: 2}
+}
+
+/* remove annyoing shadow from i2p proy interface */
+@-moz-document domain("127.0.0.1:7657") {
+   h3 { text-shadow:none !important }
+}
+
+/* I do not want to enanble js for you */
+@-moz-document domain("ebay.com") {
+   .nojs-msk .nojs-msg { display:none !important }
+}
+
+@-moz-document domain("krautchan.net") {
+   /*Hide Dane posters*/
+/*   table < tbody < tr < td < div < img[src="/images/balls/dk.png"] {display:none !important} */
+}
