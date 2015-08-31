@@ -16,18 +16,87 @@
  ;; If there is more than one, they won't work right.
  '(Buffer-menu-use-header-line nil)
  '(LaTeX-command "xetex -synctex=1")
- '(LaTeX-command-style (quote (("\\`fontspec\\'" "xelatex ") ("" "%(latex) %S%(PDFout)"))))
+ '(LaTeX-command-style
+   (quote
+	(("\\`fontspec\\'" "xelatex ")
+	 ("" "%(latex) %S%(PDFout)"))))
  '(TeX-auto-save t)
- '(TeX-command-list (quote (("TeX" "%(PDF)%(tex) %(extraopts) %`%S%(PDFout)%(mode)%' %t" TeX-run-TeX nil (plain-tex-mode texinfo-mode ams-tex-mode) :help "Run plain TeX") ("LaTeX" "%`%l%(mode)%' %t" TeX-run-TeX nil (latex-mode doctex-mode) :help "Run LaTeX") ("Makeinfo" "makeinfo %(extraopts) %t" TeX-run-compile nil (texinfo-mode) :help "Run Makeinfo with Info output") ("Makeinfo HTML" "makeinfo %(extraopts) --html %t" TeX-run-compile nil (texinfo-mode) :help "Run Makeinfo with HTML output") ("AmSTeX" "%(PDF)amstex %(extraopts) %`%S%(PDFout)%(mode)%' %t" TeX-run-TeX nil (ams-tex-mode) :help "Run AMSTeX") ("ConTeXt" "texexec --once --texutil %(extraopts) %(execopts)%t" TeX-run-TeX nil (context-mode) :help "Run ConTeXt once") ("ConTeXt Full" "texexec %(extraopts) %(execopts)%t" TeX-run-TeX nil (context-mode) :help "Run ConTeXt until completion") ("BibTeX" "bibtex %s" TeX-run-BibTeX nil t :help "Run BibTeX") ("Biber" "biber %s" TeX-run-Biber nil t :help "Run Biber") ("View" "zathura %s.pdf" TeX-run-command t t :help "Run Text viewer") ("Print" "%p" TeX-run-command t t :help "Print the file") ("Queue" "%q" TeX-run-background nil t :help "View the printer queue" :visible TeX-queue-command) ("File" "%(o?)dvips %d -o %f " TeX-run-command t t :help "Generate PostScript file") ("Index" "makeindex %s" TeX-run-command nil t :help "Create index file") ("Xindy" "texindy %s" TeX-run-command nil t :help "Run xindy to create index file") ("Check" "lacheck %s" TeX-run-compile nil (latex-mode) :help "Check LaTeX file for correctness") ("ChkTeX" "chktex -v6 %s" TeX-run-compile nil (latex-mode) :help "Check LaTeX file for common mistakes") ("Spell" "(TeX-ispell-document \"\")" TeX-run-function nil t :help "Spell-check the document") ("Clean" "TeX-clean" TeX-run-function nil t :help "Delete generated intermediate files") ("Clean All" "(TeX-clean t)" TeX-run-function nil t :help "Delete generated intermediate and output files") ("Other" "" TeX-run-command t t :help "Run an arbitrary command"))))
+ '(TeX-command-list
+   (quote
+	(("TeX" "%(PDF)%(tex) %(extraopts) %`%S%(PDFout)%(mode)%' %t" TeX-run-TeX nil
+	  (plain-tex-mode texinfo-mode ams-tex-mode)
+	  :help "Run plain TeX")
+	 ("LaTeX" "%`%l%(mode)%' %t" TeX-run-TeX nil
+	  (latex-mode doctex-mode)
+	  :help "Run LaTeX")
+	 ("Makeinfo" "makeinfo %(extraopts) %t" TeX-run-compile nil
+	  (texinfo-mode)
+	  :help "Run Makeinfo with Info output")
+	 ("Makeinfo HTML" "makeinfo %(extraopts) --html %t" TeX-run-compile nil
+	  (texinfo-mode)
+	  :help "Run Makeinfo with HTML output")
+	 ("AmSTeX" "%(PDF)amstex %(extraopts) %`%S%(PDFout)%(mode)%' %t" TeX-run-TeX nil
+	  (ams-tex-mode)
+	  :help "Run AMSTeX")
+	 ("ConTeXt" "texexec --once --texutil %(extraopts) %(execopts)%t" TeX-run-TeX nil
+	  (context-mode)
+	  :help "Run ConTeXt once")
+	 ("ConTeXt Full" "texexec %(extraopts) %(execopts)%t" TeX-run-TeX nil
+	  (context-mode)
+	  :help "Run ConTeXt until completion")
+	 ("BibTeX" "bibtex %s" TeX-run-BibTeX nil t :help "Run BibTeX")
+	 ("Biber" "biber %s" TeX-run-Biber nil t :help "Run Biber")
+	 ("View" "zathura %s.pdf" TeX-run-command t t :help "Run Text viewer")
+	 ("Print" "%p" TeX-run-command t t :help "Print the file")
+	 ("Queue" "%q" TeX-run-background nil t :help "View the printer queue" :visible TeX-queue-command)
+	 ("File" "%(o?)dvips %d -o %f " TeX-run-command t t :help "Generate PostScript file")
+	 ("Index" "makeindex %s" TeX-run-command nil t :help "Create index file")
+	 ("Xindy" "texindy %s" TeX-run-command nil t :help "Run xindy to create index file")
+	 ("Check" "lacheck %s" TeX-run-compile nil
+	  (latex-mode)
+	  :help "Check LaTeX file for correctness")
+	 ("ChkTeX" "chktex -v6 %s" TeX-run-compile nil
+	  (latex-mode)
+	  :help "Check LaTeX file for common mistakes")
+	 ("Spell" "(TeX-ispell-document \"\")" TeX-run-function nil t :help "Spell-check the document")
+	 ("Clean" "TeX-clean" TeX-run-function nil t :help "Delete generated intermediate files")
+	 ("Clean All" "(TeX-clean t)" TeX-run-function nil t :help "Delete generated intermediate and output files")
+	 ("Other" "" TeX-run-command t t :help "Run an arbitrary command"))))
  '(TeX-engine (quote xetex))
  '(TeX-master nil)
- '(TeX-output-view-style (quote (("^dvi$" ("^landscape$" "^pstricks$\\|^pst-\\|^psfrag$") "%(o?)dvips -t landscape %d -o && gv %f") ("^dvi$" "^pstricks$\\|^pst-\\|^psfrag$" "%(o?)dvips %d -o && gv %f") ("^dvi$" ("^\\(?:a4\\(?:dutch\\|paper\\|wide\\)\\|sem-a4\\)$" "^landscape$") "%(o?)xdvi %dS -paper a4r -s 0 %d") ("^dvi$" "^\\(?:a4\\(?:dutch\\|paper\\|wide\\)\\|sem-a4\\)$" "%(o?)xdvi %dS -paper a4 %d") ("^dvi$" ("^\\(?:a5\\(?:comb\\|paper\\)\\)$" "^landscape$") "%(o?)xdvi %dS -paper a5r -s 0 %d") ("^dvi$" "^\\(?:a5\\(?:comb\\|paper\\)\\)$" "%(o?)xdvi %dS -paper a5 %d") ("^dvi$" "^b5paper$" "%(o?)xdvi %dS -paper b5 %d") ("^dvi$" "^letterpaper$" "%(o?)xdvi %dS -paper us %d") ("^dvi$" "^legalpaper$" "%(o?)xdvi %dS -paper legal %d") ("^dvi$" "^executivepaper$" "%(o?)xdvi %dS -paper 7.25x10.5in %d") ("^dvi$" "." "%(o?)xdvi %dS %d") ("^pdf$" "." "zathura %o") ("^html?$" "." "netscape %o"))))
+ '(TeX-output-view-style
+   (quote
+	(("^dvi$"
+	  ("^landscape$" "^pstricks$\\|^pst-\\|^psfrag$")
+	  "%(o?)dvips -t landscape %d -o && gv %f")
+	 ("^dvi$" "^pstricks$\\|^pst-\\|^psfrag$" "%(o?)dvips %d -o && gv %f")
+	 ("^dvi$"
+	  ("^\\(?:a4\\(?:dutch\\|paper\\|wide\\)\\|sem-a4\\)$" "^landscape$")
+	  "%(o?)xdvi %dS -paper a4r -s 0 %d")
+	 ("^dvi$" "^\\(?:a4\\(?:dutch\\|paper\\|wide\\)\\|sem-a4\\)$" "%(o?)xdvi %dS -paper a4 %d")
+	 ("^dvi$"
+	  ("^\\(?:a5\\(?:comb\\|paper\\)\\)$" "^landscape$")
+	  "%(o?)xdvi %dS -paper a5r -s 0 %d")
+	 ("^dvi$" "^\\(?:a5\\(?:comb\\|paper\\)\\)$" "%(o?)xdvi %dS -paper a5 %d")
+	 ("^dvi$" "^b5paper$" "%(o?)xdvi %dS -paper b5 %d")
+	 ("^dvi$" "^letterpaper$" "%(o?)xdvi %dS -paper us %d")
+	 ("^dvi$" "^legalpaper$" "%(o?)xdvi %dS -paper legal %d")
+	 ("^dvi$" "^executivepaper$" "%(o?)xdvi %dS -paper 7.25x10.5in %d")
+	 ("^dvi$" "." "%(o?)xdvi %dS %d")
+	 ("^pdf$" "." "zathura %o")
+	 ("^html?$" "." "netscape %o"))))
  '(TeX-save-query nil)
  '(TeX-show-compilation t)
  '(TeX-source-correlate-method (quote synctex))
  '(TeX-source-correlate-mode t)
  '(TeX-source-correlate-start-server t)
- '(TeX-view-program-selection (quote (((output-dvi style-pstricks) "dvips and gv") (output-dvi "xdvi") (output-pdf "zathura") (output-html "xdg-open"))))
+ '(TeX-view-program-selection
+   (quote
+	(((output-dvi style-pstricks)
+	  "dvips and gv")
+	 (output-dvi "xdvi")
+	 (output-pdf "zathura")
+	 (output-html "xdg-open"))))
  '(autopair-global-mode t)
  '(case-fold-search nil)
  '(column-number-mode t)
@@ -56,7 +125,11 @@
  '(n-back-allowed-match-types (quote (word color position)))
  '(n-back-level 2)
  '(ourcomments-ido-ctrl-tab t)
- '(package-archives (quote (("gnu" . "http://elpa.gnu.org/packages/") ("marmalade" . "http://marmalade-repo.org/packages/") ("melpa" . "http://melpa.milkbox.net/packages/"))))
+ '(package-archives
+   (quote
+	(("gnu" . "http://elpa.gnu.org/packages/")
+	 ("marmalade" . "http://marmalade-repo.org/packages/")
+	 ("melpa" . "http://melpa.milkbox.net/packages/"))))
  '(popcmp-completion-style (quote emacs-default))
  '(preview-fast-dvips-command "pdftops -origpagesizes %s.pdf %m/preview.ps")
  '(scalable-fonts-allowed t)
@@ -68,10 +141,24 @@
  '(text-mode-hook (quote (turn-on-auto-fill text-mode-hook-identify)))
  '(text-scale-mode-step 1.0)
  '(tool-bar-mode nil)
- '(whitespace-display-mappings (quote ((space-mark 32 [32] [46]) (space-mark 160 [43] [95]) (newline-mark 10 [4347 10]) (tab-mark 9 [9002 8213 8213 8213] [9552 9]))))
+ '(whitespace-display-mappings
+   (quote
+	((space-mark 32
+				 [32]
+				 [46])
+	 (space-mark 160
+				 [43]
+				 [95])
+	 (newline-mark 10
+				   [4347 10])
+	 (tab-mark 9
+			   [9002 8213 8213 8213]
+			   [9552 9]))))
  '(whitespace-global-modes t)
  '(whitespace-line-column 10000)
- '(whitespace-style (quote (face tabs spaces trailing newline indentation empty space-mark tab-mark newline-mark)))
+ '(whitespace-style
+   (quote
+	(face tabs spaces trailing newline indentation empty space-mark tab-mark newline-mark)))
  '(word-wrap t)
  '(x-select-enable-primary nil)
  '(x-stretch-cursor t))
@@ -86,7 +173,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#303030" :foreground "#d0d0d0" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 118 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
+ '(default ((t (:inherit nil :stipple nil :background "#303030" :foreground "#d0d0d0" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 118 :width normal :foundry "PfEd" :family "DejaVuSans Mono"))))
  '(bold ((t (:weight bold))))
  '(comint-highlight-prompt ((t (:foreground "blue blue"))))
  '(custom-button ((((type x w32 ns) (class color)) (:background "lightgrey" :foreground "black" :box (:line-width 1 :style released-button)))))

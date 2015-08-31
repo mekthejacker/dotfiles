@@ -8,6 +8,8 @@ true && {
 	exec &>/tmp/envlogs/autostart
 	date
 	set -x
+	pgrep -af gpgp-agent && echo 'gpg-agent is there at autorun time!' \
+								 || echo 'No gpg-agent present at autorun time.'
 }
 
 # Temporarily disable pointer while setting layout
@@ -210,17 +212,14 @@ case $HOSTNAME in
 		# But if daemon runs from here, it will fail after X restart ;_;
 		# Crapissimo: neither -a, nor -a '', -a "", -a $'\000' do not work.
 		#  "emacsclient --alternate-editor= -c -display $DISPLAY")
-		startup_apps=(pidgin geeqie )
+		startup_apps=("firefox --profile $HOME/.ff" pidgin)
 		# ↖ These apps are to be killed gracefully by ~/.i3/on_quit.sh
 		;;
 esac
 pointer_control enable
 
-startup_apps[${#startup_apps[@]}]='mpd'
-startup_apps[${#startup_apps[@]}]='thunar'
-
 # Some configs decrypted at ~/bin/run_app.sh
-for app in "${startup_apps[@]}"; do
+for app in "${startup_apps[@]}" mpd thunar geeqie gimp redshift; do
 
 	# Switch to its workspace to take off urgency hint
 #	workspace="`sed -nr "s/^bindcode.*exec.*i3-msg\s+workspace\s+([0-9]*:?\S+)\s+.*pgrep\s+-u\s+\\\\\\$UID\s+$app.*\\\$/\1/p" ~/.i3/config`"
@@ -232,9 +231,18 @@ for app in "${startup_apps[@]}"; do
 	pgrep -u $UID -f "^$app\>" >/dev/null || { (nohup $app) & }
 done
 
-until mpc &>/dev/null; do  sleep 1;  done
-pgrep -xu $UID mpdscribble || mpdscribble
-pgrep -xu $UID ncmpcpp >/dev/null || urxvtc -name ncmpcpp -e ncmpcpp
+c=0; until mpc &>/dev/null; do
+	sleep 1;
+	[ $((c++)) -gt 60 ] && {
+		echo 'Couldn’t wait more for mpd to give a response.' >&2
+		NO_MPD=t
+		break
+	}
+done
+[ -v NO_MPD ] || {
+	pgrep -xu $UID mpdscribble || mpdscribble
+	pgrep -xu $UID ncmpcpp >/dev/null || urxvtc -name ncmpcpp -e ncmpcpp
+}
 
 crontab -l | grep -qF 'wallpaper_setter.sh' || {
 	echo '*/10 * * * * ~/scripts/wallpaper_setter.sh -qn' \

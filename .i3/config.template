@@ -66,10 +66,12 @@ mode "resize" {
 ## x	Resize
 bindcode $mod+53 mode "resize"
 
-## S-r  Reload configuration file
-bindcode $mod+Shift+27 reload
+## S-r  Reload configuration file (not used)
+#bindcode $mod+Shift+27 reload
 ## C-r  Restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
-bindcode $mod+Control+27 restart
+## Since this config is a template, it’s necessary to replace output names
+bindcode $mod+Control+27 exec "~/.i3/update_config.sh"
+
 ## C-q  Quit
 bindcode $mod+Control+24 exec "~/.i3/on_quit.sh"
 # bindcode $mod+Control+Shift+24 exec "sudo /usr/bin/killall iftop; ~/scripts/xorg.conf_chooser.sh"
@@ -85,20 +87,45 @@ bindsym $mod+Return exec urxvtc
 ## r
 ## One-command urxvtc instance, it is replacement for dmenu (also see ~/.bashrc and ~/.Xresources)
 bindcode $mod+27 exec --no-startup-id /bin/bash -c 'export ONE_COMMAND_SHELL=t && urxvtc -name one_command_shell'
-## s
-bindcode $mod+39 exec --no-startup-id ". ~/scripts/screenshot.sh"
-## S-s
-bindcode --release $mod+Shift+39 exec --no-startup-id  "~/scripts/screenshot.sh -area"
-## A-S-s
-bindcode --release $mod+Mod1+Shift+39 exec --no-startup-id  "~/scripts/screenshot.sh -area -indexed"
-## C-s
-##       66 is actually control (they are swapped with capslock on my keyboard)
-bindcode --release $mod+66+39 exec --no-startup-id "~/scripts/screenshot.sh -delay"
-## A-C-s
-##       66 is actually control (they are swapped with capslock on my keyboard)
-bindcode --release $mod+Mod1+66+39 exec --no-startup-id "~/scripts/screenshot.sh -delay -indexed"
+
+### screenshot.sh block
+##
+## It is useful to take screenshots in the way to get rid of further processing in GIMP,
+##   i.e. take them in PNG or JPEG by desire, with or without delay, if it be PNG, shall
+##   it be full RGB or indexed colours? Taking all that into account I’ve written out
+##   the functions which will actually be in use, and that got me 6:
+##
+##   Fullscreen (PNG)
+##   Fullscreen (JPEG)
+##   Window (PNG only)  +delay
+##   Area (PNG only)    +indexed
+##
+## Thankfully, that fits the number of available keybindings for the left hand based on
+##   Super, Alt, Shift, Control and S (the letter) keycodes, that is 7, but… it’s still
+##   would be a pain to remember which modifier alternates what in conjunction with what.
+##   So I’ve decided to use three keys for screen, window and area and use one modifier
+##   key to alternate one thing: delay, indexed format and JPEG.
+##
+## s (screen)
+bindcode --release $mod+39 exec --no-startup-id ". ~/scripts/screenshot.sh"
+#bindcode --release $mod+Control+39 exec --no-startup-id ". ~/scripts/screenshot.sh -delay"
+#bindcode --release $mod+Shift+39 exec --no-startup-id ". ~/scripts/screenshot.sh -indexed"
+bindcode --release $mod+Mod1+39 exec --no-startup-id ". ~/scripts/screenshot.sh -jpeg"
+
+## a (window)
+bindcode --release $mod+38 exec --no-startup-id ". ~/scripts/screenshot.sh -window"
+bindcode --release $mod+Control+38 exec --no-startup-id ". ~/scripts/screenshot.sh -window -delay"
+#bindcode --release $mod+Shift+38 exec --no-startup-id ". ~/scripts/screenshot.sh -window -indexed"
+#bindcode --release $mod+Mod1+38 exec --no-startup-id ". ~/scripts/screenshot.sh -window -jpeg"
+
+## z (area)
+bindcode --release $mod+52 exec --no-startup-id ". ~/scripts/screenshot.sh -area"
+#bindcode --release $mod+Control+52 exec --no-startup-id ". ~/scripts/screenshot.sh -area -delay"
+bindcode --release $mod+Shift+52 exec --no-startup-id ". ~/scripts/screenshot.sh -area -indexed"
+#bindcode --release $mod+Mod1+52 exec --no-startup-id ". ~/scripts/screenshot.sh -area -jpeg"
+
 ## C-l → i3lock
-bindcode $mod+Control+46 exec --no-startup-id i3lock
+bindcode $mod+Control+46 exec --no-startup-id i3lock -d -f -i "$HOME/.env/[Commie] Takamiya Nasuno Desu! - 05 [54E7195B]_00:01:57.200.png"
 ##
 ## F1
 bindcode $mod+67 exec --no-startup-id mpc toggle
@@ -152,7 +179,7 @@ bindcode $mod+61 exec --no-startup-id "~/scripts/wallpaper_setter.sh -k"
 ## `
 bindcode $mod+49 workspace 0:Main
 ## 1
-bindcode $mod+10 exec --no-startup-id "i3-msg workspace 1:Firefox && { pgrep -u $UID firefox &>/dev/null || { firefox & } }"
+bindcode $mod+10 exec --no-startup-id "i3-msg workspace 1:Firefox && { pgrep -u $UID firefox &>/dev/null || { firefox --profile ~/.ff & } }"
 ## 2
 ## This is to distinguish emacsclient window running in X and those in
 ##   terminals, i.e. to forbid creation of more than one X window while there
@@ -189,7 +216,7 @@ workspace 6:IM           output PRIMARY_OUTPUT
 workspace 7:Games        output PRIMARY_OUTPUT
 workspace 8:GIMP         output PRIMARY_OUTPUT
 workspace 9:MPD          output PRIMARY_OUTPUT
-workspace 10:Outer_space  output SLAVE_OUTPUT_1
+workspace 10:Outer_space  output SLAVE_OUTPUT_0
 
 ## Move focused container to workspace
 bindcode $mod+Shift+49 move container to workspace 0:Main
@@ -263,24 +290,27 @@ client.urgent               #ad7fa8 #ad7fa8 #ffffff #ff0000
 
 bar {
 	# verbose yes
+	# separator_symbol ":|:"
 	output PRIMARY_OUTPUT
 	position top
 	tray_output none
 	workspace_buttons yes
 	strip_workspace_numbers yes
 	status_command ". ~/.i3/generate_json_for_i3bar.sh"
+	wheel_up_cmd nop # disable mouse wheel on workspace buttons
+	wheel_down_cmd nop
 	colors {
 		background #3c3c3c
-		statusline #bbbbbb
+		statusline #cccccc
 		focused_workspace    #ad7fa8 #75507b #ffffff
 		active_workspace     #75507b #ad7fa8 #ffffff
-		inactive_workspace   #3c3c3c #3c3c3c #aaaaaa
+		inactive_workspace   #3c3c3c #3c3c3c #bbbbbb
 		urgent_workspace     #df5757 #c22f2f #ffffff
 	}
 }
 
 # bar {
-# 	output SLAVE_OUTPUT_1
+# 	output SLAVE_OUTPUT_0
 # 	position top
 # 	workspace_buttons yes
 # }

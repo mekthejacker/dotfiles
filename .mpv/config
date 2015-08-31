@@ -15,14 +15,14 @@ sub-codepage=enca:ru:en
 ## Sub loading is done via watch.sh
 sub-auto=no
 softvol=yes
-screenshot-template=%F_%n
-screenshot-format=png
+screenshot-template="%F_%P"
+screenshot-format=jpg
 ## Compressing screenshots while mpv runs is slow,
 ##   so compressing is done after with watch.sh
-screenshot-png-compression=0
+#screenshot-png-compression=0
 ## Just in case I will need jpeg some day.
-screenshot-jpeg-quality=92
-volume=50
+screenshot-jpeg-quality=94
+volume=100
 #sub-ass=no
 osd-duration=3000
 osd-fractions=yes
@@ -70,3 +70,6 @@ hwdec=vdpau
 
 [fanetbook]
 vo=opengl
+
+[encoding]
+terminal=no

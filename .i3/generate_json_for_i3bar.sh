@@ -21,6 +21,10 @@ timeout_step=0 # counts seconds till timeout_max
 timeout_max=30 # the actual timeout is one second; timeout_max introduces
                # a period functions may rely on; functions have their own
                # local timeouts, “wait_time” variable.
+separator_char='·'  # U+00B7 https://en.wikipedia.org/wiki/Interpunct
+
+# module settings
+active_window_name_max_length=50
 
 # Decrypt Gmail authentication data
 eval `gpg -qd ~/.env/private_data.sh.gpg 2>/dev/null \
@@ -42,36 +46,75 @@ eval `gpg -qd ~/.env/private_data.sh.gpg 2>/dev/null \
 #    string evaluates at runtime each time after all functions in func_list
 #    are done.
 blocks=(
+	# [0]=test [1]=separator
 	[10]=active_window_name
+
+	# indicators block
 	[20]=mpd_state
 	[30]=speakers_state
 	[31]=mic_state
 	[40]=internet_status
 	[50]=gmail
+
+	[59]=cond_separator_1 # conditional separator
 	[60]=nice_date
 )
 
 case $HOSTNAME in
 	fanetbook)
-		blocks[1]=xkb_layout
+		blocks[54]=xkb_layout
 		blocks[59]=battery_status
 		;;
 	home)
-		blocks[11]=free_space
-		blocks[51]=schedule
+		blocks[15]=free_space
+		blocks[16]=separator
+		blocks[55]=schedule
 		;;
 esac
 
 unset func_list
-bar='${comma:-}\n\t['
-# Since comma isn’t set for the first time, its line will be empty
+# $bar is to be eval’ed to output
+bar='${comma:-}\n\t[' # Since comma isn’t set for the first time, its line will be empty
 for block in ${blocks[@]}; do
 	func_list+=" get_$block"
 	bar+='\n\t${'$block':-}'
 done
 bar+="\n\t]"
 
+
 # Some functions may generate empty line if no indicator needed.
+
+# DESCRIPTION:
+#     Block for testing purposes.
+get_test() {
+	# https://developer.gnome.org/pango/stable/PangoMarkupFormat.html
+	test='{ "full_text": "<span foreground=\"blue\" bgcolor=\"#efefef\" size=\"x-large\">Blue text</span> is <i>cool</i>!",
+\t  "align": "right",
+\t  "markup": "pango",
+\t  "separator": false },'
+}
+
+# DESCRIPTION:
+#     The problem with i3bar separator is, if a separator symbol is set
+#       in the bar section of i3 config, it WILL take space on the bar,
+#       even if "separator":"false" is passed through json.
+get_separator() {
+	separator='{ "full_text": "'$separator_char'",
+\t  "separator": false },'
+}
+
+# DESCRIPTION:
+#     This separator is conditional and appears only when there is at least
+#       one indicator shown (no indicators may be present and that’s a taihen)
+#     The logic is each block of the same group sets variable like
+#       set_cond_separator_N, where N is common for all blocks within a group.
+#       Function as this checks that variable and prints conditional separator
+get_cond_separator_1() {
+	unset cond_separator_1
+	[ -v set_cond_separator_1 ] \
+		&& cond_separator_1='{ "full_text": "'$separator_char'",
+\t  "separator": false },'
+}
 
 # NOTE:
 #     Despite the fact it may seem useless to have, because all the important
@@ -83,17 +126,20 @@ bar+="\n\t]"
 #           on the previous workspace, this window title is the only way you
 #           can tell what actually this window is and where is belongs to.
 get_active_window_name() {
-	max_length=50
 	id=`xprop -root | sed -nr 's/^_NET_ACTIVE_WINDOW.*# (.*)$/\1/p'`
-	title=`xprop -id "$id" | sed -nr 's/\\\//g;s/^WM_NAME[^"]+"([^"]+)".*/\1/p'`
-	[ ${#title} -gt $max_length ] && {
+	local title=`xprop -id "$id" | sed -nr 's/\\\//g;s/^WM_NAME[^"]+"([^"]+)".*/\1/p'` \
+		u_open u_close
+	[ ${#title} -gt $active_window_name_max_length ] && {
 		## sed is expensive
-		title=`echo "$title" | sed -r 's/^(.{1,'$max_length'})\b.*/\1…/'`
+		title=`echo "$title" | sed -r "s/^(.{1,$active_window_name_max_length})\b.*/\1…/"`
 		## bash is not, but treats words with less care
 		# title=${title:0:$max_length}
 	}
-	active_window_name='{ "full_text": "'"$title"'",
+	# to underline window titles that have spaces
+	# [ "${title//* */}" ] || { u_open='<u>'; u_close='</u>'; }
+	active_window_name='{ "full_text": "'"$u_open$title$u_close${title:+ $separator_char}"'",
 \t  "align": "right",
+\t  "markup": "pango",
 \t  "separator": false },'
 }
 
@@ -113,10 +159,11 @@ get_xkb_layout() {
 	xkb_layout='{ "full_text": "'"$scroll_lock"'",
 \t  "align": "right",
 \t  "separator": false },'
+	set_cond_separaor_1=t
 }
 
 get_free_space() {
-	local wait_time=10
+	local wait_time=10 color_tag inner_separator
 	[ $timeout_step -eq 0 -o $((timeout_step % wait_time)) -eq 0 ] && {
 		mountpoints='/home / /usr'
 		yellow_point='5'
@@ -130,55 +177,62 @@ get_free_space() {
 		done
 		[ -v present_mpoints ] && for ((i=0; i<${#present_mpoints[@]}; i++)); do
 			[ $i -lt $((${#present_mpoints[@]}-1)) ] \
-				&& local separating_comma=',' \
-				|| unset separating_comma # This comma appears between blocks
+				&& local inner_separator=" $_not_used_until_they_fix_the_bug_separator_char " \
+				|| unset inner_separator # This comma appears between blocks
 			                              #   showing mountpoints.
 			read total free <<< `df -BG -P "${present_mpoints[$i]}" |\
 			  sed -rn '$ s/^\S+\s+([0-9]+)G\s+\S+\s+([0-9]+)G.*$/\1\n\2/p'`
-			# Cause this function can generate multiple blocks, an empty line
-			#   may appear before first generated block.
-			free_space="${free_space:-}${inner_comma:-}
-\t{ \"full_text\": \"$free\""
+			unset color_tag
 			if [ $free -le $red_point ]; then
-				free_space="$free_space,\n\t  \"color\": \"$red\""
+				color_tag='<span fgcolor=\"'$red'\">'
 			elif [ $free -le $yellow_point ]; then
-				free_space="$free_space,\n\t  \"color\": \"$yellow\""
+				color_tag='<span fgcolor=\"'$yellow'\">'
 			fi
-			free_space="$free_space,
+			# extra space for the last iteration
+			# $separator_char isn’t used here in favour of {separator} block
+			#   because of the middle line shifted by the subscript tag.
+			[ $((i+1)) -eq ${#present_mpoints[@]} ] && inner_separator+=' '
+			free_space="${free_space:-}${inner_comma:-}
+\t{ \"full_text\": \"${color_tag:-}${present_mpoints[$i]}:$free${color_tag:+</span>}/<sub>$total</sub>$inner_separator\",
 \t  \"separator\":false,
-\t  \"separator_block_width\":0 }"
- 			free_space="$free_space,
-\t{ \"full_text\": \"/$total at ${present_mpoints[$i]}$separating_comma\",
-\t  \"separator\": false }"
+\t  \"separator_block_width\":0,
+\t  \"markup\": \"pango\" }"
+
 			local inner_comma=',' # This comma is a part of json and divides
 			                      #   {blocks} of code.
 		done
-		[ "$free_space" ] && free_space="$free_space," # buuug >_< inner comma doesn't append itself at the end
+		[ "$free_space" ] && free_space="$free_space," # buuug >_< $inner_comma isn’t appended to the last block
 	}
 }
+
 
 get_mpd_state() {
 	unset mpd_caught_playing mpd_state
 	mpc |& sed '2s/playing//;T;Q1' &>/dev/null || {
 		mpd_caught_playing=t # this uses in get_gmail
 		mpd_state='{ "full_text": "♬",\n\t  "separator": false },'
+		set_cond_separator_1=t
 	}
 }
 
 get_speakers_state() {
 	unset speakers_state
-	amixer get 'Master',0 |& sed '$s/on]$/&/;T;Q1' &>/dev/null \
-		&& speakers_state="{ \"full_text\": \"⊀\",
+	amixer get 'Master',0 |& sed '$s/on]$/&/;T;Q1' &>/dev/null && {
+		speakers_state="{ \"full_text\": \"⊀\",
 \t  \"color\": \"$red\",
 \t  \"separator\": false },"
+		set_cond_separaor_1=t
+	}
 }
 
 get_mic_state() {
 	unset mic_state
-	amixer get 'Capture',0 |& sed '$s/on]$/&/;T;Q1' &>/dev/null \
-		&& mic_state="{ \"full_text\": \"⍉\",
+	amixer get 'Capture',0 |& sed '$s/on]$/&/;T;Q1' &>/dev/null && {
+		mic_state="{ \"full_text\": \"⍉\",
 \t  \"color\": \"$red\",
 \t  \"separator\": false },"
+		set_cond_separaor_1=t
+	}
 }
 
 get_battery_status() {
@@ -193,13 +247,13 @@ get_battery_status() {
 				pushd /sys/class/power_supply &>/dev/null
 				[ -v battery_initial_data_prepared ] || {
 					# Maximum charge available after the last calibration
-					charge_full=`cat BAT1/charge_full`
+					charge_full=$(< BAT1/charge_full)
 					# Maximum charge as it was designed
-					charge_full_design=`cat BAT1/charge_full_design`
+					charge_full_design=$(< BAT1/charge_full_design)
 					# When charging, this shows how much
-					charge_now=`cat BAT1/charge_now`
+					charge_now=$(< BAT1/charge_now)
 					# Strange values, used only for journal
-					## current_now=`cat BAT1/current_now`
+					## current_now=$(< BAT1/current_now)
 
 					steps_per_block=' ░▒▓█'
 					blocks_count=5
@@ -208,11 +262,11 @@ get_battery_status() {
 					battery_initial_data_prepared=t
 				}
 				# When charging, this shows how much
-				charge_now=`cat BAT1/charge_now`
+				charge_now=$(< BAT1/charge_now)
 				# Battery status by kernel
-				bat_status=`cat BAT1/status`
+				bat_status=$(< BAT1/status)
 				# Is external power supply plugged?
-				adp_online=`cat ADP1/online`
+				adp_online=$(< ADP1/online)
 				popd &>/dev/null
 
 				battery_lifetime=`echo "scale=2;
@@ -289,6 +343,7 @@ get_battery_status() {
 \t  \"color\":\"$color\",
 \t  \"separator\":false },"
 	}
+	set_cond_separaor_1=t
 }
 
 get_internet_status() {
@@ -300,10 +355,12 @@ get_internet_status() {
 				&& has_internets=t && {
 				internet_status='{ "full_text": "",
 \t  "separator":false },'
+				# set_cond_separaor_1=t
 			}||{
 				internet_status='{ "full_text": "∿",
 \t  "color": "'$red'",
 \t  "separator":false },'
+				set_cond_separaor_1=t
 			}
 			exec {pingout}<&-
 		}
@@ -331,6 +388,7 @@ get_gmail() {
 				gmail='{ "full_text": "U✉",
 \t  "color": "'$orange'",
 \t  "separator":false },'
+				set_cond_separaor_1=t
 				return 1
 			}
 			sed -r 's~^<H2>Error [0-9]{3}</H2>$~&~;T;Q1' \
@@ -339,6 +397,7 @@ get_gmail() {
 				gmail='{ "full_text": "E✉",
 \t  "color": "'$red'",
 \t  "separator":false },'
+				set_cond_separaor_1=t
 				return 1
 			}
 			letters_unread=`sed -nr 's/.*<fullcount>([0-9]+)<.*/\1/p' \
@@ -352,6 +411,7 @@ get_gmail() {
 \t{ "full_text": "✉",
 \t  "color": "'$green'",
 \t  "separator":false },'
+				set_cond_separaor_1=t
 			}
 			[ "$letters_unread" -gt ${old_letters_unread:-0} ] && {
 				[ -v mpd_caught_playing ] && mpc pause >/dev/null
@@ -364,43 +424,51 @@ get_gmail() {
 }
 
 get_schedule() {
-	local wait_time=30
+	local wait_time=30 dayofweek dayofmonth hour minutes
 	[ $timeout_step -eq 0 -o $((timeout_step % wait_time)) -eq 0 ] && {
 		unset schedule
-		# Error: Received EOF from statusline process
-		# read dayofweek dayofmonth hour < <(date "+%A %d %H")
-		local date_t=`date "+%A %-d %-H"`
-		local dayofweek=${date_t%% *}
-		local dayofmonth_t=${date_t#* }
-		local dayofmonth=${dayofmonth_t% *}
-		local hour=${date_t##* }
-		case "$dayofweek" in
+		read dayofweek dayofmonth hour minutes <<<$(date "+%A %-d %-H %-M")
+		# All the indicators shut down either by themselves after timeout or
+		#   with aliases from ~/bashrc/home.sh. See ‘wtr’, ‘snt’, ‘okiru’.
+		# Watering plants
+		case $dayofweek in
 			# If ~/watered hasn’t been `touch`ed within 1/2/3 days…
-			Понедельник|Четверг)
+			Понедельник|Четверг) # Monday and Thursday—days for watering plants
 				[ "`find $HOME/ -maxdepth 1 -name watered -mtime -1 2>/dev/null`" ] \
 					|| schedule='{ "full_text": "✼",
 \t  "color": "'$green'",
 \t  "separator": false },'
 				;;
-			Вторник|Пятница)
+			Вторник|Пятница) # Tuesday and Friday show that I forgot to do that yesterday
 				[ "`find ~/ -maxdepth 1 -name watered -mtime -2 2>/dev/null`" ] \
 					|| schedule='{ "full_text": "✼",
 \t  "color": "'$yellow'",
 \t  "separator": false },'
 				;;
-			Среда|Суббота)
+			Среда|Суббота) # two days delay, やべえ〜
 				[ "`find ~/ -maxdepth 1 -name watered -mtime -3 2>/dev/null`" ] \
 					|| schedule='{ "full_text": "✼",
 \t  "color": "'$brown'",
 \t  "separator": false },'
 				;;
 		esac
-		[[ "$dayofmonth" =~ ^[0-9]+$ ]] && [ $dayofmonth -ge 15 ] \
+		# Sending water counters data
+		[ $dayofmonth -ge 15 ] \
 			&& [ -z "`find ~/ -maxdepth 1 -name sent -mtime -$((dayofmonth-14)) 2>/dev/null`" ] \
 			&& schedule="${schedule:+${schedule}\n}"'{ "full_text": "♒",
 \t  "color": "'$blue'",
 \t  "separator": false },'
+		# Waking a certain someone
+		case $dayofweek in
+			Понедельник|Вторник|Среда|Четверг|Пятница) # Mon–Fri
+				[ $hour -eq 6 -a $minutes -ge 5 ] && [ -e /tmp/okiru ] \
+					&& schedule="${schedule:+${schedule}\n}"'{ "full_text": "起きる",
+\t  "color": "'$green'",
+\t  "separator": false },'
+				;;
+		esac
 	}
+	[ "$schedule" ] && set_cond_separator_1=t
 }
 
 get_nice_date() {
@@ -416,7 +484,9 @@ get_nice_date() {
 	                s/=7=/июля/;     s/=8=/августа/;
 	                s/=9=/сентября/; s/=10=/октября/;
 	                s/=11=/ноября/;  s/=12=/декабря/'`
-		nice_date='{ "full_text": "'$nice_date'" }'
+		nice_date='{ "full_text": "'$nice_date'",
+\t "markup": "pango",
+\t "urgent": "true" }'
 	}
 }
 
@@ -427,6 +497,7 @@ echo '{"version":1}[' && while true; do
 	done
 	eval echo -e \"${bar//\\/\\\\}\" || exit 3
 	comma=','
+	unset ${!set_cond_separator_*}
 	sleep 1;
 	[ $((++timeout_step)) -gt $timeout_max ] && timeout_step=1
 done

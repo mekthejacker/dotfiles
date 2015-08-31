@@ -7,6 +7,7 @@
 # See "schedule" block in ~/.i3/generate_json_for_i3bar.sh
 alias wtr='touch ~/watered'
 alias snt='touch ~/sent'
+alias okiru='rm /tmp/okiru'
 
 alias rt="urxvtc -title rtorrent -hold \
                  -e /bin/bash -c 'chmod o+rw `tty` \
@@ -21,9 +22,13 @@ alias rtcont='sudo -u rtorrent /usr/bin/pkill -CONT -xf /usr/bin/rtorrent'
 complete -F _watchsh wa-a wa-f wa-s wap-a wap-f wap-s
 #
 wa() {
+	# clb6x10 is installed separately, see the man page
+	#   man -P "less -p '.*--last-ep-'"
+	# for details.
 	~/scripts/watch.sh \
 		--no-hints -e -m "--fs --save-position-on-quit --profile=$HOSTNAME" \
-		--last-ep --last-item-mark '.' \
+		--last-ep --last-ep-command "figlet -t -f $HOME/.fonts/clb6x10 -c" \
+		--last-item-mark '.' \
 		--remember-sub-and-audio-delay \
 		-s "season %keyword disk disc cd part pt dvd" \
 		-S /home/picts/screens/ \
@@ -50,9 +55,15 @@ alias wap-s="wap s"
 alias wap-m="wap m"
 
 
+alias imgur='$HOME/scripts/imgur_upload.sh'
+alias renpy="RENPY_EDIT_PY=$HOME/.renpy/emacs.edit.r.py  renpy"
+# Viruses writers don’t expect that.
+alias firefox='firefox --profile ~/.ff'
+
 alias sync_fanetbook="sudo -u git /root/scripts/manual_sync.sh fanetbook all"
 alias sync_external_hdd="sudo /root/scripts/manual_sync.sh rescue all"
 alias detach_hdd="sudo /etc/udev/rules.d/rescue_mount.sh sud" # sync-umount-detach
+
 
 # C-M-1 — VM window # Not F1, 1!
 # C-M-2 — VM console
@@ -129,15 +140,12 @@ alias vm-wq='~/bin/qemu-shell/qmp-shell ~/qmp-sock-shindaws'
 
 
 at-msg() {
-	read -p "Example: +10 minutes"$'\n'"When? > " when
+	read -p "Examples: ‘+10 mins’, ‘19:30’."$'\n'"When? > " when
 	read -p "Text message: > " msg
 	date --date="$when" +"%H:%M" >/dev/null || return 4
 
 	at "`date --date="$when" +"%H:%M"`" <<<"DISPLAY=$DISPLAY Xdialog --msgbox \"\n   $msg   \n\" 200x100"
 }
-
-alias imgur='$HOME/scripts/imgur_upload.sh'
-alias renpy="RENPY_EDIT_PY=$HOME/.renpy/emacs.edit.r.py  renpy"
 
 # DESCRIPTION:
 #     Takes a magnet link and places a .torrent file made of it to a directory.
@@ -190,8 +198,7 @@ copy-playlist() {
 	[ -f "$HOME/.mpd/playlists/${playlist}.m3u" ] \
 		&& local playlist="$HOME/.mpd/playlists/${playlist}.m3u"
 	[ -f "$playlist" ] && [ -d "$dest" -a -w "$dest" ] && {
-		eval mpd_library_path="`sed -nr 's/^\s*music_directory\s+"(.*)"/\1/p'\
-		                   ~/.mpd/mpd.conf`"
+		mpd_library_path="$HOME/music/"
 		while read filepath; do
 			filepath="${filepath/$mpd_library_path/}"
 			cp -v  "$mpd_library_path/$filepath" "$dest"
@@ -225,3 +232,14 @@ spr() {
 		| perl -p -e 'chomp if eof' | tee /dev/tty | xclip
 	echo
 }
+
+
+# TAKES:
+#     $1 — file to encrypt. Encrypted version will be palced along with it.
+gpg-enc() {
+	GTK_IM_MODULE= QT_IM_MODULE= gpg \
+		--batch -se --output $1.gpg --yes -R *$ME_FOR_GPG $1
+}
+
+# Check unicode symbols
+chu() { echo -n "$@" | uniname; }

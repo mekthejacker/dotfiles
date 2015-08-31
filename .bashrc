@@ -8,6 +8,7 @@
 # This is to dispose of old aliases and function definitions before
 #   (re-)sourcing new or rewritten ones.
 
+
 unalias -a
 # If I replace it with
 #     unset -f `declare -F | sed 's/^declare -f //g'`
@@ -33,16 +34,16 @@ for opt in autocd cdspell dirspell dotglob extglob globstar \
     no_empty_cmd_completion; do
     shopt -s $opt
 done
-for completion_module in eix eselect gentoo git gpg iptables layman man \
-    smartctl ssh strace sysctl taskset tmux udisks watchsh; do
-    eselect bashcomp enable $completion_module &>/dev/null
-done
-unset opt completion_module
+#for completion_module in eix eselect gentoo git gpg iptables layman man \
+#    smartctl ssh strace sysctl taskset tmux udisks watchsh; do
+#    eselect bashcomp enable $completion_module &>/dev/null
+#done
+unset opt #completion_module
 # man bash says that non-login shells do not source /etc/profile and
 #   ~/.bash_profile. My shells are non-login, however, they have PATH set
 #   and they source ~/.bash_profile (which is sourcing this file
 #   in its turn). A miracle.
-. /etc/profile.d/bash-completion.sh
+. /etc/bash/bashrc.d/bash_completion.sh
 
 # Testing ur PAM
 #ulimit -S -n 8192
@@ -69,6 +70,8 @@ export PS1="\[\e[01;34m\]┎ \w\n\[\e[01;34m\]┖ \
 \[\e[01;32m\]\
 at \h \
 \[\e[01;34m\]\\$\[\e[00m\] "
+# FFS, why XDG_* vars aren’t exported from there?!
+eval `sed -nr  's/^[^#].*/export &/p' ~/.config/user-dirs.dirs`
 
 ## Aliases caveats and hints:
 ## 1. All innder double quotes must be escaped
@@ -84,9 +87,9 @@ at \h \
 #                               echo lol second line # another comment"
 
 # add to todo list
-a() { echo "$@" >> ~/todo; }
+tda() { echo "$@" >> ~/todo; }
 # delete from todo list
-d() {
+tdd() {
     [ "$1" = '-' ] && echo -n >~/todo || {
         for i in $@; do
             [[ "$i" =~ ^[0-9]+$ ]] && sed -i $1d ~/todo
@@ -98,6 +101,27 @@ alias ec="emacsclient -c -nw"
 alias emc="emacsclient"
 alias erc="emacsclient -c -nw ~/.bashrc"
 alias grep="grep --color=auto"
+alias gi='git'
+alias gia='git add'
+alias giaa='git add --all'
+alias gic='git commit'
+alias gica='git commit -a'
+alias gicam='git commit -am'
+alias gicamend='git commit --amend'
+alias gib='git branch'
+alias gip='git push'
+alias gid='git diff'
+alias gil='git log --graph --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue)<%an>%Creset" --abbrev-commit --date=relative'
+alias gilp='git log --pretty=format:"%h %ad | %s%d [%an]" --graph --date=short'
+alias gilg='git  log --all --graph --decorate'
+alias gis='git status'
+alias gio='git checkout'
+alias gim='git submodule'
+alias gima='git submodule add'
+alias gimi='git submodule init'
+alias gims='git submodule status'
+alias gimu='git submodule update'
+alias gimy='git submodule sync'
 # pinentry doesn’t like scim
 alias gpg="GTK_IM_MODULE= QT_IM_MODULE= gpg"
 alias ls="ls --color=auto"
@@ -166,4 +190,3 @@ one_command_execute() {
 	# bind shell-expand-line
 	bind -x '"\C-m":"one_command_execute"'
 }
-

@@ -356,11 +356,16 @@ cat <<"EOF"
 米※       kome
 益        yaku
 
-⚈д⚈ ⌕…⌕ °ヮ° ´Д` ╭(＾▽＾)╯ /(⌃ o ⌃)\ ╰(^◊^)╮ ◜(◙д◙)◝
+⚈д⚈ ⌕…⌕ °ヮ° ´Д` ╭(＾▽＾)╯ /(⌃ o ⌃)\ ╰(^◊^)╮ ◜(◙д◙)◝ ʘ‿ʘ  ≖‿≖
+
+ ´ ▽ ` )ﾉ  (・∀・ )  (ΘεΘ;)  ╮(─▽─)╭  (≧ω≦)  (´ヘ｀;)  (╯3╰)  (⊙_◎)  (¬▂¬)
+
+( ^▽^)σ)~O~)
 
 キタ━━━(゜∀゜)━━━!!!!!   ‘It’s here’, Kitaa!, a general expression
                         of excitement that something has appeared
                         or happened or ‘I came’.
+( ˙灬˙ )                Pedo hige 
 (・∀・)~mO               Flash of intuition
 m9(・∀・)                NO U
 ヽ(°Д°)ﾉ
@@ -372,6 +377,7 @@ m9(・∀・)                NO U
 Σ(゜д゜;)	            Shocked
 (*´Д`)ﾊｧﾊｧ               Erotic stirring, haa haa
 (ﾟДﾟ;≡;ﾟДﾟ)
+( ﾟ∀ﾟ)ｱﾊﾊ八 八 ﾉヽ ﾉヽ ﾉヽ ﾉ ＼  / ＼ / ＼
 （･∀･)つ⑩
 щ(ﾟДﾟщ)(屮ﾟДﾟ)屮          Come on
 （・Ａ・)                ‘That’s bad’
@@ -637,7 +643,9 @@ iforgot-wcpe-station-time-zone-difference() {
 }
 
 iforgot-libreoffice-writer-images() {
-	When an image is inserted in a libreoffice writer document, lowriter uses 90 dpi by default. Thus, importing SVG file in GIMP it’s necesary to set corresponding dpi and count appropriate width according to that. GIMP advises 1000px width by default, but that gives 282.24 mm of width after import to libreoffice. ESPD doc width excluding fields is 180 mm. After import to lowriter, in the document body image will look awry even if you guess the 100 % scale right. But it only seems like it, after the export to PDF with lossless image compression it’ll look as it should.
+	cat <<EOF
+	When an image is inserted in a libreoffice writer document, lowriter uses 90 dpi (not desktop resolution) by default. Thus, while importing an SVG file in GIMP it’s necesary to set corresponding dpi and count appropriate width according to that. GIMP advises 1000px width by default, but that gives 282.24 mm of width after import to libreoffice. ESPD doc width excluding fields is 180 mm. After import to lowriter, in the document body image will look awry even if you guess the 100 % scale right. But it only seems like it, after the export to PDF with lossless image compression it’ll look as it should.
+EOF
 }
 
 iforgot-libreoffice-pdf-export() {
@@ -693,4 +701,51 @@ cat <<"EOF"
 	card is hw/soft bloced: rfkill list
 	card is in wrong CRDA region: iw reg get/set <AA>
 EOF
+}
+
+iforgot-audio-conversion() {
+	echo -e '\tffmpeg -i input.wav -vn -ar 44100 -ac 2 -ab 192k -f mp3 output.mp3'
+}
+
+iforgot-keyboard-print-map() {
+cat <<"EOF"
+Test print
+
+    setxkbmap -model latitude -print \
+        | xkbcomp -xkm - - \
+        | xkbprint -label symbols -color -eps - - \
+        | ps2pdf - > xkblayout.pdf; zathura xkblayout.pdf
+
+Current keyboard clean image (can be openen in inkscape with postscript support enabled)
+
+    xkbprint -label none -color -eps :0 -o kbmap.eps
+EOF
+}
+
+iforgot-grub-update() {
+	cat <<"EOF"
+	grub --no-floppy </dev/sdX>
+	grub > root (hdM,N)            ← where M is number of disk sdX (start with 0),
+	                                 and N is partition with grub files (usually 0 or 1)
+	grub > setup (hdM)
+	grub > quit
+Also
+	grub-install --no-floppy /dev/sdX
+EOF
+}
+
+iforgot-git-update-submodule-each-and-every-one() {
+	echo 'git submodule foreach git pull origin master'
+}
+
+iforgot-convert-audio-with-ffmpeg() {
+	echp -e "\tffmpeg -i audio.ogg -acodec mp3 newfile.mp3"
+}
+
+iforgot-check-unicode-symbol() {
+	cat <<EOF
+	echo -n 'ß' | uniname
+	echo -n $'\'' | uniname
+EOF
+	echo -n $'\'' | uniname
 }

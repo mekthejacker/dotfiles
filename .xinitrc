@@ -9,6 +9,9 @@
 # CONFIG_AUDITSYSCALL=y		← gdm requires it(?)
 # In case of troubles: http://forums.gentoo.org/viewtopic-t-858965-highlight-.html
 
+pgrep -af gpg-agent && echo 'gpg-agent is still there at xinitrc time!' \
+							|| echo 'No gpg-agent at xinitrc time!'
+
 [ "${ENV_DEBUG/*i*/}" ] \
 	&& i3_cmdline='i3 &>/dev/null' \
 	|| i3_cmdline='i3 -V -d all >/tmp/envlogs/i3.stdout 2>/tmp/envlogs/i3.stderr'
