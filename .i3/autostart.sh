@@ -3,13 +3,10 @@
 # autostart.sh
 # This script is called from ~/.i3/config with ‘exec ~/.i3/autstart.sh’
 
-#[ "${ENV_DEBUG/*a*/}" ] || {
-true && {
+[ "${ENV_DEBUG/*a*/}" ] || {
 	exec &>/tmp/envlogs/autostart
 	date
 	set -x
-	pgrep -af gpgp-agent && echo 'gpg-agent is there at autorun time!' \
-								 || echo 'No gpg-agent present at autorun time.'
 }
 
 # Temporarily disable pointer while setting layout

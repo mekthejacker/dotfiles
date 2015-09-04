@@ -4,7 +4,6 @@
 . vm.sh
 . not4public.sh
 
-
 # Watering plants and sending water meter data.
 # See "schedule" block in ~/.i3/generate_json_for_i3bar.sh
 alias wtr='touch ~/watered'
