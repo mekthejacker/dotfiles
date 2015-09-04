@@ -195,5 +195,3 @@ exec {pipe_fd}<&-
 rm $pipe
 pkill -9 -f Xdialog
 export -n STARTUP
-pgrep -af gpg-agent && echo 'gpg-agent is still there!' \
-							 || echo 'No gpg-agent at prelaod time!'

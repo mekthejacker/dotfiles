@@ -218,6 +218,7 @@ case $HOSTNAME in
 esac
 pointer_control enable
 
+
 # Some configs decrypted at ~/bin/run_app.sh
 for app in "${startup_apps[@]}" mpd thunar geeqie gimp redshift; do
 
