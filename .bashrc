@@ -51,7 +51,6 @@ unset opt #completion_module
 ulimit -Sn 4096
 set -b # report exit status of background jobs immediately
 
-export DEPLOY_EXCLUDE_DIRS="$HOME/.ssh|$HOME/.gnupg"
 export EIX_LIMIT=0
 export EDITOR="emacsclient -c -nw"
 export LESS='-R -M --shift 5 -x4'
@@ -70,8 +69,6 @@ export PS1="\[\e[01;34m\]┎ \w\n\[\e[01;34m\]┖ \
 \[\e[01;32m\]\
 at \h \
 \[\e[01;34m\]\\$\[\e[00m\] "
-# FFS, why XDG_* vars aren’t exported from there?!
-eval `sed -nr  's/^[^#].*/export &/p' ~/.config/user-dirs.dirs`
 
 ## Aliases caveats and hints:
 ## 1. All innder double quotes must be escaped
@@ -113,7 +110,7 @@ alias gip='git push'
 alias gid='git diff'
 alias gil='git log --graph --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue)<%an>%Creset" --abbrev-commit --date=relative'
 alias gilp='git log --pretty=format:"%h %ad | %s%d [%an]" --graph --date=short'
-alias gilg='git  log --all --graph --decorate'
+alias gilg='git log --all --graph --decorate'
 alias gis='git status'
 alias gio='git checkout'
 alias gim='git submodule'
@@ -122,6 +119,7 @@ alias gimi='git submodule init'
 alias gims='git submodule status'
 alias gimu='git submodule update'
 alias gimy='git submodule sync'
+alias gif='git ls-files'
 # pinentry doesn’t like scim
 alias gpg="GTK_IM_MODULE= QT_IM_MODULE= gpg"
 alias ls="ls --color=auto"
@@ -182,7 +180,7 @@ one_command_execute() {
 }
 
 [ -v ONE_COMMAND_SHELL ] && {
-	PS1='\[\e[01;37m\](☞°ヮ°)☞\[\e[00m\] '
+	PS1='\[\e[01;37m\](☞＾ヮ°)☞\[\e[00m\] '
 	## This doesn’t work now, so I have to use default binding C-M-e to
 	##   expand aliases before they’ll go to nohup.
 	# shopt -s expand_aliases # actually, this may be needed only inside

@@ -1,0 +1,9 @@
+/* Change the tab-bar height */
+tab {height: 12px !important;}
+.tabbrowser-strip {height: 12px !important;}
+
+/* Show tab loading indicator while the tab is loading */
+
+.tabbrowser-tabs *|tab[busy] .tab-icon {
+  display:-moz-box;
+}

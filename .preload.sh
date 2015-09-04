@@ -158,7 +158,7 @@ push_the_bar 'Loading keyboard settings' 33
 	# unset ssh_key
 
 	push_the_bar 'Decrypting user name'
-	eval export `gpg -qd ~/.env/private_data.sh.gpg 2>/dev/null | grep -E '^ME\b'`
+	eval export `gpg -qd ~/.env/private_data.sh.gpg 2>/dev/null | grep -E '^ME(_FOR_GPG)*\b'`
 
 #	push_the_bar 'Decrypting Box account information'  # http://box.com
 #	gpg -qd --output /tmp/decrypted/secrets.`date +%s` ~/.davfs2/secrets.gpg

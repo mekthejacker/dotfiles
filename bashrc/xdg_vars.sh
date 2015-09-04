@@ -1,0 +1,51 @@
+# This file is written by xdg-user-dirs-update
+# If you want to change or add directories, just edit the line you’re
+# interested in. All local changes will be retained on the next run
+# Format is XDG_xxx_DIR="$HOME/yyy", where yyy is a shell-escaped
+# homedir-relative path, or XDG_xxx_DIR="/yyy", where /yyy is an
+# absolute path. No other format is supported.
+
+# According to the latest spec at August 2015:
+# All paths set in these environment variables must be absolute.
+
+# Base directory relative to which user-specific data files should be written.
+# XDG_DATA_HOME > XDG_DATA_DIRS
+# XDG_DATA_HOME="~/.local/share/"
+
+# Set of preference ordered base directories relative to which data files should
+#   be searched.
+# important > less important > least important
+# XDG_DATA_DIRS="/usr/local/share/:/usr/share/"
+
+# Base directory relative to which user-specific configuration files should
+#   be written.
+# XDG_CONFIG_HOME > XDG_CONFIG_DIRS
+# XDG_CONFIG_HOME="~/.config/"
+
+# Set of preference ordered base directories relative to which configuration
+#   files should be searched.
+# important > less important > least important
+# XDG_CONFIG_DIRS="/etc/xdg"
+
+# Base directory relative to which user-specific non-essential (such as cahced
+#   files, sockets, named pipes…) data should be written. Its Unix access mode
+#   MUST be 0700.
+# XDG_CACHE_HOME="~/.cache"
+
+# Base directory relative to which user-specific runtime files and other file
+#   objects should be placed. Files in the directory MUST not survive reboot
+#   or a full logout/login cycle, but must persist between logins [while the
+#   session is still there, but someone other uses the computer?]. It’s used
+#   by applications for communication and synchronization purposes and isn’t
+#   meant for large files.
+# XDG_RUNTIME_DIR='?'
+
+
+export XDG_DESKTOP_DIR="$HOME/desktop"
+export XDG_PICTURES_DIR="$HOME/picts"
+export XDG_VIDEOS_DIR="$HOME/video"
+export XDG_DOWNLOAD_DIR="$HOME/desktop"
+export XDG_TEMPLATES_DIR="$HOME/templates"
+export XDG_PUBLICSHARE_DIR="$HOME/desktop"
+export XDG_DOCUMENTS_DIR="$HOME/desktop"
+export XDG_MUSIC_DIR="$HOME/music"

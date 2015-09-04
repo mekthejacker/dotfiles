@@ -1,7 +1,9 @@
+. xdg_vars.sh
 . iforgot.sh
 . wine.sh
 . vm.sh
 . not4public.sh
+
 
 # Watering plants and sending water meter data.
 # See "schedule" block in ~/.i3/generate_json_for_i3bar.sh
@@ -14,6 +16,36 @@ alias rt="urxvtc -title rtorrent -hold \
                     && sudo -u rtorrent -H tmux -u -S /home/rtorrent/.tmux/socket attach' &"
 alias rtstop='sudo -u rtorrent /usr/bin/pkill -STOP -xf /usr/bin/rtorrent'
 alias rtcont='sudo -u rtorrent /usr/bin/pkill -CONT -xf /usr/bin/rtorrent'
+alias dot-git="`which git` --work-tree $HOME --git-dir dotfiles.git"
+alias gen-git="`which git` --work-tree $HOME --git-dir general.git"
+
+git() {
+	[ $PWD = $HOME ] && {
+		local opts="--work-tree $HOME --git-dir dotfiles.git" doton=t genon= left=$'\e[D' right=$'\e[C' input_is_ready
+		until [ -v input_is_ready ]; do
+			echo -en "Which repo would you like to operate on? ${doton:+\e[32m}dotfiles${doton:+\e[0m <} ${genon:+> \e[32m}general${genon:+\e[0m} "
+			read -sn1
+			[ "$REPLY" = $'\e' ] && read -sn2 rest && REPLY+="$rest"
+			[ "$REPLY" ] && {
+				case "$REPLY" in
+					"$left")
+						opts="--work-tree $HOME --git-dir dotfiles.git"
+						doton=t; genon=
+						;;
+					"$right")
+						opts="--work-tree $HOME --git-dir general.git"
+						doton=; genon=t
+						;;
+				esac
+				echo -en "\r\e[K" # \K lear line
+			}||{
+				echo
+				input_is_ready=t
+			}
+		done
+	}
+	`which git` $opts "$@"
+}
 
 # For me, it’s easier to see new changes on a local setup.
 [ "${MANPATH//*watch.sh*/}" ] \

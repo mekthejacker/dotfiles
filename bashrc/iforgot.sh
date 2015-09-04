@@ -739,7 +739,7 @@ iforgot-git-update-submodule-each-and-every-one() {
 }
 
 iforgot-convert-audio-with-ffmpeg() {
-	echp -e "\tffmpeg -i audio.ogg -acodec mp3 newfile.mp3"
+	echo -e "\tffmpeg -i audio.ogg -acodec mp3 newfile.mp3"
 }
 
 iforgot-check-unicode-symbol() {
@@ -747,5 +747,44 @@ iforgot-check-unicode-symbol() {
 	echo -n 'ß' | uniname
 	echo -n $'\'' | uniname
 EOF
-	echo -n $'\'' | uniname
+}
+
+iforgot-reverse-ssh() {
+cat <<EOF
+ssh -f <user_at_gateway>@<gateway_ip> -L <any_port>:<IP_behind_NAT>:<ssh_port_of_the_machine_behind_NAT> -N \
+	&& ssh -p<same_any_port> <user_at_machine_behind_NAT>@localhost
+
+If you login without keys, the first password is the password to the gateway, the second is to the machine behind NAT.
+EOF
+}
+
+iforgot-clean-git-repo-totally() {
+cat <<EOF
+Removing the origin just to make sure no reference is kept.
+
+$ git remote rm origin
+$ echo $(git log --reverse --format=%H | head -n1) > .git/info/grafts
+$ git filter-branch -- --all
+Rewrite 4352ea1fb4b0dfa5d28ad26ce6b9e042b126bd60 (8/8)
+Ref 'refs/heads/master' was rewritten
+$ rm .git/info/grafts
+$ du -sh .git
+121M    .git
+
+However, the repository size is quite big, still. It's basically the same as in the beginning. Git doesn't just delete old files that don't have a reference anymore (you have to actually tell it to do that). There are mechanisms to keep your repository clean (automatic git gc after a while, but still we want a clean repository, now).
+
+To actually remove all references to old git objects, you need to do quite a few things:
+  - Remove the filter-branch backup.
+  - Expire the reflog.
+  - Garbage collect everything.
+If you forget just one thing you might end up with the old repository size, because if the reference remains, `git gc` is unable to remove the old objects.
+
+$ git update-ref -d refs/original/refs/heads/master
+$ git reflog expire --expire=now --all
+$ git gc --prune=now --aggressive
+$ du -sh .git
+164K    .git
+
+Source: http://jedidjah.ch/code/2014/8/28/purge_old_git_history/ 28.08.2014
+EOF
 }
