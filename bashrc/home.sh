@@ -73,7 +73,7 @@ complete -F _watchsh wa-a wa-f wa-s wap-a wap-f wap-s
 #
 wa() {
 	# clb6x10 is installed separately, see the man page
-	#   man -P "less -p '.*--last-ep-'"
+	#   man -P "less -p '^.*Using a custom'" watch.sh
 	# for details.
 	~/scripts/watch.sh \
 		--no-hints -e -m "--fs --save-position-on-quit --profile=$HOSTNAME" \
@@ -87,14 +87,13 @@ wa() {
 wa-a() { wa -d /home/video/anime "$@"; }
 wa-f() { wa -d /home/video/films "$@"; }
 wa-s() { wa -d /home/video/serials "$@"; }
-wa-m() { wa -d /home/video/multiplication "$@"; }
+wa-m() { wa -d /home/video/vekmnabkmvs "$@"; }
 
 # For output on plasma tv, see also ~/.i3/config.template
 wap() {
 	local variant=$1; shift
 	xrandr --output HDMI-0 --mode 1920x1080 --right-of DVI-I-0
-#	wa-$variant -m "--x11-name big_screen --ionice-opts --profile=hdmi" $@
-	wa-$variant -m "--x11-name big_screen --profile=hdmi" $@
+	wa-$variant -m "--x11-name big_screen --ionice-opts --profile=hdmi" $@
     xrandr --output HDMI-0 --off
 	# Switch back from the workspace bound to the output with plasma
 	i3-msg workspace 0:Main
