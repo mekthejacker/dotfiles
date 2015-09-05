@@ -75,7 +75,7 @@ wa() {
 	# clb6x10 is installed separately, see the man page
 	#   man -P "less -p '^.*Using a custom'" watch.sh
 	# for details.
-	~/scripts/watch.sh \
+	~/bin/watch.sh \
 		--no-hints -e -m "--fs --save-position-on-quit --profile=$HOSTNAME" \
 		--last-ep --last-ep-command "figlet -t -f $HOME/.fonts/clb6x10 -c" \
 		--last-item-mark '.' \
@@ -104,8 +104,8 @@ alias wap-s="wap s"
 alias wap-m="wap m"
 
 
-alias imgur='$HOME/scripts/imgur_upload.sh'
-alias renpy="RENPY_EDIT_PY=$HOME/.renpy/emacs.edit.r.py  renpy"
+alias imgur="~/bin/imgur_upload.sh"
+alias renpy="RENPY_EDIT_PY=~/.renpy/emacs.edit.r.py  renpy"
 # Viruses writers don’t expect that.
 alias firefox='firefox --profile ~/.ff'
 

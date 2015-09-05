@@ -3,8 +3,8 @@
 <action>
 	<icon>file-roller</icon>
 	<name>Roll up</name>
-	<unique-id>1396152035608799-1</unique-id>
-	<command>/bin/bash ~/scripts/thunar_ca.sh --roll-up %F</command>
+	<unique-id>1441427525534567-4</unique-id>
+	<command>/bin/bash ~/bin/thunar_ca.sh --roll-up %F</command>
 	<description>Adding selected files or directories to archive</description>
 	<patterns>*</patterns>
 	<directories/>
@@ -17,8 +17,8 @@
 <action>
 	<icon>insert-image</icon>
 	<name>Convert to JPEG</name>
-	<unique-id>1396152001949908-1</unique-id>
-	<command>/bin/bash ~/scripts/thunar_ca.sh --convert-to-jpeg %F</command>
+	<unique-id>1441427517773665-3</unique-id>
+	<command>/bin/bash ~/bin/thunar_ca.sh --convert-to-jpeg %F</command>
 	<description>Converts image(s) to JPEG format</description>
 	<patterns>*</patterns>
 	<image-files/>
@@ -26,8 +26,8 @@
 <action>
 	<icon>format-text-italic</icon>
 	<name>Show the font</name>
-	<unique-id>1396152009553109-2</unique-id>
-	<command>/bin/bash ~/scripts/thunar_ca.sh --show-the-font %f</command>
+	<unique-id>1441427510508615-2</unique-id>
+	<command>/bin/bash ~/bin/thunar_ca.sh --show-the-font %f</command>
 	<description>Draw text with selected font</description>
 	<patterns>*</patterns>
 	<other-files/>
@@ -35,8 +35,8 @@
 <action>
 	<icon>edit-copy</icon>
 	<name>Filename to clipboard</name>
-	<unique-id>1396152015888997-3</unique-id>
-	<command>/bin/bash ~/scripts/thunar_ca.sh --filename-to-clipboard %f</command>
+	<unique-id>1441427502475348-1</unique-id>
+	<command>/bin/bash ~/bin/thunar_ca.sh --filename-to-clipboard %f</command>
 	<description>Copies selected filename to the X clipboard</description>
 	<patterns>*</patterns>
 	<audio-files/>

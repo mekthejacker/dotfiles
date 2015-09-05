@@ -19,7 +19,7 @@ With this script you’ll be able to do not only this, but also
 - keep it from auto-switching;
 - set default brightness which all images will have after being set as wallpaper;
 - have history of previously set images and remember their brightness and other settings after reboot;
-- and, of course, switch between images in history with settings they had. 
+- and, of course, switch between images in history with settings they had.
 
 ### Running the daemon
 
@@ -178,10 +178,4 @@ if you’re sure it will not kill any other process.
 
 ### Putting in autostart script
 
-A live example can be found in [dotfiles](https://github.com/deterenkelt/dotfiles/blob/master/.i3/autostart.sh#L78) repository, but here is a copy
-
-    pgrep -u $UID -f '^bash $HOME/scripts/wallpaper_setter.sh -B' \
-        && ~/scripts/wallpaper_setter.sh -w \
-        || { ~/scripts/wallpaper_setter.sh -B -0.3 \
-             -e "i3-nagbar -m \"%m\" -b Restart \"%a\"" \
-             -d /home/picts/watched & }
+A live example can be found in [dotfiles](https://github.com/deterenkelt/dotfiles/blob/master/.i3/autostart.sh#L99) repository.

@@ -74,7 +74,7 @@ bindcode $mod+Control+27 exec "~/.i3/update_config.sh"
 
 ## C-q  Quit
 bindcode $mod+Control+24 exec "~/.i3/on_quit.sh"
-# bindcode $mod+Control+Shift+24 exec "sudo /usr/bin/killall iftop; ~/scripts/xorg.conf_chooser.sh"
+# bindcode $mod+Control+Shift+24 exec "sudo /usr/bin/killall iftop; ~/bin/xorg.conf_chooser.sh"
 ## C-t  To choose other xorg.conf when X will start again.
 bindcode $mod+Control+28 exec "~/.i3/autostart.sh stop_after_main_workspace"
 
@@ -107,22 +107,22 @@ bindcode $mod+27 exec --no-startup-id /bin/bash -c 'export ONE_COMMAND_SHELL=t &
 ##   key to alternate one thing: delay, indexed format and JPEG.
 ##
 ## s (screen)
-bindcode --release $mod+39 exec --no-startup-id ". ~/scripts/screenshot.sh"
-#bindcode --release $mod+Control+39 exec --no-startup-id ". ~/scripts/screenshot.sh -delay"
-#bindcode --release $mod+Shift+39 exec --no-startup-id ". ~/scripts/screenshot.sh -indexed"
-bindcode --release $mod+Mod1+39 exec --no-startup-id ". ~/scripts/screenshot.sh -jpeg"
+bindcode --release $mod+39 exec --no-startup-id ". ~/bin/screenshot.sh"
+#bindcode --release $mod+Control+39 exec --no-startup-id ". ~/bin/screenshot.sh -delay"
+#bindcode --release $mod+Shift+39 exec --no-startup-id ". ~/bin/screenshot.sh -indexed"
+bindcode --release $mod+Mod1+39 exec --no-startup-id ". ~/bin/screenshot.sh -jpeg"
 
 ## a (window)
-bindcode --release $mod+38 exec --no-startup-id ". ~/scripts/screenshot.sh -window"
-bindcode --release $mod+Control+38 exec --no-startup-id ". ~/scripts/screenshot.sh -window -delay"
-#bindcode --release $mod+Shift+38 exec --no-startup-id ". ~/scripts/screenshot.sh -window -indexed"
-#bindcode --release $mod+Mod1+38 exec --no-startup-id ". ~/scripts/screenshot.sh -window -jpeg"
+bindcode --release $mod+38 exec --no-startup-id ". ~/bin/screenshot.sh -window"
+bindcode --release $mod+Control+38 exec --no-startup-id ". ~/bin/screenshot.sh -window -delay"
+#bindcode --release $mod+Shift+38 exec --no-startup-id ". ~/bin/screenshot.sh -window -indexed"
+#bindcode --release $mod+Mod1+38 exec --no-startup-id ". ~/bin/screenshot.sh -window -jpeg"
 
 ## z (area)
-bindcode --release $mod+52 exec --no-startup-id ". ~/scripts/screenshot.sh -area"
-#bindcode --release $mod+Control+52 exec --no-startup-id ". ~/scripts/screenshot.sh -area -delay"
-bindcode --release $mod+Shift+52 exec --no-startup-id ". ~/scripts/screenshot.sh -area -indexed"
-#bindcode --release $mod+Mod1+52 exec --no-startup-id ". ~/scripts/screenshot.sh -area -jpeg"
+bindcode --release $mod+52 exec --no-startup-id ". ~/bin/screenshot.sh -area"
+#bindcode --release $mod+Control+52 exec --no-startup-id ". ~/bin/screenshot.sh -area -delay"
+bindcode --release $mod+Shift+52 exec --no-startup-id ". ~/bin/screenshot.sh -area -indexed"
+#bindcode --release $mod+Mod1+52 exec --no-startup-id ". ~/bin/screenshot.sh -area -jpeg"
 
 ## C-l → i3lock
 bindcode $mod+Control+46 exec --no-startup-id i3lock -d -f -i "$HOME/.env/[Commie] Takamiya Nasuno Desu! - 05 [54E7195B]_00:01:57.200.png"
@@ -130,9 +130,9 @@ bindcode $mod+Control+46 exec --no-startup-id i3lock -d -f -i "$HOME/.env/[Commi
 ## F1
 bindcode $mod+67 exec --no-startup-id mpc toggle
 ## F2
-bindcode $mod+68 exec --no-startup-id "~/scripts/add2playlist.sh"
+bindcode $mod+68 exec --no-startup-id "~/bin/add2playlist.sh"
                                                              # create new
-bindcode $mod+Shift+68 exec --no-startup-id "~/scripts/add2playlist.sh -c"
+bindcode $mod+Shift+68 exec --no-startup-id "~/bin/add2playlist.sh -c"
 ## F3
 bindcode $mod+69 exec --no-startup-id amixer set Master toggle
 ## F4
@@ -159,21 +159,21 @@ bindcode $mod+Shift+95 exec --no-startup-id eject -t
 #bindcode $mod+96 exec --no-startup-id /bin/bash -c ""
 
 ## g     Restrict wallpapers to subdirectory
-bindcode $mod+42 exec --no-startup-id "~/scripts/wallpaper_setter.sh -r"
+bindcode $mod+42 exec --no-startup-id "~/bin/wallpaper_setter.sh -r"
 ## b     Decrease brightness
-bindcode $mod+56 exec --no-startup-id "~/scripts/wallpaper_setter.sh -b -0.1"
+bindcode $mod+56 exec --no-startup-id "~/bin/wallpaper_setter.sh -b -0.1"
 ## S-b   Increase brightness
-bindcode $mod+Shift+56 exec --no-startup-id "~/scripts/wallpaper_setter.sh -b +0.1"
+bindcode $mod+Shift+56 exec --no-startup-id "~/bin/wallpaper_setter.sh -b +0.1"
 ## n     Change mode
-bindcode $mod+57 exec --no-startup-id "~/scripts/wallpaper_setter.sh -m"
+bindcode $mod+57 exec --no-startup-id "~/bin/wallpaper_setter.sh -m"
 ## ,     Set previous (<)
-bindcode $mod+59 exec --no-startup-id "~/scripts/wallpaper_setter.sh -p"
+bindcode $mod+59 exec --no-startup-id "~/bin/wallpaper_setter.sh -p"
 ## .     Set new (>)
-bindcode $mod+60  exec --no-startup-id "~/scripts/wallpaper_setter.sh -n"
+bindcode $mod+60  exec --no-startup-id "~/bin/wallpaper_setter.sh -n"
 ## S-.   Force new (--|>)
-bindcode $mod+Shift+60  exec --no-startup-id "~/scripts/wallpaper_setter.sh -fn"
+bindcode $mod+Shift+60  exec --no-startup-id "~/bin/wallpaper_setter.sh -fn"
 ## /     Keep
-bindcode $mod+61 exec --no-startup-id "~/scripts/wallpaper_setter.sh -k"
+bindcode $mod+61 exec --no-startup-id "~/bin/wallpaper_setter.sh -k"
 
 ## Switch to workspace and launch related application.
 ## `

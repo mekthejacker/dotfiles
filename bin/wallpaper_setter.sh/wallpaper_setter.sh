@@ -108,7 +108,7 @@ Parameters:
                script is left hanging in the background for some reason.
 
 The order of keys is important!
-Report bugs to https://github.com/deterenkelt/scripts/issues
+Report bugs to https://github.com/deterenkelt/dotfiles/issues
 EOF
 }
 
