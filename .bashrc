@@ -21,7 +21,7 @@ unset -f `sed -nr "s/^\s*([-_a-zA-Z0-9]+)\(\)\s*\{.*$/\1/p" \
 	mkdir -m 700 /tmp/envlogs &>/dev/null # /tmp should be on tmpfs
 }
 # code     file               logfile (under /tmp/envlogs/)
-# x    /usr/bin/X          x (just for the mention, it’s always present)
+# x    /usr/bin/X          x (just for the file name, it’s always present)
 # p    ~/.preload.sh       preload
 # i    /usr/bin/i3         i3.stdout + i3.stderr
 # g    ~/.i3/g…_for_i3bar  gentext4i3bar
@@ -29,7 +29,7 @@ unset -f `sed -nr "s/^\s*([-_a-zA-Z0-9]+)\(\)\s*\{.*$/\1/p" \
 # r    ~/bin/run_app.sh    runapp_<app_name>
 # q    ~/.i3/on_quit.sh    on_quit
 # -    prevents the variable to be empty
-export ENV_DEBUG=-pq
+export ENV_DEBUG=-paq
 for opt in autocd cdspell dirspell dotglob extglob globstar \
     no_empty_cmd_completion; do
     shopt -s $opt

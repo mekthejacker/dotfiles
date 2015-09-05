@@ -96,13 +96,13 @@ case $HOSTNAME in
 		startup_apps=()
 		;;
 	*)
-		pgrep -u $UID -f "^bash $HOME/bin/wallpaper_setter.sh -B" \
-			|| { ~/bin/wallpaper_setter.sh -B -0.3 \
+		pgrep -u $UID -f "^bash $HOME/bin/wallpaper_setter/walpaper_setter.sh -B" \
+			|| { ~/bin/wallpaper_setter/wallpaper_setter.sh -B -0.3 \
 			   -e "i3-nagbar -m \"%m\" -b Restart \"%a\"" \
 			   -d /home/picts/screens & }
 		# Urxvtc windows must appear after wallpaper is set, due to their
 		#   fake transparency.
-		~/bin/wallpaper_setter.sh -w
+		~/bin/wallpaper_setter/wallpaper_setter.sh -w
 
 		urxvtc --title 'Todo list' -e watch -t -n15 cat -n ~/todo
 # ┌────┐
