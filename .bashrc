@@ -128,7 +128,6 @@ spr="| curl -F 'sprunge=<-' http://sprunge.us" # add ?<lang> for line numbers
 #alias td="todo -A "
 #alias tdD="todo -D "
 alias tmux="tmux -u -f ~/.tmux/config -S $HOME/.tmux/socket"
-alias deploy="/root/scripts/deploy_configuration.sh "
 
 #[ -v SSH_CLIENT ] && . ~/.preload.sh
 
