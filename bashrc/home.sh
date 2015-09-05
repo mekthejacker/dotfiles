@@ -15,9 +15,12 @@ alias rt="urxvtc -title rtorrent -hold \
                     && sudo -u rtorrent -H tmux -u -S /home/rtorrent/.tmux/socket attach' &"
 alias rtstop='sudo -u rtorrent /usr/bin/pkill -STOP -xf /usr/bin/rtorrent'
 alias rtcont='sudo -u rtorrent /usr/bin/pkill -CONT -xf /usr/bin/rtorrent'
-alias dot-git="`which git` --work-tree $HOME --git-dir dotfiles.git"
-alias gen-git="`which git` --work-tree $HOME --git-dir general.git"
+alias dotgit="`which git` --work-tree $HOME --git-dir $HOME/dotfiles.git"
+alias gengit="`which git` --work-tree $HOME --git-dir $HOME/general.git"
 
+# DESCRIPTION:
+#     Overriding git for $HOME to maintain configs in one public (dotiles)
+#     and one private (general) repo.
 git() {
 	[ $PWD = $HOME ] && {
 		local opts="--work-tree $HOME --git-dir dotfiles.git" doton=t genon= left=$'\e[D' right=$'\e[C' input_is_ready
@@ -44,6 +47,22 @@ git() {
 		done
 	}
 	`which git` $opts "$@"
+}
+
+# DESCRIPTION:
+#     Check if a file in $HOME is in dotfiles of general repo,
+# TAKES:
+#     $1 — file path under $HOME
+isinrepo() {
+	local found
+	[ "`dotgit ls-files "$1"`" -ef "$1" ] \
+		&& echo Found in dotfiles. && found=t
+	[ "`gengit ls-files "$1"`" -ef "$1" ] \
+		&& echo Found in general. && found=t
+	[ -v found ] || {
+		echo Not found.
+		return 1
+	}
 }
 
 # For me, it’s easier to see new changes on a local setup.

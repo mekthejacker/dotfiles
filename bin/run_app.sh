@@ -177,7 +177,7 @@ case $app_name in
 		             /\[bookmarks]/!d
 		             G;s/\n\n/\n/;s/$/\n/
 		         }' ~/.config/geeqie/history
-		run_app /usr/bin/geeqie ~/.config/geeqie/history
+		run_app /usr/bin/geeqie # ~/.config/geeqie/history.gpg ~/.config/geeqie/geeqierc.xml
 		;;
 	mpd)
 		GTK_IM_MODULE= QT_IM_MODULE= gpg -qd --yes --output /tmp/decrypted/mpd.conf.common ~/.mpd/mpd.conf.common.gpg

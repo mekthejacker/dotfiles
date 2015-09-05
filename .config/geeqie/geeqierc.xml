@@ -253,7 +253,7 @@
         show_thumbnails = "true" 
         show_directory_date = "false" 
         home_path = "/home/picts/watched" 
-        last_path = "/home/picts/faces/smug" 
+        last_path = "/home/picts/wallpapers/cities_and_buildings" 
         startup_path = "1" 
         exit_on_close = "false" 
 
@@ -262,7 +262,7 @@
         main_window.w = "1600" 
         main_window.h = "878" 
         main_window.maximized = "false" 
-        main_window.hdivider_pos = "1316" 
+        main_window.hdivider_pos = "1375" 
         main_window.vdivider_pos = "541" 
 
         float_window.x = "22" 
@@ -279,7 +279,7 @@
 
         toolbar_hidden = "true" 
         show_info_pixel = "false" 
-        image_overlay.state = "3" 
+        image_overlay.state = "0" 
         image_overlay.histogram_channel = "3" 
         image_overlay.histogram_mode = "1" >
         <bar_sort enabled = "true" mode = "0" action = "0" selection = "0" filter_key = "" />
