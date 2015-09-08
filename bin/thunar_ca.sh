@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
 # thunar_ca.sh – set of custom actions for Thunar file manager.
-set -x
+#set -x
 action=$1
 shift
+
+DESKTOP=`xdg-user-dir DESKTOP`
 
 echo '-->'
 echo $@
@@ -116,12 +118,12 @@ func1() {
 	'--convert-to-jpeg')
 		for image in "$@"; do
 			image="${image##*/}"
-			[ -e "$HOME/Desktop/${image%.*}.jpg" ] && {
+			[ -e "$DESKTOP/${image%.*}.jpg" ] && {
 				Xdialog --ok-label="Rewrite" --cancel-label="Cancel" \
-				        --yesno "File ‘$HOME/Desktop/${image%.*}.jpg’ already exists." 0x0 \
-					|| rm "$HOME/Desktop/${image%.*}.jpg"
+				        --yesno "File ‘$DESKTOP/${image%.*}.jpg’ already exists." 0x0 \
+					|| rm "$DESKTOP/${image%.*}.jpg"
 			}
-			convert "$image" -quality 92 "$HOME/Desktop/${image%.*}.jpg" \
+			convert "$image" -quality 92 "$DESKTOP/${image%.*}.jpg" \
 				&& notify-send  -t 2000 'Converted!' \
 				|| notify-send  -t 2000 'Failed to convert…'
 		done

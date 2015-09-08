@@ -41,11 +41,11 @@
 # XDG_RUNTIME_DIR='?'
 
 
-export XDG_DESKTOP_DIR="$HOME/desktop"
-export XDG_PICTURES_DIR="$HOME/picts"
-export XDG_VIDEOS_DIR="$HOME/video"
-export XDG_DOWNLOAD_DIR="$HOME/desktop"
-export XDG_TEMPLATES_DIR="$HOME/templates"
-export XDG_PUBLICSHARE_DIR="$HOME/desktop"
-export XDG_DOCUMENTS_DIR="$HOME/desktop"
-export XDG_MUSIC_DIR="$HOME/music"
+XDG_DESKTOP_DIR="$HOME/desktop"
+XDG_PICTURES_DIR="$HOME/picts"
+XDG_VIDEOS_DIR="$HOME/video"
+XDG_DOWNLOAD_DIR="$HOME/desktop"
+XDG_TEMPLATES_DIR="$HOME/templates"
+XDG_PUBLICSHARE_DIR="$HOME/desktop"
+XDG_DOCUMENTS_DIR="$HOME/desktop"
+XDG_MUSIC_DIR="$HOME/music"

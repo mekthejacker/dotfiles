@@ -1,4 +1,3 @@
-. xdg_vars.sh
 . iforgot.sh
 . wine.sh
 . vm.sh
@@ -93,7 +92,7 @@ wa-m() { wa -d /home/video/vekmnabkmvs "$@"; }
 wap() {
 	local variant=$1; shift
 	xrandr --output HDMI-0 --mode 1920x1080 --right-of DVI-I-0
-	wa-$variant -m "--x11-name big_screen --ionice-opts --profile=hdmi" $@
+	wa-$variant -m "--x11-name big_screen --profile=hdmi" $@ # --ionice-opts 
     xrandr --output HDMI-0 --off
 	# Switch back from the workspace bound to the output with plasma
 	i3-msg workspace 0:Main

@@ -159,21 +159,21 @@ bindcode $mod+Shift+95 exec --no-startup-id eject -t
 #bindcode $mod+96 exec --no-startup-id /bin/bash -c ""
 
 ## g     Restrict wallpapers to subdirectory
-bindcode $mod+42 exec --no-startup-id "~/bin/wallpaper_setter.sh -r"
+bindcode $mod+42 exec --no-startup-id "~/bin/wallpaper_setter/wallpaper_setter.sh -r"
 ## b     Decrease brightness
-bindcode $mod+56 exec --no-startup-id "~/bin/wallpaper_setter.sh -b -0.1"
+bindcode $mod+56 exec --no-startup-id "~/bin/wallpaper_setter/wallpaper_setter.sh -b -0.1"
 ## S-b   Increase brightness
-bindcode $mod+Shift+56 exec --no-startup-id "~/bin/wallpaper_setter.sh -b +0.1"
+bindcode $mod+Shift+56 exec --no-startup-id "~/bin/wallpaper_setter/wallpaper_setter.sh -b +0.1"
 ## n     Change mode
-bindcode $mod+57 exec --no-startup-id "~/bin/wallpaper_setter.sh -m"
+bindcode $mod+57 exec --no-startup-id "~/bin/wallpaper_setter/wallpaper_setter.sh -m"
 ## ,     Set previous (<)
-bindcode $mod+59 exec --no-startup-id "~/bin/wallpaper_setter.sh -p"
+bindcode $mod+59 exec --no-startup-id "~/bin/wallpaper_setter/wallpaper_setter.sh -p"
 ## .     Set new (>)
-bindcode $mod+60  exec --no-startup-id "~/bin/wallpaper_setter.sh -n"
+bindcode $mod+60  exec --no-startup-id "~/bin/wallpaper_setter/wallpaper_setter.sh -n"
 ## S-.   Force new (--|>)
-bindcode $mod+Shift+60  exec --no-startup-id "~/bin/wallpaper_setter.sh -fn"
+bindcode $mod+Shift+60  exec --no-startup-id "~/bin/wallpaper_setter/wallpaper_setter.sh -fn"
 ## /     Keep
-bindcode $mod+61 exec --no-startup-id "~/bin/wallpaper_setter.sh -k"
+bindcode $mod+61 exec --no-startup-id "~/bin/wallpaper_setter/wallpaper_setter.sh -k"
 
 ## Switch to workspace and launch related application.
 ## `

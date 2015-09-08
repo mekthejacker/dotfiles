@@ -43,10 +43,13 @@
 #	atd
 #	    that is already set up and running.
 
+set -x
+exec &>/tmp/envlogsscr
+
 # for scrot exec command
 export FORMAT INDEXED DISPLAY OPEN_IN_GIMP
 
-pushd ${XDG_DESKTOP_DIR:-$HOME}
+pushd `xdg-user-dir DESKTOP` # defaults to $HOME
 while [ "$1" ]; do
 	case "$1" in
 		-delay) delay='-d 5' ;; # seconds
