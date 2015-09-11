@@ -243,7 +243,7 @@ done
 }
 
 crontab -l | grep -qF 'wallpaper_setter.sh' || {
-	echo '*/10 * * * * ~/scripts/wallpaper_setter.sh -qn' \
-		>/var/spool/cron/crontabs/$ME \
+	echo '*/10 * * * * ~/bin/wallpaper_setter/wallpaper_setter.sh -qn' \
+		>>/var/spool/cron/crontabs/$ME \
 		|| notify-send -t 4000 "${0##*/}" "Couldn’t set crontab file."
 }

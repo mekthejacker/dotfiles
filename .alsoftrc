@@ -208,7 +208,7 @@ drivers = alsa,null,wave
 
 ## device:
 #  Sets the device name for the default playback device.
-#device = default
+device = default
 
 ## device-prefix:
 #  Sets the prefix used by the discovered (non-default) playback devices. This

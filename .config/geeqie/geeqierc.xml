@@ -253,7 +253,7 @@
         show_thumbnails = "true" 
         show_directory_date = "false" 
         home_path = "/home/picts/watched" 
-        last_path = "/home/picts/wallpapers/cities_and_buildings" 
+        last_path = "/home/picts/screens/hyouka" 
         startup_path = "1" 
         exit_on_close = "false" 
 

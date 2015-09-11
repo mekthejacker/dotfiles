@@ -12,6 +12,9 @@
 # -c    create a new playlist with this song instead of selecting existed one.
 # -C    mpd client to send HUP to.
 
+# Requires: mpd, mpc, Xdialog.
+# Written with ncmpcpp and i3 WM in mind.
+
 MPD_MUSIC_DIR=`sed -nr 's^\s*music_directory\s+"(.*)/*".*^\1^p' ~/.mpd/mpd.conf`
 MPD_MUSIC_DIR=${MPD_MUSIC_DIR/#~/$HOME}
 MPD_PLAYLIST_DIR=`sed -nr 's^\s*playlist_directory\s+"(.*)/*".*^\1^p' ~/.mpd/mpd.conf`
