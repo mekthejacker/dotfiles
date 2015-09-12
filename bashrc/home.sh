@@ -237,21 +237,37 @@ compress-screenshot() {
 	export -nf crush
 }
 
-# Copies MPD playlist to a specified folder.
-# $1 — path to playlist file (~/.mpd/playlists/…)
-# $2 — where to copy
+# Copies current MPD playlist to a specified folder.
+# $1 — where to copy
 copy-playlist() {
-	local playlist="$1"
-	local dest="$2"
-	[ -f "$HOME/.mpd/playlists/${playlist}.m3u" ] \
-		&& local playlist="$HOME/.mpd/playlists/${playlist}.m3u"
-	[ -f "$playlist" ] && [ -d "$dest" -a -w "$dest" ] && {
-		mpd_library_path="$HOME/music/"
+	err() { echo "$1" >&2; echo $2; }  # $1 — message; $2 — return code
+	local dest="$1" cur_pl='current.m3u' pl_dir pl library_path got_a_sane_reply
+	pl_dir=`sed -nr 's/^\s*playlist_directory\s+"(.+)"\s*$/\1/p' ~/.mpd/mpd.conf`
+	library_path=`sed -nr 's/^\s*music_directory\s+"(.+)"\s*$/\1/p' ~/.mpd/mpd.conf`
+	eval [ -d "$pl_dir" ] \
+		|| return `err 'Playlist directory is indeterminable.' 3`
+	eval [ -d "$library_path" ] \
+		|| return `err 'Path to music library is indeterminable.' 4`
+	pl="$pl_dir/$cur_pl"
+	mpc save "$cur_pl"  # MPD_HOST must be set in the environment
+	[ -f "$pl" ] || return `err 'Playlist wasn’t saved' 5`
+	[ -w "$dest" ] && {
 		while read filepath; do
-			filepath="${filepath/$mpd_library_path/}"
-			cp -v  "$mpd_library_path/$filepath" "$dest"
-		done < "$playlist"
-	} || echo -e 'Usage:\ncopy_playlist <playlist file> <directory to copy to>'
+			filepath="${filepath/$library_path/}"
+			cp -v  "$library_path/$filepath" "$dest" || {
+				unset got_a_sane_reply
+				until [ -v got_a_sane_reply ]; do
+					read -n1 -p 'Error on copying. Continue? [Y/n] > '; echo
+					case "$REPLY" in
+						y|Y|'') got_a_sane_reply=t;;  # And skip further messages
+						n|N) break 2;;
+						*) echo 'Y or N.';;
+					esac
+				done
+			}
+		done < "$pl"
+		:
+	}|| return `err "Destination dir ‘$dest’ is not writable." 6`
 }
 
 # $1 — filename to fix figure dashes in

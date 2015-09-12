@@ -788,3 +788,35 @@ $ du -sh .git
 Source: http://jedidjah.ch/code/2014/8/28/purge_old_git_history/ 28.08.2014
 EOF
 }
+
+iforgot-audio-mixing() {
+cat <<EOF
+First, you need snd_aloop module from the kernel
+
+Symbol: SND_ALOOP [=y]
+Prompt: Generic loopback driver (PCM)
+  Location:
+    -> Device Drivers
+      -> Sound card support (SOUND [=y])
+        -> Advanced Linux Sound Architecture (SND [=y])
+          -> Generic sound devices (SND_DRIVERS [=y])
+
+Then, you’ll need to create a virtual card for it. See ~/.asoundrc.
+But after activating it, dumb ALSA will probably make the Loopback
+device the first and the default card, so you’ll have to alter
+module options, adding
+    snd_aloop.index=2
+or something to the kernel
+command line. No, altering with ~/.asloftrc won’t help. Dunno, why.
+You can check with
+    mpv --audio-device=help — the sound should be gone
+unless they finally fixed it.
+And finally, you can use the device for recording with a command like
+
+    arecord -D "hw:2,1" -f cd -t wav /tmp/s.wav
+EOF
+}
+
+iforgot-cd-back() {
+	echo -e '\tcd ~-'
+}
