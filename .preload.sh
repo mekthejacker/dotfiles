@@ -12,7 +12,8 @@
 	set -x
 }
 
-export STARTUP=t
+export STARTUP=t WIDTH=800 HEIGHT=600 PRIMARY_OUTPUT \
+	   GNUPG_HOME GPG_TTY PATH XMODIFIERS GTK_IM_MODULE QT_IM_MODULE
 
 # There’s actually no need in this, since in _my_ case I load SCIM after I do
 #   first decrypting operations with GPG, so SCIM won’t interfere with
@@ -63,7 +64,7 @@ n=0
 for ((i=0; i<screen_number; i++)); do
 	 while read outp; do
 		 [ -v PRIMARY_OUTPUT ] && eval export SLAVE_OUTPUT_$((n++))=$outp \
-			 || export PRIMARY_OUTPUT=$outp
+			 || PRIMARY_OUTPUT=$outp
 	 done < <(xrandr --screen $i | sed -nr 's/^(\S+) connected.*/\1/p')
 done
 
@@ -76,7 +77,7 @@ push_the_bar 'Determining width and height of the 1st output'
 # This assumes the first screen listed is the main in use.
 read WIDTH HEIGHT  <<< `xrandr | \
 	sed -nr 's/^\s+([0-9]+)x([0-9]+).*\*.*/\1\n\2/p;T;Q1' && echo -e '800\n600'`
-export WIDTH HEIGHT # often being used in my own scripts later
+WIDTH HEIGHT # often being used in my own scripts later
 [ ${#OUTPUTS} -gt 0 ] && {
 	push_the_bar 'Making sure that we operate on the first monitor'
 	xte "mousemove $(( WIDTH/2 ))  $(( HEIGHT/2 ))"
@@ -131,13 +132,13 @@ push_the_bar 'Loading keyboard settings' 33
 
 [ -v NO_KEYS ] || {
 	push_the_bar 'Checking gpg-agent'
-	export GNUPGHOME=/tmp/decrypted/.gnupg
+	GNUPGHOME=/tmp/decrypted/.gnupg
 	pgrep -u $UID gpg-agent || {
 		push_the_bar 'Starting gpg-agent'
 		eval $(gpg-agent --daemon --use-standard-socket )
 	}
 	push_the_bar 'Exporting gpg-agent data'
-	export GPG_TTY=`tty`
+	GPG_TTY=`tty`
 
 	## Loading SSH keys.
 	## After I found _very strange_ behaviour of gpg-agent I decided to refuse of
@@ -172,13 +173,13 @@ push_the_bar 'Exporting custom ~/bin into PATH' 66
 # In order to have some applications that store data open for everyone
 #   who can boot your PC, there are substitution scripts that decrypt data
 #   from repository and delete them after application is closed.
-export PATH="$HOME/bin:$PATH"
+PATH="$HOME/bin:$PATH"
 
 push_the_bar 'Launching SCIM'
 LANG='en_US.utf-8' scim -d
-export XMODIFIERS=@im=SCIM
-export GTK_IM_MODULE=scim
-export QT_IM_MODULE=scim
+XMODIFIERS=@im=SCIM
+GTK_IM_MODULE=scim
+QT_IM_MODULE=scim
 
 push_the_bar 'Making symlinks for config files'
 ln -sf ~/.config/htop/htoprc.$HOSTNAME ~/.config/htop/htoprc
