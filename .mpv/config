@@ -6,6 +6,7 @@ osc=no
 alang=ja,jpn,en,eng,de,deu,ru,rus
 ## redraw subs at seeking
 demuxer-mkv-subtitle-preroll=yes
+force-window=yes
 ## precise seeking helps Zehkul’s script
 hr-seek-demuxer-offset=5
 ## Suppress status line messages.
@@ -37,6 +38,7 @@ cursor-autohide=0
 cursor-autohide-fs-only=yes
 ## Too many unnecessary files. Enabled in wa alias in ~/bashrc/home.sh
 #save-position-on-quit=yes
+input-unix-socket=~/.mpv/socket
 
 [hdmi]
 profile-desc="For output on big plasma"

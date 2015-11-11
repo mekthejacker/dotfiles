@@ -60,7 +60,7 @@
 	alias arx="pushd /home/Games/Arx\ Fatalis/ ; ./arx -u/home/Games/Arx\ Fatalis/; popd"
 	alias audiosurf="pushd /home/games/audioslurp && wine Launcher.exe && popd"
 	alias banished="pushd /home/games/Banished; wine64 Banished.exe; popd"
-	alias hegemony="wine /home/games/Hegemony\ Gold\ -\ Wars\ of\ Ancient\ Greece/Hegemony\ Gold.exe"
+	alias hegemony="pushd /home/games/hegemony; wine Hegemony\ Gold.exe; popd"
 	alias hitman="pushd /home/sszb/.wine/drive_c/Games/Hitman_Blood_money; wine HitmanBloodMoney.exe; popd"
 	alias hl2-cm="pushd /home/games/steam/SteamApps/common/CM2013/; wine Launcher_EP0.EXE; popd;"
 	alias hl2-ep1-cm="pushd /home/games/steam/SteamApps/common/CM2013/; wine Launcher_EP1.EXE; popd"
@@ -68,7 +68,7 @@
 	alias hl2-cm-conf="pushd /home/games/steam/SteamApps/common/CM2013/; wine Configurator.EXE; popd"
 	alias il2="pushd /home/games/IL2; wine il2fb.exe; popd"
 	alias minimetro="$HOME/assembling/minimetro/MiniMetro*x86_64"
-	alias steam="taskset -c 1-3 steam"
+	alias s="taskset -c 1-3 steam"
 	alias teamviewer="pushd /home/soft_win/teamviewer_8_portable; wine TeamViewer.exe; popd"
 	alias zeus="pushd /home/games/Poseidon; wine Zeus.exe; popd"
 
@@ -121,13 +121,27 @@
 				&& echo -e "$w---] [${g}OK${w}]$s" \
 				|| echo -e "$w---] [${r}FAIL${w}]$s"
 		done
-		echo -en "\n${w}---] Setting emulated virtual desktop size to "
-		echo -e "${WIDTH}x${HEIGHT}${s}." # defined in ~/.preload.sh
+		# WIDTH, HEIGHT and DPI are set in ~/preload.sh
+		echo -en "\n${w}---] Setting emulated virtual desktop size to ${WIDTH}x${HEIGHT}${s}."
 		cat <<EOF >/tmp/vd.reg
 ÿþWindows Registry Editor Version 5.00
 
 [HKEY_CURRENT_USER\Software\Wine\Explorer\Desktops]
 "Default"="${WIDTH}x${HEIGHT}"
+EOF
+		chmod 644 /tmp/vd.reg
+		sudo -u sszb -H /usr/bin/regedit /tmp/vd.reg \
+			&& echo -e "$w---] [${g}OK${w}]$s" \
+			|| echo -e "$w---] [${r}FAIL${w}]$s"
+		rm /tmp/vd.reg
+
+		echo -en "\n${w}---] Setting display DPI to actual value of $DPI."
+		hex_dpi=`printf "%08x\n" $DPI`
+		cat <<EOF >/tmp/vd.reg
+ÿþWindows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\System\CurrentControlSet\Hardware Profiles\Current\Software\Fonts]
+"LogPixels"=dword:$hex_dpi
 EOF
 		chmod 644 /tmp/vd.reg
 		sudo -u sszb -H /usr/bin/regedit /tmp/vd.reg \

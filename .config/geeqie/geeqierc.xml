@@ -30,7 +30,7 @@
             file_ops.enable_in_place_rename = "true" 
             file_ops.confirm_delete = "false" 
             file_ops.enable_delete_key = "true" 
-            file_ops.safe_delete_enable = "false" 
+            file_ops.safe_delete_enable = "true" 
             file_ops.safe_delete_path = "/home/dtr/.local/share/Trash/files" 
             file_ops.safe_delete_folder_maxsize = "128" 
             properties.tabs_order = "" 
@@ -52,7 +52,7 @@
             image.exif_rotate_enable = "true" 
             image.use_custom_border_color = "true" 
             image.use_custom_border_color_in_fullscreen = "true" 
-            image.border_color = "#EAEAEAEAEAEA" 
+            image.border_color = "#000000000000" 
             image.use_clutter_renderer = "false" 
             thumbnails.max_width = "128" 
             thumbnails.max_height = "128" 
@@ -253,7 +253,7 @@
         show_thumbnails = "true" 
         show_directory_date = "false" 
         home_path = "/home/picts/watched" 
-        last_path = "/home/picts/screens/hyouka" 
+        last_path = "/home/dtr/picts/screens/love lab" 
         startup_path = "1" 
         exit_on_close = "false" 
 
@@ -262,8 +262,8 @@
         main_window.w = "1600" 
         main_window.h = "878" 
         main_window.maximized = "false" 
-        main_window.hdivider_pos = "1375" 
-        main_window.vdivider_pos = "541" 
+        main_window.hdivider_pos = "1324" 
+        main_window.vdivider_pos = "552" 
 
         float_window.x = "22" 
         float_window.y = "0" 
@@ -282,7 +282,7 @@
         image_overlay.state = "0" 
         image_overlay.histogram_channel = "3" 
         image_overlay.histogram_mode = "1" >
-        <bar_sort enabled = "true" mode = "0" action = "0" selection = "0" filter_key = "" />
+        <bar_sort enabled = "false" mode = "0" action = "0" selection = "0" filter_key = "" />
         <bar enabled = "false" width = "250" >
             <clear/>
             <pane_histogram id = "histogram" title = "Linear Histogram on RGB" expanded = "true" histogram_channel = "4" histogram_mode = "0" />

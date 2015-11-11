@@ -67,9 +67,10 @@ isinrepo() {
 # For me, it’s easier to see new changes on a local setup.
 [ "${MANPATH//*watch.sh*/}" ] \
 	&& export MANPATH="$HOME/.watch.sh/:$MANPATH"
-# Enabling bash-completion for my aliases
+# Enabling bash-completion for my functions
+. /usr/share/bash-completion/completions/watchsh
 complete -F _watchsh wa-a wa-f wa-s wap-a wap-f wap-s
-#
+
 wa() {
 	# clb6x10 is installed separately, see the man page
 	#   man -P "less -p '^.*Using a custom'" watch.sh
@@ -92,7 +93,7 @@ wa-m() { wa -d /home/video/vekmnabkmvs "$@"; }
 wap() {
 	local variant=$1; shift
 	xrandr --output HDMI-0 --mode 1920x1080 --right-of DVI-I-0
-	wa-$variant -m "--x11-name big_screen --profile=hdmi" $@ # --ionice-opts 
+	wa-$variant -m "--x11-name big_screen --profile=hdmi" $@ # --ionice-opts
     xrandr --output HDMI-0 --off
 	# Switch back from the workspace bound to the output with plasma
 	i3-msg workspace 0:Main
@@ -113,10 +114,15 @@ alias sync_external_hdd="sudo /root/scripts/manual_sync.sh rescue all"
 alias detach_hdd="sudo /etc/udev/rules.d/rescue_mount.sh sud" # sync-umount-detach
 
 
+# SPICE:
+# Shift + F11 — fullscreen/windowed
+# Shift + F12 — release mouse
+#
 # C-M-1 — VM window # Not F1, 1!
 # C-M-2 — VM console
 # from virt-X to virt-TTY: ‘sendkey ctrl-alt-f1’ in the VM console
 # from virt-TTY to virt-X: ‘chvt 7’ in the VM window
+#
 # To connect to a vm running spice-vdagent:
 #   $ spicec -h 127.0.0.1 -p 5900
 # Default bridged network connection
@@ -127,8 +133,7 @@ alias detach_hdd="sudo /etc/udev/rules.d/rescue_mount.sh sud" # sync-umount-deta
 # (QEMU) change ide0-cd ~/path/to/iso.iso
 alias qemu-graphic="qemu-system-x86_64 -daemonize -enable-kvm \
 	-cpu host \
-	-boot order=dc \
-	-no-frame -no-quit " # -sdl
+	-boot order=dc " # -no-frame -no-quit -sdl # All three together
 
 alias qemu-nographic="qemu-system-x86_64  -enable-kvm \
 	-cpu host \
@@ -170,29 +175,50 @@ alias vm-fq='~/bin/qemu-shell/qmp-shell ~/qmp-sock-vmfeedawra'
 # ,if=virtio
 #-drive file=$HOME/fake.qcow2,if=virtio \
 #-drive file=/home/soft_win/virtio-win-0.1-81.iso,media=cdrom,index=1 \
-alias vm-w="qemu-graphic	-smp 1,cores=1,threads=1 -m 1024 \
+alias vm-w="qemu-graphic	-smp 1,cores=2,threads=1 -m 1512 -drive file=/home/dtr/desktop/virtio-win-0.1.102.iso,media=cdrom,index=1 \
 	-vga qxl -spice addr=192.168.0.1,port=5903,disable-ticketing \
 	-qmp unix:$HOME/qmp-sock-shindaws,server,nowait \
 	-name 'Win_XP,process=vm-winxp' -rtc base=localtime -usbdevice tablet \
 	-drive file=$HOME/vm_winxp.img,if=ide \
--net nic,model=virtio -net user "
+	-netdev vde,id=mynet,sock=/tmp/vde.ctl \
+		-device virtio-net-pci,netdev=mynet"
 
-#-netdev user,id=network0 -device e1000,netdev=network0"
-## -netdev user,id=mynet0 \
-## -device virtio-net,netdev=mynet0"
-	# -netdev vde,id=taputapu,sock=/tmp/vde.ctl \
-	# 	-device virtio-net-pci,netdev=taputapu,mac=11:11:11:11:11:11"
-#-net vde,vlan=0 -net nic,vlan=0,macaddr=52:54:00:00:EE:02
-alias vm-wc='spicec -h 192.168.0.1 -p 5903 -t QEMU_WinXP'
+## VDE switch
+## + VM is a true part of local network.
+## + VM uses LAN samba server with as many shares as you want.
+#	-netdev vde,id=taputapu,sock=/tmp/vde.ctl \
+#		-device virtio-net-pci,netdev=taputapu,mac=FE:ED:DF:EE:DA:FE"
+
+## User networking (SLIRP)
+## samba share is accessible via \\10.0.2.4\qemu
+#    -netdev user,id=mynet0,smb=/home/dtr/desktop,smbserver=10.0.2.4 \
+#        -device virtio-net,netdev=mynet0"
+
+alias vm-wc='spicec -h 192.168.0.1 -p 5903 -t QEMU_WinXP____Shift_F11'
 alias vm-wq='~/bin/qemu-shell/qmp-shell ~/qmp-sock-shindaws'
 
 
 at-msg() {
+	local when msg
 	read -p "Examples: ‘+10 mins’, ‘19:30’."$'\n'"When? > " when
 	read -p "Text message: > " msg
 	date --date="$when" +"%H:%M" >/dev/null || return 4
 
-	at "`date --date="$when" +"%H:%M"`" <<<"DISPLAY=$DISPLAY Xdialog --msgbox \"\n   $msg   \n\" 200x100"
+	at "`date --date="$when" +"%H:%M"`" \
+	     <<<"mpc |& sed -n '2s/playing//;T;Q1' || {
+	             mpc pause                     >/dev/null
+	             echo '{ \"command\": [\"set_property\", \"pause\", true] }' | socat - ~/.mpv/socket
+	             echo '{ \"command\": [\"set_property\", \"fullscreen\", false] }' | socat - ~/.mpv/socket
+	             aplay ~/.env/Tutturuu_v2.wav  >/dev/null
+	             mpc play                      >/dev/null
+	         }
+	         DISPLAY=$DISPLAY Xdialog --msgbox \"\n   $msg   \n\" 200x100"
+	# Should add exit fullscreen command for mpv.
+	# See JSON IPC for mpv.
+	# 1. find an mpv instance (by WM_CLASS? or from the list of X windows? i3 workspace windows?)
+	# 2. find whether the current mpv instance is in fullscreen mode
+	# 3. if it is, then send a command to socket to exit fullscreen.
+	# For #3 to work IPC socket path should be added to the mpv config.
 }
 
 # DESCRIPTION:
@@ -307,3 +333,27 @@ gpg-enc() {
 
 # Check unicode symbols
 chu() { echo -n "$@" | uniname; }
+
+arecord-mixed() {
+	set -x
+	sudo /sbin/modprobe snd_aloop
+	# Applications which sound is to be recorded may need to be restarted.
+	cp ~/.asoundrc.mix ~/.asoundrc
+	# 2 is the number of the Loopback card.
+	arecord -D "hw:2,1" -f cd -t wav /tmp/s.wav
+	rm  ~/.asoundrc
+	sudo /sbin/modprobe -r snd_aloop
+	set +x
+}
+
+# DESCRIPTION
+#    Records sound from microphone and converts it to mp3
+rec() {
+	local ts
+	ts=`date +%s`
+	arecord -f cd -t wav /tmp/$ts.wav
+	ffmpeg -i /tmp/$ts.wav -codec:a libmp3lame -qscale:a 0 /tmp/$ts.mp3
+	echo -n /tmp/$ts.mp3 | xclip
+}
+
+fpic() { find ~/picts -iname "*$@*"; }

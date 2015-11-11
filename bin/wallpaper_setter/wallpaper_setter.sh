@@ -29,11 +29,9 @@
 # - Xdialog (required only for GUI directory choosing dialog andinfo window).
 # Tested with GNU bash-4.2.45, GNU sed-4.2.1 and GNU grep-2.14.
 
-#set -x
-
 str="$@"
 if [ -v D -a ! -z "$str" ]; then
-	[ "${str//*-B*/}" ] && {
+	[ "${str//*-S*/}" ] && {
 		# client
 		LOGFILE="$HOME/wallpaper_client.log"
 	}||{
@@ -46,10 +44,10 @@ cat <<"EOF"
 Usage:
 
 Starting daemon:
-./wallpaper_setter.sh [-qUBls] [-e command] -d directory
+./wallpaper_setter.sh -S [-qUBls] -d directory
 
 Sending commands to daemon:
-./wallpaper_setter.sh [-q] [-e command] -b|-i|-k|-m|-[f]n|-p|
+./wallpaper_setter.sh [-q] -b|-i|-k|-m|-[f]n|-p|
                       -r|-R directory|-u|w
 
 To get information:
@@ -63,17 +61,6 @@ Parameters:
 -B amount      Initial brightness value to be used when setting the next
                wallpaper.
 -d directory   A directory where wallpapers stored.
--e command     Output error messages through this ‘command’.
-               Since this script is supposed to run in background, there should
-               be some utility interacting with your GUI so you could be aware
-               of what’s going on, if something went wrong. It better should be
-               the first parameter specified.
-               %m and %a within the ‘command’ will be substituted with the
-               actual message and shell code to restart this script, e.g.
-                 -e "i3-nagbar -m \"%m\" -b 'Restart' \"%a\""
-               will be executed as
-                 i3-nagbar -m "A message" -b 'Restart' \
-                   "/…/…/wallpaper.sh \"with\" \"all\" \"its\" \"parameters\" &"
 -f             Force action. At current state using this key in addition
                to ‘-n’ will cancel the effect of ‘-k’ and set a new wallpaper.
 -h             Show this help.
@@ -90,6 +77,8 @@ Parameters:
                and tile.
 -n             Change to the next (random) wallpaper.
 -p             Move back to the previous wallpaper in the history.
+-q             Be quiet. No output will be done, so it’s safe to use in a cron
+               job.
 -r             Restrict to subdirectory. Calls GUI interface with a list
                of subdirectories to pick. After selection wallpapers will be
                taken only from selected directory (and its subdirectories).
@@ -97,15 +86,16 @@ Parameters:
                from the new directory. This option implies ‘-u’.
 -R directory   CLI version of the above. Instead of calling GUI, sets
                restriction to the directory passed as argument.
--q             Be quiet. No output will be done, so it’s safe to use in a cron
-               job.
 -s             Scale images that are smaller than screen to fill it (saving
                proportions), instead of placing them in center in scale 1:1.
+-S             Start as server.
 -u             Update the internal list of files in the directory it currently
                looks for wallpapers.
 -v             Print version and legal information.
 -w             Redraw current wallpaper. Useful in autostart script if this
                script is left hanging in the background for some reason.
+-z directory   Refresh symbolic link to the current wallpaper in the directory
+               on changing. And if it doesn’t exist, create one.
 
 The order of keys is important!
 Report bugs to https://github.com/deterenkelt/dotfiles/issues
@@ -175,7 +165,7 @@ EOF
 	return 4
 }
 
-VERSION=20140829
+VERSION=20151104
 
 set -f # Don’t mess with my asterisks, dumb bash!
 shopt -s extglob
@@ -202,18 +192,25 @@ exec {txpipe_fd}<>$txpipe
 
 # $1 – Error message
 ermes() {
-	[ -v BE_QUIET ] || {
-		which ${ERR_CMD%% *} &>/dev/null \
-			&& eval exec `echo "$ERR_CMD" | sed -r "s~([^\])%m~\1${0//\//\\/}: ${1//\//\\/}~"` \
-			|| echo -e "Couldn’t call ‘${ERR_CMD%% *}’.\nError message: $1" >&2
-	}
+#	which ${ERR_CMD%% *} &>/dev/null \
+	#		&& eval exec `echo "$ERR_CMD" | sed -r "s~([^\])%m~\1${0//\//\\/}: ${1//\//\\/}~"` \
+	[ -v BE_QUIET ] || notify-send -a Restart:'' 'wallpaper_setter.sh' "$1"
+	echo -e "Error: $1." >&2
 }
 
 # $1 – Command to send to the script in background
 send_command() {
 	[ -v LOGFILE ] && set -x && exec &>$LOGFILE
-	local command=$1
-	local try=0
+	local command try partial_success success
+	command=$1
+	try=0
+	# while there are more than 1 clients hanging wait for them to finish.
+	# It’s to prevent from simultaneous writing to the rxpipe
+	while [ "`pgrep -cf "wallpaper_setter.sh\s+-[^S]"`" -gt 1 ] \
+			  && \
+			  [ "`ps -o pid= --sort=lstart -$(pgrep -f "wallpaper_setter.sh\s+-[^S]") | head -n1`" != $$ ]; do
+		sleep 15
+	done
 	until [ -v partial_success ]; do
 		# Add timestamp as 1st field? Commands may pile up.
 		# Add directive to flush buffer on the server side?
@@ -221,17 +218,17 @@ send_command() {
 		# echo $stamp $command > $rxpipe
 		echo $command > $rxpipe
 		read -t 15 -u $txpipe_fd
-		[ "$REPLY" = "ACK $command" ] && local partial_success=t
+		[ "$REPLY" = "ACK $command" ] && partial_success=t
 		# If not successful, maybe flush tx pipe?
 		[ $((++try)) -eq 3 ] && [ ! -v partial_success ] && {
 			ermes "$0: Command ‘$command’ wasn’t accepted."
 			return 7
 		}
 	done
-	local try=0
+	try=0
 	until [ -v success ]; do
-		read -t 15 -u $txpipe_fd
-		[ "$REPLY" = "DONE $command" ] && local success=t
+		read -t 9999 -u $txpipe_fd
+		[ "$REPLY" = "DONE $command" ] && success=t
 		# If not successful, maybe flush tx pipe?
 		[ $((++try)) -eq 3 ] && [ ! -v success ] && {
 			ermes "$0: Command ‘$command’ couldn’t complete."
@@ -244,10 +241,9 @@ send_command() {
 
 COLLECTION_FILE="$HOME/.wallpaper_setter/collection"
 
-while getopts ':b:B:d:e:fhHikl:mnprR:qsuvw' option; do
+while getopts ':b:B:d:e:fhHikl:mnNpqrR:Sqsuvw' option; do
 	case $option in
 		b)
-			as_client=t
 			[[ "$OPTARG" =~ ^[-+]?[0-9]\.?[0-9]?$ ]] || {
 				ermes "‘-b’: incorrect value for brightness: ‘$OPTARG’."
 				exit 8
@@ -296,7 +292,6 @@ while getopts ':b:B:d:e:fhHikl:mnprR:qsuvw' option; do
 			         sed -r "s/%a/${0//\//\\\/} ${params} \&/g"`
 			;;
 		f)
-			as_client=t
 			FORCE_COMMANDS=t
 			;;
 		h)
@@ -308,11 +303,9 @@ while getopts ':b:B:d:e:fhHikl:mnprR:qsuvw' option; do
 			exit 0
 			;;
 		i)
-			as_client=t
 			send_command 'show_current_image_path' || exit $?
 			;;
 		k)
-			as_client=t
 			send_command 'keep_current_wallpaper' || exit $?
 			;;
 		l)
@@ -322,11 +315,9 @@ while getopts ':b:B:d:e:fhHikl:mnprR:qsuvw' option; do
 			}
 			;;
 		m)
-			as_client=t
 			send_command 'change_fill_mode' || exit $?
 			;;
 		n)
-			as_client=t
 			[ -v BE_QUIET ] && {
 				send_command 'next_command_be_quiet' || exit $?
 			}
@@ -337,7 +328,6 @@ while getopts ':b:B:d:e:fhHikl:mnprR:qsuvw' option; do
 			fi
 			;;
 		p)
-			as_client=t
 			send_command 'previous_wallpaper' || exit $?
 			;;
 		q)
@@ -345,11 +335,9 @@ while getopts ':b:B:d:e:fhHikl:mnprR:qsuvw' option; do
 			[ -v LOGFILE ] || exec >/dev/null 2>&1
 			;;
 		r)
-			as_client=t
 			send_command 'restrict_to_directory' || exit $?
 			;;
 		R)
-			as_client=t
 			[ -d "$OPTARG" ] || {
 				ermes "No such directory: ‘$OPTARG’."
 				exit 13
@@ -359,8 +347,10 @@ while getopts ':b:B:d:e:fhHikl:mnprR:qsuvw' option; do
 		s)
 			SCALE_DONT_CENTER=t
 			;;
+		S)
+			SERVER=t
+			;;
 		u)
-			as_client=t
 			send_command 'update_list' || exit $?
 			;;
 		v)
@@ -368,8 +358,16 @@ while getopts ':b:B:d:e:fhHikl:mnprR:qsuvw' option; do
 			exit 0
 			;;
 		w)
-			as_client=t
 			send_command 'redraw_wallpaper' || exit $?
+			;;
+		z)
+			[ -d "$OPTARG" ] && LINK_DIR="$OPTARG" || {
+				ermes "-z option requires a directory as an argument."
+				exit 38
+			}
+			;;
+		N) # FOR TEST PURPOSES ONLY
+			send_command 'hang_forever' || exit $?
 			;;
 		\?)
 			ermes "Invalid option: ‘-$OPTARG’."
@@ -382,13 +380,12 @@ while getopts ':b:B:d:e:fhHikl:mnprR:qsuvw' option; do
 	esac
 done
 
-# I wanted client to accept multiple commands at once, e.g. -fnk
+# I wanted the client to accept multiple commands at once, e.g. -fnk
 # This is what this variable is needed for — to be sure script will exit before
-#   it will start a server. It IS needed for the case cycle to process all
-#   flags passed.
-[ -v as_client ] && exit 0
+#   it will start a server.
+[ -v SERVER ] || exit 0
 
-# If the execution went till here, it means we’re running in the background.
+# If the execution went here, it means we’re running in the background.
 #   Only -d, -e, -s and -l options may be set
 [ -v WALLPAPER_DIR ] && cd "$WALLPAPER_DIR" || {
 	show_usage
@@ -584,6 +581,7 @@ next_wallpaper() {
 				let c_index--
 			}
 			hsetroot $fillmode "$image" $brightness
+			[ -v LINK_DIR ] && ln -sf "$image" "$LINK_DIR/"
 		}
 	fi
 	return 0
@@ -701,7 +699,7 @@ while read -u $rxpipe_fd; do
 		keep_current_wallpaper)
 			echo "ACK $REPLY" > $txpipe
 			KEEP_CURRENT_WALLPAPER=t
-			notify-send -t2 "" "Keeping current wallpaper."
+			[ -v BE_QUIET ] || notify-send -t2 "" "Keeping current wallpaper."
 			echo "DONE $REPLY" > $txpipe
 			;;
 		next_command_be_quiet)
@@ -713,7 +711,7 @@ while read -u $rxpipe_fd; do
 			echo "ACK $REPLY" > $txpipe
 			if [ -v KEEP_CURRENT_WALLPAPER ]; then
 				ermes "Keeping current wallpaper. Call with -f to force change."
-				[ -v BE_QUIET ] && echo "DONE $REPLY" > $txpipe
+				echo "DONE $REPLY" > $txpipe
 			else
 				next_wallpaper && echo "DONE $REPLY" > $txpipe
 			fi
@@ -744,6 +742,10 @@ while read -u $rxpipe_fd; do
 			echo "ACK $REPLY" > $txpipe
 			hsetroot $fillmode "$image" $brightness \
 				&& echo "DONE $REPLY" > $txpipe
+			;;
+		hang_forever) # for test purposes
+			echo "ACK $REPLY" > $txpipe
+			while true; do sleep 1; done
 			;;
 		*)
 			if grep -qE "^restrict_to_directory\s.+$" <<< "$REPLY"; then

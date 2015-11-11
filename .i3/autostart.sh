@@ -55,11 +55,12 @@ sudo /usr/bin/killall iftop
 pgrep urxvtd || urxvtd -q -o -f
 tmux="tmux -u -f $HOME/.tmux/config -S $HOME/.tmux/socket"
 if pgrep -u $UID -f '^tmux.*$' &>/dev/null; then
-	[ "$1" = stop_after_main_workspace ] && {
+	[ "$1" = stop_after_main_workspace ] || {
 		for pane in `$tmux list-windows -t0 | sed -r 's/^([0-9]+):.*/\1/g'`; do
 			$tmux send -t 0:$pane C-c
 			$tmux send -t 0:$pane export\ DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS" ENTER
 			$tmux send -t 0:$pane export\ DISPLAY="$DISPLAY" ENTER
+			$tmux send -t 0:$pane C-c
 		done
 	}
 else
@@ -96,9 +97,8 @@ case $HOSTNAME in
 		startup_apps=()
 		;;
 	*)
-		pgrep -u $UID -f "^bash $HOME/bin/wallpaper_setter/walpaper_setter.sh -B" \
-			|| { ~/bin/wallpaper_setter/wallpaper_setter.sh -B -0.3 \
-			   -e "i3-nagbar -m \"%m\" -b Restart \"%a\"" \
+		pgrep -u $UID -f "^bash $HOME/bin/wallpaper_setter/wallpaper_setter.sh -S" \
+			|| { ~/bin/wallpaper_setter/wallpaper_setter.sh -S -B -0.3 \
 			   -d /home/picts/screens & }
 		# Urxvtc windows must appear after wallpaper is set, due to their
 		#   fake transparency.
@@ -215,6 +215,8 @@ case $HOSTNAME in
 esac
 pointer_control enable
 
+
+[ $DISPLAY = 108 ] && exit  # quit if it’s a Xephyr window
 
 # Some configs decrypted at ~/bin/run_app.sh
 for app in "${startup_apps[@]}" mpd thunar geeqie gimp redshift; do

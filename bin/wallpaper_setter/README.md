@@ -126,6 +126,8 @@ will be executed as
 
 `-w` Redraw current wallpaper. Useful in autostart script if this script is left hanging in the background for some reason.
 
+`-z directory` Make a symbolic link to the current wallpaper in the specified directory on wallpaper change.
+
 ##### Notes
 
 - The order of keys is important!

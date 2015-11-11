@@ -153,10 +153,9 @@ bindcode $mod+75 exec --no-startup-id eval mpc prev
 ## F10
 bindcode $mod+76 exec --no-startup-id eval mpc next
 ## F11
-bindcode $mod+95 exec --no-startup-id eject
-bindcode $mod+Shift+95 exec --no-startup-id eject -t
+bindcode $mod+95 exec --no-startup-id eval mpc random
 ## F12
-#bindcode $mod+96 exec --no-startup-id /bin/bash -c ""
+bindcode $mod+96 exec --no-startup-id eval mpc single
 
 ## g     Restrict wallpapers to subdirectory
 bindcode $mod+42 exec --no-startup-id "~/bin/wallpaper_setter/wallpaper_setter.sh -r"
@@ -251,6 +250,7 @@ assign [class="Steam"] → "7:Games"
 assign [class="hl2_linux"] → "7:Games"
 assign [class="[tT]rine*"] → "7:Games"
 assign [class="StarConflict"] → "7:Games"
+assign [class="dota2"] → "7:Games"
 assign [class="Gimp"] → "8:GIMP"
 assign [class="URxvt" instance="ncmpcpp"] → "9:MPD"
 assign [class="mpv" instance="big_screen"] → "10:Outer_space"
@@ -259,8 +259,11 @@ assign [class="mpv" instance="big_screen"] → "10:Outer_space"
 for_window [class="URxvt" instance="one_command_shell"] floating enable
 for_window [class="spicec"] floating disable
 for_window [class="Xdialog"] floating enable
+for_window [class="at_msg"] floating enable
+for_window [instance=at_msg] sticky enable
 for_window [class="Yad"] floating enable
 for_window [class="Convert Script"] floating enable
+
 
 
 ## This executes every reload

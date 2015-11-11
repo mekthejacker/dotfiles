@@ -28,8 +28,8 @@ unset -f `sed -nr "s/^\s*([-_a-zA-Z0-9]+)\(\)\s*\{.*$/\1/p" \
 # a    ~/.i3/autostart.sh  autostart
 # r    ~/bin/run_app.sh    runapp_<app_name>
 # q    ~/.i3/on_quit.sh    on_quit
-# -    prevents the variable to be empty
-export ENV_DEBUG=-paq
+# -    prevents the variable from being empty
+export ENV_DEBUG=-paiq
 for opt in autocd cdspell dirspell dotglob extglob globstar \
     no_empty_cmd_completion; do
     shopt -s $opt
@@ -39,11 +39,6 @@ done
 #    eselect bashcomp enable $completion_module &>/dev/null
 #done
 unset opt #completion_module
-# man bash says that non-login shells do not source /etc/profile and
-#   ~/.bash_profile. My shells are non-login, however, they have PATH set
-#   and they source ~/.bash_profile (which is sourcing this file
-#   in its turn). A miracle.
-. /etc/bash/bashrc.d/bash_completion.sh
 
 # Testing ur PAM
 #ulimit -S -n 8192

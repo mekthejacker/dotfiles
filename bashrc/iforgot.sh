@@ -4,17 +4,23 @@
 
 # <<EOF expands heredoc, <<"EOF" leaves it as is.
 
+# DESCRIPTION
+#     Shows…
+# TAKES
+#     $@
 iforgot() {
 	local keywords="$@"
 	[ "$keywords" ] || {
 		read -p 'What have you forgot, darling? > '
 		local keywords="$REPLY"
 		echo "Thanks, also you can use parameters to this function, like"
-		echo -e "\tiforgot <what>"
+		echo -e "\tiforgot <something> <also this>"
 	}
-	for keyword in $keywords; do
-		declare -F | sed -nr 's/^declare -f (iforgot-.*'$keyword'.*)/\1/p'
-	done
+#	for keyword in $keywords; do
+#		.*${keywords// /.*}
+#		func_list="`declare -F | sed -nr 's/^declare -f (iforgot-.*'$keyword'.*)/\1/p'`"
+#	done
+#	echo -n `$func` | xclip
 }
 
 iforgot-restart-daemons-from-the-runlevel-i-am-in() {
@@ -360,6 +366,8 @@ cat <<"EOF"
 
  ´ ▽ ` )ﾉ  (・∀・ )  (ΘεΘ;)  ╮(─▽─)╭  (≧ω≦)  (´ヘ｀;)  (╯3╰)  (⊙_◎)  (¬▂¬)
 
+(つд⊂)
+
 ( ^▽^)σ)~O~)
 
 キタ━━━(゜∀゜)━━━!!!!!   ‘It’s here’, Kitaa!, a general expression
@@ -614,12 +622,12 @@ iforgot-mpv-crunchyroll-streaming() {
 iforgot-audio-recording() {
 cat <<EOF
 Record:
-	arecord -f cd -t wav `date +s`.wav
+	arecord -f cd -t wav s.wav
 
 Conversion to MP3 VBR
-     ffmpeg -i 19122014.wav -codec:a libmp3lame -qscale:a 9 output.mp3
+     ffmpeg -i s.wav -codec:a libmp3lame -qscale:a 0 `date`.mp3
                                                           ^
-                                                      lame quality
+                                                      fine quality
 
  lame    Avg    b/rate range  ffmpeg
 option  kbit/s     kbit/s     option
@@ -820,3 +828,31 @@ EOF
 iforgot-cd-back() {
 	echo -e '\tcd ~-'
 }
+
+iforgot-hex-to-dec-conversion() {
+cat<<"EOF"
+From hex to dec:
+    $ echo $(( 16#FF ))
+    255
+    $ echo "ibase=16; FFF" | bc  # NB the upper case
+    4095
+    $ printf "%d\n" 0xA  # NB 0x
+    10
+
+From dec to hex:
+    $ echo "obase=16; 10" | bc
+    A
+    $ printf "%x\n" 11
+    b
+
+Pad the number, that must be 5 digit long with zeroes:
+    $ printf "%05x\n" 91
+    0005b
+
+For printf use ‘x’ to print abcdef and ‘X’ for ABCDEF.
+EOF
+	# bc and printf examples are taken from here:
+	# http://www.cyberciti.biz/faq/linux-unix-convert-hex-to-decimal-number/
+}
+
+iforgot-nested-x() { echo -e '\tXephyr :108 -resizeable &'; }

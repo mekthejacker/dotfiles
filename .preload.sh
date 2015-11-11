@@ -12,7 +12,7 @@
 	set -x
 }
 
-export STARTUP=t WIDTH=800 HEIGHT=600 PRIMARY_OUTPUT \
+export STARTUP=t WIDTH=800 HEIGHT=600 DPI=96 PRIMARY_OUTPUT \
 	   GNUPG_HOME GPG_TTY PATH XMODIFIERS GTK_IM_MODULE QT_IM_MODULE
 
 # There’s actually no need in this, since in _my_ case I load SCIM after I do
@@ -73,11 +73,12 @@ done
 #   with huge screen spread onto two monitors.
 ~/.i3/update_config.sh
 
-push_the_bar 'Determining width and height of the 1st output'
-# This assumes the first screen listed is the main in use.
-read WIDTH HEIGHT  <<< `xrandr | \
-	sed -nr 's/^\s+([0-9]+)x([0-9]+).*\*.*/\1\n\2/p;T;Q1' && echo -e '800\n600'`
-WIDTH HEIGHT # often being used in my own scripts later
+push_the_bar 'Determining width, height and dpi of the 1st output'
+# These vars often used in the scripts later, e.g. in ~/bashrc/wine
+# 211.6 is the width in mm of a display with dpi=96 and screen width equal to 800 px,
+#   i.e. to get the default 96 dpi even if sed couldn’t parse xrandr output.
+read WIDTH HEIGHT width_mm < <(xrandr | sed -rn 's/.*primary ([0-9]+)x([0-9]+).* ([0-9]+)mm x [0-9]+mm.*/\1 \2 \3/p; T; Q1' && echo '800 600 211.6')
+DPI=`echo "scale=2; dpi=$WIDTH/$width_mm*25.4; scale=0; dpi /= 1; print dpi" | bc -q`
 [ ${#OUTPUTS} -gt 0 ] && {
 	push_the_bar 'Making sure that we operate on the first monitor'
 	xte "mousemove $(( WIDTH/2 ))  $(( HEIGHT/2 ))"

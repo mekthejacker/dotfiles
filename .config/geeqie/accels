@@ -32,6 +32,7 @@
 ; (gtk_accel_path "<Actions>/MenuActions/ColorProfile0" "")
 (gtk_accel_path "<Actions>/MenuActions/ConnectZoomFit" "")
 (gtk_accel_path "<Actions>/MenuActions/FolderList" "4")
+; (gtk_accel_path "<Actions>/MenuActionsExternal/gthumb.desktop" "")
 ; (gtk_accel_path "<Actions>/MenuActions/SplitQuad" "")
 ; (gtk_accel_path "<Actions>/MenuActions/SaveMetadata" "<Primary>s")
 (gtk_accel_path "<Actions>/MenuActions/PrevImage" "")

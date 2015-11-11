@@ -36,10 +36,11 @@ if [ -v CREATE_NEW_PLAYLIST -o ${#available_playlists[@]} -eq 0 ]; then
 	                --inputbox 'New playlist name:' 300x100 '.m3u' ) \
 		&& echo "$current_song_path" > "$MPD_PLAYLIST_DIR/$reply"
 else
+	latest_pl=$(ls -t1 "$MPD_PLAYLIST_DIR" | head -n1)
 	reply=$(Xdialog --no-buttons \
 	                --title 'Choose playlist' \
 	                --backtitle "Choose playlist to add ‘${current_song_artist_title##*/}’" \
-	                --fselect "$MPD_PLAYLIST_DIR/" $((WIDTH-200))x$((HEIGHT-100)) 2>&1 ) \
+	                --fselect "$MPD_PLAYLIST_DIR/$latest_pl" $((WIDTH-WIDTH/10))x$((HEIGHT-HEIGHT/10)) 2>&1 ) \
 		&& [ -f "$reply" ] && {
 		grep -qF "$current_song_path" "$reply" || {
 			echo "$current_song_path" >> "$reply"
@@ -48,10 +49,21 @@ else
 	}
 fi
 
-[ -v new_song_added ] && {
-	pkill -HUP ncmpcpp
-	urxvtc -name ncmpcpp -e ncmpcpp
-}
+current_ws=`i3-msg -t get_workspaces | sed -nr 's/.*"([0-9]+:[^"]+)","visible":(true|false),"focused":true.*/\1/p'`
+mpd_ws=`sed -rn 's/^\s*workspace ([0-9]+:MPD).*/\1/p'  ~/.i3/config`
 
 # Taking off urgent hint
-i3-msg "workspace 9:MPD; focus child; workspace back_and_forth"
+# There may be two cases:
+#   1. I just add a random song to playlist while doing some work on another
+#      workspace, which means that ncmpcpp will have an urgent hint that I need
+#      to take off and return to my old workspace.
+#   2. I add a bunch of songs from the current playlist to their own. I am
+#      already at the workspace with MPD and there’s no urgent hint to take off.
+[ "$current_ws" = "$mpd_ws" ] || {
+	# Not sure if this is still needed, cause ncmpcpp updates fast.
+	# [ -v new_song_added ] && {
+	# 	pkill -HUP ncmpcpp
+	# 	urxvtc -name ncmpcpp -e ncmpcpp
+	# }
+	i3-msg "workspace $mpd_ws; focus child; workspace back_and_forth"
+}
