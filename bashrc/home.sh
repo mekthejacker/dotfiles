@@ -1,19 +1,44 @@
+## sourced from ~/.bashrc
+
+
 . iforgot.sh
 . wine.sh
 . vm.sh
 . not4public.sh
+
+
+#
+ #  Common aliases
+#
 
 # Watering plants and sending water meter data.
 # See "schedule" block in ~/.i3/generate_json_for_i3bar.sh
 alias wtr='touch ~/watered'
 alias snt='touch ~/sent'
 alias okiru='rm /tmp/okiru'
-
+# rtorrent
 alias rt="urxvtc -title rtorrent -hold \
                  -e /bin/bash -c 'chmod o+rw `tty` \
                     && sudo -u rtorrent -H tmux -u -S /home/rtorrent/.tmux/socket attach' &"
 alias rtstop='sudo -u rtorrent /usr/bin/pkill -STOP -xf /usr/bin/rtorrent'
 alias rtcont='sudo -u rtorrent /usr/bin/pkill -CONT -xf /usr/bin/rtorrent'
+# Strike the earth!
+alias d='dwarf-fortress'
+alias dt='dwarftherapist'
+alias ddt='/bin/bash -c "dwarf-fortress; i3-msg layout tabbed; sleep 15; dwarftherapist; i3-msg focus left"'
+alias dk="pkill -9f '(Dwarf_Fortress|DwarfTherapist)'"
+alias imgur="~/bin/imgur_upload.sh"
+alias renpy="RENPY_EDIT_PY=~/.renpy/emacs.edit.r.py  renpy"
+# Viruses writers don’t expect that.
+alias firefox='firefox --profile ~/.ff'
+#alias sync_fanetbook="sudo -u git /root/scripts/manual_sync.sh fanetbook all"
+#alias sync_external_hdd="sudo /root/scripts/manual_sync.sh rescue all"
+#alias detach_hdd="sudo /etc/udev/rules.d/rescue_mount.sh sud" # sync-umount-detach
+
+#
+ #  Managing two git repos for ~/, dotfiles is public.
+#
+
 alias dotgit="`which git` --work-tree $HOME --git-dir $HOME/dotfiles.git"
 alias gengit="`which git` --work-tree $HOME --git-dir $HOME/general.git"
 
@@ -53,6 +78,13 @@ git() {
 # TAKES:
 #     $1 — file path under $HOME
 isinrepo() {
+	[ "$*" ] || {
+		cat <<EOF
+Usage: isinrepo $HOME/…/<filename>
+
+EOF
+		return
+	}
 	local found
 	[ "`dotgit ls-files "$1"`" -ef "$1" ] \
 		&& echo Found in dotfiles. && found=t
@@ -60,21 +92,24 @@ isinrepo() {
 		&& echo Found in general. && found=t
 	[ -v found ] || {
 		echo Not found.
-		return 1
+		return 3
 	}
 }
+
+#
+ #  watch.sh block
+#
 
 # For me, it’s easier to see new changes on a local setup.
 [ "${MANPATH//*watch.sh*/}" ] \
 	&& export MANPATH="$HOME/.watch.sh/:$MANPATH"
 # Enabling bash-completion for my functions
 . /usr/share/bash-completion/completions/watchsh
-complete -F _watchsh wa-a wa-f wa-s wap-a wap-f wap-s
+complete -F _watchsh wa-a wa-f wa-s wap-a wap-f wap-s wa-alias
 
 wa() {
-	# clb6x10 is installed separately, see the man page
+	# clb6x10 is installed separately, see the man page for details.
 	#   man -P "less -p '^.*Using a custom'" watch.sh
-	# for details.
 	~/bin/watch.sh \
 		--no-hints -e -m "--fs --save-position-on-quit --profile=$HOSTNAME" \
 		--last-ep --last-ep-command "figlet -t -f $HOME/.fonts/clb6x10 -c" \
@@ -85,48 +120,42 @@ wa() {
 		--screenshot-dir-skel="macro,misc" "$@"
 }
 wa-a() { wa -d /home/video/anime "$@"; }
+# alias wa-alias='wa -d /home/video/anime' ## Redo with aliases? Why did I stick to functions?
 wa-f() { wa -d /home/video/films "$@"; }
 wa-s() { wa -d /home/video/serials "$@"; }
-wa-m() { wa -d /home/video/vekmnabkmvs "$@"; }
+wa-m() { wa -d /home/video/мультипликация "$@"; }
 
-# For output on plasma tv, see also ~/.i3/config.template
+# Output on the plasma. See also ~/.i3/config.template for workspace bindings.
 wap() {
 	local variant=$1; shift
 	xrandr --output HDMI-0 --mode 1920x1080 --right-of DVI-I-0
-	wa-$variant -m "--x11-name big_screen --profile=hdmi" $@ # --ionice-opts
+	wa-$variant -m "--x11-name big_screen --profile=hdmi" $@ # --ionice-opts        ## Maybe because of this?
     xrandr --output HDMI-0 --off
 	# Switch back from the workspace bound to the output with plasma
-	i3-msg workspace 0:Main
+	# i3-msg workspace 0:Main
 }
 alias wap-a="wap a"
 alias wap-f="wap f"
 alias wap-s="wap s"
 alias wap-m="wap m"
 
-
-alias imgur="~/bin/imgur_upload.sh"
-alias renpy="RENPY_EDIT_PY=~/.renpy/emacs.edit.r.py  renpy"
-# Viruses writers don’t expect that.
-alias firefox='firefox --profile ~/.ff'
-
-alias sync_fanetbook="sudo -u git /root/scripts/manual_sync.sh fanetbook all"
-alias sync_external_hdd="sudo /root/scripts/manual_sync.sh rescue all"
-alias detach_hdd="sudo /etc/udev/rules.d/rescue_mount.sh sud" # sync-umount-detach
-
-
-# SPICE:
-# Shift + F11 — fullscreen/windowed
-# Shift + F12 — release mouse
 #
-# C-M-1 — VM window # Not F1, 1!
-# C-M-2 — VM console
-# from virt-X to virt-TTY: ‘sendkey ctrl-alt-f1’ in the VM console
-# from virt-TTY to virt-X: ‘chvt 7’ in the VM window
+ #  QEMU block
+#
+
+# SPICE keys
+#     Shift + F11 — fullscreen/windowed
+#     Shift + F12 — release mouse
+# QEMU keys
+#     C-M-1 — VM window # Not F1, 1!
+#     C-M-2 — VM console
+#     from virt-X to virt-TTY: ‘sendkey ctrl-alt-f1’ in the VM console
+#     from virt-TTY to virt-X: ‘chvt 7’ in the VM window
 #
 # To connect to a vm running spice-vdagent:
-#   $ spicec -h 127.0.0.1 -p 5900
+#     $ spicec -h 127.0.0.1 -p 5900
 # Default bridged network connection
-#	… -netdev user,id=vmnic,hostname=vmdebean -device virtio-net,netdev=vmnic
+#     … -netdev user,id=vmnic,hostname=vmdebean -device virtio-net,netdev=vmnic
 # While no qxl driver for Xorg and spice-vdagent installed, -sdl may be used.
 #alias spicec="spicec --hotkeys 'toggle-fullscreen=shift+f11,release-cursor=shift+f12'"
 # ~/bin/qemu-shell/qmp-shell
@@ -175,7 +204,7 @@ alias vm-fq='~/bin/qemu-shell/qmp-shell ~/qmp-sock-vmfeedawra'
 # ,if=virtio
 #-drive file=$HOME/fake.qcow2,if=virtio \
 #-drive file=/home/soft_win/virtio-win-0.1-81.iso,media=cdrom,index=1 \
-alias vm-w="qemu-graphic	-smp 1,cores=2,threads=1 -m 1512 -drive file=/home/dtr/desktop/virtio-win-0.1.102.iso,media=cdrom,index=1 \
+alias vm-w="qemu-graphic	-smp 1,cores=2,threads=1 -m 1512 -drive file=/home/$ME/desktop/virtio-win-0.1.102.iso,media=cdrom,index=1 \
 	-vga qxl -spice addr=192.168.0.1,port=5903,disable-ticketing \
 	-qmp unix:$HOME/qmp-sock-shindaws,server,nowait \
 	-name 'Win_XP,process=vm-winxp' -rtc base=localtime -usbdevice tablet \
@@ -191,12 +220,15 @@ alias vm-w="qemu-graphic	-smp 1,cores=2,threads=1 -m 1512 -drive file=/home/dtr/
 
 ## User networking (SLIRP)
 ## samba share is accessible via \\10.0.2.4\qemu
-#    -netdev user,id=mynet0,smb=/home/dtr/desktop,smbserver=10.0.2.4 \
+#    -netdev user,id=mynet0,smb=/home/$ME/desktop,smbserver=10.0.2.4 \
 #        -device virtio-net,netdev=mynet0"
 
 alias vm-wc='spicec -h 192.168.0.1 -p 5903 -t QEMU_WinXP____Shift_F11'
 alias vm-wq='~/bin/qemu-shell/qmp-shell ~/qmp-sock-shindaws'
 
+#
+ #  Various funstions making life easier. Kind of an addition to ~/bin.
+#
 
 at-msg() {
 	local when msg
@@ -228,6 +260,12 @@ at-msg() {
 #   $1 — magnet link
 #   $2 — path to resulting .torrent file
 magnet-to-torrent() {
+	[ "$*" ] || {
+		cat <<EOF
+Usage: magnet-to-torrent <magnet link> <new file path>
+EOF
+		return
+	}
 	[[ "$1" =~ xt=urn:btih:([^&/]+) ]] || {
 		echo 'Invalid magnet link!' >&2
 		return 3
@@ -264,19 +302,22 @@ compress-screenshot() {
 }
 
 # Copies current MPD playlist to a specified folder.
-# $1 — where to copy
 copy-playlist() {
 	err() { echo "$1" >&2; echo $2; }  # $1 — message; $2 — return code
-	local dest="$1" cur_pl='current.m3u' pl_dir pl library_path got_a_sane_reply
+	local cur_pl='current.m3u' dest="/run/media/$ME/PHONE_CARD/Sounds/Music/" \
+		  pl_dir pl library_path got_a_sane_reply
 	pl_dir=`sed -nr 's/^\s*playlist_directory\s+"(.+)"\s*$/\1/p' ~/.mpd/mpd.conf`
 	library_path=`sed -nr 's/^\s*music_directory\s+"(.+)"\s*$/\1/p' ~/.mpd/mpd.conf`
 	eval [ -d "$pl_dir" ] \
 		|| return `err 'Playlist directory is indeterminable.' 3`
 	eval [ -d "$library_path" ] \
 		|| return `err 'Path to music library is indeterminable.' 4`
-	pl="$pl_dir/$cur_pl"
+
+	pushd "$pl_dir"
+	rm -f $cur_pl
 	mpc save "$cur_pl"  # MPD_HOST must be set in the environment
-	[ -f "$pl" ] || return `err 'Playlist wasn’t saved' 5`
+
+	[ -f "$cur_pl" ] || return `err 'Playlist wasn’t saved' 5`
 	[ -w "$dest" ] && {
 		while read filepath; do
 			filepath="${filepath/$library_path/}"
@@ -291,9 +332,9 @@ copy-playlist() {
 					esac
 				done
 			}
-		done < "$pl"
-		:
-	}|| return `err "Destination dir ‘$dest’ is not writable." 6`
+		done < "$cur_pl"
+		popd
+	}|| { popd; return `err "Destination dir ‘$dest’ is not writable." 6`; }
 }
 
 # $1 — filename to fix figure dashes in
@@ -332,7 +373,7 @@ gpg-enc() {
 }
 
 # Check unicode symbols
-chu() { echo -n "$@" | uniname; }
+chu() { echo -n "$@" | uniname; }  # from uniutils package
 
 arecord-mixed() {
 	set -x

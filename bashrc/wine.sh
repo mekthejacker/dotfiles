@@ -3,15 +3,19 @@
 	#   but in order for him to be able to show the windows on our X session,
 	#   he must be allowed to do this in the first place.
 	xhost +si:localuser:sszb > /dev/null
-	export WINEDEBUG="-all"
+	export WINEDEBUG="-all" \
+		   WINEARCH \
+		   WINEPREFIX \
+		   __GL_THREADED_OPTIMIZATIONS=1 \
+		   __GL_SYNC_TO_VBLANK=0 \
+		   __GL_YIELD="NOTHING" \
+		   SDL_AUDIODRIVER=alsa
+
 	# In order to get output use
 	#     WINEDEBUG=warn wine …
 	#   or
 	#     WINEDEBUG=warn+all wine …
-	export __GL_THREADED_OPTIMIZATIONS=1 # May be set to 1 if game supports it
-	export __GL_SYNC_TO_VBLANK=0
-	export __GL_YIELD="NOTHING"
-	export SDL_AUDIODRIVER=alsa
+
 
 	# DESCRIPTION
 	#     This is general function to do all the jobs.
@@ -35,7 +39,7 @@
 			regedit)
 				binary='/usr/bin/regedit' ;;
 			*)
-				echo 'I am not supposed to be run as this command.' >&2
+				echo 'I am not supposed to run as this command.' >&2
 				return 3
 		esac
 		WINEARCH=win$arch WINEPREFIX=/home/sszb/.wine${arch//32/} sudo -u sszb -H $binary "$@"
@@ -59,7 +63,7 @@
 	alias alice="pushd /home/games/Alice; cp linux_config config.cfg; wine alice.exe; popd"
 	alias arx="pushd /home/Games/Arx\ Fatalis/ ; ./arx -u/home/Games/Arx\ Fatalis/; popd"
 	alias audiosurf="pushd /home/games/audioslurp && wine Launcher.exe && popd"
-	alias banished="pushd /home/games/Banished; wine64 Banished.exe; popd"
+	alias banished="pushd /home/games/Banished; wine64 Application.exe; popd"
 	alias hegemony="pushd /home/games/hegemony; wine Hegemony\ Gold.exe; popd"
 	alias hitman="pushd /home/sszb/.wine/drive_c/Games/Hitman_Blood_money; wine HitmanBloodMoney.exe; popd"
 	alias hl2-cm="pushd /home/games/steam/SteamApps/common/CM2013/; wine Launcher_EP0.EXE; popd;"
@@ -74,11 +78,14 @@
 
 	wineprefix-setup64() { wineprefix-setup "$@"; }
 
+	#
+	# IT DOESN’T WORK PROPERLY FOR WINE64 YET
+	#
 	# [$1] — '--setoptonly' = quit after setting options
 	wineprefix-setup() {
 		[ ${FUNCNAME[1]} = wineprefix-setup64 ] \
-			&& local WINEARCH=win32 WINEPREFIX=/home/sszb/.wine \
-			|| local WINEARCH=win64 WINEPREFIX=/home/sszb/.wine64
+			&& local WINEARCH=win64 WINEPREFIX=/home/sszb/.wine64 \
+			|| local WINEARCH=win32 WINEPREFIX=/home/sszb/.wine
 		# Maybe some day it will work…
 		# shopt -s expand_aliases
 		local w='\e[00;37m'
@@ -122,7 +129,7 @@
 				|| echo -e "$w---] [${r}FAIL${w}]$s"
 		done
 		# WIDTH, HEIGHT and DPI are set in ~/preload.sh
-		echo -en "\n${w}---] Setting emulated virtual desktop size to ${WIDTH}x${HEIGHT}${s}."
+		echo -e "\n${w}---] Setting emulated virtual desktop size to ${WIDTH}x${HEIGHT}${s}."
 		cat <<EOF >/tmp/vd.reg
 ÿþWindows Registry Editor Version 5.00
 
@@ -135,7 +142,7 @@ EOF
 			|| echo -e "$w---] [${r}FAIL${w}]$s"
 		rm /tmp/vd.reg
 
-		echo -en "\n${w}---] Setting display DPI to actual value of $DPI."
+		echo -e "\n${w}---] Setting display DPI to the actual value of $DPI."
 		hex_dpi=`printf "%08x\n" $DPI`
 		cat <<EOF >/tmp/vd.reg
 ÿþWindows Registry Editor Version 5.00

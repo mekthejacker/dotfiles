@@ -31,8 +31,8 @@ TIMEOUT_MAX=30 # the actual timeout is one second; TIMEOUT_MAX introduces
                # local timeouts, ‘wait_time’ variable.
 SEPARATOR_CHAR='·'  # U+00B7 https://en.wikipedia.org/wiki/Interpunct
 GOOGLE_DNS='8.8.4.4'
-PING_HOST="$GOOGLE_DNS"
-ping_successful='Unknown' # preset for the first time
+PING_HOST="$GOOGLE_DNS"    #  — preset for the first time
+ping_successful='Unknown'  #  /
 
 # module settings
 ACTIVE_WINDOW_NAME_MAX_LENGTH=50
@@ -117,13 +117,15 @@ get_test() {
 get_active_window_name() {
 	local id title
 	id=`xprop -root | sed -nr 's/^_NET_ACTIVE_WINDOW.*# (.*)$/\1/p'`
-	title=`xprop -id "$id" | sed -nr 's/\\\//g;s/^WM_NAME[^"]+"([^"]+)".*/\1/p'`
-	[ ${#title} -gt $ACTIVE_WINDOW_NAME_MAX_LENGTH ] \
-		&& title=`echo "$title" | sed -r "s/^(.{1,$ACTIVE_WINDOW_NAME_MAX_LENGTH})\b.*/\1…/"`
-	active_window_name='{ "full_text": "'"$title"'",
+	title=`xprop -id "$id" |& sed -nr 's/\\\//g;s/^WM_NAME[^"]+"([^"]+)".*/\1/p'`
+	[ ${#title} -ne 0 ] && {
+		[ ${#title} -gt $ACTIVE_WINDOW_NAME_MAX_LENGTH ] \
+			&& title=`echo "$title" | sed -r "s/^(.{1,$ACTIVE_WINDOW_NAME_MAX_LENGTH})\b.*/\1…/"`
+		active_window_name='{ "full_text": "'"$title"'",
 \t  "align": "right",
 \t  "markup": "pango",
 \t  "separator": false },'
+	}|| active_window_name=''
 }
 
 get_xkb_layout() {
@@ -162,7 +164,7 @@ get_xkb_layout() {
 #   — Ugh…
 get_free_space() {
 	local wait_time=10 mountpoint present_mpoints i inner_separator total free \
-		  color_tag inner_comma
+		  color_tag json_comma
 	[ $TIMEOUT_STEP -eq 0 -o $((TIMEOUT_STEP % wait_time)) -eq 0 ] && {
 		unset free_space
 		for mountpoint in $FREE_SPACE_MPOINTS; do
@@ -173,9 +175,9 @@ get_free_space() {
 		done
 		[ -v present_mpoints ] && for ((i=0; i<${#present_mpoints[@]}; i++)); do
 			[ $i -lt $((${#present_mpoints[@]}-1)) ] \
-				&& inner_separator=" $_not_used_until_they_fix_the_bug_SEPARATOR_CHAR " \
+				&& inner_separator=" $_not_used_" \
 				|| unset inner_separator # This comma appears between blocks
-			                              #   showing mountpoints.
+			                             #   showing mountpoints.
 			read total free <<< `df -BG -P "${present_mpoints[$i]}" |\
 			  sed -rn '$ s/^\S+\s+([0-9]+)G\s+\S+\s+([0-9]+)G.*$/\1\n\2/p'`
 			unset color_tag
@@ -185,16 +187,14 @@ get_free_space() {
 				color_tag='<span fgcolor=\"'$yellow'\">'
 			fi
 			[ $((i+1)) -eq ${#present_mpoints[@]} ] && inner_separator+=' '
-			free_space="${free_space:-}${inner_comma:-}
+			free_space="${free_space:-}${json_comma:-}
 \t{ \"full_text\": \"${color_tag:-}${present_mpoints[$i]}:$free${color_tag:+</span>}/<sub>$total</sub>$inner_separator\",
 \t  \"separator\":false,
 \t  \"separator_block_width\":0,
 \t  \"markup\": \"pango\" }"
-
-			inner_comma=',' # This comma is a part of json and divides
-			                #  {blocks} of code.
+			json_comma=','
 		done
-		[ "$free_space" ] && free_space="$free_space," # buuug >_< $inner_comma doesn’t append to the last block
+		[ "$free_space" ] && free_space+="$json_comma"
 	}
 }
 
@@ -348,8 +348,7 @@ get_internet_status() {
 			if [ "$PING_HOST" = "$GOOGLE_DNS" -a -v ping_successful ]; then
 				HAS_INTERNETS=t
 				# This block is _intended_ to be empty
-				internet_status='{ "full_text": "",
-\t  "separator":false },'
+				internet_status=''
 			elif [ "$PING_HOST" != "$GOOGLE_DNS" -a ! -v ping_successful ]; then
 				# We pinged our gateway and it wasn’t successful.
 				#   Maybe the problem is on our side? I.e. bad cable.
@@ -367,13 +366,12 @@ get_internet_status() {
 			exec {PINGOUT}<&-
 		}
 		[ -v COPROC ] || {
-			# wait_time can be here 2×, 3× timeouts or more.
 			if [ "$PING_HOST" = "$GOOGLE_DNS" -a ! -v ping_successful ]; then
 				PING_HOST=$(route -n | sed -rn 's/^0\.0\.0\.0\s+(\S+)\s.*/\1/p')  # default gateway IP
 			elif [ "$PING_HOST" != "$GOOGLE_DNS" -a -v ping_successful ]; then
 				PING_HOST=$GOOGLE_DNS
 			fi
-			coproc ping -W $wait_time -q -n -c1 $PING_HOST
+			coproc ping -W 15 -q -n -c1 $PING_HOST
 			# <& duplicates input file descriptors,
 			# >& duplicates output file descriptors, They both work here.
 			# {braces} are important.
@@ -465,6 +463,7 @@ get_schedule() {
 \t  "color": "'$blue'",
 \t  "separator": false },'
 		# Waking a certain someone
+		# 5 6 * * 1-6 touch /tmp/okiru
 		case $dayofweek in
 			Понедельник|Вторник|Среда|Четверг|Пятница) # Mon–Fri
 				[ $hour -eq 6 -a $minutes -ge 5 ] && [ -e /tmp/okiru ] \

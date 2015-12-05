@@ -67,6 +67,9 @@ input-cursor=yes
 #nocache=yes
 
 [home]
+## For desktop recording
+#vo=opengl-hq
+## For playing fast
 vo=vdpau
 hwdec=vdpau
 

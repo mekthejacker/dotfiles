@@ -109,8 +109,8 @@ bindcode $mod+27 exec --no-startup-id /bin/bash -c 'export ONE_COMMAND_SHELL=t &
 ## s (screen)
 bindcode --release $mod+39 exec --no-startup-id ". ~/bin/screenshot.sh"
 #bindcode --release $mod+Control+39 exec --no-startup-id ". ~/bin/screenshot.sh -delay"
-#bindcode --release $mod+Shift+39 exec --no-startup-id ". ~/bin/screenshot.sh -indexed"
-bindcode --release $mod+Mod1+39 exec --no-startup-id ". ~/bin/screenshot.sh -jpeg"
+#bindcode --release $mod+Mod1+39 exec --no-startup-id ". ~/bin/screenshot.sh -indexed"
+bindcode --release $mod+Shift+39 exec --no-startup-id ". ~/bin/screenshot.sh -jpeg"
 
 ## a (window)
 bindcode --release $mod+38 exec --no-startup-id ". ~/bin/screenshot.sh -window"
@@ -201,7 +201,7 @@ bindcode $mod+18 exec --no-startup-id "i3-msg workspace 9:MPD && { pgrep -u $UID
 ## 0
 bindcode $mod+19 workspace 10:Outer_space
 ## -
-# bindcode $mod+20 workspace 11:Mail
+# bindcode $mod+20 workspace "11:Mail"
 ## TAB   Back and forth
 bindsym $mod+Tab workspace back_and_forth
 
@@ -215,7 +215,7 @@ workspace 6:IM           output PRIMARY_OUTPUT
 workspace 7:Games        output PRIMARY_OUTPUT
 workspace 8:GIMP         output PRIMARY_OUTPUT
 workspace 9:MPD          output PRIMARY_OUTPUT
-workspace 10:Outer_space  output SLAVE_OUTPUT_0
+workspace 10:Outer_space output SLAVE_OUTPUT_0
 
 ## Move focused container to workspace
 bindcode $mod+Shift+49 move container to workspace 0:Main
@@ -244,13 +244,14 @@ assign [class="spicec"] → "5:Misc"
 assign [class="screenshot_preview"] → "5:Misc"
 assign [class="Pidgin"] → "6:IM"
 assign [class="Skype"] → "6:IM"
-assign [class="Ts3client"] → "6:IM"
 assign [class="Wine"] → "7:Games"
 assign [class="Steam"] → "7:Games"
 assign [class="hl2_linux"] → "7:Games"
 assign [class="[tT]rine*"] → "7:Games"
 assign [class="StarConflict"] → "7:Games"
 assign [class="dota2"] → "7:Games"
+assign [class="Dwarf_Fortress"] → "7:Games"
+assign [class="DwarfTherapist"] → "7:Games"
 assign [class="Gimp"] → "8:GIMP"
 assign [class="URxvt" instance="ncmpcpp"] → "9:MPD"
 assign [class="mpv" instance="big_screen"] → "10:Outer_space"
@@ -296,6 +297,7 @@ bar {
 	# separator_symbol ":|:"
 	output PRIMARY_OUTPUT
 	position top
+	mode hide # dock | invisible
 	tray_output none
 	workspace_buttons yes
 	strip_workspace_numbers yes

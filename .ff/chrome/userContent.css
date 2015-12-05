@@ -54,8 +54,3 @@ body textarea {
 @-moz-document domain("ebay.com") {
    .nojs-msk .nojs-msg { display:none !important }
 }
-
-@-moz-document domain("krautchan.net") {
-   /*Hide Dane posters*/
-/*   table < tbody < tr < td < div < img[src="/images/balls/dk.png"] {display:none !important} */
-}

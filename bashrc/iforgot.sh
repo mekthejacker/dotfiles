@@ -583,9 +583,11 @@ echo Actually, someday they should fix -pattern_type glob and '*.png' and '%d'
 }
 
 iforgot-record-my-desktop() {
-	set -x
-	man -P"less -p'^\s*X11 grabbing'" ffmpeg
-	set +x
+	cat <<"EOF"
+ffmpeg -y  -f x11grab -video_size 1600x875 -framerate 25 -i :0.0+0,25 -f alsa -ac 2 -i hw:0 -async 1 -b:v 1000k -vcodec libx264 -crf 0 -preset ultrafast -acodec pcm_s16le /tmp/output.mkv
+
+P.S. Don’t forget to switch mpv’s -vo to opengl-hq or something for ffmpeg to be able to catch its output.
+EOF
 }
 
 iforgot-check-own-process-memory() {
@@ -856,3 +858,16 @@ EOF
 }
 
 iforgot-nested-x() { echo -e '\tXephyr :108 -resizeable &'; }
+
+iforgot-eix() {
+	cat <<EOF
+
+--only-names --in-overlay <overlay>
+Also: equery has repository sunrise
+
+-c
+-Ac
+-ec
+
+EOF
+}

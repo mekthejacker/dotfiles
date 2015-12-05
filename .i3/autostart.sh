@@ -159,12 +159,12 @@ case $HOSTNAME in
 # ╔═════════════════╗ # ╔════════╤════════╗
 # ║        ⋅        ║ # ║        │        ║
 # ║                 ║ # ║        │        ║
+# ║                 ║ # ║        │        ║
 # ╠━━━━━━━━┳━━━━━━━━╣ # ║        │        ║
-# ║        ┃––+––+––║ # ║        │        ║
-# ║        ┃        ║ # ╠━━━━━━━━╈━━━━━━━━╣
-# ╚════════╩════════╝ # ║        ┃––+––+––║
-                      # ║        ┃        ║
-                      # ╚════════╩════════╝
+# ║        ┃––+––+––║ # ╠━━━━━━━━╈━━━━━━━━╣
+# ║        ┃        ║ # ║        ┃––+––+––║
+# ║        ┃        ║ # ║        ┃        ║
+# ╚════════╩════════╝ # ╚════════╩════════╝
 		xte "mousemove $(( WIDTH/4 )) $(( HEIGHT/2 ))"
 		xte 'mouseclick 1'
 		i3-msg split h
@@ -209,20 +209,20 @@ case $HOSTNAME in
 		# But if daemon runs from here, it will fail after X restart ;_;
 		# Crapissimo: neither -a, nor -a '', -a "", -a $'\000' do not work.
 		#  "emacsclient --alternate-editor= -c -display $DISPLAY")
-		startup_apps=("firefox --profile $HOME/.ff" pidgin)
-		# ↖ These apps are to be killed gracefully by ~/.i3/on_quit.sh
+		startup_apps=("firefox --profile $HOME/.ff")   # pidgin
+		# ↖ ~/.i3/on_quit.sh kills gracefully these apps on exit.
 		;;
 esac
 pointer_control enable
 
 
-[ $DISPLAY = 108 ] && exit  # quit if it’s a Xephyr window
+[ $DISPLAY = 108 ] && exit  # quit if it’s a Xephyr X client
 
 # Some configs decrypted at ~/bin/run_app.sh
 for app in "${startup_apps[@]}" mpd thunar geeqie gimp redshift; do
 
 	# Switch to its workspace to take off urgency hint
-#	workspace="`sed -nr "s/^bindcode.*exec.*i3-msg\s+workspace\s+([0-9]*:?\S+)\s+.*pgrep\s+-u\s+\\\\\\$UID\s+$app.*\\\$/\1/p" ~/.i3/config`"
+	#	workspace="`sed -nr "s/^bindcode.*exec.*i3-msg\s+workspace\s+([0-9]*:?\S+)\s+.*pgrep\s+-u\s+\\\\\\$UID\s+$app.*\\\$/\1/p" ~/.i3/config`"
 
 	# { … & } becasue otherwise ‘&’ will fork to background the whole string
 	#   including subshell created by the left part of ‘||’ statement.

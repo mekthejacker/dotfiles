@@ -58,26 +58,28 @@ Looks like it’s time to reconsider addition policy." 480x95
 Xdialog --gauge 'X preloading started!' 630x100 <$pipe &
 
 # I. Initial preparations
+push_the_bar "Cleaning `du -hsx ~/.local/share/gvfs-metadata` gvfs-metadata"
+rm -rf ~/.local/share/gvfs-metadata
+
 push_the_bar 'Retrieving output information'
-screen_number=`xrandr --screen 9999 |& sed -nr 's/.*\s([0-9]+)\).*/\1/p'`
-n=0
-for ((i=0; i<screen_number; i++)); do
-	 while read outp; do
-		 [ -v PRIMARY_OUTPUT ] && eval export SLAVE_OUTPUT_$((n++))=$outp \
-			 || PRIMARY_OUTPUT=$outp
-	 done < <(xrandr --screen $i | sed -nr 's/^(\S+) connected.*/\1/p')
-done
+n=0; while read outp; do
+	[ -v PRIMARY_OUTPUT ] && eval export SLAVE_OUTPUT_$((n++))=$outp \
+		|| PRIMARY_OUTPUT=$outp
+done < <(xrandr --screen 0 | sed -nr 's/^(\S+) connected.*/\1/p')
 
 # Disabling all other outputs except the main one BEFORE
 #   gpg spawns pinentry window and autorun messes the workspace
 #   with huge screen spread onto two monitors.
 ~/.i3/update_config.sh
 
-push_the_bar 'Determining width, height and dpi of the 1st output'
+push_the_bar 'Determining width, height and dpi of the primary output'
 # These vars often used in the scripts later, e.g. in ~/bashrc/wine
 # 211.6 is the width in mm of a display with dpi=96 and screen width equal to 800 px,
 #   i.e. to get the default 96 dpi even if sed couldn’t parse xrandr output.
-read WIDTH HEIGHT width_mm < <(xrandr | sed -rn 's/.*primary ([0-9]+)x([0-9]+).* ([0-9]+)mm x [0-9]+mm.*/\1 \2 \3/p; T; Q1' && echo '800 600 211.6')
+# Better look for a ‘connected primary’ display… or not?
+#read WIDTH HEIGHT width_mm < <(xrandr | sed -rn 's/connected.*primary ([0-9]+)x([0-9]+).* ([0-9]+)mm x [0-9]+mm.*/\1 \2 \3/p; T; Q1' && echo '800 600 211.6')
+#                                                                     ^ NB the whitespace
+read WIDTH HEIGHT width_mm < <(xrandr | sed -rn 's/^.* connected.* ([0-9]+)x([0-9]+).* ([0-9]+)mm x [0-9]+mm.*$/\1 \2 \3/p; T; Q1' && echo '800 600 211.6')
 DPI=`echo "scale=2; dpi=$WIDTH/$width_mm*25.4; scale=0; dpi /= 1; print dpi" | bc -q`
 [ ${#OUTPUTS} -gt 0 ] && {
 	push_the_bar 'Making sure that we operate on the first monitor'

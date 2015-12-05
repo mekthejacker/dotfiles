@@ -13,6 +13,7 @@ user_pref("mousewheel.acceleration.factor", 1);
 user_pref("mousewheel.default.delta_multiplier_y", 270);
 user_pref("network.dns.disableIPv6", true);
 user_pref("general.warnOnAboutConfig", false);
+user_pref("general.useragent.override", "Mozilla/5.0 (X11; Linux x86_64; rv:39.0) Gecko/20100101 Firefox/39.0. Please read a personal appeal from the owner of this browser: ‘Install gentoo, you fat fuck!’");
 user_pref("browser.urlbar.clickSelectsAll", false);
 user_pref("network.standard-url.escape-utf8", false);
 // Number of pages firefox keeps prepared to display from the tab history
