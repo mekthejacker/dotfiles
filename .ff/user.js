@@ -59,6 +59,7 @@ user_pref("media.cache_size", 51200);
 user_pref("browser.cache.memory.capacity", 1048576);
 // Equal to what disk.cache.max_entry_size offers by default
 iser_pref("browser.cache.memory.max_entry_size", 51200);
+
 //
 // --- MEDIA ----------------------------------------------------------------
 //
@@ -104,6 +105,17 @@ user_pref("media.getusermedia.screensharing.enabled", false);
 // --- REMOVE USELESS ----------------------------------------------------------------
 //
 
+// Disable Mozilla’s antitracjing list that duplicates uBlock function
+// and is less effective (due to being based on the list from Disconnect).
+// https://support.mozilla.org/en-US/kb/tracking-protection-firefox
+// https://wiki.mozilla.org/Polaris
+// https://hg.mozilla.org/releases/mozilla-beta/file/00bcc10b3bdc/browser/base/content/browser-trackingprotection.js
+user_pref("privacy.trackingprotection.enabled", false);
+user_pref("privacy.trackingprotection.pbmode.enabled", false);
+user_pref("browser.trackingprotection.updateURL", "");
+user_pref("browser.trackingprotection.gethashURL", "");
+user_pref("browser.polaris.enabled", false);
+user_pref("privacy.trackingprotection.introURL", "");
 
 // d:15000
 user_pref("browser.sessionstore.interval", 60000);
@@ -194,6 +206,7 @@ user_pref("network.allow-experiments", false);
 user_pref("experiments.enabled", false);
 user_pref("experiments.supported", false);
 user_pref("experiments.manifest.uri", "");
+user_pref("experiments.activeExperiment", false);
 
 // Forbid popups to modify window elements
 user_pref("dom.popup_maximum", 5);
@@ -290,3 +303,54 @@ user_pref("security.ssl3.ecdhe_ecdsa_rc4_128_sha", false);
 user_pref("security.ssl3.ecdhe_rsa_rc4_128_sha", false);
 user_pref("security.ssl3.rsa_rc4_128_md5", false);
 user_pref("security.ssl3.rsa_rc4_128_sha", false);
+
+// Отключает автоматическое скачивание и установку ADB Helper и аддона для удаленной отладки мобильных
+// браузеров при первом запуске WebIDE. Ручная установка через меню WebIDE все еще будет работать.
+// https://developer.mozilla.org/en-US/docs/Tools/Valence
+user_pref("devtools.webide.autoinstallADBHelper", false);
+user_pref("devtools.webide.autoinstallFxdtAdapters", false);
+// Отключает авто-подсоединение к предыдущему отлаживаемому устройству/эмулятору при запуске WebIDE.
+user_pref("devtools.webide.autoConnectRuntime", false);
+
+// Отключает возможность соединения с устройством на Firefox OS для отладки по Wi-Fi.
+// https://wiki.mozilla.org/DevTools/WiFi_Debugging
+user_pref("devtools.remote.wifi.scan", false);
+user_pref("devtools.remote.wifi.visible", false);
+
+// Отключает команду screenshot --imgur, которая автоматически загружает сделанный скриншот на Imgur.
+// https://bugzilla.mozilla.org/show_bug.cgi?id=992386
+// https://bugzilla.mozilla.org/show_bug.cgi?id=1173158
+// https://hg.mozilla.org/releases/mozilla-beta/file/ab89cbfcd3e6/toolkit/devtools/gcli/commands/screenshot.js#l382
+user_pref("devtools.gcli.imgurClientID", "");
+user_pref("devtools.gcli.imgurUploadURL", "");
+
+// Отключает скачивание и показ подсказок для свойств CSS с developer.mozilla.org в Developer Tools.
+// https://hg.mozilla.org/releases/mozilla-beta/file/7f005a3c9f9d/browser/devtools/styleinspector/test/browser_ruleview_context-menu-show-mdn-docs-03.js#l5
+// https://hg.mozilla.org/releases/mozilla-beta/file/14b2376c96fa/browser/devtools/styleinspector/rule-view.js#l1538
+// https://hg.mozilla.org/releases/mozilla-beta/file/7f005a3c9f9d/browser/devtools/shared/widgets/MdnDocsWidget.js#l5
+user_pref("devtools.inspector.mdnDocsTooltip.enabled", false);
+
+// Отключает рекламу Firefox Developer Edition в Developer Tools.
+// https://hg.mozilla.org/releases/mozilla-esr38/file/0f8338121472/browser/devtools/shared/doorhanger.js#l17
+user_pref("devtools.devedition.promo.enabled", false);
+user_pref("devtools.devedition.promo.shown", true);
+user_pref("devtools.devedition.promo.url", "");
+
+// Отключает SSDP, нужный для обнаружения телевизоров и реализации функции Send Video To Device в
+// Firefox для Android. Десктопный Firefox тоже почему-то посылал соответствующие мультикаст-запросы.
+// https://bugzilla.mozilla.org/show_bug.cgi?id=1111967
+// https://support.mozilla.org/en-US/kb/use-firefox-android-send-videos-chromecast
+// https://trac.torproject.org/projects/tor/ticket/16222
+// https://support.mozilla.org/en-US/kb/how-stop-firefox-making-automatic-connections#w_send-video-to-device
+user_pref("browser.casting.enabled", false);
+
+// Отключает передачу по сети рисуемых браузером кадров специальному отладочному вьюверу.
+// https://wiki.mozilla.org/Platform/GFX/LayerScope
+// https://trac.torproject.org/projects/tor/ticket/16222#comment:8
+// https://hg.mozilla.org/releases/mozilla-esr38/file/a20c7910a82f/gfx/thebes/gfxPrefs.h#l208
+// https://hg.mozilla.org/releases/mozilla-esr38/file/a20c7910a82f/gfx/layers/LayerScope.cpp#l1243
+user_pref("gfx.layerscope.enabled", false);
+// https://hg.mozilla.org/releases/mozilla-esr38/file/a20c7910a82f/gfx/thebes/gfxPrefs.h#l209
+// https://hg.mozilla.org/releases/mozilla-esr38/file/a20c7910a82f/gfx/layers/LayerScope.cpp#l1202
+// https://hg.mozilla.org/releases/mozilla-esr38/file/a20c7910a82f/netwerk/base/nsServerSocket.cpp#l281
+user_pref("gfx.layerscope.port", 100000);

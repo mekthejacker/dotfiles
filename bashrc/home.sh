@@ -304,20 +304,25 @@ compress-screenshot() {
 # Copies current MPD playlist to a specified folder.
 copy-playlist() {
 	err() { echo "$1" >&2; echo $2; }  # $1 — message; $2 — return code
-	local cur_pl='current.m3u' dest="/run/media/$ME/PHONE_CARD/Sounds/Music/" \
+	local cur_pl='current' dest="/run/media/$ME/PHONE_CARD/Sounds/Music/" \
 		  pl_dir pl library_path got_a_sane_reply
 	pl_dir=`sed -nr 's/^\s*playlist_directory\s+"(.+)"\s*$/\1/p' ~/.mpd/mpd.conf`
 	library_path=`sed -nr 's/^\s*music_directory\s+"(.+)"\s*$/\1/p' ~/.mpd/mpd.conf`
+	library_path="${library_path/#\~/$HOME}"
 	eval [ -d "$pl_dir" ] \
 		|| return `err 'Playlist directory is indeterminable.' 3`
 	eval [ -d "$library_path" ] \
 		|| return `err 'Path to music library is indeterminable.' 4`
-
-	pushd "$pl_dir"
-	rm -f $cur_pl
+	# [ "$*" ] && dest="$*" || {
+	# 	dest="$HOME/phone_card"
+	# 	disk=`sudo /sbin/findfs LABEL=PHONE_CARD` \
+	# 		&& sudo /bin/mount -t vfat -o users,fmask=0111,dmask=0000,rw,codepage=866,iocharset=iso8859-5,utf8 $disk $HOME/phone_card \
+	# 			|| return `err "Default destination PHONE_CARD cannot be found." 7`
+	# }
+	eval pushd $pl_dir
+	rm -vf $cur_pl.m3u
 	mpc save "$cur_pl"  # MPD_HOST must be set in the environment
-
-	[ -f "$cur_pl" ] || return `err 'Playlist wasn’t saved' 5`
+	[ -f "$cur_pl.m3u" ] || return `err 'Playlist wasn’t saved' 5`
 	[ -w "$dest" ] && {
 		while read filepath; do
 			filepath="${filepath/$library_path/}"
@@ -332,9 +337,14 @@ copy-playlist() {
 					esac
 				done
 			}
-		done < "$cur_pl"
+		done < "$cur_pl.m3u"
 		popd
-	}|| { popd; return `err "Destination dir ‘$dest’ is not writable." 6`; }
+	}||{ popd; return `err "Destination dir ‘$dest’ is not writable." 6`; }
+
+    # [ "$dest" = "$HOME/phone_card" ] && {
+	# 	sudo /bin/umount "$dest"
+	# 	rm -rf "$dest"
+	# }
 }
 
 # $1 — filename to fix figure dashes in

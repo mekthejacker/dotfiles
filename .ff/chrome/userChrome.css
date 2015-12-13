@@ -1,3 +1,7 @@
+/*                                                            */
+/* http://kb.mozillazine.org/UserChrome.css_Element_Names/IDs */
+/*                                                            */
+
 /* Change the tab-bar height */
 tab {height: 12px !important;}
 .tabbrowser-strip {height: 12px !important;}
@@ -6,4 +10,14 @@ tab {height: 12px !important;}
 
 .tabbrowser-tabs *|tab[busy] .tab-icon {
   display:-moz-box;
+}
+
+/* Never show “Open in New Window” when right clicking */
+#context-openlink,
+#context-openlinkprivate,
+#context-sendimage,
+#context-setWallpaper,
+#context-setDesktopBackground,
+#context-sendpage {
+	display: none !important
 }

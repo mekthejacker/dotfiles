@@ -1,0 +1,67 @@
+unmap r rotate rotate-cw
+unmap R reload
+unmap G goto
+
+map z zoom out
+map   [fullscreen] z zoom out
+map x zoom in
+map   [fullscreen] x zoom in
+map w zoom 100
+map   [fullscreen] w zoom 100
+map s adjust_window best-fit
+map   [fullscreen] s adjust_window best-fit
+map <C-r> reload
+map   [fullscreen]  <C-r> reload
+map f toggle_fullscreen
+map   [fullscreen] f toggle_fullscreen
+
+map q scroll top # why it works after one key was passed?
+map   [fullscreen] q scroll top
+map e scroll bottom # this works flawlessly >_>
+map   [fullscreen] e scroll bottom
+map a scroll up
+map   [fullscreen] a scroll up
+map d scroll down
+map   [fullscreen] d scroll down
+map g goto # enter page number, press ‘g’ //_-
+map   [fullscreen] g goto
+
+
+# completion-bg "#232323"
+# completion-fg "#DDDDDD"
+# completion-group-bg "#000000"
+# completion-group-fg #DEDEDE
+# completion-highlight-bg #9FBC00
+# completion-highlight-fg #232323
+# inputbar-bg #131313
+# inputbar-fg #9FBC00
+# notification-bg #FFFFFF
+# notification-fg #000000
+# notification-error-bg  #FFFFFF
+# notification-error-fg  #FF1212
+# notification-warning-bg  #FFFFFF
+# notification-warning-fg  #FFF712
+# tabbar-fg #FFFFFF
+# tabbar-bg #000000
+# tabbar-focus-fg #9FBC00
+# tabbar-focus-bg  #000000
+
+# incremental-search false
+# highlight-color #9FBC00
+# highlight-active-color #00BC00
+# highlight-transparency 0.5
+# page-padding 1 #  defines the gap in pixels between each rendered page.
+# render-loading-bg #FFFFFF
+# render-loading-fg #000000
+
+
+set synctex true
+set window-title-basename true
+set guioptions shv
+set statusbar-bg "#303030"
+set statusbar-fg "#d0d0d0"
+set font "Terminus 12"
+set default-bg "#303030"
+set default-fg "#d0d0d0"
+set page-padding 7
+set selection-clipboard clipboard # primary
