@@ -297,8 +297,8 @@ bar {
 	# separator_symbol ":|:"
 	output PRIMARY_OUTPUT
 	position top
-	mode hide # dock | invisible
-	tray_output none
+	mode hide # hide | dock | invisible
+	tray_output primary # none | primary | <output>
 	workspace_buttons yes
 	strip_workspace_numbers yes
 	status_command ". ~/.i3/generate_json_for_i3bar.sh"
