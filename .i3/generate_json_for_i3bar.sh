@@ -81,6 +81,8 @@ case $HOSTNAME in
 		modules[200]=
 		modules[255]=schedule
 		;;
+	paskapuukko)
+		modules[159]=battery_status
 esac
 
 #      modules=( … nice_date )                      ← name in the module list
@@ -367,7 +369,7 @@ get_internet_status() {
 		}
 		[ -v COPROC ] || {
 			if [ "$PING_HOST" = "$GOOGLE_DNS" -a ! -v ping_successful ]; then
-				PING_HOST=$(route -n | sed -rn 's/^0\.0\.0\.0\s+(\S+)\s.*/\1/p')  # default gateway IP
+				PING_HOST=$(route -n | sed -rn 's/^0\.0\.0\.0\s+(\S+)\s.*/\1/p;T;Q')  # default gateway IP
 			elif [ "$PING_HOST" != "$GOOGLE_DNS" -a -v ping_successful ]; then
 				PING_HOST=$GOOGLE_DNS
 			fi
