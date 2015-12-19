@@ -297,7 +297,7 @@ bar {
 	# separator_symbol ":|:"
 	output PRIMARY_OUTPUT
 	position top
-	mode hide # hide | dock | invisible
+	mode dock # hide | dock | invisible
 	tray_output primary # none | primary | <output>
 	workspace_buttons yes
 	strip_workspace_numbers yes

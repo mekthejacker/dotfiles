@@ -70,79 +70,71 @@ else
 	neww su \; \
 	set remain-on-exit on \; \
 	select-window -t 0:1
-# Another user termianl in tmux
-#	neww -n wa-a \; \
-#	set remain-on-exit on \; \
+	# Another user termianl in tmux
+	#  neww -n wa-a \; \
+	#  set remain-on-exit on \; \
 fi
+
+[ "$DISPLAY" = ":108" ] && exit 0  # stop here if it’s a Xephyr window
 
 pointer_control disable
 
+startup_apps=(mpd "firefox --profile $HOME/.ff" redshift thunar)
 # WIDTH and HEIGHT were set in the ~/.preload.sh
 case $HOSTNAME in
-	fanetbook)
-		hsetroot -fill ~/.env/wallpaper.png
-		urxvtc -hold -name 'htop' -title "htop" -e htop
-		xte "mousemove $(( WIDTH/2 ))  $(( HEIGHT/2 ))"
-		xte 'mouseclick 1'
-		i3-msg layout tabbed
-
-		for iface_config in `ls ~/.iftop/$HOSTNAME.*`; do
-			urxvtc -hold -title ${iface_config##*.} \
-				-e sudo /usr/sbin/iftop -c "$iface_config"
-		done
-		urxvtc
-		urxvtc
-		urxvtc -hold -title tmux -e $tmux attach \; find-window -N root
-
-		startup_apps=()
+	home)
+		startup_apps+=(gimp geeqie pidgin skype)
 		;;
-	*)
-		pgrep -u $UID -f "^bash $HOME/bin/wallpaper_setter/wallpaper_setter.sh -S" \
-			|| { ~/bin/wallpaper_setter/wallpaper_setter.sh -S -B -0.3 \
-			   -d /home/picts/screens & }
-		# Urxvtc windows must appear after wallpaper is set, due to their
-		#   fake transparency.
-		~/bin/wallpaper_setter/wallpaper_setter.sh -w
+	paskapuukko)
+		startup_apps+=(skype)
+		;;
+esac
 
-		urxvtc --title 'Todo list' -e watch -t -n15 cat -n ~/todo
+pgrep -u $UID -f "^bash $HOME/bin/wallpaper_setter/wallpaper_setter.sh -S" \
+	|| { ~/bin/wallpaper_setter/wallpaper_setter.sh -S -B -0.3 -d /home/picts/screens & }
+# Urxvtc windows must appear after wallpaper is set, due to their
+#   fake transparency.
+~/bin/wallpaper_setter/wallpaper_setter.sh -w
+
+urxvtc --title 'Todo list' -e watch -t -n15 cat -n ~/todo
 # ┌────┐
 # │    │
 # │    │
 # └────┘
-		i3-msg split v
-		urxvtc -hold -title 'htop' -e htop
+i3-msg split v
+urxvtc -hold -title 'htop' -e htop
 # ╔════╗
 # ║    ║
 # ╟────╢
 # ║    ║
 # ╚════╝
-		# Move cursor near the center of the lower urxvtc with htop
-		xte "mousemove $(( WIDTH/2 ))  $(( 3*HEIGHT/4 ))"
-		xte 'mouseclick 1'  # …and focus it.
-		i3-msg split h
+# Move cursor near the center of the lower urxvtc with htop
+xte "mousemove $(( WIDTH/2 ))  $(( 3*HEIGHT/4 ))"
+xte 'mouseclick 1'  # …and focus it.
+i3-msg split h
 # ╔═════╗ # ╔═══════╗
 # ║     ║ # ║       ║
 # ╟─────╢ # ╠━━━┯━━━╣
 # ║  ⋅  ║ # ║   │   ║
 # ╚═════╝ # ╚═══╧═══╝
-		iface_configs=(`ls ~/.iftop/$HOSTNAME.*`)
-		[ ${#iface_configs} -gt 1 ] && iftops_need_their_own_container=t
-		for ((i=0; i<${#iface_configs[@]}; i++)); do
-			urxvtc -hold -title ${iface_configs[$i]##*.} \
-				-e sudo /usr/sbin/iftop -c "${iface_configs[$i]}"
-			[ $i -eq 0 ] && [ -v iftops_need_their_own_container ] && \
-				i3-msg split h
-		done
+iface_configs=(`ls ~/.iftop/$HOSTNAME.*`)
+[ ${#iface_configs} -gt 1 ] && iftops_need_their_own_container=t
+for ((i=0; i<${#iface_configs[@]}; i++)); do
+	urxvtc -hold -title ${iface_configs[$i]##*.} \
+		   -e sudo /usr/sbin/iftop -c "${iface_configs[$i]}"
+	[ $i -eq 0 ] && [ -v iftops_need_their_own_container ] && \
+		i3-msg split h
+done
 # ╔═════════════════╗
 # ║                 ║
 # ╠━━━━━━━━┳━━┯━━┯━━╣
 # ║        ┃  │  │  ║  (Possible variation if there are 3 htop configs)
 # ╚════════╩══╧══╧══╝
-		[ -v iftops_need_their_own_container ] && {
-			xte "mousemove $(( 9*WIDTH/16 )) $(( 3*HEIGHT/4 ))"
-			xte 'mouseclick 1'
-			i3-msg layout tabbed
-		}
+[ -v iftops_need_their_own_container ] && {
+	xte "mousemove $(( 9*WIDTH/16 )) $(( 3*HEIGHT/4 ))"
+	xte 'mouseclick 1'
+	i3-msg layout tabbed
+}
 # ╔═════════════════╗ # ╔═════════════════╗
 # ║                 ║ # ║                 ║
 # ║                 ║ # ║                 ║
@@ -150,12 +142,12 @@ case $HOSTNAME in
 # ║        ┃⋅ │  │  ║ # ║        ┃––+––+––║  ← tabs
 # ║        ┃  │  │  ║ # ║        ┃        ║
 # ╚════════╩══╧══╧══╝ # ╚════════╩════════╝
-		xte "mousemove $(( WIDTH/2 ))  $(( HEIGHT/4 ))"
-		xte 'mouseclick 1'
-		# raise upper empty urxvtc up to ≈5/6 of the height
-		i3-msg resize grow height 30 px or 30 ppt
-		i3-msg split h
-		urxvtc
+xte "mousemove $(( WIDTH/2 ))  $(( HEIGHT/4 ))"
+xte 'mouseclick 1'
+# raise upper empty urxvtc up to ≈5/6 of the height
+i3-msg resize grow height 30 px or 30 ppt
+i3-msg split h
+urxvtc -hold -title tmux -e $tmux attach
 # ╔═════════════════╗ # ╔════════╤════════╗
 # ║        ⋅        ║ # ║        │        ║
 # ║                 ║ # ║        │        ║
@@ -165,12 +157,12 @@ case $HOSTNAME in
 # ║        ┃        ║ # ║        ┃––+––+––║
 # ║        ┃        ║ # ║        ┃        ║
 # ╚════════╩════════╝ # ╚════════╩════════╝
-		xte "mousemove $(( WIDTH/4 )) $(( HEIGHT/2 ))"
-		xte 'mouseclick 1'
-		i3-msg split h
-		i3-msg layout tabbed
-		urxvtc
-		urxvtc
+xte "mousemove $(( WIDTH/4 )) $(( HEIGHT/2 ))"
+xte 'mouseclick 1'
+i3-msg split h
+i3-msg layout tabbed
+urxvtc
+urxvtc
 # ╔════════╤════════╗ # ╔════════╦════════╗
 # ║        │        ║ # ║––+––+––┃        ║
 # ║        │        ║ # ║        ┃        ║
@@ -180,14 +172,14 @@ case $HOSTNAME in
 # ║        ┃––+––+––║ # ║        ┃––+––+––║
 # ║        ┃        ║ # ║        ┃        ║
 # ╚════════╩════════╝ # ╚════════╩════════╝
-		xte "mousemove $(( 3*WIDTH/4 )) $(( HEIGHT/2 ))"
-		xte 'mouseclick 1'
-		i3-msg split h
-		i3-msg layout tabbed
-		urxvtc
-		urxvtc -hold -title tmux -e $tmux attach
-		xte "mousemove $(( 11*WIDTH/12 )) $(( HEIGHT/2 ))"
-		xte 'mouseclick 1'
+xte "mousemove $(( 3*WIDTH/4 )) $(( HEIGHT/2 ))"
+xte 'mouseclick 1'
+i3-msg split v
+i3-msg layout tabbed
+#urxvtc
+#urxvtc -hold -title tmux -e $tmux attach
+xte "mousemove $(( 11*WIDTH/12 )) $(( HEIGHT/2 ))"
+xte 'mouseclick 1'
 # ╔════════╦════════╗ # ╔════════╦════════╗
 # ║––+––+––┃        ║ # ║––+––+––┃––+––+––║
 # ║        ┃        ║ # ║        ┃        ║
@@ -197,30 +189,14 @@ case $HOSTNAME in
 # ║        ┃––+––+––║ # ║        ┃––+––+––║
 # ║        ┃        ║ # ║        ┃        ║
 # ╚════════╩════════╝ # ╚════════╩════════╝
-		# This is for calling via hotkey in ~/.i3/config to test without
-		#   restarting WM.
-		[ "$1" = stop_after_main_workspace ] && {
-			pointer_control enable
-			exit 0
-		}
 
-		# Oh, fine, we can just run emacsclient with no argument to -a option
-		#   and it will start emacs daemon and will connect to it.
-		# But if daemon runs from here, it will fail after X restart ;_;
-		# Crapissimo: neither -a, nor -a '', -a "", -a $'\000' do not work.
-		#  "emacsclient --alternate-editor= -c -display $DISPLAY")
-		startup_apps=("firefox --profile $HOME/.ff")   # pidgin
-		# ↖ ~/.i3/on_quit.sh kills gracefully these apps on exit.
-		;;
-esac
 pointer_control enable
 
-
-[ $DISPLAY = 108 ] && exit  # quit if it’s a Xephyr X client
+# This is to check whether script is called via hotkey in ~/.i3/config.
+[ "$1" = stop_after_main_workspace ] && exit 0
 
 # Some configs decrypted at ~/bin/run_app.sh
-for app in "${startup_apps[@]}" mpd thunar geeqie gimp redshift; do
-
+for app in "${startup_apps[@]}"; do
 	# Switch to its workspace to take off urgency hint
 	#	workspace="`sed -nr "s/^bindcode.*exec.*i3-msg\s+workspace\s+([0-9]*:?\S+)\s+.*pgrep\s+-u\s+\\\\\\$UID\s+$app.*\\\$/\1/p" ~/.i3/config`"
 

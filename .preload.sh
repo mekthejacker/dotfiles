@@ -92,6 +92,7 @@ grep -qF "$HOME/phone_card" /proc/mounts && sudo /bin/umount $HOME/phone_card
 rm -f $HOME/phone_card
 mkdir -m700 $HOME/phone_card &>/dev/null
 c=0; until grep -q $HOME/phone_card /proc/mounts || {
+	[ "$HOSTNAME" = paskapuukko ] && break
 	unset found mounted
     # mount with rw,nosuid,nodev,relatime,uid=1000,gid=1000,fmask=0022,dmask=0077,codepage=866,iocharset=iso8859-5,shortname=mixed,showexec,utf8,flush,errors=remount-ro and leav eit as is?
 	disk=`sudo /sbin/findfs LABEL=PHONE_CARD`

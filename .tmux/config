@@ -55,11 +55,12 @@ setw -g utf8 on
 setw -g window-status-format '#{window_index}:#{window_name}'
 setw -g window-status-current-format '#{window_index}:#{pane_title}'
 
-## Smell british scent around here…
+## I smell British scent around here…
 ## Also see ~/.Xresources for colour palette.
 set -g status-style 'bg=#181818,fg=#aaaaaa' # black on light grey
 set -g message-style 'bg=colour3,fg=#101010' # dark on dark yellow
 set -g message-command-style 'bg=colour3,fg=#101010' # dark on dark yellow
+set -g status-position top
 setw -g window-status-current-style 'bg=#aaaaaa,fg=#101010' # black on light grey
 setw -g window-status-last-style 'bg=#555753,fg=#101010' # black on grey
 setw -g window-status-bell-style 'bg=colour1,fg=colour7' # light white on light red
