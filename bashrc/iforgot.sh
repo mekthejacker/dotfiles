@@ -889,3 +889,5 @@ iforgot-nmap-scan() {
 	 nmap -Pn -T4 -sV -p 22,8087 198.116.0.22
 EOF
 }
+
+iforgot-hierarchy-of-linux-fs() { echo -e '\tman hier'; }

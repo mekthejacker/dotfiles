@@ -5,6 +5,8 @@
 # It starts deamons needed to be started before the window manager.
 # ~/.bashrc runs this script for ssh clients.
 
+[ "$HOSTNAME" = paskapuukko ] && xbacklight -set 55
+
 [ "${ENV_DEBUG/*p*/}" ] || {
 	exec &>/tmp/envlogs/preload
 	date

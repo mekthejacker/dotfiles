@@ -1,0 +1,9 @@
+interface: wlan0
+promiscuous: yes
+hide-destination: yes
+show-totals: no
+# Use-bytes affect only the bar!
+use-bytes: yes
+# 22 Mbit/sec is the maximum for 802.11g
+max-bandwidth: 22M
+filter-code: not ether host ff:ff:ff:ff:ff:f8
