@@ -203,9 +203,8 @@ cat <<"EOF"
 		…
 		exit
 
-	umount -l /mnt/chroot/proc
-	umount -l /mnt/chroot/dev{/pts,/shm}
-	umount -l /mnt/chroot/sys
+	umount -l /mnt/chroot/dev{/shm,/pts,}
+	umount /mnt/chroot{/boot,/sys,/proc,}
 EOF
 }
 
@@ -869,5 +868,24 @@ Also: equery has repository sunrise
 -Ac
 -ec
 
+EOF
+}
+
+iforgot-mkfs-ext4-options() {
+	cat<<EOF
+For /boot:
+	# 40–50 MiB should be enough.
+For /:
+	# Actually, 1 mln inodes is enough, 200% is for accidental need for a system in chroot.
+	mkfs.ext4 -j -O extent,dir_index -N 2000000 -L "root" /dev/sda2
+For /home:
+	# For home, the number of inodes is around 500K per TB.
+	mkfs.ext4 -m0 -j -O extent,dir_index,sparse_super -N 500000 -L "home" /dev/sda3
+EOF
+}
+
+iforgot-nmap-scan() {
+	cat<<EOF
+	 nmap -Pn -T4 -sV -p 22,8087 198.116.0.22
 EOF
 }
