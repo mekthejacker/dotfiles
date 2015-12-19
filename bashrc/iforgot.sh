@@ -883,3 +883,9 @@ For /home:
 	mkfs.ext4 -m0 -j -O extent,dir_index,sparse_super -N 500000 -L "home" /dev/sda3
 EOF
 }
+
+iforgot-nmap-scan() {
+	cat<<EOF
+	 nmap -Pn -T4 -sV -p 22,8087 198.116.0.22
+EOF
+}
