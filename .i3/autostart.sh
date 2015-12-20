@@ -86,7 +86,7 @@ case $HOSTNAME in
 		startup_apps+=(gimp geeqie pidgin skype)
 		;;
 	paskapuukko)
-		startup_apps+=(skype)
+		# startup_apps+=(skype)  # how the fuck does skype switch the workspace by itself?!
 		;;
 esac
 
@@ -117,7 +117,7 @@ i3-msg split h
 # ╟─────╢ # ╠━━━┯━━━╣
 # ║  ⋅  ║ # ║   │   ║
 # ╚═════╝ # ╚═══╧═══╝
-iface_configs=(`ls ~/.iftop/$HOSTNAME.*`)
+iface_configs=(`ls -B ~/.iftop/$HOSTNAME.*`)
 [ ${#iface_configs} -gt 1 ] && iftops_need_their_own_container=t
 for ((i=0; i<${#iface_configs[@]}; i++)); do
 	urxvtc -hold -title ${iface_configs[$i]##*.} \
