@@ -2,7 +2,7 @@
 # Any customization should be done in ~/.gtkrc-2.0.mine instead.
 
 gtk-theme-name="Mist"
-gtk-icon-theme-name="gnome-wise"
+gtk-icon-theme-name="gnome-noble"
 gtk-font-name="Terminus 12"
 gtk-cursor-theme-name="Adwaita"
 gtk-cursor-theme-size=0

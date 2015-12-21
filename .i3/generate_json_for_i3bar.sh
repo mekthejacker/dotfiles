@@ -62,11 +62,11 @@ modules=(
 	#   set a non-empty variable of same name.
 	# Simply erase or comment a separator, if you don’t need it.
 	[100]=
-	[210]=mpd_state
-	[220]=speakers_state
-	[230]=mic_state
-	[240]=internet_status
-	[250]=gmail
+	[130]=mpd_state
+	[140]=speakers_state
+	[150]=mic_state
+	[160]=internet_status
+	[170]=gmail
 	[300]=
 	[350]=nice_date
 )
@@ -77,12 +77,16 @@ case $HOSTNAME in
 		modules[159]=battery_status
 		;;
 	home)
-		modules[150]=free_space
+		modules[110]=free_space
 		modules[200]=
 		modules[255]=schedule
 		;;
 	paskapuukko)
-		modules[159]=battery_status
+		modules[110]=free_space
+		# modules[120]=battery_status
+		modules[200]=
+		# modules[300]=
+		modules[250]=xkb_layout
 esac
 
 #      modules=( … nice_date )                      ← name in the module list
@@ -233,6 +237,8 @@ get_mic_state() {
 \t  \"separator\": false },"
 }
 
+# NOTES:
+#     Relies upon sys-power/acpi because names and paths may differ.
 get_battery_status() {
 	local wait_time=30 charge_now bat_status adp_online battery_lifetime \
 		  bat_lt_hours bat_lt_minutes bat_time_left \

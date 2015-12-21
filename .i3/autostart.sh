@@ -111,37 +111,59 @@ urxvtc -hold -title 'htop' -e htop
 # Move cursor near the center of the lower urxvtc with htop
 xte "mousemove $(( WIDTH/2 ))  $(( 3*HEIGHT/4 ))"
 xte 'mouseclick 1'  # …and focus it.
+
+iface_configs=(`ls ~/.iftop/$HOSTNAME.*[^~]`)  # ls -B doesn’t work here.
+[ ${#iface_configs} -gt 1 -a $WIDTH -ge 1600 ] && iftops_need_their_own_container=t
+
 i3-msg split h
 # ╔═════╗ # ╔═══════╗
 # ║     ║ # ║       ║
 # ╟─────╢ # ╠━━━┯━━━╣
-# ║  ⋅  ║ # ║   │   ║
+# ║  ⋅  ║ # ║   │   ║  # htop | [iftop container]
 # ╚═════╝ # ╚═══╧═══╝
-iface_configs=(`ls -B ~/.iftop/$HOSTNAME.*`)
-[ ${#iface_configs} -gt 1 ] && iftops_need_their_own_container=t
+
 for ((i=0; i<${#iface_configs[@]}; i++)); do
-	urxvtc -hold -title ${iface_configs[$i]##*.} \
-		   -e sudo /usr/sbin/iftop -c "${iface_configs[$i]}"
-	[ $i -eq 0 ] && [ -v iftops_need_their_own_container ] && \
+	urxvtc -hold -title ${iface_configs[i]##*.} \
+		   -e sudo /usr/sbin/iftop -c "${iface_configs[i]}"
+	[ $i -eq 0 -a -v iftops_need_their_own_container ] && \
 		i3-msg split h
 done
 # ╔═════════════════╗
 # ║                 ║
 # ╠━━━━━━━━┳━━┯━━┯━━╣
-# ║        ┃  │  │  ║  (Possible variation if there are 3 htop configs)
+# ║  htop  ┃  │  │  ║  (Possible variation if there are 3 iftop configs and WIDTH >= 1600)
 # ╚════════╩══╧══╧══╝
-[ -v iftops_need_their_own_container ] && {
-	xte "mousemove $(( 9*WIDTH/16 )) $(( 3*HEIGHT/4 ))"
+# ╔═══════════════╗
+# ║               ║
+# ╠━━━┯━━━┯━━━┯━━━╣
+# ║   │   │   │   ║  (Possible variation if there are 3 htop configs and WIDTH < 1600.
+# ╚═══╧═══╧═══╧═══╝   htop and iftops are in the same container)
+[ ${#iface_configs[@]} -gt 0 ] && {
+	[ -v iftops_need_their_own_container ] && {
+		# move to the first iftop window
+		# ╔═════════════════╗ # ╔═════════════════╗
+		# ║                 ║ # ║                 ║
+		# ║                 ║ # ║                 ║
+		# ╠━━━━━━━━┳━━┯━━┯━━╣ # ╠━━━━━━━━┳━━━━━━━━╣
+		# ║        ┃⋅ │  │  ║ # ║        ┃––+––+––║  ← tabs
+		# ║        ┃  │  │  ║ # ║        ┃        ║
+		# ╚════════╩══╧══╧══╝ # ╚════════╩════════╝
+		xte "mousemove $(( 9*WIDTH/16 )) $(( 3*HEIGHT/4 ))"
+		:
+	}||{
+		# move to the htop window to make it active tab, or it will be some iftop window
+		# ╔═══════════════╗ # ╔═══════════════╗
+		# ║               ║ # ║               ║
+		# ║               ║ # ║               ║
+		# ╠━━━┯━━━┯━━━┯━━━╣ # ╠━━━━━━━━━━━━━━━╣
+		# ║⋅  │   │   │   ║ # ║–––+–––+–––+–––║  ← tabs
+		# ║   │   │   │   ║ # ║               ║
+		# ╚═══╧═══╧═══╧═══╝ # ╚═══════════════╝
+		xte "mousemove $(( 1*WIDTH/16 )) $(( 3*HEIGHT/4 ))"
+	}
 	xte 'mouseclick 1'
 	i3-msg layout tabbed
 }
-# ╔═════════════════╗ # ╔═════════════════╗
-# ║                 ║ # ║                 ║
-# ║                 ║ # ║                 ║
-# ╠━━━━━━━━┳━━┯━━┯━━╣ # ╠━━━━━━━━┳━━━━━━━━╣
-# ║        ┃⋅ │  │  ║ # ║        ┃––+––+––║  ← tabs
-# ║        ┃  │  │  ║ # ║        ┃        ║
-# ╚════════╩══╧══╧══╝ # ╚════════╩════════╝
 xte "mousemove $(( WIDTH/2 ))  $(( HEIGHT/4 ))"
 xte 'mouseclick 1'
 # raise upper empty urxvtc up to ≈5/6 of the height
