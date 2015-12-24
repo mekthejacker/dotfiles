@@ -886,7 +886,7 @@ EOF
 
 iforgot-nmap-scan() {
 	cat<<EOF
-	 nmap -Pn -T4 -sV -p 22,8087 198.116.0.22
+	 nmap -Pn -T4 -sV -p 22,8087 127.0.0.1
 EOF
 }
 
