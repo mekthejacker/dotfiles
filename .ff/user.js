@@ -193,9 +193,13 @@ user_pref("browser.selfsupport.url", "");
 
 // Disable integrated support of Pocket proprietary service of bookmarks. http://www.opennet.ru/opennews/art.shtml?num=42245 https://wiki.mozilla.org/QA/Pocket_integration
 user_pref("browser.pocket.enabled", false);
+//// api.getpocket.com // ""
 user_pref("browser.pocket.api", "");
+//// getpocket.com
 user_pref("browser.pocket.site", "");
+//// 40249-e88c401e1b1f2242d9e441c4
 user_pref("browser.pocket.oAuthConsumerKey", "");
+//// en-GB ru
 user_pref("browser.pocket.enabledLocales", "");
 
 // Disable collection of statistics for effectiveness rating of current values of DNS TTL.

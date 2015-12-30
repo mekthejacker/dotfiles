@@ -241,6 +241,7 @@ assign [class="(?i)libreoffice*"] → "5:Misc"
 assign [class="Soffice"] → "5:Misc"
 assign [class="^qemu*"] → "5:Misc"
 assign [class="spicec"] → "5:Misc"
+assign [class="com-sun-javaws-Main"] → "5:Misc"
 assign [class="screenshot_preview"] → "5:Misc"
 assign [class="Pidgin"] → "6:IM"
 assign [class="Skype"] → "6:IM"
@@ -256,6 +257,7 @@ assign [class="Gimp"] → "8:GIMP"
 assign [class="URxvt" instance="ncmpcpp"] → "9:MPD"
 assign [class="mpv" instance="big_screen"] → "10:Outer_space"
 
+
 ## Arbitrary commands for specific windows
 for_window [class="URxvt" instance="one_command_shell"] floating enable
 for_window [class="spicec"] floating disable
@@ -264,7 +266,7 @@ for_window [class="at_msg"] floating enable
 for_window [instance=at_msg] sticky enable
 for_window [class="Yad"] floating enable
 for_window [class="Convert Script"] floating enable
-
+for_window [class="com-sun-javaws-Main"] floating disable
 
 
 ## This executes every reload

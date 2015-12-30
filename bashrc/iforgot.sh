@@ -886,7 +886,11 @@ EOF
 
 iforgot-nmap-scan() {
 	cat<<EOF
-	 nmap -Pn -T4 -sV -p 22,8087 127.0.0.1
+	 nmap [-A] -Pn -T4 -sS -p 22,8087 127.0.0.1
+      -A  add traceroute and version info
+      -Pn ping type: none — skip host discovery
+      -T4 timing template (↑ is faster)
+      -sS TCP SYN scan method — most versatile
 EOF
 }
 

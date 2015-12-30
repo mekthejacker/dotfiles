@@ -3,6 +3,11 @@
 # generate_json_for_i3bar.sh
 # A replacement for i3status written in bash.
 
+# Requirements:
+# GNU bash 4.3 (4.2 would probably be fine, but definitely not older)
+#   with enabled extglob
+# GNU sed 4.2.1
+
 # Shebang here is just for you to check the JSON output in terminal for syntax
 #   errors, not for running as executable in your i3 config,
 #   where it should be SOURCED from.
@@ -83,10 +88,7 @@ case $HOSTNAME in
 		;;
 	paskapuukko)
 		modules[110]=free_space
-		# modules[120]=battery_status
-		#modules[200]=
-		# modules[300]=
-		#modules[250]=xkb_layout
+		modules[120]=battery_status
 esac
 
 #      modules=( … nice_date )                      ← name in the module list
@@ -169,7 +171,7 @@ get_xkb_layout() {
 #   — This will be a pain.
 #   — Ugh…
 get_free_space() {
-	local wait_time=10 mountpoint present_mpoints i inner_separator total free \
+	local wait_time=10 i mountpoint present_mpoints inner_separator total free \
 		  color_tag json_comma
 	[ $TIMEOUT_STEP -eq 0 -o $((TIMEOUT_STEP % wait_time)) -eq 0 ] && {
 		unset free_space
@@ -214,8 +216,8 @@ get_mpd_state() {
 		read r s <<EOF
 $( sed -nr '$ s/.*random:\s*(on|off)\s+single:\s*(on|off).*/\1 \2/p' <<<"$mpc_output")
 EOF
-		[ "$r" = on ] && random="_z"
-		[ "$s" = on ] && single="_s"
+		[ "$r" = on ] && random="ˬz"
+		[ "$s" = on ] && single="ˬs"
 		mpd_caught_playing=t # this uses in get_gmail
 		mpd_state='{ "full_text": "'♬$random$single'",\n\t  "separator": false },'
 	}
@@ -240,86 +242,86 @@ get_mic_state() {
 # NOTES:
 #     Relies upon sys-power/acpi because names and paths may differ.
 get_battery_status() {
-	local wait_time=30 charge_now bat_status adp_online battery_lifetime \
-		  bat_lt_hours bat_lt_minutes bat_time_left \
-		  level full_blocks offset next_block blocks colour journal
+	local wait_time=30 i o bat adapter steps_per_block blocks_count levels_count \
+		  level full_blocks offset next_block blocks colour bat_time bat_hours \
+		  bat_minutes
 	[ $TIMEOUT_STEP -eq 0 -o $((TIMEOUT_STEP % wait_time)) -eq 0 ] && {
 		unset battery_status
-		[ -e /sys/class/power_supply/ADP1/online ] && {
-			# We have adapter, and probably, battery.
-			if [ -e /sys/class/power_supply/BAT1/status ]; then
-				# Yes, battery is present too.
-				pushd /sys/class/power_supply &>/dev/null
-				[ -v BAT_DATA_PREPARED ] || {
-					# Maximum charge available after the last calibration
-					CHARGE_FULL=$(< BAT1/charge_full)
-					# Maximum charge as it was designed
-					CHARGE_FULL_DESIGN=$(< BAT1/charge_full_design)
+		# No device
+		#o='No support for device type: power_supply'
 
-					STEPS_PER_BLOCK=' ░▒▓█'
-					BLOCKS_COUNT=5
-					LEVELS_COUNT=$(( ${#STEPS_PER_BLOCK} * $BLOCKS_COUNT ))
-					TOTAL_HOURS_BY_DESIGN="6"
-					BAT_DATA_PREPARED=t
+		# Ejected
+		#o='Adapter 0: on-line'
+
+		# Fully charged and on AC adapter
+		#o='Battery 0: Full, 100%
+		#Battery 0: design capacity 4824 mAh, last full capacity 3437 mAh = 71%
+		#Adapter 0: on-line'
+
+		# Charging, 31%
+		#o='Battery 0: Charging, 31%, 00:06:36 until charged
+		#Battery 0: design capacity 4837 mAh, last full capacity 3446 mAh = 71%
+		#Adapter 0: on-line'
+
+		# Discharging 1%
+		#o='Battery 0: Discharging, 1%, 02:14:29 remaining
+		#Battery 0: design capacity 5083 mAh, last full capacity 3622 mAh = 71%
+		#Adapter 0: off-line'
+
+		# Charging at zero rate
+		#o='Battery 0: Charging, 1%, charging at zero rate - will never fully charge.
+		#Battery 0: design capacity 4821 mAh, last full capacity 3435 mAh = 71%s
+		#Adapter 0: on-line'
+
+		o=`acpi -abi`
+		bat=(`sed -nr '1 s/^Battery.*: (Full|Charging|Discharging|Unknown), ([0-9]{1,3})%,?\s?(([0-9]{2}):([0-9]{2}):[0-9]{2}|charging at zero rate)?.*$/\1 \2 \3 \4 \5/p'<<<"$o"`)
+		adapter=$(sed -nr 's/^Adapter.*: (on-line|off-line)$/\1/p'<<<"$o")
+
+		[ "$adapter" ] && {
+			# Adapter line should be always present, if POWER_SUPPLY works
+			[ "$bat" ] && {
+				steps_per_block=' ░▒▓█'
+				blocks_count=5
+				levels_count=$(( ${#steps_per_block} * $blocks_count ))
+				# level is an integer from 1 to levels_count (25 is the default).
+				level=$(( bat[1] * levels_count / 100 ))  # current charge in percent * levels_count / 100%
+				full_blocks=$(( level / blocks_count ))  # is level is, say, 24, then 24/5 = 4
+				[ $full_blocks -lt $blocks_count ] && {
+					# Now we need to determine the char for the block that is not full
+					# [ $(( level % ${#steps_per_block} )) -eq 0 ] \
+					# 	&& offset=0 \
+					# 	|| offset=$(( level - full_blocks * blocks_count - 1 ))
+					# next_block=${steps_per_block:$offset:1}
+					# set -x
+					# declare -p level
+					next_block=${steps_per_block:$(( level % ${#steps_per_block} )):1}
+					# set +x
+					# exit 0
 				}
-				# When charging, this shows how much
-				charge_now=$(< BAT1/charge_now)
-				# Battery status as reported by kernel
-				bat_status=$(< BAT1/status)
-				# Is external power supply plugged?
-				adp_online=$(< ADP1/online)
-				popd &>/dev/null
-
-				battery_lifetime=`echo "scale=2;
-                                  $TOTAL_HOURS_BY_DESIGN*$charge_now\
-				                  /$CHARGE_FULL_DESIGN" | bc`
-				bat_lt_hours=${battery_lifetime%.*}
-				[ ${#bat_lt_hours} -ne 0 ] && \
-					bat_lt_hours="${bat_lt_hours}h " || unset bat_lt_hours
-				bat_lt_minutes=`echo "scale=0; ${battery_lifetime#*.}*3/5" | bc`
-				[ ${#bat_lt_minutes} -ne 0 ] && \
-					bat_lt_minutes="${bat_lt_minutes}m"
-				bat_time_left=" ${bat_lt_hours:-}${bat_lt_minutes:-}"
-# W!
-# Write a journal of battery charge level till it’s completely discharged.
-# Be sure _the filesystem_ you save journal on _is protected_ from power loss,
-#   e.g. has "data=journal,barrier=1" among mount opts for ext3/4, otherwise
-#   all discharging will be in vain.
-				# journal=/battery_journal.csv
-				level=$(( $charge_now * $LEVELS_COUNT / $CHARGE_FULL ))
-				full_blocks=$(( $level / $BLOCKS_COUNT ))
-				[ $full_blocks -lt $BLOCKS_COUNT ] && {
-					if [ $level -eq 0 ]; then
-						offset=$level
-					else
-						offset=$(( $level - $full_blocks * $BLOCKS_COUNT - 1 ))
-					fi
-					next_block=${STEPS_PER_BLOCK:$offset:1}
-				}
-
-				for ((i=0; i<$full_blocks; i++)); do
-					blocks="$blocks${STEPS_PER_BLOCK:4:1}"
+				for ((i=0; i<full_blocks; i++)); do
+					blocks+="${steps_per_block:4:1}"
 				done
-				[ -v next_block ] && blocks="$blocks$next_block"
-				while [ ${#blocks} -lt $BLOCKS_COUNT ]; do
-					blocks="$blocks${STEPS_PER_BLOCK:0:1}"
+				[ -v next_block ] && blocks+="$next_block"
+				# Complete the empty space when ${#full_blocks} -lt 4
+				while [ ${#blocks} -lt $blocks_count ]; do
+					blocks+="${steps_per_block:0:1}"
 				done
 
-				if [ $adp_online -eq 1 ]; then
+				if [ $adapter = on-line ]; then
 					colour=$green
 				elif [ $level -ge 5 ]; then
 					colour=$white
 				elif [ $level -gt 1 ]; then
 					colour=$orange
 				else
-					# Battery is about to be discharged completely → 0
+					#  Battery is about to be discharged completely → 0
 					# (but still can work for 30 min in idle for me)
 					colour=$red
 					# Throw a message about shutdown and try to perform it.
-					$(Xdialog --timeout 5 \
-						--ok-label Shutdown --cancel-label 'NO, WAIT!' \
-						--yesno 'Battery level is low.\nIt’s time to shutdown soon.' 370x100)
-					[ $charge_now -eq 0 -a $? -eq 0 ] && {
+					$(Xdialog \
+						  --ok-label Shutdown --cancel-label 'NO, WAIT!' \
+						  --yesno 'Battery level is low.\nIt’s time to shutdown soon.' 370x100)
+					[ $level -eq 0 -a $? -eq 0 ] && {
 						shutdown &>/dev/null || {  # ~/bin/shutdown
 							Xdialog --msgbox 'Shutdown returned with an error.\nYou have to do it manually!' 330x100
 							# If the script cannot call shutdown itself,
@@ -330,17 +332,36 @@ get_battery_status() {
 						}
 					}
 				fi
-				# [ -v journal ] && \
-				# echo "`date +%s`;$charge_now;$current_now;$level" >> $journal
-			else
-				blocks='EJECTED'
+
+				[[ "$bat" =~ ^Full|Unknown$ ]] && bat_time='' || {
+						[ "${bat[2]}" = charging ] && {
+							bat_time='='  # charging at zero rate
+						}||{
+							bat_hours=${bat[3]#0}
+							bat_hours=${bat_hours#0}  # no, ${bat[3]##0} wouldn’t work
+							bat_minutes=${bat[4]#0}
+							bat_minutes=${bat_minutes#0}
+							bat_time="${bat_hours:+${bat_hours}h }${bat_minutes:+${bat_minutes}m}"
+						}
+					}
+				[[ "$bat_time" =~ ^(|=|[0-9]+h [0-9]+m|[0-9]+m)$ ]] || bat_time='?'
+				:
+			}||{
 				colour=$red
-			fi
-		} || {
-			blocks='NO POWER_SUPPLY CLASS FOUND'
+				blocks='EJECTED'
+				[ "$adapter" = on-line ] || blocks+='? Unknown response.'
+			}
+			:
+		}||{
 			colour=$red
+			[ "$o" = 'No support for device type: power_supply' ] && {
+				# Should be enabled in the kernel
+				blocks='No POWER_SUPPLY, EFI or ACPI?'
+			}||{
+				blocks='Strange. Unknown response.'
+			}
 		}
-		battery_status="{ \"full_text\": \"┫$blocks┣${bat_time_left:-}\",
+		declare -g battery_status="{ \"full_text\": \"┫$blocks┣${bat_time:+ $bat_time}\",
 \t  \"color\":\"$colour\",
 \t  \"separator\":false },"
 	}

@@ -76,5 +76,8 @@ hwdec=vdpau
 [fanetbook]
 vo=opengl
 
+[paskapuukko]
+vo=vaapi
+hwdec=vaapi
 [encoding]
 terminal=no
