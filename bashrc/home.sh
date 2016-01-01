@@ -128,9 +128,9 @@ wa-m() { wa -d /home/video/мультипликация "$@"; }
 # Output on the plasma. See also ~/.i3/config.template for workspace bindings.
 wap() {
 	local variant=$1; shift
-	xrandr --output HDMI-0 --mode 1920x1080 --right-of DVI-I-0
+	xrandr --output $SLAVE_OUTPUT_0 --auto --right-of $PRIMARY_OUTPUT
 	wa-$variant -m "--x11-name big_screen --profile=hdmi" $@ # --ionice-opts        ## Maybe because of this?
-    xrandr --output HDMI-0 --off
+    xrandr --output $SLAVE_OUTPUT_0 --off
 	# Switch back from the workspace bound to the output with plasma
 	# i3-msg workspace 0:Main
 }
