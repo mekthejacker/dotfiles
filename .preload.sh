@@ -23,7 +23,7 @@ export STARTUP=t WIDTH=800 HEIGHT=600 DPI=96 PRIMARY_OUTPUT \
 #   in pinentry if SCIM is active, I may forget something, change the order
 #   of actions or you may stumble upon this makeing your own ~/.preload.sh,
 #   so just let it be here and use $gpg, not gpg.
-#gpg="GTK_IM_MODULE= QT_IM_MODULE= gpg" # This doesn’t work for some reason.
+alias gpg="GTK_IM_MODULE= QT_IM_MODULE= gpg"
 # Starting zenity progress window to be aware when lags come from
 #   if they appear.
 pipe=/tmp/x_preloading_pipe
@@ -69,6 +69,12 @@ n=0; while read outp; do
 		|| PRIMARY_OUTPUT=$outp
 done < <(xrandr --screen 0 | sed -nr 's/^(\S+) connected.*/\1/p')
 
+[ $HOSTNAME = home ] && {
+	PRIMARY_OUTPUT=VGA1
+	SLAVE_OUTPUT_0=HDMI3
+}
+
+export ${!SLAVE_OUTPUT_*}
 # Disabling all other outputs except the main one BEFORE
 #   gpg spawns pinentry window and autorun messes the workspace
 #   with huge screen spread onto two monitors.
