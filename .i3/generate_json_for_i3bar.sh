@@ -67,8 +67,8 @@ modules=(
 	[150]=mic_state
 	[160]=internet_status
 	[170]=gmail
-	[300]=
-	[350]=nice_date
+	[200]=
+	[250]=nice_date
 )
 
 case $HOSTNAME in
@@ -84,9 +84,9 @@ case $HOSTNAME in
 	paskapuukko)
 		modules[110]=free_space
 		# modules[120]=battery_status
-		modules[200]=
+		#modules[200]=
 		# modules[300]=
-		modules[250]=xkb_layout
+		#modules[250]=xkb_layout
 esac
 
 #      modules=( … nice_date )                      ← name in the module list

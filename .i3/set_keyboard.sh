@@ -4,7 +4,12 @@
 ##  especially true for extension cords) may cause input devices to be
 ##  re-enabled, so it’s handy to have this script mentioned in i3 config
 ##  among those things to be done at reloading configuration.
-xkbcomp ~/.env/xkbcomp.xkb $DISPLAY
+
+[ -e ~/.env/xkbcomp.$HOSTNAME.xkm ] \
+	&& xkbcomp_map="$HOME/.env/xkbcomp.$HOSTNAME.xkm" \
+	|| xkbcomp_map="$HOME/.env/xkbcomp.xkm"  # generic
+xkbcomp $xkbcomp_map $DISPLAY
+
 ## Setting NumLock
 numlockx off
 numlockx on

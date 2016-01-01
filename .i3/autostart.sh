@@ -79,7 +79,7 @@ fi
 
 pointer_control disable
 
-startup_apps=(mpd "firefox --profile $HOME/.ff" redshift thunar)
+startup_apps=(mpd "firefox --profile $HOME/.ff" redshift thunar pidgin)
 # WIDTH and HEIGHT were set in the ~/.preload.sh
 case $HOSTNAME in
 	home)
