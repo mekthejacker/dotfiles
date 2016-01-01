@@ -826,9 +826,7 @@ And finally, you can use the device for recording with a command like
 EOF
 }
 
-iforgot-cd-back() {
-	echo -e '\tcd ~-'
-}
+iforgot-cd-back() { echo -e '\tcd ~-'; }
 
 iforgot-hex-to-dec-conversion() {
 cat<<"EOF"
@@ -859,7 +857,7 @@ EOF
 iforgot-nested-x() { echo -e '\tXephyr :108 -resizeable &'; }
 
 iforgot-eix() {
-	cat <<EOF
+cat <<EOF
 
 --only-names --in-overlay <overlay>
 Also: equery has repository sunrise
@@ -872,7 +870,7 @@ EOF
 }
 
 iforgot-mkfs-ext4-options() {
-	cat<<EOF
+cat<<EOF
 For /boot:
 	# 40–50 MiB should be enough.
 For /:
@@ -885,19 +883,19 @@ EOF
 }
 
 iforgot-nmap-scan() {
-	cat<<EOF
-	 nmap [-A] -Pn -T4 -sS -p 22,8087 127.0.0.1
-      -A  add traceroute and version info
-      -Pn ping type: none — skip host discovery
-      -T4 timing template (↑ is faster)
-      -sS TCP SYN scan method — most versatile
+cat<<EOF
+nmap [-A] -Pn -T4 -sS -p 22,8087 127.0.0.1
+    -A  add traceroute and version info
+    -Pn ping type: none — skip host discovery
+    -T4 timing template (↑ is faster)
+    -sS TCP SYN scan method — most versatile
 EOF
 }
 
 iforgot-hierarchy-of-linux-fs() { echo -e '\tman hier'; }
 
 iforgot-ssh-passing-through-gateway() {
-	cat<<EOF
+cat<<EOF
 1. Tunneling
 ssh -f gate_user@gate_ip -L [localhost:]<big_port>:<host_behind_gw>:<sshd_port_on_that_host> -N && ssh -p<big_port> <user_at_host_behind>@localhost
 alias pass-me-through="ssh -p4444 -f tunnel@randomfucks.com -L 20000:192.168.1.15:22 -N && ssh -p20000 me@localhost"
@@ -910,6 +908,14 @@ Hostname II.PP.II.PP
 
 Host behind
 HostName PP.II.PP.II
-ProxyCommand  ssh -qW %h:%p gw 
+ProxyCommand  ssh -qW %h:%p gw
+EOF
+}
+
+iforgot-ssh-forward-80-port() {
+cat<<EOF
+Say we have imgur.com blocked in our network. But there is a server which can access it.
+	ssh -L 9000:imgur.com:80 user@server
+Then open localhost:9000 in your browser.
 EOF
 }

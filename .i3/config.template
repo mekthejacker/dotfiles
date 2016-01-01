@@ -131,7 +131,7 @@ bindcode $mod+Control+46 exec --no-startup-id i3lock -d -f -i "$HOME/.env/[Commi
 bindcode $mod+67 exec --no-startup-id mpc toggle
 ## F2
 bindcode $mod+68 exec --no-startup-id "~/bin/add2playlist.sh"
-                                                             # create new
+         # create new
 bindcode $mod+Shift+68 exec --no-startup-id "~/bin/add2playlist.sh -c"
 ## F3
 bindcode $mod+69 exec --no-startup-id amixer set Master toggle
