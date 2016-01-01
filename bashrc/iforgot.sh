@@ -891,3 +891,21 @@ EOF
 }
 
 iforgot-hierarchy-of-linux-fs() { echo -e '\tman hier'; }
+
+iforgot-ssh-passing-through-gateway() {
+	cat<<EOF
+1. Tunneling
+ssh -f gate_user@gate_ip -L [localhost:]<big_port>:<host_behind_gw>:<sshd_port_on_that_host> -N && ssh -p<big_port> <user_at_host_behind>@localhost
+alias pass-me-through="ssh -p4444 -f tunnel@randomfucks.com -L 20000:192.168.1.15:22 -N && ssh -p20000 me@localhost"
+  scp -P <any_port> localhost:REMOTEPATH LOCALPATH
+  scp -P <any_port> LOCALPATH localhost:REMOTEPATH
+
+2. Proxying
+Host gw
+Hostname II.PP.II.PP
+
+Host behind
+HostName PP.II.PP.II
+ProxyCommand  ssh -qW %h:%p gw 
+EOF
+}

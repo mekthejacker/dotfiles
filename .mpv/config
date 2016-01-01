@@ -42,8 +42,10 @@ input-unix-socket=~/.mpv/socket
 
 [hdmi]
 profile-desc="For output on big plasma"
-vo=vdpau
-hwdec=vdpau
+#vo=vdpau
+#hwdec=vdpau
+vo=vaapi
+hwdec=vaapi
 ## For this type of ALSA device specification see
 ## cat /proc/asound/devices
 ao=alsa:device=[hw:1,7]
@@ -70,8 +72,11 @@ input-cursor=yes
 ## For desktop recording
 #vo=opengl-hq
 ## For playing fast
-vo=vdpau
-hwdec=vdpau
+#vo=vdpau
+#hwdec=vdpau
+vo=vaapi
+hwdec=vaapi
+
 
 [fanetbook]
 vo=opengl
