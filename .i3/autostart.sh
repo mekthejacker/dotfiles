@@ -83,7 +83,7 @@ startup_apps=(mpd "firefox --profile $HOME/.ff" redshift thunar pidgin)
 # WIDTH and HEIGHT were set in the ~/.preload.sh
 case $HOSTNAME in
 	home)
-		startup_apps+=(gimp geeqie)
+		startup_apps+=(gimp geeqie pidgin)
 		;;
 	paskapuukko)
 		# startup_apps+=(skype)  # how the fuck does skype switch the workspace by itself?!

@@ -8,5 +8,5 @@ for slave in ${!SLAVE_OUTPUT_*}; do
 	[ -v STARTUP ] && eval xrandr --output \$$slave --off
 done
 # Hide the bar if on plasma
-[ $HOSTNAME = home ] && sed -ri '/bar \{/,/\}/ {s/(^\s*mode\s+)dock/\1hide/}' ~/.i3/config
+#[ $HOSTNAME = home ] && sed -ri '/bar \{/,/\}/ {s/(^\s*mode\s+)dock/\1hide/}' ~/.i3/config
 [ -v STARTUP ] || i3-msg restart
