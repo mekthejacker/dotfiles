@@ -79,7 +79,7 @@ case $HOSTNAME in
 	home)
 		modules[110]=free_space
 		modules[200]=
-		modules[255]=schedule
+		modules[155]=schedule
 		;;
 	paskapuukko)
 		modules[110]=free_space

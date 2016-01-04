@@ -758,15 +758,6 @@ iforgot-check-unicode-symbol() {
 EOF
 }
 
-iforgot-reverse-ssh() {
-cat <<EOF
-ssh -f <user_at_gateway>@<gateway_ip> -L <any_port>:<IP_behind_NAT>:<ssh_port_of_the_machine_behind_NAT> -N \
-	&& ssh -p<same_any_port> <user_at_machine_behind_NAT>@localhost
-
-If you login without keys, the first password is the password to the gateway, the second is to the machine behind NAT.
-EOF
-}
-
 iforgot-clean-git-repo-totally() {
 cat <<EOF
 Removing the origin just to make sure no reference is kept.
@@ -885,8 +876,12 @@ EOF
 }
 
 iforgot-nmap-scan() {
-	cat<<EOF
-	 nmap -Pn -T4 -sV -p 22,8087 127.0.0.1
+cat<<EOF
+nmap [-A] -Pn -T4 -sS -p 22,8087 127.0.0.1
+      -A  add traceroute and version info
+      -Pn ping type: none — skip host discovery
+      -T4 timing template (↑ is faster)
+      -sS TCP SYN scan method — most versatile
 EOF
 }
 
@@ -915,4 +910,8 @@ cat <<EOF
 Say we have no access to imgur from our network, but we can connect to a server that can.
 	ssh -L 9000:imgur.com:80 user@server
 EOF
+}
+
+iforgot-ssh-clear-known-hosts-from-a-host() {
+echo 'ssh-keygen -f ~/.ssh/known_hosts -R <host with invalid key>'
 }
