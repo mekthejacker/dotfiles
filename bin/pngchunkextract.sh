@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 
 # pngchunkextract.sh
-# This script extract data hidden in file with pngchunkinsert.sh.
+# This script extracts data hidden in file with pngchunkinsert.sh.
 # pngchunkinsert.sh © deterenkelt 2014
 
-# This program is free software; you can redistribute it and/or modify it 
-# under the terms of the GNU General Public License as published 
-# by the Free Software Foundation; either version 3 of the License, 
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published
+# by the Free Software Foundation; either version 3 of the License,
 # or (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
-# but without any warranty; without even the implied warranty 
-# of merchantability or fitness for a particular purpose. 
+# but without any warranty; without even the implied warranty
+# of merchantability or fitness for a particular purpose.
 # See the GNU General Public License for more details.
 
 # See pngchunkinsert.sh for details on PNG file structure.
@@ -28,7 +28,7 @@ Usage:
 ./pngchunkextract.sh <file> <chunk_name> [output_file_name]
 EOF
 }
- 
+
 [ "$#" -eq 1 ] && [ "$1" = '-h' -o "$1" = '--help' ] || [ "$#" -eq 0 ] && show_usage && exit 0
 
 source_file="$1"
@@ -46,7 +46,7 @@ possible_offsets=`grep --text --byte-offset --only-matching \
                        "$chunk_name" "$source_file" \
                   | sed -r 's/^([0-9]+):.*/\1/g'`
 
-while read offset; do 
+while read offset; do
 	hex_size="`od -j $((offset-4)) -N 4 -A n -t x1 "$source_file" | sed 's/\s//g'`"
 	[[ "$hex_size" =~ ^[0-9abcdef]{8}$ ]] || {
 		echo 'Couldn’t compute hexadecimal value of the chunk length.' >&2

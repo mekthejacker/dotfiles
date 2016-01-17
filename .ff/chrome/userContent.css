@@ -54,3 +54,14 @@ body textarea {
 @-moz-document domain("ebay.com") {
    .nojs-msk .nojs-msg { display:none !important }
 }
+
+/*hide a person by pubkey*/
+div.hidbord_msgfrom_s4JaGeAnTBUk3fGAb3Es1oSY4DPyPZmRDS5YMAeJxi59 {
+    display: none !important;
+}
+/*hide anonymous posts*/
+/*
+div.hidbord_msgfrom_ {
+    display: none !important;
+}
+*/

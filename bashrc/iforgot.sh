@@ -913,5 +913,9 @@ EOF
 }
 
 iforgot-ssh-clear-known-hosts-from-a-host() {
-echo 'ssh-keygen -f ~/.ssh/known_hosts -R <host with invalid key>'
+	echo 'ssh-keygen -f ~/.ssh/known_hosts -R <host with invalid key>'
+}
+
+iforgot-ssh-multiple-port-forward() {
+	echo 'root # ssh -f GATE -L 9000:IP_BEHIND_NAT:80 -L 443:IP_BEHIND_NAT:443 -L 623:IP_BEHIND_NAT:623 -L 5900:IP_BEHIND_NAT:5900 -N'
 }
