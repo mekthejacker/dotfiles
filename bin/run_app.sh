@@ -200,9 +200,9 @@ case $app_name in
 #			~/.purple/accounts.xml.gpg
 		;;
 	shutdown)
-		~/.i3/on_quit.sh
+		#~/.i3/on_quit.sh
 		pkill -HUP gpg-agent # clear cache
-		sudo /sbin/shutdown $@
+		sudo /sbin/init 0
 		;;
 	*)
 		cat <<"EOF"

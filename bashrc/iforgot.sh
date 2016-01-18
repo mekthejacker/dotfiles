@@ -919,3 +919,12 @@ Say we have imgur.com blocked in our network. But there is a server which can ac
 Then open localhost:9000 in your browser.
 EOF
 }
+
+iforgot-ssh-multiple-port-forward() {
+cat <<EOF
+Supermicro
+    root # ssh -f GATE -L 9000:IP_BEHIND_NAT:80 -L 443:IP_BEHIND_NAT:443 -L 623:IP_BEHIND_NAT:623 -L 5900:IP_BEHIND_NAT:5900 -N
+iLO
+    root # ssh -f GATE -L 9000:IP_BEHIND_NAT:80 -L 443:IP_BEHIND_NAT:443 -L 17988:IP_BEHIND_NAT:17988 -L 17990:IP_BEHIND_NAT:17990 -N
+EOF
+}

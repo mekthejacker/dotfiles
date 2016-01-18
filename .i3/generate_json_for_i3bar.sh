@@ -245,125 +245,125 @@ get_battery_status() {
 	local wait_time=30 i o bat adapter steps_per_block blocks_count levels_count \
 		  level full_blocks offset next_block blocks colour bat_time bat_hours \
 		  bat_minutes
-	[ $TIMEOUT_STEP -eq 0 -o $((TIMEOUT_STEP % wait_time)) -eq 0 ] && {
-		unset battery_status
-		# No device
-		#o='No support for device type: power_supply'
+	[ -v LOW_POWER ] || {
+		[ $TIMEOUT_STEP -eq 0 -o $((TIMEOUT_STEP % wait_time)) -eq 0 ] && {
+			unset battery_status
+			# No device
+			#o='No support for device type: power_supply'
 
-		# Ejected
-		#o='Adapter 0: on-line'
+			# Ejected
+			#o='Adapter 0: on-line'
 
-		# Fully charged and on AC adapter
-		#o='Battery 0: Full, 100%
-		#Battery 0: design capacity 4824 mAh, last full capacity 3437 mAh = 71%
-		#Adapter 0: on-line'
+			# Fully charged and on AC adapter
+			#o='Battery 0: Full, 100%
+			#Battery 0: design capacity 4824 mAh, last full capacity 3437 mAh = 71%
+			#Adapter 0: on-line'
 
-		# Charging, 31%
-		#o='Battery 0: Charging, 31%, 00:06:36 until charged
-		#Battery 0: design capacity 4837 mAh, last full capacity 3446 mAh = 71%
-		#Adapter 0: on-line'
+			# Charging, 31%
+			#o='Battery 0: Charging, 31%, 00:06:36 until charged
+			#Battery 0: design capacity 4837 mAh, last full capacity 3446 mAh = 71%
+			#Adapter 0: on-line'
 
-		# Discharging 1%
-		#o='Battery 0: Discharging, 1%, 02:14:29 remaining
-		#Battery 0: design capacity 5083 mAh, last full capacity 3622 mAh = 71%
-		#Adapter 0: off-line'
+			# Discharging 1%
+			#o='Battery 0: Discharging, 1%, 02:14:29 remaining
+			#Battery 0: design capacity 5083 mAh, last full capacity 3622 mAh = 71%
+			#Adapter 0: off-line'
 
-		# Charging at zero rate
-		#o='Battery 0: Charging, 1%, charging at zero rate - will never fully charge.
-		#Battery 0: design capacity 4821 mAh, last full capacity 3435 mAh = 71%s
-		#Adapter 0: on-line'
+			# Charging at zero rate
+			#o='Battery 0: Charging, 1%, charging at zero rate - will never fully charge.
+			#Battery 0: design capacity 4821 mAh, last full capacity 3435 mAh = 71%s
+			#Adapter 0: on-line'
 
-		o=`acpi -abi`
-		bat=(`sed -nr '1 s/^Battery.*: (Full|Charging|Discharging|Unknown), ([0-9]{1,3})%,?\s?(([0-9]{2}):([0-9]{2}):[0-9]{2}|charging at zero rate)?.*$/\1 \2 \3 \4 \5/p'<<<"$o"`)
-		adapter=$(sed -nr 's/^Adapter.*: (on-line|off-line)$/\1/p'<<<"$o")
+			o=`acpi -abi`
+			bat=(`sed -nr '1 s/^Battery.*: (Full|Charging|Discharging|Unknown), ([0-9]{1,3})%,?\s?(([0-9]{2}):([0-9]{2}):[0-9]{2}|charging at zero rate)?.*$/\1 \2 \3 \4 \5/p'<<<"$o"`)
+			adapter=$(sed -nr 's/^Adapter.*: (on-line|off-line)$/\1/p'<<<"$o")
 
-		[ "$adapter" ] && {
-			# Adapter line should be always present, if POWER_SUPPLY works
-			[ "$bat" ] && {
-				steps_per_block=' ░▒▓█'
-				blocks_count=5
-				levels_count=$(( ${#steps_per_block} * $blocks_count ))
-				# level is an integer from 1 to levels_count (25 is the default).
-				level=$(( bat[1] * levels_count / 100 ))  # current charge in percent * levels_count / 100%
-				full_blocks=$(( level / blocks_count ))  # is level is, say, 24, then 24/5 = 4
-				[ $full_blocks -lt $blocks_count ] && {
-					# Now we need to determine the char for the block that is not full
-					# [ $(( level % ${#steps_per_block} )) -eq 0 ] \
-					# 	&& offset=0 \
-					# 	|| offset=$(( level - full_blocks * blocks_count - 1 ))
-					# next_block=${steps_per_block:$offset:1}
-					# set -x
-					# declare -p level
-					next_block=${steps_per_block:$(( level % ${#steps_per_block} )):1}
-					# set +x
-					# exit 0
-				}
-				for ((i=0; i<full_blocks; i++)); do
-					blocks+="${steps_per_block:4:1}"
-				done
-				[ -v next_block ] && blocks+="$next_block"
-				# Complete the empty space when ${#full_blocks} -lt 4
-				while [ ${#blocks} -lt $blocks_count ]; do
-					blocks+="${steps_per_block:0:1}"
-				done
+			[ "$adapter" ] && {
+				# Adapter line should be always present, if POWER_SUPPLY works
+				[ "$bat" ] && {
+					steps_per_block=' ░▒▓█'
+					blocks_count=5
+					levels_count=$(( ${#steps_per_block} * $blocks_count ))
+					# level is an integer from 1 to levels_count (25 is the default).
+					level=$(( bat[1] * levels_count / 100 ))  # current charge in percent * levels_count / 100%
+					full_blocks=$(( level / blocks_count ))  # is level is, say, 24, then 24/5 = 4
+					[ $full_blocks -lt $blocks_count ] && {
+						# Now we need to determine the char for the block that is not full
+						# [ $(( level % ${#steps_per_block} )) -eq 0 ] \
+						# 	&& offset=0 \
+						# 	|| offset=$(( level - full_blocks * blocks_count - 1 ))
+						# next_block=${steps_per_block:$offset:1}
+						# set -x
+						# declare -p level
+						next_block=${steps_per_block:$(( level % ${#steps_per_block} )):1}
+						# set +x
+						# exit 0
+					}
+					for ((i=0; i<full_blocks; i++)); do
+						blocks+="${steps_per_block:4:1}"
+					done
+					[ -v next_block ] && blocks+="$next_block"
+					# Complete the empty space when ${#full_blocks} -lt 4
+					while [ ${#blocks} -lt $blocks_count ]; do
+						blocks+="${steps_per_block:0:1}"
+					done
 
-				if [ $adapter = on-line ]; then
-					colour=$green
-				elif [ $level -ge 5 ]; then
-					colour=$white
-				elif [ $level -gt 1 ]; then
-					colour=$orange
-				else
-					#  Battery is about to be discharged completely → 0
-					# (but still can work for 30 min in idle for me)
+					if [ $adapter = on-line ]; then
+						colour=$green
+					elif [ $level -ge 5 ]; then
+						colour=$white
+					elif [ $level -gt 1 ]; then
+						colour=$orange
+					else
+						#  Battery is about to be discharged completely → 0
+						# (but still can work for 30 min in idle for me)
+						colour=$red
+						# Throw a message about shutdown and try to perform it.
+						$(Xdialog \
+							  --ok-label Shutdown --cancel-label 'NO, WAIT!' \
+							  --yesno "Battery level ($level) is low.\nIt’s time to shutdown soon." 370x100) && {
+							(nohup shutdown &>/dev/null) || {  # ~/bin/shutdown
+								Xdialog --msgbox 'Shutdown returned with an error.\nYou have to do it manually!' 330x100
+								# If the script cannot call shutdown itself,
+								#   it must at least try to save the energy
+								#   by omitting this function
+								LOW_POWER=t
+							}
+						}
+					fi
+
+					[[ "$bat" =~ ^Full|Unknown$ ]] && bat_time='' || {
+							[ "${bat[2]}" = charging ] && {
+								bat_time='='  # charging at zero rate
+							}||{
+								bat_hours=${bat[3]#0}
+								bat_hours=${bat_hours#0}  # no, ${bat[3]##0} wouldn’t work
+								bat_minutes=${bat[4]#0}
+								bat_minutes=${bat_minutes#0}
+								bat_time="${bat_hours:+${bat_hours}h }${bat_minutes:+${bat_minutes}m}"
+							}
+						}
+					[[ "$bat_time" =~ ^(|=|[0-9]+h [0-9]+m|[0-9]+m)$ ]] || bat_time='?'
+					:
+				}||{
 					colour=$red
-					# Throw a message about shutdown and try to perform it.
-					$(Xdialog \
-						  --ok-label Shutdown --cancel-label 'NO, WAIT!' \
-						  --yesno 'Battery level is low.\nIt’s time to shutdown soon.' 370x100)
-					[ $level -eq 0 -a $? -eq 0 ] && {
-						shutdown &>/dev/null || {  # ~/bin/shutdown
-							Xdialog --msgbox 'Shutdown returned with an error.\nYou have to do it manually!' 330x100
-							# If the script cannot call shutdown itself,
-							#   it must at least try to save the energy
-							#   going to sleep for 20 minutes (by that time
-							#   the battery will be probably exhausted).
-							sleep 1200
-						}
-					}
-				fi
-
-				[[ "$bat" =~ ^Full|Unknown$ ]] && bat_time='' || {
-						[ "${bat[2]}" = charging ] && {
-							bat_time='='  # charging at zero rate
-						}||{
-							bat_hours=${bat[3]#0}
-							bat_hours=${bat_hours#0}  # no, ${bat[3]##0} wouldn’t work
-							bat_minutes=${bat[4]#0}
-							bat_minutes=${bat_minutes#0}
-							bat_time="${bat_hours:+${bat_hours}h }${bat_minutes:+${bat_minutes}m}"
-						}
-					}
-				[[ "$bat_time" =~ ^(|=|[0-9]+h [0-9]+m|[0-9]+m)$ ]] || bat_time='?'
+					blocks='EJECTED'
+					[ "$adapter" = on-line ] || blocks+='? Unknown response.'
+				}
 				:
 			}||{
 				colour=$red
-				blocks='EJECTED'
-				[ "$adapter" = on-line ] || blocks+='? Unknown response.'
+				[ "$o" = 'No support for device type: power_supply' ] && {
+					# Should be enabled in the kernel
+					blocks='No POWER_SUPPLY, EFI or ACPI?'
+				}||{
+					blocks='Strange. Unknown response.'
+				}
 			}
-			:
-		}||{
-			colour=$red
-			[ "$o" = 'No support for device type: power_supply' ] && {
-				# Should be enabled in the kernel
-				blocks='No POWER_SUPPLY, EFI or ACPI?'
-			}||{
-				blocks='Strange. Unknown response.'
-			}
-		}
-		declare -g battery_status="{ \"full_text\": \"┫$blocks┣${bat_time:+ $bat_time}\",
+			declare -g battery_status="{ \"full_text\": \"┫$blocks┣${bat_time:+ $bat_time}\",
 \t  \"color\":\"$colour\",
 \t  \"separator\":false },"
+		}
 	}
 }
 

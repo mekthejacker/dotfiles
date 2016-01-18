@@ -79,11 +79,11 @@ fi
 
 pointer_control disable
 
-startup_apps=(mpd "firefox --profile $HOME/.ff" redshift thunar pidgin)
+startup_apps=(mpd "firefox --profile $HOME/.ff" thunar pidgin)
 # WIDTH and HEIGHT were set in the ~/.preload.sh
 case $HOSTNAME in
 	home)
-		startup_apps+=(gimp geeqie pidgin)
+		startup_apps+=(gimp geeqie pidgin redshift)
 		;;
 	paskapuukko)
 		# startup_apps+=(skype)  # how the fuck does skype switch the workspace by itself?!
@@ -94,7 +94,7 @@ pgrep -u $UID -f "^bash $HOME/bin/wallpaper_setter/wallpaper_setter.sh -S" \
 	|| { ~/bin/wallpaper_setter/wallpaper_setter.sh -S -B -0.3 -d /home/picts/screens & }
 # Urxvtc windows must appear after wallpaper is set, due to their
 #   fake transparency.
-~/bin/wallpaper_setter/wallpaper_setter.sh -w
+~/bin/wallpaper_setter/wallpaper_setter.sh -w &
 
 urxvtc --title 'Todo list' -e watch -t -n15 cat -n ~/todo
 # ┌────┐
