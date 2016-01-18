@@ -758,15 +758,6 @@ iforgot-check-unicode-symbol() {
 EOF
 }
 
-iforgot-reverse-ssh() {
-cat <<EOF
-ssh -f <user_at_gateway>@<gateway_ip> -L <any_port>:<IP_behind_NAT>:<ssh_port_of_the_machine_behind_NAT> -N \
-	&& ssh -p<same_any_port> <user_at_machine_behind_NAT>@localhost
-
-If you login without keys, the first password is the password to the gateway, the second is to the machine behind NAT.
-EOF
-}
-
 iforgot-clean-git-repo-totally() {
 cat <<EOF
 Removing the origin just to make sure no reference is kept.
@@ -927,4 +918,8 @@ Supermicro
 iLO
     root # ssh -f GATE -L 9000:IP_BEHIND_NAT:80 -L 443:IP_BEHIND_NAT:443 -L 17988:IP_BEHIND_NAT:17988 -L 17990:IP_BEHIND_NAT:17990 -N
 EOF
+}
+
+iforgot-ssh-clear-known-hosts-from-a-host() {
+	echo 'ssh-keygen -f ~/.ssh/known_hosts -R <host with invalid key>'
 }

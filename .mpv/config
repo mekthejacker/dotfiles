@@ -1,21 +1,28 @@
 ## Options that are common for any profile
 [default]
-## No on-screen controller buttons
-osc=no
 ## Audio track languages
 alang=ja,jpn,en,eng,de,deu,ru,rus
+## 0ms after window goes fullscreen
+cursor-autohide=0
+cursor-autohide-fs-only=yes
 ## redraw subs at seeking
 demuxer-mkv-subtitle-preroll=yes
 force-window=yes
 ## precise seeking helps Zehkul’s script
 hr-seek-demuxer-offset=5
+input-unix-socket=~/.mpv/socket
 ## Suppress status line messages.
 ## mpv like to print a lot when spawned from coproc in watch.sh
 msg-level=all=info
-sub-codepage=enca:ru:en
-## Sub loading is done via watch.sh
-sub-auto=no
-softvol=yes
+## No on-screen controller buttons
+osc=no
+osd-duration=3000
+#osd-font=''
+## default: 45 px at Height==720px
+osd-font-size=30
+osd-fractions=yes
+## Too many unnecessary files. Enabled in wa alias in ~/bashrc/home.sh
+#save-position-on-quit=yes
 screenshot-template="%F_%P"
 screenshot-format=jpg
 ## Compressing screenshots while mpv runs is slow,
@@ -23,29 +30,20 @@ screenshot-format=jpg
 #screenshot-png-compression=0
 ## Just in case I will need jpeg some day.
 screenshot-jpeg-quality=94
-volume=100
-#sub-ass=no
-osd-duration=3000
-osd-fractions=yes
-#osd-font=''
-## default: 45 px at Height==720px
-osd-font-size=30
+softvol=yes
+## Sub loading is done via watch.sh
+sub-auto=no
+sub-codepage=enca:ru:en
 ## Disable ass subs for this to take effect
 sub-text-font='DejaVu Sans Mono'
 sub-text-font-size=50
-## 0ms after window goes fullscreen
-cursor-autohide=0
-cursor-autohide-fs-only=yes
-## Too many unnecessary files. Enabled in wa alias in ~/bashrc/home.sh
-#save-position-on-quit=yes
-input-unix-socket=~/.mpv/socket
+vo=opengl-hq,vaapi,vdpau,xv
+volume=100
+ytdl-format=bestvideo+bestaudio
+
 
 [hdmi]
 profile-desc="For output on big plasma"
-#vo=vdpau
-#hwdec=vdpau
-vo=vaapi
-hwdec=vaapi
 ## For this type of ALSA device specification see
 ## cat /proc/asound/devices
 ao=alsa:device=[hw:1,7]
@@ -53,12 +51,6 @@ ao=alsa:device=[hw:1,7]
 #ao=alsa:device=spdif
 #ao=alsa:device=hw=hdmi
 ####ac=hwac3,hwdts,hwmpa,
-fs=yes
-
-[fb]
-profile-desc="For playing on framebuffer w/o X"
-vo=directfb:buffermode=triple
-monitoraspect=16:9
 fs=yes
 
 [interlaced_bluray]
@@ -69,17 +61,24 @@ input-cursor=yes
 #nocache=yes
 
 [home]
-## For desktop recording
-#vo=opengl-hq
-## For playing fast
-#vo=vdpau
-#hwdec=vdpau
-vo=vaapi
+vo=opengl-hq
+#vo=opengl-hq:scale=ewa_lanczossharp:cscale=ewa_lanczossharp:interpolation:temporal-dither:gamma=0.9:blend-subtitles=yes:target-prim=bt.709:target-trc=srgb
+#vo=opengl-hq:scale=ewa_lanczossharp:cscale=ewa_lanczossharp:interpolation:temporal-dither:gamma=0.9:blend-subtitles=yes:icc-profile="/home/dtr/.env/FULLHD.icm"
+#hwdec=vaapi
+
+[vo.xv]
+vo=xv
+
+[vo.vdpau]
+hwdec=vdpau
+
+[vo.vaapi]
 hwdec=vaapi
 
-
-[fanetbook]
-vo=opengl
+[vo.directfb]
+profile-desc="For playing on framebuffer w/o X"
+vo=directfb:buffermode=triple
+monitoraspect=16:9
 
 [paskapuukko]
 vo=vaapi
