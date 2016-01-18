@@ -80,5 +80,8 @@ profile-desc="For playing on framebuffer w/o X"
 vo=directfb:buffermode=triple
 monitoraspect=16:9
 
+[paskapuukko]
+vo=vaapi
+hwdec=vaapi
 [encoding]
 terminal=no

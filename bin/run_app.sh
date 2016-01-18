@@ -201,7 +201,7 @@ case $app_name in
 		;;
 	shutdown)
 		~/.i3/on_quit.sh
-		kill -HUP `pgrep gpg-agent` # clear cache
+		pkill -HUP gpg-agent # clear cache
 		sudo /sbin/shutdown $@
 		;;
 	*)
