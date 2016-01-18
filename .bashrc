@@ -1,5 +1,4 @@
 # /etc/skel/.bashrc
-
 #
 # This file is sourced by all *interactive* bash shells on startup,
 # including some apparently interactive shells such as scp and rcp
