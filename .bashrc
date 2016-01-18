@@ -102,7 +102,6 @@ alias gicm='git commit -m'
 alias gicam='git commit -am'
 alias gicamend='git commit --amend'
 alias gib='git branch'
-alias gip='git push'
 alias gif='git fetch'
 alias giff='git diff'
 alias gull='git pull'
@@ -118,6 +117,7 @@ alias gims='git submodule status'
 alias gimu='git submodule update'
 alias gimy='git submodule sync'
 alias gils='git ls-files'
+alias gush='git push'
 # pinentry doesn’t like scim
 alias gpg="GTK_IM_MODULE= QT_IM_MODULE= gpg"
 alias ls="ls --color=auto"
