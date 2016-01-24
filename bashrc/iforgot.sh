@@ -878,8 +878,13 @@ cat<<EOF
 nmap [-A] -Pn -T4 -sS -p 22,8087 127.0.0.1
     -A  add traceroute and version info
     -Pn ping type: none — skip host discovery
+    -PR ping type: ARP — check hosts in LAN
+    -PU ping type: UDP
+    -PA ping type: TCP ACK
+    -PS ping type: TCP SYN
     -T4 timing template (↑ is faster)
-    -sS TCP SYN scan method — most versatile
+    -sS port scan: TCP SYN scan method — most versatile
+    -sn port scan: no
 EOF
 }
 
@@ -933,5 +938,16 @@ In order to launch a Linux process, QEMU needs the process executable itself and
      $ qemu-i386 -L / /bin/ls
 qemu is used to run a whole system: from kernel to a UI, which includes many process working as an operating system qemu-softmmu is a accelerator for mapping memory and IO, so it cannot work alone, it need a master. so I guess it is a part of qemu indeed. So a qemua-user can run a single program of a (different) type of OS without emulating a whole living OS.
 https://forums.gentoo.org/viewtopic-p-6270729.html?sid=0038823980fbcef5643128181d129bc1#6270729
+EOF
+}
+
+iforgot-tcpdump-check-multicast() {
+cat<<EOF
+Specific host:
+    tcpdump -i eth0 -s0 -vv host 239.255.255.250
+All multicast:
+    tcpdump -i eth0 -s0 -vv net 224.0.0.0/4
+
+    Don’t forget to check smcroute join/leave.
 EOF
 }

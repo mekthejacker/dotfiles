@@ -8,7 +8,7 @@
 !	 	WM_CLASS in the example above may be:
 !		- ‘rxvt’, then same options derived from rxvt will work for urxvt;
 !		- ‘URxvt’, these options will not work for rxvt.
-!	<optionname>: <value> 
+!	<optionname>: <value>
 !		WM_CLASS will be assumed to terminal.
 !	[WM_CLASS]*<optionname>: <value>
 !		Options that have WM_CLASS matching the first WM_CLASS of the window
@@ -40,9 +40,11 @@ URxvt.saveLines: 3000
 !-- Look and feel
 !
 !! Scroll inside of subscreen, less etc.
+URxvt.preeditType:Root
 URxvt.secondaryWheel: true
 URxvt.cursorUnderline: false
-URxvt.font: xft:Terminus:autohint=true
+URxvt.font: xft:Terminus:autohint=true \
+            xft:DevaVu Sans Mono:autohint=true
 URxvt.transparent: true
 URxvt.borderless: true
 URxvt.shading: 35
