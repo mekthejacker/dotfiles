@@ -208,7 +208,7 @@ send_command() {
 	# It’s to prevent from simultaneous writing to the rxpipe
 	while [ "`pgrep -cf "wallpaper_setter.sh\s+-[^S]"`" -gt 1 ] \
 			  && \
-			  [ "`ps -o pid= --sort=lstart -$(pgrep -f "wallpaper_setter.sh\s+-[^S]") | head -n1`" != $$ ]; do
+		  [ "`ps -o pid= --sort=lstart -$(pgrep -f "wallpaper_setter.sh\s+-[^S]") | head -n1`" != $$ ]; do
 		sleep 15
 	done
 	until [ -v partial_success ]; do

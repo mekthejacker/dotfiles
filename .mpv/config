@@ -81,7 +81,10 @@ vo=directfb:buffermode=triple
 monitoraspect=16:9
 
 [paskapuukko]
-vo=vaapi
-hwdec=vaapi
+#vo=vaapi
+#hwdec=vaapi
+vo=opengl-hq
+
+
 [encoding]
 terminal=no

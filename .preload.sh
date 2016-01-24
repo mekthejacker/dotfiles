@@ -194,7 +194,12 @@ GTK_IM_MODULE=scim
 QT_IM_MODULE=scim
 
 push_the_bar 'Making symlinks for config files'
-ln -sf ~/.config/htop/htoprc.$HOSTNAME ~/.config/htop/htoprc
+for config in ~/.config/htop/htoprc \
+              ~/.config/geeqie/geeqierc.xml \
+              ~/.config/geeqie/history \
+			  ; do
+	ln -sf $config.$HOSTNAME $config
+done
 
 push_the_bar 'Loading ~/.Xresources to Xorg'
 xrdb ~/.Xresources

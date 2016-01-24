@@ -5,7 +5,7 @@
 . wine.sh
 . vm.sh
 . not4public.sh
-
+. home-ssh.sh
 
 #
  #  Common aliases
