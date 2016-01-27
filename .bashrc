@@ -109,7 +109,7 @@ alias gil='git log --graph --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset 
 alias gilp='git log --pretty=format:"%h %ad | %s%d [%an]" --graph --date=short'
 alias gilg='git log --all --graph --decorate'
 alias gis='git status'
-alias gio='git checkout'
+alias gico='git checkout'
 alias gim='git submodule'
 alias gima='git submodule add'
 alias gimi='git submodule init'
