@@ -951,3 +951,11 @@ All multicast:
     Don’t forget to check smcroute join/leave.
 EOF
 }
+
+iforgot-lsof-fuser() {
+cat <<EOF
+    fuser -m <filesystem>
+    lsof | grep <filesystem>
+EOF
+	
+}
