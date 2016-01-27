@@ -207,6 +207,9 @@ push_the_bar 'Helping X server to find localized Terminus'
 xset +fp /usr/share/fonts/terminus && xset fp rehash
 push_the_bar 'Disabling screensaver'
 xset s off
+push_the_bar 'Setting standby and off time'
+# Go to standby after 3 hours and off nine minutes later
+xset dpms $((60*60*3)) 0 $((60*63*3))
 
 echo "101" >$pipe
 exec {pipe_fd}<&-
