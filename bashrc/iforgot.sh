@@ -957,5 +957,71 @@ cat <<EOF
     fuser -m <filesystem>
     lsof | grep <filesystem>
 EOF
-	
+}
+
+iforgot-tcpdump-usage() {
+# http://www.rationallyparanoid.com/articles/tcpdump.html
+cat <<EOF
+See the list of interfaces on which tcpdump can listen:
+tcpdump -D
+Be verbose:
+tcpdump -v
+tcpdump -vv
+tcpdump -vvv
+…and print the data of each packet in both hex and ASCII, excluding the link level header:
+tcpdump -v -X
+…but including the link level header:
+tcpdump -v -XX
+Be quiet while capturing packets:
+tcpdump -q
+Limit the capture to 100 packets:
+tcpdump -c 100
+Record the packet capture to a file called capture.cap:
+tcpdump -w capture.cap
+…but display on-screen how many packets have been captured in real-time:
+tcpdump -v -w capture.cap
+
+Listen
+…on interface eth0:
+tcpdump -i eth0
+…on any available interface (cannot be done in promiscuous mode. Requires Linux kernel 2.2 or greater):
+tcpdump -i any
+
+Display
+IP addresses and port numbers (try -nn)
+tcpdump -n
+The packets of a file called capture.cap:
+tcpdump -r capture.cap
+The packets using maximum detail of a file called capture.cap:
+tcpdump -vvv -r capture.cap
+
+Capture
+By host:
+tcpdump -n host 192.168.1.1
+tcpdump -n dst host 192.168.1.1
+tcpdump -n src host 192.168.1.1
+By network:
+tcpdump -n net 192.168.1.0/24
+tcpdump -n dst net 192.168.1.0/24
+tcpdump -n src net 192.168.1.0/24
+By destination port:
+tcpdump -n dst port 23
+tcpdump -n dst portrange 1-1023
+…also filter by protocol:
+tcpdump -n tcp dst portrange 1-1023
+tcpdump -n udp dst portrange 1-1023
+By destination IP and destination port:
+tcpdump -n "dst host 192.168.1.1 and dst port 23"
+tcpdump -n "dst host 192.168.1.1 and (dst port 80 or dst port 443)"
+By protocol
+tcpdump -v icmp
+tcpdump -v arp
+tcpdump -v "icmp or arp"
+Broadcast or multicast:
+tcpdump -n "broadcast or multicast"
+500 bytes of data for each packet rather than the default of 68 bytes:
+tcpdump -s 500
+All bytes of data within the packet:
+tcpdump -s 0
+EOF
 }
