@@ -957,5 +957,14 @@ cat <<EOF
     fuser -m <filesystem>
     lsof | grep <filesystem>
 EOF
-	
+}
+
+iforgot-git-amend() {
+	cat <<EOF
+If you haven’t pushed changes upstream, ‘git commit --amend’ should be enough.
+If you did, you have to rebase the current HEAD.
+     git rebase -i HEAD~2
+will print the last commit, and you should delete the last of two lines, then do
+     git push origin +master
+EOF
 }
