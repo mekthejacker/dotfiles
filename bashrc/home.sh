@@ -46,7 +46,7 @@ alias gengit="`which git` --work-tree $HOME --git-dir $HOME/general.git"
 #     Overriding git for $HOME to maintain configs in one public (dotiles)
 #     and one private (general) repo.
 git() {
-	[ $PWD = $HOME ] && {
+	[ "$PWD" = "$HOME" ] && {
 		local opts="--work-tree $HOME --git-dir dotfiles.git" doton=t genon= left=$'\e[D' right=$'\e[C' input_is_ready
 		until [ -v input_is_ready ]; do
 			echo -en "Which repo would you like to operate on? ${doton:+\e[32m}dotfiles${doton:+\e[0m <} ${genon:+> \e[32m}general${genon:+\e[0m} "
