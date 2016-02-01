@@ -1033,4 +1033,5 @@ If you did, you have to rebase the current HEAD.
      git rebase -i HEAD~2
 will print the last commit, and you should delete the last of two lines, then do
      git push origin +master
+EOF
 }
