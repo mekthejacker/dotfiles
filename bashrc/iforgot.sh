@@ -875,16 +875,16 @@ EOF
 
 iforgot-nmap-scan() {
 cat<<EOF
-nmap [-A] -Pn -T4 -sS -p 22,8087 127.0.0.1
-    -A  add traceroute and version info
-    -Pn ping type: none — skip host discovery
-    -PR ping type: ARP — check hosts in LAN
-    -PU ping type: UDP
-    -PA ping type: TCP ACK
-    -PS ping type: TCP SYN
-    -T4 timing template (↑ is faster)
-    -sS port scan: TCP SYN scan method — most versatile
-    -sn port scan: no
+# nmap [-A] -Pn -T4 -sS -p 22,8087 127.0.0.1
+       -A  add traceroute and version info
+       -Pn ping type: none — skip host discovery
+       -PR ping type: ARP — check hosts in LAN
+       -PU ping type: UDP
+       -PA ping type: TCP ACK
+       -PS ping type: TCP SYN
+       -T4 timing template (↑ is faster)
+       -sS port scan: TCP SYN scan method — most versatile
+       -sn port scan: no
 EOF
 }
 
