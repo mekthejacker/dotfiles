@@ -911,7 +911,7 @@ EOF
 iforgot-ssh-forward-80-port() {
 cat<<EOF
 Say we have imgur.com blocked in our network. But there is a server which can access it.
-	ssh -L 9000:imgur.com:80 user@server
+	ssh -N -L 9000:imgur.com:80 user@server
 Then open localhost:9000 in your browser.
 EOF
 }

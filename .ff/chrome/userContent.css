@@ -65,3 +65,7 @@ div.hidbord_msgfrom_ {
     display: none !important;
 }
 */
+
+@-moz-document domain("vk.com") {
+   #left_ads, #left_blocks { display: none !important }
+}
