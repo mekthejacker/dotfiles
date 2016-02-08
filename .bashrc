@@ -93,6 +93,7 @@ alias ec="emacsclient -c -nw"
 alias emc="emacsclient"
 alias erc="emacsclient -c -nw ~/.bashrc"
 alias grep="grep --color=auto"
+alias gash="git stash"
 alias gi='git'
 alias gia='git add'
 alias giaa='git add --all'
