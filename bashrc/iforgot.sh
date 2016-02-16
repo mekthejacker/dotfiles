@@ -1035,3 +1035,14 @@ will print the last commit, and you should delete the last of two lines, then do
      git push origin +master
 EOF
 }
+
+iforgot-cd-to-previous-dir() {
+	echo -e '\tcd -'
+}
+
+iforgot-tail-print-from-nth-line() {
+	cat <<EOF
+Remove all but the last filename.
+	ls -r | tail -n+2 | xargs rm
+EOF
+}
