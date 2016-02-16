@@ -1,5 +1,5 @@
 # DO NOT EDIT! This file will be overwritten by LXAppearance.
-# Use ~/.gtkrc-2.0.mine for setting lik gtk-can-change-accels instead.
+# Use ~/.gtkrc-2.0.mine for settings like gtk-can-change-accels instead.
 
 gtk-theme-name="Mist"
 gtk-icon-theme-name="gnome-noble"

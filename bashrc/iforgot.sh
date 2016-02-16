@@ -1035,3 +1035,14 @@ will print the last commit, and you should delete the last of two lines, then do
      git push origin +master
 EOF
 }
+
+
+iforgot-combine-images-together() {
+	cat <<EOF
+Use convert from imagemagick.
+    convert  img1.png  img2.png img3.png -append out.png
+
+-append → from top to bottom
++append → from left to right
+EOF
+}
