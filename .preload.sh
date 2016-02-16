@@ -197,6 +197,7 @@ push_the_bar 'Making symlinks for config files'
 for config in ~/.config/htop/htoprc \
               ~/.config/geeqie/geeqierc.xml \
               ~/.config/geeqie/history \
+              ~/.scim/config \
 			  ; do
 	ln -sf $config.$HOSTNAME $config
 done
