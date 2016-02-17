@@ -1036,7 +1036,6 @@ will print the last commit, and you should delete the last of two lines, then do
 EOF
 }
 
-<<<<<<< HEAD
 iforgot-cd-to-previous-dir() {
 	echo -e '\tcd -'
 }
