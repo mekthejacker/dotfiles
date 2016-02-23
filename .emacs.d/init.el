@@ -293,13 +293,9 @@
 
 ;; Load code snippets, shortcuts etc.
 (load "~/.emacs.d/little_things/code_snippets.el")
-(load "~/.emacs.d/little_things/fill-column-indicator.el")
 (load "~/.emacs.d/little_things/linum.el")
 ;; must be after code_snippets, because there may be redefined functions
 (load "~/.emacs.d/little_things/shortcuts.el")
-(load "~/.emacs.d/little_things/pcre2el.el")
-;;(load "~/.emacs.d/geben-0.26/dbgp.el")
-;;(load "~/.emacs.d/geben-0.26/geben.el")
 
 ;; Prevent default init load
 (setq inhibit-default-init 1)
@@ -312,11 +308,6 @@
 
 ;; Enabling line numbers
 (global-linum-mode 1)
-
-;; Enabling 80-column margin 'rule or 'shading
-(setq fci-style 'shading)
-(require 'fill-column-indicator)
-(fci-mode 1)
 
 ;; (add-hook 'php-mode-hook 'font-lock-add-keywords) ;;(font-lock-add-keywords nil '(("^[^\n]\\{80\\}\\(.*\\)$" 1 font-lock-warning-face t)))
 
