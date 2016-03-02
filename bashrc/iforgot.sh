@@ -1056,3 +1056,92 @@ Use convert from imagemagick.
 +append → from left to right
 EOF
 }
+
+iforgot-google-search() {
+cat <<"EOF"
++word — Doesn’t work unless you search for G+ things or blood type.
+-excludethis
+"exact phrase"
+a * saved is a * earned
+100..200
+
+token:example.com
+site:       anything from this site
+related:    …or the sites related to it
+info:       information about the web address
+cache:      pages from the google cache
+
+this OR that
+
+From https://support.google.com/websearch/answer/2466433
+EOF
+}
+
+iforgot-screen-commands() {
+cat<<"EOF"
+Ctrl+a c    new window
+Ctrl+a n    next window
+Ctrl+a p    previous window
+Ctrl+a "    select window from list
+Ctrl+a Ctrl+a    previous window viewed
+Ctrl+a :fit    fit screen size to new terminal size.
+               Ctrl+a F is the same. Do after resizing xterm.
+Ctrl+a d    detach screen from terminal.
+            Start screen with -r option to reattach
+Ctrl+a A    set window title
+Ctrl+a x    lock sessiion, enter user password to unlock.
+Ctrl+a [    enter scrollback/copy mode. Enter to start
+            and end copy region. Ctrl+a ] to leave this mode.
+Ctrl+a ]    paste buffer. Supports pasting between windows.
+Ctrl+a >    write paste buffer to file,
+            useful for copying between screens
+Ctrl+a <    read paste buffer from file,
+            useful for pasting between screens
+Ctrl+a ?    show key bindings/command names.
+            Note unbound commands only in man page.
+Ctrl+a :    goto screen command prompt up shows last command entered
+EOF
+}
+
+iforgot-tmux() {
+cat<<"EOF"
+Starting tmux:
+    1. tmux -uL <socket name> new -ds <session name>
+             ^^                    ^^
+             ||                    |└─  name new session
+             ||                    └─  detach immediately
+             |└─  create custom socket
+             └─  enable unicode support
+    2. tmux -L username new
+
+Check available sessions:
+    tmux -L root list-sessions
+
+Attach to an existing session from the outside
+  or switch between client sessions inside:
+    tmux -L root attach [-t <session name>]
+
+Keys
+    C-a c        create new window
+        d        detach client
+        j        prev window
+        l        next window
+        Space    last window
+        r        respawn window
+        R        reload ~/.tmux.conf
+        w        choose window interactively
+        x        close pane/window
+        2        split horizontally
+        3        split vertically
+        o        move between panes in a split window
+        4        rename window
+        $        rename session
+        ?        list-keys
+        :lsk     — » —
+        :list-keys    — » —
+        :monitor-activity <on|off>    enable/disable activity
+                                      monitoring
+        :monitor-content <string>    the same, but for the
+                                     specified string.
+EOF
+}
