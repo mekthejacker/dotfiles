@@ -167,6 +167,8 @@ alias wap-f="wap f"
 alias wap-s="wap s"
 alias wap-m="wap m"
 
+alias vivaldi="vivaldi --flag-switches-begin --debug-packed-apps --silent-debugger-extension-api --flag-switches-end"
+
 #
  #  QEMU block
 #

@@ -4,10 +4,10 @@ dotfiles
 Configuration files for i3 window manager, Emacs, nano, bash, urxvt and other environment.
 
 <p align="center">
-<img src="img/jan_2014.png" alt="desktop" />
+<img src="img/mar_2016.png" alt="desktop" />
 <br/>
-<i>This is how my desktop looks like as of january 2014 —<br/>
-all the windows were opened from the start of i3 WM</i>
+<i>My desktop as of March 2016 – all the windows were opened<br/>
+automatically at the start of i3 WM</i>
 </p>
 
 ### How X is started
