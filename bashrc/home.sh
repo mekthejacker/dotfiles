@@ -1,11 +1,9 @@
 ## sourced from ~/.bashrc
 
-
 . iforgot.sh
 . wine.sh
 . vm.sh
 . not4public.sh
-. home-ssh.sh
 
 #
  #  Common aliases
@@ -20,8 +18,38 @@ alias okiru='rm /tmp/okiru'
 alias rt="urxvtc -title rtorrent -hold \
                  -e /bin/bash -c 'chmod o+rw `tty` \
                     && sudo -u rtorrent -H tmux -u -S /home/rtorrent/.tmux/socket attach' &"
-alias rtstop='sudo -u rtorrent /usr/bin/pkill -STOP -xf /usr/bin/rtorrent'
-alias rtcont='sudo -u rtorrent /usr/bin/pkill -CONT -xf /usr/bin/rtorrent'
+# For temporary freeing the connection from torrents.
+rt-pause() {
+	[ "${FUNCNAME[1]}" = rt-unpause ] && local unpause=t || local pause=t
+	local rtstate=$(ps -o state,cmd ax | sed -rn "s:^([DRSTtWXZ])\s+$(which rtorrent).*:\1:p")
+	case "$rtstate" in
+		D) echo 'The process is in uninterruptible sleep (usually IO). I better not do anything.' >&2
+		   return 3
+		   ;;
+		R|S) [ -v unpause ] \
+		       && echo 'Already running!' \
+		       || sudo -u rtorrent /usr/bin/pkill -STOP -xf /usr/bin/rtorrent;;
+		T) [ -v pause ] \
+		       && echo 'Already paused!' \
+		       || sudo -u rtorrent /usr/bin/pkill -CONT -xf /usr/bin/rtorrent;;
+		t) echo 'The process is stopped by debugger during the tracing. I better not do anything.' >&2
+		   return 4
+		   ;;
+		W) echo '2.6 kernel? Am I on a router? /Ghi-hi-hi…/' >&2
+		   return 5
+		   ;;
+		X) echo 'The process seems to be dead.' >&2
+		   return 6
+		   ;;
+		Z) echo 'The process is in zombie state. Impossible to do start or stop.' >&2
+		   return 7
+		   ;;
+		*) echo -e "Cannot recognize process state ‘$rtstate’." >&2
+		   return 8
+		   ;;
+	esac
+}
+rt-unpause() { rt-pause; }
 # Strike the earth!
 alias d='dwarf-fortress'
 alias dt='dwarftherapist'
@@ -200,6 +228,10 @@ alias vm-f="qemu-graphic	-smp 1,cores=1,threads=1 -m 1024 \
 		-device virtio-net-pci,netdev=taputapu,mac=FE:ED:AF:EE:DA:FE"
 alias vm-fc='spicec -h 127.0.0.1 -p 5902 -t QEMU_Feedawra'
 alias vm-fq='~/bin/qemu-shell/qmp-shell ~/qmp-sock-vmfeedawra'
+
+alias vm-almafi='spicec -h 127.0.0.1 -p 7001 -t Almafi'
+alias vm-almafi='spicec -h 127.0.0.1 -p 7002 -t Sat'
+alias vm-almafi='spicec -h 127.0.0.1 -p 7003 -t Streamer'
 
 # ,if=virtio
 #-drive file=$HOME/fake.qcow2,if=virtio \

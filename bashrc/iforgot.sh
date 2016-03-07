@@ -1103,6 +1103,7 @@ Ctrl+a :    goto screen command prompt up shows last command entered
 EOF
 }
 
+# Keybindings below aren’t the default ones.
 iforgot-tmux() {
 cat<<"EOF"
 Starting tmux:
