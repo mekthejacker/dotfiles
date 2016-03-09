@@ -74,6 +74,7 @@
 	alias minimetro="$HOME/assembling/minimetro/MiniMetro*x86_64"
 	alias s="taskset -c 1-3 steam"
 	alias teamviewer="pushd /home/soft_win/teamviewer_8_portable; wine TeamViewer.exe; popd"
+	wog() { pushd /home/games/WorldOfGoo; ./WorldOfGoo.bin64; popd; }
 	alias zeus="pushd /home/games/Poseidon; wine Zeus.exe; popd"
 
 	wineprefix-setup64() { wineprefix-setup "$@"; }

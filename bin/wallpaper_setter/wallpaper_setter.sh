@@ -201,15 +201,17 @@ ermes() {
 # $1 – Command to send to the script in background
 send_command() {
 	[ -v LOGFILE ] && set -x && exec &>$LOGFILE
-	local command try partial_success success
-	command=$1
-	try=0
+	local command=$1 try=0 c=0 partial_success success
 	# while there are more than 1 clients hanging wait for them to finish.
 	# It’s to prevent from simultaneous writing to the rxpipe
 	while [ "`pgrep -cf "wallpaper_setter.sh\s+-[^S]"`" -gt 1 ] \
 			  && \
 		  [ "`ps -o pid= --sort=lstart -$(pgrep -f "wallpaper_setter.sh\s+-[^S]") | head -n1`" != $$ ]; do
 		sleep 15
+		[ $((++c)) -gt 4 ] && {
+			ermes "Quitting after 1 minute of waiting."
+			exit 78
+		}
 	done
 	until [ -v partial_success ]; do
 		# Add timestamp as 1st field? Commands may pile up.
