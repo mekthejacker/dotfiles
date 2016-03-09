@@ -3,9 +3,21 @@
 #  While running bash, hit CTRL+V, and then type the key sequence.
 #  So, typing 'ALT + left arrow' in Konsole gets you back:
 #    ^[[1;3D
-#  The readline entry to make this skip back a word will then be:
-#    "\e[1;3D" backward-word
+#  Keeping in mind that the escape sequence \e is printed as ^[,
+#    the readline entry to make this skip back a word will then be:
+#   "\e[1;3D": backward-word
+# "\C-q": "quoted-insert" – press C-q to paste ‘quoted insert’
 
+## If you don’t like control echo of special characters,
+##    e.g. ^C on the screen
+#set echo-control-characters off
+
+## (C-x C-r) re-read ~/.inputrc
+"\C-x\C-r": re-read-init-file
+
+"\C-d": end-of-line
+
+## Moving
 "\eh": beginning-of-line
 "\e\'": end-of-line
 "\el": forward-char
@@ -13,47 +25,56 @@
 "\e\"": forward-word
 "\eH": backward-word
 
+## Editing
 # as ‘delete’ key does
 #"\e[3~": delete-char
 # and this is as ‘backspace’
 "\e;": backward-delete-char
 "\e:": backward-kill-word
-# ???
-# "": quoted-insert
-# inserts tab character
+"\er": revert-line  # to its original state
+"\C-[1;2P": unix-line-discard  # C-u works, but it’s placed inconveniently far.
+"\C-g": "pasting test" 
+## Prepend pasted filename with ‘imgur’ command and run it.
+"\C-i": complete
+#"\C-y": "\C-aimgur \C-e\C-m"
+## Insert the tab character
 "\C-T": tab-insert
 #upcase-word
 #downcase-word
 "\C-z": undo
 "\C-Z": revert-line
 
+## Manipulation the previous commands.
+#
 ## Refer to command line n.
-# !n     
+# !n
 ## Refer to the current command minus n.
-# !-n    
+# !-n
 ## Refer to the previous command.  This is a synonym for `!-1'.
-# !!     
-## Refer to the most recent command preceding the current position in the history list starting with string.
+# !!
+## Refer to the most recent command preceding the current position
+##   in the history list starting with string.
 # !string
-## Refer to the most recent command preceding the current postition in the history list containing string.
-## The trailing ? may be omitted if string is followed  immediately by a newline.
+## Refer to the most recent command preceding the current postition
+##   in the history list containing string. The trailing ? may be
+##   omitted, if string is followed immediately by a newline.
 # !?string[?]
-## Quick substitution.  Repeat the previous command, replacing string1 with string2.  
-## Equivalent to ``!!:s/string1/string2/'' (see Modifiers below).
+## Quick substitution. Repeat the previous command, replacing string1
+##   with string2. Equivalent to ``!!:s/string1/string2/'' (see
+##   Modifiers below).
 # ^string1^string2^
 ## The entire command line typed so far.
-# !#     
+# !#
 
-
+# Emacs-like copypaste
 "\e- ": set-mark
-# ???
 "\C-x ": exchange-point-and-mark
 "\C-j": copy-region-as-kill
 "\C-k": kill-region
-"\C-y": yank 
+"\C-y": yank
 
 "\C-l": clear-screen
-"\C-r": redraw-current-line
+#"\C-r": redraw-current-line
 
 "\C-r": previous-history
 "\C-v": next-history
@@ -64,7 +85,7 @@
 ## non-incremetal- ???
 #history-search-forward
 ## and -backward
-"\ee": shell-expand-line
+"\ee": shell-expand-line  # expand aliases
 # history-expand-line
 ## ↓ M-TAB
 #dynamic-complete-history
@@ -75,5 +96,7 @@
 # call $VISUAL, $EDITOR or ‘emacs’ and execute the result as a shell command
 #"\C-e": edit-and-execute-command
 
-# (C-x C-r) re-read ~/.inputrc
-"\er": re-read-init-file
+## Recording macroses
+# "\C-x(": start-kbd-macro
+# "\C-x)": end-kbd-macro
+# "\C-xe": call-last-kbd-macro

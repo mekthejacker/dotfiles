@@ -113,3 +113,10 @@ one_command_shell*geometry: 70x1
 
 !!Xcursor.theme: default
 Xcursor.theme: Adwaita
+
+!! Make C-; send the same keycode as C-u, which removes the line to the left
+!!   of the cursor and copies it to the kill ring buffer. That way it fits
+!!   better with the other bindings for kill ring.
+!! It must be bound here, because C-; along with several other C- bindings
+!!   cannot be bound in ~/.inputrc as a usual hotkey.
+URxvt.keysym.Control-semicolon: \025
