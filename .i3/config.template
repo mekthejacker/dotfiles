@@ -157,13 +157,16 @@ bindcode $mod+95 exec --no-startup-id eval mpc random
 ## F12
 bindcode $mod+96 exec --no-startup-id eval mpc single
 
-## g     Restrict wallpapers to subdirectory
+## Y — show curently playing song in MPD
+bindcode $mod+29 exec --no-startup-id eval 'notify-send -t 3500 "mpd" "`mpc | head -n1`"'
+
+## G     Restrict wallpapers to subdirectory
 bindcode $mod+42 exec --no-startup-id "~/bin/wallpaper_setter/wallpaper_setter.sh -r"
-## b     Decrease brightness
+## B     Decrease brightness
 bindcode $mod+56 exec --no-startup-id "~/bin/wallpaper_setter/wallpaper_setter.sh -b -0.1"
-## S-b   Increase brightness
+## S-B   Increase brightness
 bindcode $mod+Shift+56 exec --no-startup-id "~/bin/wallpaper_setter/wallpaper_setter.sh -b +0.1"
-## n     Change mode
+## N     Change mode
 bindcode $mod+57 exec --no-startup-id "~/bin/wallpaper_setter/wallpaper_setter.sh -m"
 ## ,     Set previous (<)
 bindcode $mod+59 exec --no-startup-id "~/bin/wallpaper_setter/wallpaper_setter.sh -p"

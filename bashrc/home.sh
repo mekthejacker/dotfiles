@@ -232,8 +232,8 @@ alias vm-fc='spicec -h 127.0.0.1 -p 5902 -t QEMU_Feedawra'
 alias vm-fq='~/bin/qemu-shell/qmp-shell ~/qmp-sock-vmfeedawra'
 
 alias vm-almafi='spicec -h 127.0.0.1 -p 7001 -t Almafi'
-alias vm-almafi='spicec -h 127.0.0.1 -p 7002 -t Sat'
-alias vm-almafi='spicec -h 127.0.0.1 -p 7003 -t Streamer'
+alias vm-sat='spicec -h 127.0.0.1 -p 7002 -t Sat'
+alias vm-streamer='spicec -h 127.0.0.1 -p 7003 -t Streamer'
 
 # ,if=virtio
 #-drive file=$HOME/fake.qcow2,if=virtio \
