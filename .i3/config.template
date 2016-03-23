@@ -134,10 +134,11 @@ bindcode $mod+68 exec --no-startup-id "~/bin/add2playlist.sh"
          # create new
 bindcode $mod+Shift+68 exec --no-startup-id "~/bin/add2playlist.sh -c"
 ## F3
-bindcode $mod+69 exec --no-startup-id amixer set Master toggle
-## F4
 ## See ‘amixer scontrols | $PAGER’ for a complete list of controls
-bindcode $mod+70 exec --no-startup-id "amixer sset 'Capture',0 toggle"
+bindcode $mod+69 exec --no-startup-id "amixer sset 'Capture',0 toggle"
+bindcode $mod+Shift+69 exec --no-startup-id amixer set Master toggle
+## F4
+bindcode $mod+70 exec --no-startup-id "mpc del 0"
 ## F5
 bindcode $mod+71 exec --no-startup-id amixer set Master 2%-
 bindcode $mod+Control+71 exec --no-startup-id xbacklight -dec 5

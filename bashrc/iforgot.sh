@@ -480,6 +480,35 @@ cat<<"EOF"
 EOF
 }
 
+iforgot-iptables() {
+	cat <<"EOF"
+Destination NAT means, we translate the destination address of a packet to make it go somewhere else instead of where it was originally addressed.
+
+    # iptables -t nat -A  PREROUTING -d 10.10.10.99/32 -j DNAT --to-destination 192.168.1.101
+
+Source NAT. We want to do SNAT to translate the from address of our reply packets to make them look like they’re coming from 10.10.10.99 instead of 192.168.1.101.
+
+    # iptables -t nat -A POSTROUTING -s 192.168.1.101/32 -j SNAT --to-source 10.10.10.99
+
+Sometimes SNAT doesn’t suit the task, if the --to-source IP address is dynamic. Iptables can dynamically get the address, if you use MASQUERADE, but it is slower.
+
+    # iptables -t nat -A POSTROUTING -s 10.0.0.0/24 --sport 123[:789] \
+                                     -d 10.1.0.0/24 --dport 456[:654] \
+               -o OUT_IFACE -j MASQUERADE
+
+To delete a rule, get its number first:
+
+    # iptables -L -t nat --line-number
+
+Then delete:
+
+    # iptables -t nat -D POSTROUTING <number>
+
+From https://thewiringcloset.wordpress.com/2013/03/27/linux-iptable-snat-dnat/
+http://www.karlrupp.net/en/computer/nat_tutorial
+EOF
+}
+
 iforgot-shell-colours(){
 cat<<EOF
 	There are only 8 colors in general. From man terminfo:
@@ -1144,5 +1173,65 @@ Keys
                                       monitoring
         :monitor-content <string>    the same, but for the
                                      specified string.
+EOF
+}
+
+iforgot-easyrsa-procedure() {
+	cat <<EOF
+1. Copy to another place
+    # cp -a /usr/share/easy-rsa /root/easy-rsa-example
+    # cd !$
+2. Edit ‘vars.example’ and save it as ‘vars’
+    # nano vars.example
+3. Prepare directories
+    # easyrsa init-pki
+4. Create CA certificate and key. That passphrase must be common for our company.
+    # easyrsa build-ca
+5. Create parameters for the Diffie–Hellman exchange
+    # easyrsa gen-dh
+6. Generate crl.pem
+    # easyrsa gen-crl
+7. Generate TLS authentication key
+    # openvpn --genkey --secret pki/private/ta.key
+8. Build server certificate and key.
+    # easyrsa build-server-full SERVERNAME
+9 Generate a passphrase for its client
+    # openssl rand -base64 6
+10. … and build client’s certificate and key.
+    # easyrsa build-client-full CLIENTNAME
+11. To decrypt a key in order to avoid entering passphrase every time
+    # cd pki/private
+    # cp NAME.key NAME.key NAME.key.org
+    # openssl rsa -in ./NAME.key.org -out ./NAME.key
+
+For the OpenVPN server you will need:
+./pki/crl.pem
+./pki/private/SERVERNAME.key
+./pki/private/ta.key
+./pki/issued/SERVERNAME.crt
+./pki/dh.pem
+./pki/ca.crt
+
+For its client you’ll need:
+./pki/ca.crt
+./pki/private/ta.key
+./pki/private/CLIENTNAME.key
+./pki/issued/CLIENTNAME.crt
+
+EOF
+iforgot-vpn-nb
+}
+
+iforgot-vpn-nb() {
+	cat<<EOF
+NB  TUN is a L2 device and TAP is L3. They are incompatible,
+    and the device setting must match on server and client.
+In the config use just "tun" or "tap", to make openvpn
+dynamically create a device.
+
+And finally, to let us into the other network…
+# iptables -A INPUT -i tun+ -j ACCEPT
+# iptables -A FORWARD -i tun+ -j ACCEPT
+# iptables -t nat -A POSTROUTING -s VPN_NETWORK_ADDRESS/NET_PREFIX -j SNAT --to-source SERVERS_LOCAL_IP
 EOF
 }
