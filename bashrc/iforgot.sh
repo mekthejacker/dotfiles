@@ -1023,6 +1023,11 @@ tcpdump -n "broadcast or multicast"
 tcpdump -s 500
 All bytes of data within the packet:
 tcpdump -s 0
+
+Filter to match DHCP packets including a specific client MAC address:
+tcpdump -i br0 -vvv -s 1500 '((port 67 or port 68) and (udp[38:4] = 0x3e0ccf08))'
+Filter to capture packets sent by the client (DISCOVER, REQUEST, INFORM):
+tcpdump -i br0 -vvv -s 1500 '((port 67 or port 68) and (udp[8:1] = 0x1))'
 EOF
 }
 
@@ -1144,5 +1149,23 @@ Keys
                                       monitoring
         :monitor-content <string>    the same, but for the
                                      specified string.
+EOF
+}
+
+iforgot-find-newer-older() {
+	cat <<"EOF"
+Find those that have been modified in the last two days
+  i.e. newer than 2 days:
+    find -mtime -2
+
+Find the files older than 2 days:
+    find -mtime +2
+EOF
+}
+
+iforgot-trace-there-and-back() {
+	cat <<EOF
+    ping -R -c1 XX.XX.XX.XX
+    NB: 9 hops max!
 EOF
 }

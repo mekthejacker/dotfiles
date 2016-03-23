@@ -194,7 +194,7 @@ exec {txpipe_fd}<>$txpipe
 ermes() {
 #	which ${ERR_CMD%% *} &>/dev/null \
 	#		&& eval exec `echo "$ERR_CMD" | sed -r "s~([^\])%m~\1${0//\//\\/}: ${1//\//\\/}~"` \
-	[ -v BE_QUIET ] || notify-send -a Restart:'' 'wallpaper_setter.sh' "$1"
+	[ -v BE_QUIET ] || notify-send -a wallpaper "${0##*/}" "$1"
 	echo -e "Error: $1." >&2
 }
 
@@ -205,12 +205,12 @@ send_command() {
 	# while there are more than 1 clients hanging wait for them to finish.
 	# It’s to prevent from simultaneous writing to the rxpipe
 	while [ "`pgrep -cf "wallpaper_setter.sh\s+-[^S]"`" -gt 1 ] \
-			  && \
+		  && \
 		  [ "`ps -o pid= --sort=lstart -$(pgrep -f "wallpaper_setter.sh\s+-[^S]") | head -n1`" != $$ ]; do
 		sleep 15
 		[ $((++c)) -gt 4 ] && {
 			ermes "Quitting after 1 minute of waiting."
-			exit 78
+			return 7
 		}
 	done
 	until [ -v partial_success ]; do
@@ -227,13 +227,12 @@ send_command() {
 			return 7
 		}
 	done
-	try=0
 	until [ -v success ]; do
-		read -t 9999 -u $txpipe_fd
+		read -t 60 -u $txpipe_fd
 		[ "$REPLY" = "DONE $command" ] && success=t
 		# If not successful, maybe flush tx pipe?
 		[ $((++try)) -eq 3 ] && [ ! -v success ] && {
-			ermes "$0: Command ‘$command’ couldn’t complete."
+			ermes "Command ‘$command’ couldn’t complete."
 			return 7
 		}
 	done
