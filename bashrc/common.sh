@@ -1,5 +1,5 @@
 #
- #  Various funstions making life easier. Kind of an addition to ~/bin.
+ #  Various functions that make the life easier. Kind of an addition to ~/bin.
 #
 
 # Viruses writers don’t expect that.
