@@ -59,20 +59,10 @@ iforgot-check-gcc-options() {
 	set +x
 }
 
-iforgot-xkb-opts-retrieval-from-gnome2() {
-	set -x
-	gconftool-2 -R /desktop/gnome/peripherals/keyboard/kbd
-	set +x
-}
-
 iforgot-xkb-opts() {
 	set -x
 	less /usr/share/X11/xkb/rules/evdev.lst
 	set +x
-}
-
-iforgot-android-screenshot-via-sdk() {
-	echo "ddms"
 }
 
 iforgot-load-all-possible-sensors-modules() {
@@ -388,7 +378,7 @@ cat <<"EOF"
 キタ━━━(゜∀゜)━━━!!!!!   ‘It’s here’, Kitaa!, a general expression
                         of excitement that something has appeared
                         or happened or ‘I came’.
-( ˙灬˙ )                Pedo hige 
+( ˙灬˙ )                Pedo hige
 (・∀・)~mO               Flash of intuition
 m9(・∀・)                NO U
 ヽ(°Д°)ﾉ
@@ -470,7 +460,7 @@ iforgot-du-sort() {
 	echo -e '\tdu -hsx * | sort -h'
 }
 
-iforgot-fonts-list() {
+iforgot-font-list() {
 	echo -e '\tfc-list'
 }
 
@@ -1320,4 +1310,10 @@ cat <<EOF
 	printf '%dd:%02dh:%02dm:%02ds\n' $((secs/86400)) $(($secs/3600)) $(($secs%3600/60)) $(($secs%60))
 EOF
 # From http://stackoverflow.com/a/28451379/685107
+}
+
+iforgot-find-broken-links() {
+cat <<EOF
+    find -xtype l rm {} \+
+EOF
 }

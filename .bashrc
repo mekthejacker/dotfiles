@@ -123,6 +123,8 @@ alias gush='git push'
 alias gpg="GTK_IM_MODULE= QT_IM_MODULE= gpg"
 alias ls="ls --color=auto"
 alias re=". ~/.bashrc" # re-source
+alias rename="perl-rename"
+alias rename-test="perl-rename -n"
 spr="| curl -F 'sprunge=<-' http://sprunge.us" # add ?<lang> for line numbers
 #alias td="todo -A "
 #alias tdD="todo -D "
