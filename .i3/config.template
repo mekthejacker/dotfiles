@@ -158,7 +158,7 @@ bindcode $mod+95 exec --no-startup-id eval mpc random
 ## F12
 bindcode $mod+96 exec --no-startup-id eval mpc single
 
-## Y — show curently playing song in MPD
+## Y — show currently playing song in MPD
 bindcode $mod+29 exec --no-startup-id eval 'notify-send -t 3500 "mpd" "`mpc | head -n1`"'
 
 ## G     Restrict wallpapers to subdirectory

@@ -1258,3 +1258,49 @@ And finally, to let us into the other network…
 # see also SNAT/MASQUERADE above
 EOF
 }
+
+iforgot-ssh-rsh-copy-dir-with-tar() {
+cat<<EOF
+    rsh kumquat mkdir /work/bkup/jane
+    tar cf - . | rsh kumquat 'cd /work/bkup/jane && tar xBf -'
+EOF
+}
+
+iforgot-tar() {
+cat<<EOF
+Create an archive
+
+    tar -a -c [-v] -f archive.tar.xz DIRECTORY
+          \  \   \  \
+           \  \   \  \_ file name
+            \  \   \_ verbose output
+             \  \_ create (or compress)
+              \_ automaticallly detect the compressor from the extension
+Decompress
+
+    tar -a -x [-v] -f archive.tar.xz -C CD_HERE_BEFORE_EXTRACTION
+             \
+              \_ eXtract
+
+EOF
+}
+
+iforgot-ssh-close-hanging-session() {
+cat <<EOF
+    ~.
+
+    ~ is the default escape character (can be altered with -e <escape_char>).
+    Escape character + dot closes the hanging session.
+EOF
+}
+
+iforgot-seconds-to-hms() {
+cat <<EOF
+	date -d@36 -u +%H:%M:%S
+	00:00:36
+
+	secs=100000
+	printf '%dd:%02dh:%02dm:%02ds\n' $((secs/86400)) $(($secs/3600)) $(($secs%3600/60)) $(($secs%60))
+EOF
+# From http://stackoverflow.com/a/28451379/685107
+}
