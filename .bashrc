@@ -186,17 +186,3 @@ one_command_execute() {
 	# bind shell-expand-line
 	bind -x '"\C-m":"one_command_execute"'
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
