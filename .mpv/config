@@ -27,7 +27,7 @@ screenshot-template="%F_%P"
 screenshot-format=jpg
 ## Compressing screenshots while mpv runs is slow,
 ##   so compressing is done after with watch.sh
-#screenshot-png-compression=0
+screenshot-png-compression=9
 ## Just in case I will need jpeg some day.
 screenshot-jpeg-quality=94
 softvol=yes

@@ -155,8 +155,10 @@ bindcode $mod+75 exec --no-startup-id eval mpc prev
 bindcode $mod+76 exec --no-startup-id eval mpc next
 ## F11
 bindcode $mod+95 exec --no-startup-id eval mpc random
+bindcode $mod+Control+95 exec --no-startup-id eject
 ## F12
 bindcode $mod+96 exec --no-startup-id eval mpc single
+bindcode $mod+Control+96 exec --no-startup-id eject -t
 
 ## Y — show currently playing song in MPD
 bindcode $mod+29 exec --no-startup-id eval 'notify-send -t 3500 "mpd" "`mpc | head -n1`"'

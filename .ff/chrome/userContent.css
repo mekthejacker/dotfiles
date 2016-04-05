@@ -34,13 +34,6 @@ body textarea {
 	a[href="/cg/"] { display: none !important }
 }
 
-@-moz-document domain("slovari.yandex.ru") {
-/* hide unnecessary column on the left
-   this makes articles showing at the left edge of the screen, which is useful
-   when another window next to browser need to be opened*/
-/*	td.l-page__left { display: none !important }*/
-}
-
 @-moz-document domain("github.com") {
 	.highlight pre {tab-size: 2}
 }
@@ -55,16 +48,20 @@ body textarea {
    .nojs-msk .nojs-msg { display:none !important }
 }
 
+@-moz-document domain("lainchan.org") {
 /*hide a person by pubkey*/
-div.hidbord_msgfrom_s4JaGeAnTBUk3fGAb3Es1oSY4DPyPZmRDS5YMAeJxi59 {
-    display: none !important;
-}
+/*
+   div.hidbord_msgfrom_s4JaGeAnTBUk3fGAb3Es1oSY4DPyPZmRDS5YMAeJxi59 {
+      display: none !important;
+   }
+*/
 /*hide anonymous posts*/
 /*
 div.hidbord_msgfrom_ {
     display: none !important;
 }
 */
+}
 
 @-moz-document domain("vk.com") {
    #ads_left, #left_blocks { display: none !important }

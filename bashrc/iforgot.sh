@@ -9,18 +9,44 @@
 # TAKES
 #     $@
 iforgot() {
-	local keywords="$@"
+	local keywords="$@" k func_list top_list
 	[ "$keywords" ] || {
 		read -p 'What have you forgot, darling? > '
 		local keywords="$REPLY"
 		echo "Thanks, also you can use parameters to this function, like"
 		echo -e "\tiforgot <something> <also this>"
 	}
-#	for keyword in $keywords; do
-#		.*${keywords// /.*}
-#		func_list="`declare -F | sed -nr 's/^declare -f (iforgot-.*'$keyword'.*)/\1/p'`"
-#	done
-#	echo -n `$func` | xclip
+	func_list=(`declare -F | sed -nr 's/^declare -f (iforgot-.*)/\1/p'`)
+	echo
+	for k in $keywords; do
+		for func in ${func_list[@]}; do
+			[[ "$func" =~ ^.*$k.*$ ]] && top_list+=($func)
+		done
+		[ ${#top_list[@]} -ne 0 ] && {
+			echo -e "Functions that contain ‘$k’ in their names:\n"
+			for func in ${top_list[@]}; do
+				echo $func | grep -E "(|$k)"
+			done
+			echo
+		}
+		echo -e "Functions that contain ‘$k’ in their bodies:\n"
+		for func in ${func_list[*]}; do
+			type $func | sed -rn '1d
+			                      /^iforgot.*'$k'/,/}/d
+			                      2H
+			                      /'$k'/H
+			                      ${ g; s/'$k'/'$k'/;t good; Q
+			                            :good s/\s+/ /g
+			                                  s/\(\)/\n/g
+			                                  s/\n\s/\n/g
+			                                  p
+			                       }' \
+			           | grep -v ^$ \
+			           | fold  -s -w $((`tput cols`-8)) \
+			           | sed '/^ iforgot/ !s/.*/\t&/g; s/^ //g' \
+			           | grep -E "(|$k)"
+		done
+	done
 }
 
 iforgot-restart-daemons-from-the-runlevel-i-am-in() {
@@ -1315,5 +1341,24 @@ EOF
 iforgot-find-broken-links() {
 cat <<EOF
     find -xtype l rm {} \+
+EOF
+}
+
+iforgot-xdg-dirs() {
+cat<<EOF
+Show:
+    xdg-user-dir DESKTOP
+Set:
+    grep ^[^#] ~/.config/user-dirs.dirs
+EOF
+}
+
+iforgot-framebuffer-with-utf8() {
+	echo jfbterm
+}
+
+iforgot-bash-regexes() {
+cat <<"EOF"
+    man -P "less -p '^\s+\[\['" bash
 EOF
 }
