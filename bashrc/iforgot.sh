@@ -1362,3 +1362,13 @@ cat <<"EOF"
     man -P "less -p '^\s+\[\['" bash
 EOF
 }
+
+iforgot-text-utils() {
+cat <<EOF
+    fmt — reformat lines to width.
+    fold – simple version of the above.
+    column – autoformat columns.
+    colrm — remove columns.
+    paste – merge lines from two files
+EOF
+}
