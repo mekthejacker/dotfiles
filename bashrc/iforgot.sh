@@ -1300,7 +1300,7 @@ EOF
 }
 
 iforgot-tar() {
-cat<<EOF
+cat<<"EOF"
 Create an archive
 
     tar -a -c -v -p -f archive.tar.xz DIRECTORY
