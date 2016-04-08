@@ -199,3 +199,21 @@ alias vm-w="qemu-graphic	-smp 1,cores=2,threads=1 -m 1512 -drive file=/home/$ME/
 
 alias vm-wc='spicec -h 192.168.0.1 -p 5903 -t QEMU_WinXP____Shift_F11'
 alias vm-wq='~/bin/qemu-shell/qmp-shell ~/qmp-sock-shindaws'
+
+alias vm-ts-mother-setup="qemu-system-x86_64  -enable-kvm \
+	-cpu host \
+	-smp 1,cores=1,threads=1 \
+	-boot order=dc \
+	-m 1024 -serial stdio \
+	-name 'vm-ts-mother-setup,process=vm-ts-mother-setup' \
+	-drive file=\`ls /sysrcd/sysresccd-*.iso | tail -n1\`,media=cdrom,index=0 \
+	-netdev vde,id=pxelan,sock=/tmp/vde.ctl \
+		-device virtio-net-pci,netdev=pxelan,mac=BA:C1:47:BA:C1:47"
+alias vm-pxe-client-setup="qemu-system-x86_64  -enable-kvm \
+	-cpu host \
+	-smp 1,cores=1,threads=1 \
+	-boot order=n \
+	-m 1024 -serial stdio \
+	-name 'vm-pxe-clinet-setup,process=vm-pxe-client-setup' \
+	-netdev vde,id=pxelan,sock=/tmp/vde.ctl \
+		-device virtio-net-pci,netdev=pxelan,mac=BA:C1:47:2B:4C:14"

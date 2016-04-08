@@ -727,8 +727,9 @@ while read -u $rxpipe_fd; do
 			          --title 'Where shall I take wallpapers?' \
 			          --backtitle 'Where shall I take wallpapers?' \
 			          --dselect \"$PWD\" $((WIDTH-200))x$((HEIGHT-100)) 2>&1`" \
-			&& [ -d "$dir" ] && restrict_to_directory "$dir" \
-				&& echo "DONE $REPLY" > $txpipe
+			    && [ -d "$dir" ] && restrict_to_directory "$dir" \
+			    && echo "DONE $REPLY" > $txpipe
+			export_collection
 			;;
 		show_current_image_path)
 			echo "ACK $REPLY" > $txpipe

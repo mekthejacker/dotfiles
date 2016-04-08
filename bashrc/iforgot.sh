@@ -1303,12 +1303,13 @@ iforgot-tar() {
 cat<<EOF
 Create an archive
 
-    tar -a -c [-v] -f archive.tar.xz DIRECTORY
-          \  \   \  \
-           \  \   \  \_ file name
-            \  \   \_ verbose output
-             \  \_ create (or compress)
-              \_ automaticallly detect the compressor from the extension
+    tar -a -c -v -p -f archive.tar.xz DIRECTORY
+          \  \  \  \  \
+           \  \  \  \  \_ file name
+            \  \  \  \_ preserve attributes
+             \  \  \_ verbose output
+              \  \_ create (or compress)
+               \_ automaticallly detect the compressor from the extension
 Decompress
 
     tar -a -x [-v] -f archive.tar.xz -C CD_HERE_BEFORE_EXTRACTION
