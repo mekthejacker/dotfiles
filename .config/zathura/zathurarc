@@ -14,6 +14,9 @@ map <C-r> reload
 map   [fullscreen]  <C-r> reload
 map f toggle_fullscreen
 map   [fullscreen] f toggle_fullscreen
+map <C-q> quit
+map   [fullscreen]  <C-q> quit
+
 
 map q scroll top # why it works after one key was passed?
 map   [fullscreen] q scroll top
