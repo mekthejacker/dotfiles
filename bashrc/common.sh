@@ -249,19 +249,25 @@ fpic() { find ~/picts -iname "*$@*"; }
 #     $1 — A net address without the last octet, 192.168.2 for example.
 java-site-exception() {
 	local exception_list=$HOME/.java/deployment/security/exception.sites \
-	      exceptions o site e match
+	      exceptions o site e match c
 	exceptions=(`<$exception_list`)
 	[[ "$1" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]] || {
 		echo "Usage:    ${FUNCNAME[0]} 192.168.2" >&2
 		return
 	}
+	c=0
 	for o in {1..254}; do
-		site="https://$1.$o/"
-		unset match
-		for e in ${exceptions[@]}; do
-			[ "$site" = "$e" ] && match=t
+		for site in "https://$1.$o/" "http://$1.$o/"; do
+			unset match
+			for e in ${exceptions[@]}; do
+				[ "$site" = "$e" ] && match=t
+			done
+			[ -v match ] || {
+				echo "$site" >>$exception_list
+				let c++
+			}
 		done
-		[ -v match ] || echo "$site" >>$exception_list
 	done
+	echo "Added $c hosts."
 }
 # Thanks, Krishna!

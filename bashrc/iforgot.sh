@@ -1373,3 +1373,11 @@ cat <<EOF
     paste – merge lines from two files
 EOF
 }
+
+iforgot-wlan-check-link() {
+cat<<EOF
+    iw dev wlan0 link
+EOF
+}
+
+iforgot-nginx-hashed-passwords() { echo -e '\topenssl passwd -apr1'; }
