@@ -47,8 +47,8 @@ user_pref("font.size.variable.ja", 22);
 //
 
 // Disable disk cache, cause it slows things down
-user_pref("browser.cache.disk.capacity", 0);
-user_pref("browser.cache.disk.enable", false);
+user_pref("browser.cache.disk.capacity", 1048576);
+user_pref("browser.cache.disk.enable", true);
 user_pref("browser.cache.disk.smart_size.enabled", true);
 user_pref("browser.cache.disk_cache_ssl", false);
 // Dollchan Extenstion requires more than default 5 MiB to work properly, if browser works for weeks
@@ -58,7 +58,7 @@ user_pref("media.cache_size", 51200);
 // Cache in memory, in KiB
 user_pref("browser.cache.memory.capacity", 1048576);
 // Equal to what disk.cache.max_entry_size offers by default
-iser_pref("browser.cache.memory.max_entry_size", 51200);
+user_pref("browser.cache.memory.max_entry_size", 51200);
 
 //
 // --- MEDIA ----------------------------------------------------------------

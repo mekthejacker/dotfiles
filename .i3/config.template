@@ -74,22 +74,71 @@ bindcode $mod+Control+27 exec "~/.i3/update_config.sh"
 
 ## C-q  Quit
 bindcode $mod+Control+24 exec "~/.i3/on_quit.sh"
+## C-l → i3lock
+bindcode $mod+Control+46 exec --no-startup-id i3lock -d -f -i "$HOME/.env/[Commie] Takamiya Nasuno Desu! - 05 [54E7195B]_00:01:57.200.png"
+## To choose other xorg.conf when X will start again.
 # bindcode $mod+Control+Shift+24 exec "sudo /usr/bin/killall iftop; ~/bin/xorg.conf_chooser.sh"
-## C-t  To choose other xorg.conf when X will start again.
+## C-t replay sequence that opens windows on the Main workspace.
 bindcode $mod+Control+28 exec "~/.i3/autostart.sh stop_after_main_workspace"
 
-## How to make it work?
+## This executes every reload
+exec_always --no-startup-id "~/.i3/set_keyboard.sh"
+## And this once at the start
+exec --no-startup-id "~/.i3/autostart.sh"
+
+## How to make it working?
 #bindcode $mod+Control_L+29 exec "Xdialog --msgbox 'CONTROL_L+y' 0x0"
 #bindcode $mod+Control_R+29 exec "Xdialog --msgbox 'CONTROL_R+y' 0x0"
 
 ## RET
 bindsym $mod+Return exec urxvtc
 ## r
-## One-command urxvtc instance, it is replacement for dmenu (also see ~/.bashrc and ~/.Xresources)
+## One-command urxvtc instance, it is a replacement for dmenu (also see ~/.bashrc and ~/.Xresources)
 bindcode $mod+27 exec --no-startup-id /bin/bash -c 'export ONE_COMMAND_SHELL=t && urxvtc -name one_command_shell'
 
-### screenshot.sh block
-##
+
+## F1 → toggle MPD play/pause
+bindcode $mod+67 exec --no-startup-id mpc toggle
+## F2 → add the currently playing song to a playlist
+bindcode $mod+68 exec --no-startup-id "~/bin/add2playlist.sh"
+  ## C+F2 → create a new playlist instead
+  bindcode $mod+Control+68 exec --no-startup-id "~/bin/add2playlist.sh -c"
+## F3 → On/off the microphone. Better than setting it up in every IM client.
+## See ‘amixer scontrols | $PAGER’ for a complete list of controls
+bindcode $mod+69 exec --no-startup-id "amixer sset 'Capture',0 toggle"
+  ## C+F3 → On/off the sound
+  bindcode $mod+Control+69 exec --no-startup-id amixer set Master toggle
+## F4 → Remove the currently playing song from the MPD playlist
+bindcode $mod+70 exec --no-startup-id "mpc del 0"
+## F5 → Volume down
+bindcode $mod+71 exec --no-startup-id amixer set Master 2%-
+## F6 → MPD volume down
+bindcode $mod+72 exec --no-startup-id eval mpc volume -2
+## F7 → MPD volume up
+bindcode $mod+73 exec --no-startup-id eval mpc volume +2
+## F8 → Volume up
+bindcode $mod+74 exec --no-startup-id amixer set Master 2%+
+## F9 → MPD switch to the previous song
+bindcode $mod+75 exec --no-startup-id eval mpc prev
+## F10 → MPD switch to the next song
+bindcode $mod+76 exec --no-startup-id eval mpc next
+## F11 → MPD switch random mode on/off.
+bindcode $mod+95 exec --no-startup-id eval mpc random
+## F12 → MPD switch single mode on/off
+bindcode $mod+96 exec --no-startup-id eval mpc single
+
+## C-F5 → Brightness down
+bindcode $mod+Control+71 exec --no-startup-id xbacklight -dec 5
+## C+F8 → Brightness up
+bindcode $mod+Control+74 exec --no-startup-id xbacklight -inc 5
+## C-F11 → Eject
+bindcode $mod+Control+95 exec --no-startup-id eject
+## C-F12 → Call the caret back
+bindcode $mod+Control+96 exec --no-startup-id eject -t
+
+#
+ #  Screenshot.sh block
+#
 ## It is useful to take screenshots in the way to get rid of further processing in GIMP,
 ##   i.e. take them in PNG or JPEG by desire, with or without delay, if it be PNG, shall
 ##   it be full RGB or indexed colours? Taking all that into account I’ve written out
@@ -124,45 +173,12 @@ bindcode --release $mod+52 exec --no-startup-id ". ~/bin/screenshot.sh -area"
 bindcode --release $mod+Shift+52 exec --no-startup-id ". ~/bin/screenshot.sh -area -indexed"
 #bindcode --release $mod+Mod1+52 exec --no-startup-id ". ~/bin/screenshot.sh -area -jpeg"
 
-## C-l → i3lock
-bindcode $mod+Control+46 exec --no-startup-id i3lock -d -f -i "$HOME/.env/[Commie] Takamiya Nasuno Desu! - 05 [54E7195B]_00:01:57.200.png"
-##
-## F1
-bindcode $mod+67 exec --no-startup-id mpc toggle
-## F2
-bindcode $mod+68 exec --no-startup-id "~/bin/add2playlist.sh"
-         # create new
-bindcode $mod+Shift+68 exec --no-startup-id "~/bin/add2playlist.sh -c"
-## F3
-## See ‘amixer scontrols | $PAGER’ for a complete list of controls
-bindcode $mod+69 exec --no-startup-id "amixer sset 'Capture',0 toggle"
-bindcode $mod+Shift+69 exec --no-startup-id amixer set Master toggle
-## F4
-bindcode $mod+70 exec --no-startup-id "mpc del 0"
-## F5
-bindcode $mod+71 exec --no-startup-id amixer set Master 2%-
-bindcode $mod+Control+71 exec --no-startup-id xbacklight -dec 5
-## F6
-bindcode $mod+72 exec --no-startup-id eval mpc volume -2
-## F7
-bindcode $mod+73 exec --no-startup-id eval mpc volume +2
-## F8
-bindcode $mod+74 exec --no-startup-id amixer set Master 2%+
-bindcode $mod+Control+74 exec --no-startup-id xbacklight -inc 5
-## F9
-bindcode $mod+75 exec --no-startup-id eval mpc prev
-## F10
-bindcode $mod+76 exec --no-startup-id eval mpc next
-## F11
-bindcode $mod+95 exec --no-startup-id eval mpc random
-bindcode $mod+Control+95 exec --no-startup-id eject
-## F12
-bindcode $mod+96 exec --no-startup-id eval mpc single
-bindcode $mod+Control+96 exec --no-startup-id eject -t
-
 ## Y — show currently playing song in MPD
 bindcode $mod+29 exec --no-startup-id eval 'notify-send -t 3500 "mpd" "`mpc | head -n1`"'
 
+#
+ #  Wallpaper_setter.sh block
+#
 ## G     Restrict wallpapers to subdirectory
 bindcode $mod+42 exec --no-startup-id "~/bin/wallpaper_setter/wallpaper_setter.sh -r"
 ## B     Decrease brightness
@@ -180,7 +196,9 @@ bindcode $mod+Shift+60  exec --no-startup-id "~/bin/wallpaper_setter/wallpaper_s
 ## /     Keep
 bindcode $mod+61 exec --no-startup-id "~/bin/wallpaper_setter/wallpaper_setter.sh -k"
 
-## Switch to workspace and launch related application.
+#
+ #  Switching workspaces with a launch of a corresponding application
+#
 ## `
 bindcode $mod+49 workspace 0:Main
 ## 1
@@ -264,7 +282,6 @@ assign [class="Gimp"] → "8:GIMP"
 assign [class="URxvt" instance="ncmpcpp"] → "9:MPD"
 assign [class="mpv" instance="big_screen"] → "10:Outer_space"
 
-
 ## Arbitrary commands for specific windows
 for_window [class="URxvt" instance="one_command_shell"] floating enable
 for_window [class="spicec"] floating disable
@@ -276,14 +293,9 @@ for_window [class="Convert Script"] floating enable
 for_window [class="com-sun-javaws-Main"] floating disable
 
 
-## This executes every reload
-exec_always --no-startup-id "~/.i3/set_keyboard.sh"
-## And this once at the start
-exec --no-startup-id "~/.i3/autostart.sh"
-
 ## Window border style
-new_window 1pixel
-new_float 1pixel
+new_window none
+new_float pixel 1
 
 hide_edge_borders both
 focus_follows_mouse no

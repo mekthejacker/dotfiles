@@ -124,6 +124,7 @@
  '(n-back-active-match-types (quote (position)))
  '(n-back-allowed-match-types (quote (word color position)))
  '(n-back-level 2)
+ '(nginx-indent-tabs-mode t)
  '(ourcomments-ido-ctrl-tab t)
  '(package-archives
    (quote
@@ -296,6 +297,8 @@
 (load "~/.emacs.d/little_things/linum.el")
 ;; must be after code_snippets, because there may be redefined functions
 (load "~/.emacs.d/little_things/shortcuts.el")
+
+(setq tramp-verbose 10)
 
 ;; Prevent default init load
 (setq inhibit-default-init 1)

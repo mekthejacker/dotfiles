@@ -108,6 +108,7 @@ alias wap-s="wap s"
 alias wap-m="wap m"
 
 alias vivaldi="vivaldi --flag-switches-begin --debug-packed-apps --silent-debugger-extension-api --flag-switches-end"
+alias vivcp="cp -v ~/.config/vivaldi/custom.css  /opt/vivaldi/resources/vivaldi/style/"
 
 #
  #  QEMU block
