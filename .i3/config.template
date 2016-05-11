@@ -197,6 +197,14 @@ bindcode $mod+Shift+60  exec --no-startup-id "~/bin/wallpaper_setter/wallpaper_s
 bindcode $mod+61 exec --no-startup-id "~/bin/wallpaper_setter/wallpaper_setter.sh -k"
 
 #
+ #  mpv-tv block
+#
+# NumPad 4
+bindcode $mod+83 exec --no-startup-id "mpv-tv.sh prev"
+# NumPad 6
+bindcode $mod+85 exec --no-startup-id "mpv-tv.sh next"
+
+#
  #  Switching workspaces with a launch of a corresponding application
 #
 ## `
@@ -284,6 +292,7 @@ assign [class="mpv" instance="big_screen"] → "10:Outer_space"
 
 ## Arbitrary commands for specific windows
 for_window [class="URxvt" instance="one_command_shell"] floating enable
+#for_window [class="URxvt" instance="one_command_shell"] new float 1pixel
 for_window [class="spicec"] floating disable
 for_window [class="Xdialog"] floating enable
 for_window [class="at_msg"] floating enable

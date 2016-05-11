@@ -325,15 +325,31 @@ EOF
 }
 
 # Wi-Fi
+iforgot-wifi-check-link() {
+cat<<EOF
+    iwconfig
+    iw dev wlan0 link
+EOF
+}
+
 iforgot-wifi-connect() {
 cat <<"EOF"
-    iwconfig wlan0 \
-                   essid <point name> \
-                   mode managed       \
-                   key s: <password>
-
-    ifconfig wlan0 <ip address> netmask <mask>
+    cat <<"EOF" >/etc/wpa_supplicant.conf
+    network={
+        ssid="wpatest"
+        scan_ssid=1
+        key_mgmt=WPA-PSK
+        psk=""
+    }
+    EOF
+pkill wpa_supplicant
+ifconfig wlan0 down
+ifconfig wlan0 up
+iwconfig wlan0 essid "wpatest"  # channel 7
+wpa_supplicant -B -Dnl8011 -iwlan0 -c/etc/wpa_supplicant.conf  # -D wext
+busybox udhcpc -x hostname iamhere -i wlan0  # dhcpcd
 EOF
+# From https://www.pantz.org/software/wpa_supplicant/wirelesswpa2andlinux.html
 }
 
 iforgot-wifi-scan() {
@@ -910,9 +926,16 @@ iforgot-nested-x() { echo -e '\tXephyr :108 -resizeable &'; }
 
 iforgot-eix() {
 cat <<EOF
-
---only-names --in-overlay <overlay>
-Also: equery has repository sunrise
+Show what’s installed from an overlay
+    $ eix --only-names --in-overlay <overlay>
+Also helpful
+    $ equery has repository sunrise
+Find a package by [category/]name
+    $ eix -A [category/]name
+Find packages by description
+    $ eix -S "viewer"
+Find pacakges by description in a particular category
+    $ eix -S "viewer" -C app-text
 
 -c
 -Ac
@@ -927,10 +950,10 @@ For /boot:
 	# 40–50 MiB should be enough.
 For /:
 	# Actually, 1 mln inodes is enough, 200% is for accidental need for a system in chroot.
-	mkfs.ext4 -j -O extent,dir_index -N 2000000 -L "root" /dev/sda2
+	mkfs.ext4 -j -L "root" $(: -b1024) -O extent,dir_index -N 300000 /dev/sda2
 For /home:
 	# For home, the number of inodes is around 500K per TB.
-	mkfs.ext4 -m0 -j -O extent,dir_index,sparse_super -N 500000 -L "home" /dev/sda3
+	mkfs.ext4 -j -L "home" -m0 -O extent,dir_index,sparse_super -N 500000  /dev/sda3
 EOF
 }
 
@@ -1374,10 +1397,65 @@ cat <<EOF
 EOF
 }
 
-iforgot-wlan-check-link() {
-cat<<EOF
-    iw dev wlan0 link
+iforgot-nginx-hashed-passwords() { echo -e '\topenssl passwd -apr1'; }
+
+iforgot-bash-fast-replace() {
+cat<<"EOF"
+    !!:gs/pattern/replacement/
 EOF
 }
 
-iforgot-nginx-hashed-passwords() { echo -e '\topenssl passwd -apr1'; }
+iforgot-git-merge-resolve-conflicts() {
+cat <<"EOF"
+    git reset --hard
+    git rebase --skip
+After resolving conflicts, merge with
+    git add $conflicting_file
+    git rebase --continue
+EOF
+}
+
+iforgot-tmpfs-no-space-left() {
+cat <<EOF
+If /tmp is mounted as tmpfs, there may be such situation as ‘no space left’
+while du -hsx say there’s plenty. And df -h at the same time will confirm,
+that there’s no free space left. What did take that space? Old files, that
+were removed. Why are they holding space? There are processes that still
+hold on these files. Kill these processess, and the space will be freed.
+How to find such processes?
+    $ lsof | grep /tmp | grep deleted   # | while read pid; do kill -9 $pid; done
+EOF
+}
+
+iforgot-ssh-multiple-commands() {
+cat <<"EOF"
+Since
+    $ ssh myhost "ls foo; cd bar"
+as well as
+    $ ssh myhost /bin/bash -c 'ls foo; cd bar'
+won’t work as expected, the only way to pass multiple commands is to use herestring
+    $ ssh myhost <<<"ls foo; cd bar"
+or heredoc
+    $ ssh myhost <<EOF
+          ls foo
+          cd bar
+      EOF
+
+Remember to use "EOF" to prevent early expansion, and <<-EOF to strip tabs, if necessary.
+EOF
+}
+
+iforgot-ssh-nohup-fork-to-background() {
+cat <<"EOF"
+If
+    $ ssh myhost <<<"cd bar; (nohup ./a_daemon.sh) &"
+    . . . .
+hangs, and -f (fork to background) doesn’t work because stdin in not a terminal, specify stdin and stdout for nohup:
+    $ ssh myhost <<<"cd bar; (nohup ./a_daemon.sh </dev/null &>/dev/null) &"
+    $
+EOF
+}
+#
+ #  If you want more, I find these sites helpful:
+#
+# https://www.pantz.org

@@ -58,9 +58,9 @@ URxvt.scrollstyle: plain
 !
 !! These characters are used as delimiters for double-click word selection
 !! by default, but may be overriden
-URxvt.cutchars: `\"\'&()*,;<=>?@[]^{|}
+URxvt.cutchars: `\\\"\'&()*,;<=>?@[]^{|}
 URxvt.perl-ext-common:default,matcher
-URxvt.urlLauncher: palemoon -new-tab
+URxvt.urlLauncher: xdg-open
 URxvt.underlineURLs: true
 ! NB: 2 = middle mouse button (that will run urls instead of selecting text)
 URxvt.matcher.button: 2
@@ -109,6 +109,7 @@ URxvt.underlineColor: #75507B
 !highlightTextColor: #000000
 
 one_command_shell*geometry: 70x1
+one_command_shell*borderless: false
 !!mc_shell.font: xft:Gentium Basic:autohint=true:size=10
 
 !!Xcursor.theme: default

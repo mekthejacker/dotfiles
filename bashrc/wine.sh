@@ -1,15 +1,17 @@
 [ -v DISPLAY ] && {
+	unset WINEDEBUG WINEARCH WINEPREFIX __GL_THREADED_OPTIMIZATIONS __GL_SYNC_TO_VBLANK __GL_YIELD
 	# This setup uses a dummy user called sszb that holds all prefixes,
 	#   but in order for him to be able to show the windows on our X session,
 	#   he must be allowed to do this in the first place.
 	xhost +si:localuser:sszb > /dev/null
 	export WINEDEBUG="-all" \
-		   WINEARCH \
-		   WINEPREFIX \
-		   __GL_THREADED_OPTIMIZATIONS=1 \
-		   __GL_SYNC_TO_VBLANK=0 \
-		   __GL_YIELD="NOTHING" \
-		   SDL_AUDIODRIVER=alsa
+	       WINEARCH \
+	       WINEPREFIX \
+	       SDL_AUDIODRIVER=alsa
+	       # __GL_THREADED_OPTIMIZATIONS=1 \
+	       # __GL_SYNC_TO_VBLANK=0 \
+	       # __GL_YIELD="NOTHING" \
+
 
 	# In order to get output use
 	#     WINEDEBUG=warn wine …

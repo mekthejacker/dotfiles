@@ -19,6 +19,11 @@ pointer_control() {
 
 # Wait for the last command sent to background to create a window
 wait_for_program () {
+	#
+	# You should use
+	#   xdotool search --sync --onlyvisible --class "some wm class here"
+	# instead
+	#
 	local c=0; until [ $((++c)) -eq 15 ]; do
 		xdotool search --onlyvisible --pid $! 2>/dev/null && break
 		sleep 1
@@ -43,7 +48,7 @@ sudo /usr/bin/killall iftop
 # Applications that need to be started before layout setting:
 #   urxvtd, tmux and emacs daemon in tmux.
 # Substitute line:
-	# neww -n wa-a "{ (nohup emacs --daemon &>/dev/null) & } && /bin/bash " \; \
+	# neww -n wa-a "{ (nohup emacs --daemon &>/dev/null) & } && /bin/bash " \; \            ## nohup requires also requires ‘</dev/null’ to not hang
 #   is useless since emacsclient running from here still fails to connect to
 #   Emacs because it tries to do that while applications are messing around
 #   with gpg keys, which causes a delay before i3 windows actually appear.
@@ -52,7 +57,7 @@ sudo /usr/bin/killall iftop
 #   I fucking hate that goddamn piece of crap, but too lazy to set up vim.
 # Yes, it seems that the only way to have that shit working between X restarts
 #   and independently of X is to run daemon via init scripts >_>
-pgrep urxvtd || urxvtd -q -o -f
+pgrep -u $UID urxvtd || urxvtd -q -o -f
 tmux="tmux -u -f $HOME/.tmux/config -S $HOME/.tmux/socket"
 if pgrep -u $UID -f '^tmux.*$' &>/dev/null; then
 	[ "$1" = stop_after_main_workspace ] || {
@@ -224,9 +229,9 @@ for app in "${startup_apps[@]}"; do
 
 	# { … & } becasue otherwise ‘&’ will fork to background the whole string
 	#   including subshell created by the left part of ‘||’ statement.
-	# (nohup $app) actuallyy needed only for emacs as daemon
+	# (nohup $app) actually needed only for emacs as daemon
 	# Preventing apps that persist between sessions to be runned again
-	pgrep -u $UID -f "^$app\>" >/dev/null || { (nohup $app) & }
+	pgrep -u $UID -f "^$app\>" >/dev/null || { (nohup $app </dev/null &>/dev/null) & }
 done
 
 c=0; until mpc &>/dev/null; do
@@ -247,3 +252,12 @@ crontab -l | grep -qF 'wallpaper_setter.sh' || {
 		>>/var/spool/cron/crontabs/$ME \
 		|| notify-send -t 4000 "${0##*/}" "Couldn’t set crontab file."
 }
+
+# For the automation of setting up sindows on other workspaces,
+#   xdotool windowactivate #WID
+# should be helpful.
+#
+#WID=`xdotool search --name "Mozilla Firefox" | head -1`
+# >> No, use xdotool’s WINDOW STACK
+#xdotool windowactivate $WID
+#xdotool key F5

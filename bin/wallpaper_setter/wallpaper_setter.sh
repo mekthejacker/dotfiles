@@ -437,7 +437,7 @@ $brightness"
 
 # $1 — index of the item to restore
 restore_from_collection() {
-	local field_number=0
+	local field_number=0 idx=$1
 	unset image fillmode brightness
 	while IFS= read -r -d $'\0' data; do
 		case $((field_number++)) in
@@ -453,7 +453,7 @@ restore_from_collection() {
 					&& brightness="$data"
 				;;
 		esac
-	done < <(echo -n "${collection[$1]}" \
+	done < <(echo -n "${collection[idx]}" \
 		| sed -rn '1h; 2,$ H; ${g; s/^(.*)\n([^\n]+)\n([^\n]+)$/\1\x00\2\x00\3\x00/g; p}')
 	# This way it should work even if ${collection[$1]} expands
 	#   to only one line (or no lines).
@@ -466,6 +466,7 @@ restore_from_collection() {
 }
 
 export_collection() {
+	local keep
 	set +f
 	rm $COLLECTION_FILE.* 2>/dev/null
 	set -f
@@ -473,8 +474,8 @@ export_collection() {
 		echo -n "${collection[$i]}" > "$COLLECTION_FILE.$i"
 	done
 	[ -v KEEP_CURRENT_WALLPAPER ] \
-		&& local keep=keep \
-		|| local keep=don’t keep
+		&& keep='keep' \
+		|| keep='don’t keep'
 	echo -n "$PWD
 $c_index
 $keep" > "$COLLECTION_FILE.rc"
@@ -772,4 +773,5 @@ while read -u $rxpipe_fd; do
 	[ -v wasnt_quiet ] && {
 		unset NEXT_COMMAND_BE_QUIET BE_QUIET wasnt_quiet
 	}
+	export_collection  # to have settings saved in case of sudden power loss
 done

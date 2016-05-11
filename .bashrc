@@ -8,7 +8,6 @@
 # This is to dispose of old aliases and function definitions before
 #   (re-)sourcing new or rewritten ones.
 
-
 unalias -a
 # If I replace it with
 #     unset -f `declare -F | sed 's/^declare -f //g'`
@@ -16,20 +15,6 @@ unalias -a
 unset -f `sed -nr "s/^\s*([-_a-zA-Z0-9]+)\(\)\s*\{.*$/\1/p" \
           ~/.bashrc ~/bashrc/* 2>/dev/null`
 
-[ -v ENV_DEBUG ] || {
-	rm -rf /tmp/envlogs/* &>/dev/null
-	mkdir -m 700 /tmp/envlogs &>/dev/null # /tmp should be on tmpfs
-}
-# code     file               logfile (under /tmp/envlogs/)
-# x    /usr/bin/X          x (just for the file name, it’s always present)
-# p    ~/.preload.sh       preload
-# i    /usr/bin/i3         i3.stdout + i3.stderr
-# g    ~/.i3/g…_for_i3bar  gentext4i3bar
-# a    ~/.i3/autostart.sh  autostart
-# r    ~/bin/run_app.sh    runapp_<app_name>
-# q    ~/.i3/on_quit.sh    on_quit
-# -    prevents the variable from being empty
-export ENV_DEBUG=-paiq
 for opt in autocd cdspell dirspell dotglob extglob globstar \
     no_empty_cmd_completion; do
     shopt -s $opt
@@ -78,45 +63,45 @@ at \h \
 #     alias plsplsplsdontbreak="echo some stuff # this is comment
 #                               echo lol second line # another comment"
 
-# add to todo list
-tda() { echo "$@" >> ~/todo; }
-# delete from todo list
-tdd() {
-    [ "$1" = '-' ] && echo -n >~/todo || {
-        for i in $@; do
-            [[ "$i" =~ ^[0-9]+$ ]] && sed -i $1d ~/todo
-        done
-    }
-}
 alias bc="bc -q"
 alias ec="emacsclient -c -nw"
 alias emc="emacsclient"
 alias erc="emacsclient -c -nw ~/.bashrc"
 alias grep="grep --color=auto"
+# git
 alias gash="git stash"
 alias gi='git'
 alias gia='git add'
 alias giaa='git add --all'
+alias gib='git branch'
 alias gic='git commit'
 alias gica='git commit -a'
 alias gicm='git commit -m'
 alias gicam='git commit -am'
-alias gicamend='git commit --amend'
-alias gib='git branch'
+alias gicamend='git commit -a --amend'  # after editing the wrongly commited files
+alias gico='git checkout'  # checkout may also take args in form [commit] <file>
 alias gif='git fetch'
 alias giff='git diff'
+alias giffbase='git diff --base'  # against base file
+alias giffours='git diff --ours'  # against our changes
+alias gifftheirs='git diff --theirs'  # against their changes
 alias gil='git ls-files'
 alias gilog='git log --graph --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue)<%an>%Creset" --abbrev-commit --date=relative'
-alias gilogp='git log --pretty=format:"%h %ad | %s%d [%an]" --graph --date=short'
-alias gilogg='git log --all --graph --decorate'
-alias gis='git status'
-alias gico='git checkout'
+alias gilog2='git log --pretty=format:"%h %ad | %s%d [%an]" --graph --date=short'
+alias gilog3='git log --all --graph --decorate'
+alias gilogp='git log -p '  # changes in file over time
 alias gim='git submodule'
 alias gima='git submodule add'
 alias gimi='git submodule init'
 alias gims='git submodule status'
 alias gimu='git submodule update'
 alias gimy='git submodule sync'
+alias gipa='git format-patch'  # …origin
+alias gire='git revert'  # revert a specific commit
+alias giread='git revert HEAD'  # reverts the last commit
+alias gire='git revert'
+alias gire='git revert'
+alias gis='git status'
 alias gull='git pull'
 alias gush='git push'
 # pinentry doesn’t like scim
@@ -130,12 +115,30 @@ spr="| curl -F 'sprunge=<-' http://sprunge.us" # add ?<lang> for line numbers
 #alias tdD="todo -D "
 alias tmux="tmux -u -f ~/.tmux/config -S $HOME/.tmux/socket"
 
-#[ -v SSH_CLIENT ] && . ~/.preload.sh
+# Though TERM is kept via SSH’s SendEnv,
+#   rxvt-unicode-256color gives messed colours in emacsclient.
+# Other working replacement may be screen-256color. rxvt-basic works as a monochrome screen
+[ -v SSH_CLIENT ] && export TERM=xterm-256color
 
 # Test for an interactive shell.  There is no need to set anything
 # past this point for scp and rcp, and it's important to refrain from
 # outputting anything in those cases.
 [[ $- = *i* ]] || return 0
+
+[ -v ENV_DEBUG ] || {
+	rm -rf /tmp/envlogs/* &>/dev/null
+	mkdir -m 700 /tmp/envlogs &>/dev/null # /tmp should be on tmpfs
+}
+# code     file               logfile (under /tmp/envlogs/)
+# x    /usr/bin/X          x (just for the file name, it’s always present)
+# p    ~/.preload.sh       preload
+# i    /usr/bin/i3         i3.stdout + i3.stderr
+# g    ~/.i3/g…_for_i3bar  gentext4i3bar
+# a    ~/.i3/autostart.sh  autostart
+# r    ~/bin/run_app.sh    runapp_<app_name>
+# q    ~/.i3/on_quit.sh    on_quit
+# -    prevents the variable from being empty
+export ENV_DEBUG=-paiq
 
 [ ! -v DISPLAY -a "`tty`" = /dev/tty2 ] && {
 	# W! startx IGNORES ~/.xserverrc options if something passed beyond -- !
@@ -144,6 +147,17 @@ alias tmux="tmux -u -f ~/.tmux/config -S $HOME/.tmux/socket"
 	# This was needed when I used to switch between configs.
 	# exec startx -- -config xorg.conf$(<~/.xorg.conf.suffix) -nolisten tcp &>/tmp/envlogs/x
 	# rm ~/.xorg.conf.suffix &>/dev/null
+}
+
+# add to todo list
+tda() { echo "$@" >> ~/todo; }
+# delete from todo list
+tdd() {
+    [ "$1" = '-' ] && echo -n >~/todo || {
+        for i in $@; do
+            [[ "$i" =~ ^[0-9]+$ ]] && sed -i $1d ~/todo
+        done
+    }
 }
 
 pushd ~/bashrc >/dev/null

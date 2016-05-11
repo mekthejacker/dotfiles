@@ -107,6 +107,13 @@ alias wap-f="wap f"
 alias wap-s="wap s"
 alias wap-m="wap m"
 
+mpv-tv() {
+	mkfifo /tmp/mpv-tv.fifo 2>/dev/null
+	xrandr --output $SLAVE_OUTPUT_0 --auto --right-of $PRIMARY_OUTPUT
+	mpv --profile=tv ~/.mpd/playlists/iptv-local.m3u
+	xrandr --output $SLAVE_OUTPUT_0 --off
+}
+
 alias vivaldi="vivaldi --flag-switches-begin --debug-packed-apps --silent-debugger-extension-api --flag-switches-end"
 alias vivcp="cp -v ~/.config/vivaldi/custom.css  /opt/vivaldi/resources/vivaldi/style/"
 
@@ -201,15 +208,29 @@ alias vm-w="qemu-graphic	-smp 1,cores=2,threads=1 -m 1512 -drive file=/home/$ME/
 alias vm-wc='spicec -h 192.168.0.1 -p 5903 -t QEMU_WinXP____Shift_F11'
 alias vm-wq='~/bin/qemu-shell/qmp-shell ~/qmp-sock-shindaws'
 
-alias vm-ts-mother-setup="qemu-system-x86_64  -enable-kvm \
-	-cpu host \
-	-smp 1,cores=1,threads=1 \
-	-boot order=dc \
-	-m 1024 -serial stdio \
-	-name 'vm-ts-mother-setup,process=vm-ts-mother-setup' \
-	-drive file=\`ls /sysrcd/sysresccd-*.iso | tail -n1\`,media=cdrom,index=0 \
-	-netdev vde,id=pxelan,sock=/tmp/vde.ctl \
-		-device virtio-net-pci,netdev=pxelan,mac=BA:C1:47:BA:C1:47"
+vm-ts-mother-setup() {
+	[ -r "$1" ] \
+		&& file="$1" \
+		|| file=`ls ~/work/lifestream/minimal-sysrcd/sysresccd-*.iso | tail -n1`
+	[ -f "$file" ] || {
+		echo "No such file: ‘$file’." >&2
+		return 3
+	}
+	qemu-system-x86_64  -enable-kvm \
+	                  -cpu host \
+                      -smp 1,cores=1,threads=1 \
+                      -boot order=dc \
+                      -m 1024 \
+                      -name 'vm-ts-mother-setup,process=vm-ts-mother-setup' \
+                      -drive "file=$file,media=cdrom,index=0" \
+                      -netdev vde,id=pxelan,sock=/tmp/vde.ctl \
+                      -device virtio-net-pci,netdev=pxelan,mac=BA:C1:47:BA:C1:47 \
+                      -serial stdio
+# -vga qxl -spice addr=192.168.5.1,port=7000,disable-ticketing \
+# -nographic console=/dev/ttyS0
+	# -serial stdio
+
+}
 alias vm-pxe-client-setup="qemu-system-x86_64  -enable-kvm \
 	-cpu host \
 	-smp 1,cores=1,threads=1 \
@@ -218,3 +239,17 @@ alias vm-pxe-client-setup="qemu-system-x86_64  -enable-kvm \
 	-name 'vm-pxe-clinet-setup,process=vm-pxe-client-setup' \
 	-netdev vde,id=pxelan,sock=/tmp/vde.ctl \
 		-device virtio-net-pci,netdev=pxelan,mac=BA:C1:47:2B:4C:14"
+
+
+vm-moms() {
+	qemu-system-x86_64 -enable-kvm \
+	                   -cpu host \
+                       -smp 1,cores=4,threads=2,maxcpus=16 \
+                       -boot order=dc \
+                       -m 4096 \
+                       -name 'vm-moms,process=vm-moms' \
+                       -drive "file=/home/soft_lin/install-amd64-minimal-20160414.iso,media=cdrom,index=0" \
+                       -drive "file=$HOME/moms.img,media=disk,format=raw,if=ide,index=1" \
+                       -netdev vde,id=pxelan,sock=/tmp/vde.ctl \
+                       -device virtio-net-pci,netdev=pxelan,mac=BA:C1:47:BA:C1:47
+}

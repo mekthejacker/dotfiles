@@ -1,3 +1,17 @@
+# ~/.mpv/config
+#
+# About the outputs (--vo) and hardware decoding (--hwdec)
+#   1. The best is opengl-hq.
+#   2. vdpau and vaapi outputs are not recommended unless both opengl-hq
+#      and opengl do not work.
+#   3. --hwdec and --vo are different options, and hwdec=vaapi doesn’t require
+#      vo=vaapi, as one would think.
+#      --vo opengl can be used with --hwdec vaapi, for instance.
+#   4. --hwdec vdpau/vaapi is just a solution for a _fast_ decode. VDPAU was
+#      made for low-power computers, such as smartphones, tablets etc. If you
+#      care about quality of the image, do not use it and use vo=opengl-hq.
+
+[home]
 ## Options that are common for any profile
 [default]
 ## Audio track languages
@@ -25,6 +39,7 @@ osd-fractions=yes
 #save-position-on-quit=yes
 screenshot-template="%F_%P"
 screenshot-format=jpg
+#screenshot-format=png
 ## Compressing screenshots while mpv runs is slow,
 ##   so compressing is done after with watch.sh
 screenshot-png-compression=9
@@ -37,13 +52,16 @@ sub-codepage=enca:ru:en
 ## Disable ass subs for this to take effect
 sub-text-font='DejaVu Sans Mono'
 sub-text-font-size=50
-vo=opengl-hq,vaapi,vdpau,xv
+#vo=opengl-hq:scale=ewa_lanczossharp:cscale=ewa_lanczossharp:interpolation:temporal-dither:gamma=0.9:blend-subtitles=yes:target-prim=bt.709:target-trc=srgb
+#vo=opengl-hq:scale=ewa_lanczossharp:cscale=ewa_lanczossharp:interpolation:temporal-dither:gamma=0.9:blend-subtitles=yes:icc-profile="/home/dtr/.env/FULLHD.icm"
+vo=opengl-hq,opengl,vdpau,vaapi,xv
 volume=100
 ytdl-format=bestvideo+bestaudio
 
 
 [hdmi]
 profile-desc="For output on big plasma"
+x11-name=big_screen
 ## For this type of ALSA device specification see
 ## cat /proc/asound/devices
 ## discrete card
@@ -63,31 +81,20 @@ vo=vdpau:sharpen=.5:denoise=1:deint=4:chroma-deint:pullup
 input-cursor=yes
 #nocache=yes
 
-[home]
-vo=opengl-hq
-#vo=opengl-hq:scale=ewa_lanczossharp:cscale=ewa_lanczossharp:interpolation:temporal-dither:gamma=0.9:blend-subtitles=yes:target-prim=bt.709:target-trc=srgb
-#vo=opengl-hq:scale=ewa_lanczossharp:cscale=ewa_lanczossharp:interpolation:temporal-dither:gamma=0.9:blend-subtitles=yes:icc-profile="/home/dtr/.env/FULLHD.icm"
-#hwdec=vaapi
-
-[vo.xv]
-vo=xv
-
-[vo.vdpau]
-hwdec=vdpau
-
-[vo.vaapi]
-hwdec=vaapi
-
 [vo.directfb]
 profile-desc="For playing on framebuffer w/o X"
 vo=directfb:buffermode=triple
 monitoraspect=16:9
 
-[paskapuukko]
-#vo=vaapi
-#hwdec=vaapi
-vo=opengl-hq
-
-
 [encoding]
 terminal=no
+
+[tv]
+profile-desc="IPTV"
+input-file=/tmp/mpv-tv.fifo
+ao=alsa:device=[hw:0,8]
+fs=yes
+vo=opengl
+hwdec=vaapi
+x11-name=big_screen
+save-position-on-quit=yes
