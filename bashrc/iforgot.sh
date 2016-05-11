@@ -1326,7 +1326,7 @@ iforgot-tar() {
 cat<<"EOF"
 Create an archive
 
-    tar -a -c -v -p -f archive.tar.xz DIRECTORY
+    tar -a -c -v -p -f archive.tar.xz /some/directory
           \  \  \  \  \
            \  \  \  \  \_ file name
             \  \  \  \_ preserve attributes
@@ -1335,10 +1335,14 @@ Create an archive
                \_ automaticallly detect the compressor from the extension
 Decompress
 
-    tar -a -x [-v] -f archive.tar.xz -C CD_HERE_BEFORE_EXTRACTION
+    tar -a -x [-v] -f archive.tar.xz -C /cd/here/before/extraction
              \
               \_ eXtract
 
+List
+    tar -t -a -f archive.tar.xz  "look me up"
+          \
+           \_ list files
 EOF
 }
 
@@ -1402,6 +1406,12 @@ iforgot-nginx-hashed-passwords() { echo -e '\topenssl passwd -apr1'; }
 iforgot-bash-fast-replace() {
 cat<<"EOF"
     !!:gs/pattern/replacement/
+EOF
+}
+
+iforgot-wifi-check-link() {
+cat<<EOF
+    iw dev wlan0 link
 EOF
 }
 

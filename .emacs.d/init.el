@@ -124,6 +124,7 @@
  '(n-back-active-match-types (quote (position)))
  '(n-back-allowed-match-types (quote (word color position)))
  '(n-back-level 2)
+ '(nginx-indent-level 4)
  '(nginx-indent-tabs-mode t)
  '(ourcomments-ido-ctrl-tab t)
  '(package-archives
@@ -142,6 +143,7 @@
  '(text-mode-hook (quote (turn-on-auto-fill text-mode-hook-identify)))
  '(text-scale-mode-step 1.0)
  '(tool-bar-mode nil)
+ '(tramp-mode t)
  '(whitespace-display-mappings
    (quote
 	((space-mark 32
@@ -356,3 +358,4 @@
 	
 
 ;;(add-hook 'LaTeX-mode-hook 'turn-on-auto-fill)
+
