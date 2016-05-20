@@ -1465,7 +1465,254 @@ hangs, and -f (fork to background) doesn’t work because stdin in not a termina
     $
 EOF
 }
+
+iforgot-wget() {
+cat <<EOF
+       -S
+       --server-response
+           Print the headers sent by HTTP servers and responses sent by FTP servers.
+
+       -nc
+       --no-clobber
+           If a file is downloaded more than once in the same directory, Wget's behavior depends on a few
+           options, including -nc.  In certain cases, the local file will be clobbered, or overwritten,
+           upon repeated download.  In other cases it will be preserved.
+
+           When running Wget without -N, -nc, -r, or -p, downloading the same file in the same directory
+           will result in the original copy of file being preserved and the second copy being named
+           file.1.  If that file is downloaded yet again, the third copy will be named file.2, and so on.
+           (This is also the behavior with -nd, even if -r or -p are in effect.)  When -nc is specified,
+           this behavior is suppressed, and Wget will refuse to download newer copies of file.  Therefore,
+           ""no-clobber"" is actually a misnomer in this mode---it's not clobbering that's prevented (as
+           the numeric suffixes were already preventing clobbering), but rather the multiple version
+           saving that's prevented.
+
+           When running Wget with -r or -p, but without -N, -nd, or -nc, re-downloading a file will result
+           in the new copy simply overwriting the old.  Adding -nc will prevent this behavior, instead
+           causing the original version to be preserved and any newer copies on the server to be ignored.
+
+           When running Wget with -N, with or without -r or -p, the decision as to whether or not to
+           download a newer copy of a file depends on the local and remote timestamp and size of the file.
+           -nc may not be specified at the same time as -N.
+       -t number
+       --tries=number
+           Set number of tries to number. Specify 0 or inf for infinite retrying.  The default is to retry
+           20 times, with the exception of fatal errors like "connection refused" or "not found" (404),
+           which are not retried.
+       --save-headers
+           Save the headers sent by the HTTP server to the file, preceding the actual contents, with an
+           empty line as the separator.
+       --post-data=string
+       --post-file=file
+           Use POST as the method for all HTTP requests and send the specified data in the request body.
+           --post-data sends string as data, whereas --post-file sends the contents of file.  Other than
+           that, they work in exactly the same way. In particular, they both expect content of the form
+           "key1=value1&key2=value2", with percent-encoding for special characters; the only difference is
+           that one expects its content as a command-line parameter and the other accepts its content from
+           a file. In particular, --post-file is not for transmitting files as form attachments: those
+           must appear as "key=value" data (with appropriate percent-coding) just like everything else.
+           Wget does not currently support "multipart/form-data" for transmitting POST data; only
+           "application/x-www-form-urlencoded". Only one of --post-data and --post-file should be
+           specified.
+
+           Please note that wget does not require the content to be of the form "key1=value1&key2=value2",
+           and neither does it test for it. Wget will simply transmit whatever data is provided to it.
+           Most servers however expect the POST data to be in the above format when processing HTML Forms.
+
+           Please be aware that Wget needs to know the size of the POST data in advance.  Therefore the
+           argument to "--post-file" must be a regular file; specifying a FIFO or something like
+           /dev/stdin won't work.  It's not quite clear how to work around this limitation inherent in
+           HTTP/1.0.  Although HTTP/1.1 introduces chunked transfer that doesn't require knowing the
+           request length in advance, a client can't use chunked unless it knows it's talking to an
+           HTTP/1.1 server.  And it can't know that until it receives a response, which in turn requires
+           the request to have been completed -- a chicken-and-egg problem.
+
+           Note: As of version 1.15 if Wget is redirected after the POST request is completed, its
+           behaviour will depend on the response code returned by the server.  In case of a 301 Moved
+           Permanently, 302 Moved Temporarily or 307 Temporary Redirect, Wget will, in accordance with
+           RFC2616, continue to send a POST request.  In case a server wants the client to change the
+           Request method upon redirection, it should send a 303 See Other response code.
+
+           This example shows how to log in to a server using POST and then proceed to download the
+           desired pages, presumably only accessible to authorized users:
+
+                   # Log in to the server.  This can be done only once.
+                   wget --save-cookies cookies.txt \
+                        --post-data 'user=foo&password=bar' \
+                        http://server.com/auth.php
+
+                   # Now grab the page or pages we care about.
+                   wget --load-cookies cookies.txt \
+                        -p http://server.com/interesting/article.php
+
+           If the server is using session cookies to track user authentication, the above will not work
+           because --save-cookies will not save them (and neither will browsers) and the cookies.txt file
+           will be empty.  In that case use --keep-session-cookies along with --save-cookies to force
+           saving of session cookies.
+       --method=HTTP-Method
+           For the purpose of RESTful scripting, Wget allows sending of other HTTP Methods without the
+           need to explicitly set them using --header=Header-Line.  Wget will use whatever string is
+           passed to it after --method as the HTTP Method to the server.
+
+       -c
+       --continue
+           Continue getting a partially-downloaded file.  This is useful when you want to finish up a
+           download started by a previous instance of Wget, or by another program.  For instance:
+
+                   wget -c ftp://sunsite.doc.ic.ac.uk/ls-lR.Z
+
+           If there is a file named ls-lR.Z in the current directory, Wget will assume that it is the
+           first portion of the remote file, and will ask the server to continue the retrieval from an
+           offset equal to the length of the local file.
+
+           Note that you don't need to specify this option if you just want the current invocation of Wget
+           to retry downloading a file should the connection be lost midway through.  This is the default
+           behavior.  -c only affects resumption of downloads started prior to this invocation of Wget,
+           and whose local files are still sitting around.
+
+           Without -c, the previous example would just download the remote file to ls-lR.Z.1, leaving the
+           truncated ls-lR.Z file alone.
+
+       -w seconds
+       --wait=seconds
+           Wait the specified number of seconds between the retrievals.  Use of this option is
+           recommended, as it lightens the server load by making the requests less frequent.  Instead of
+           in seconds, the time can be specified in minutes using the "m" suffix, in hours using "h"
+           suffix, or in days using "d" suffix.
+
+           Specifying a large value for this option is useful if the network or the destination host is
+           down, so that Wget can wait long enough to reasonably expect the network error to be fixed
+           before the retry.  The waiting interval specified by this function is influenced by
+           "--random-wait", which see.
+
+       --waitretry=seconds
+           If you don't want Wget to wait between every retrieval, but only between retries of failed
+           downloads, you can use this option.  Wget will use linear backoff, waiting 1 second after the
+           first failure on a given file, then waiting 2 seconds after the second failure on that file, up
+           to the maximum number of seconds you specify.
+
+           By default, Wget will assume a value of 10 seconds.
+
+       --random-wait
+           Some web sites may perform log analysis to identify retrieval programs such as Wget by looking
+           for statistically significant similarities in the time between requests. This option causes the
+           time between requests to vary between 0.5 and 1.5 * wait seconds, where wait was specified
+           using the --wait option, in order to mask Wget's presence from such analysis.
+
+           A 2001 article in a publication devoted to development on a popular consumer platform provided
+           code to perform this analysis on the fly.  Its author suggested blocking at the class C address
+           level to ensure automated retrieval programs were blocked despite changing DHCP-supplied
+           addresses.
+
+           The --random-wait option was inspired by this ill-advised recommendation to block many
+           unrelated users from a web site due to the actions of one.
+       --user=user
+       --password=password
+           Specify the username user and password password for both FTP and HTTP file retrieval.  These
+           parameters can be overridden using the --ftp-user and --ftp-password options for FTP
+           connections and the --http-user and --http-password options for HTTP connections.
+       -nH
+       --no-host-directories
+           Disable generation of host-prefixed directories.  By default, invoking Wget with -r
+           http://fly.srk.fer.hr/ will create a structure of directories beginning with fly.srk.fer.hr/.
+           This option disables such behavior.
+   Recursive Retrieval Options
+       -r
+       --recursive
+           Turn on recursive retrieving.    The default maximum depth is 5.
+       -l depth
+       --level=depth
+           Specify recursion maximum depth level depth.
+       --cut-dirs=number
+                   No options        -> ftp.xemacs.org/pub/xemacs/
+                   -nH               -> pub/xemacs/
+                   -nH --cut-dirs=1  -> xemacs/
+                   -nH --cut-dirs=2  -> .
+
+                   --cut-dirs=1      -> ftp.xemacs.org/xemacs/
+                   ...
+
+       -k
+       --convert-links
+           After the download is complete, convert the links in the document to make them suitable for
+           local viewing.  This affects not only the visible hyperlinks, but any part of the document that
+           links to external content, such as embedded images, links to style sheets, hyperlinks to non-
+           HTML content, etc.
+
+           Each link will be changed in one of the two ways:
+
+           ·   The links to files that have been downloaded by Wget will be changed to refer to the file
+               they point to as a relative link.
+
+               Example: if the downloaded file /foo/doc.html links to /bar/img.gif, also downloaded, then
+               the link in doc.html will be modified to point to ../bar/img.gif.  This kind of
+               transformation works reliably for arbitrary combinations of directories.
+
+           ·   The links to files that have not been downloaded by Wget will be changed to include host
+               name and absolute path of the location they point to.
+
+               Example: if the downloaded file /foo/doc.html links to /bar/img.gif (or to ../bar/img.gif),
+               then the link in doc.html will be modified to point to http://hostname/bar/img.gif.
+
+           Because of this, local browsing works reliably: if a linked file was downloaded, the link will
+           refer to its local name; if it was not downloaded, the link will refer to its full Internet
+           address rather than presenting a broken link.  The fact that the former links are converted to
+           relative links ensures that you can move the downloaded hierarchy to another directory.
+
+           Note that only at the end of the download can Wget know which links have been downloaded.
+           Because of that, the work done by -k will be performed at the end of all the downloads.
+       -m
+       --mirror
+           Turn on options suitable for mirroring.  This option turns on recursion and time-stamping, sets
+           infinite recursion depth and keeps FTP directory listings.  It is currently equivalent to -r -N
+           -l inf --no-remove-listing.
+
+EOF
+}
+
+iforgot-ntp () {
+cat <<EOF
+Print currently used servers
+    ntpq -p
+remote: peers speficified in the ntp.conf file
+* = current time source
+# = source selected, distance exceeds maximum value
+o = source selected, Pulse Per Second (PPS) used
++ = source selected, included in final set
+x = source false ticker
+. = source selected from end of candidate list
+– = source discarded by cluster algorithm
+blank = source discarded high stratum, failed sanity
+
+refid: remote source’s synchronization source
+
+stratum: stratum level of the source
+
+t: types available
+l = local (such as a GPS, WWVB)
+u = unicast (most common)
+m = multicast
+b = broadcast
+– = netaddr
+
+when: number of seconds passed since last response
+
+poll: polling interval, in seconds, for source
+
+reach: indicates success/failure to reach source, 377 all attempts successful
+
+delay: indicates the roundtrip time, in milliseconds, to receive a reply
+
+offset: indicates the time difference, in milliseconds, between the client server and source
+
+disp/jitter: indicates the difference, in milliseconds, between two samples
+EOF
+# From http://tech.kulish.com/2007/10/30/ntp-ntpq-output-explained/
+}
+
 #
  #  If you want more, I find these sites helpful:
 #
 # https://www.pantz.org
+
+

@@ -241,7 +241,7 @@ rec() {
 	echo -n /tmp/$ts.mp3 | xclip
 }
 
-fpic() { find ~/picts -iname "*$@*"; }
+fpic() { find /home/picts -iname "*$@*"; }
 
 # DESCRIPTION:
 #     Adds all hosts in a given subnet to the java exception site list.
