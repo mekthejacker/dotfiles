@@ -349,6 +349,8 @@ iwconfig wlan0 essid "wpatest"  # channel 7
 wpa_supplicant -B -Dnl8011 -iwlan0 -c/etc/wpa_supplicant.conf  # -D wext
 busybox udhcpc -x hostname iamhere -i wlan0  # dhcpcd
 EOF
+# iwconfig has ‘sens’ parameter to send roaming agressiveness. How to do that
+#   with wpa_supplicant?
 # From https://www.pantz.org/software/wpa_supplicant/wirelesswpa2andlinux.html
 }
 
