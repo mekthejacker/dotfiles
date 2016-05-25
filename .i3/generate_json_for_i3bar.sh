@@ -67,6 +67,7 @@ modules=(
 	#   set a non-empty variable of same name.
 	# Simply erase or comment a separator, if you don’t need it.
 	[100]=
+	[101]=envdebug_status
 	[130]=mpd_state
 	[140]=speakers_state
 	[150]=mic_state
@@ -103,13 +104,25 @@ esac
 # Tabulation and spaces in output of the script are just to have a nice view
 #   while testing this script in a terminal and are not neccesary.
 
-# DESCRIPTION:
-#     Module for testing purposes.
+ # Module for testing purposes.
+#
 get_test() {
 	# https://developer.gnome.org/pango/stable/PangoMarkupFormat.html
 	test='{ "full_text": "<span foreground=\"blue\" bgcolor=\"#efefef\" size=\"x-large\">Blue text</span> is <i>cool</i>!",
 \t  "align": "right",
 \t  "markup": "pango",
+\t  "separator": false },'
+}
+
+ # Show a red ‘+’, if ENV_DEBUG is enabled for some startup stage.
+#    Having it enabled makes the log grow and fill /tmp until there’s
+#    no space left.
+get_envdebug_status() {
+	[ "$ENV_DEBUG" = '+' ] || local status='+'
+	envdebug_status='{ "full_text": "'$status'",
+\t  "markup": "pango",
+\t  "color": "'$red'",
+\t  "urgent": "true",
 \t  "separator": false },'
 }
 

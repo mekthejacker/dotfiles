@@ -138,7 +138,7 @@ alias tmux="tmux -u -f ~/.tmux/config -S $HOME/.tmux/socket"
 # r    ~/bin/run_app.sh    runapp_<app_name>
 # q    ~/.i3/on_quit.sh    on_quit
 # -    prevents the variable from being empty
-export ENV_DEBUG=-paiq
+export ENV_DEBUG='+'
 
 [ ! -v DISPLAY -a "`tty`" = /dev/tty2 ] && {
 	# W! startx IGNORES ~/.xserverrc options if something passed beyond -- !
