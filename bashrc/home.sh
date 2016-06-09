@@ -20,12 +20,12 @@ alias rt="urxvtc -title rtorrent -hold \
                  -e /bin/bash -c 'chmod o+rw `tty` \
                     && sudo -u rtorrent -H tmux -u -S /home/rtorrent/.tmux/socket attach' &"
 # For temporary freeing the connection from torrents.
-rt-unpause() { rt-pause; }
-rt-pause() {
-	[ "${FUNCNAME[1]}" = rt-unpause ] && local unpause=t || local pause=t
+rt-continue() { rt-stop; }
+rt-stop() {
+	[ "${FUNCNAME[1]}" = rt-continue ] && local unpause=t || local pause=t
 	local rtstate=$(ps -o state,cmd ax | sed -rn "s:^([DRSTtWXZ])\s+$(which rtorrent).*:\1:p")
 	case "$rtstate" in
-		D) echo 'The process is in uninterruptible sleep (usually IO). I better not do anything.' >&2
+		D) echo 'The process is in uninterruptible sleep (usually I/O). I better not do anything.' >&2
 		   return 3
 		   ;;
 		R|S) [ -v unpause ] \
@@ -37,7 +37,7 @@ rt-pause() {
 		t) echo 'The process is stopped by debugger during the tracing. I better not do anything.' >&2
 		   return 4
 		   ;;
-		W) echo '2.6 kernel? Am I on a router? /Ghi-hi-hi…/' >&2
+		W) echo '2.6 kernel? Am I on a soap box? /Ghi-hi-hi…/' >&2
 		   return 5
 		   ;;
 		X) echo 'The process seems to be dead.' >&2

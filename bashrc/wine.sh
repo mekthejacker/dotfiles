@@ -8,9 +8,9 @@
 	       WINEARCH \
 	       WINEPREFIX \
 	       SDL_AUDIODRIVER=alsa
-	       # __GL_THREADED_OPTIMIZATIONS=1 \
-	       # __GL_SYNC_TO_VBLANK=0 \
-	       # __GL_YIELD="NOTHING" \
+	        __GL_THREADED_OPTIMIZATIONS=1 \
+	        __GL_SYNC_TO_VBLANK=0 \
+	        #__GL_YIELD="NOTHING" \
 
 
 	# In order to get output use

@@ -559,6 +559,31 @@ http://www.karlrupp.net/en/computer/nat_tutorial
 EOF
 }
 
+iforgot-iptables-multicast-forward() {
+cat <<EOF
+    cat <<EOF >/etc/igmpproxy/igmpproxy.conf
+    quickleave
+    phyint vlan102 upstream  ratelimit 0  threshold 1
+    altnet 192.168.12.0/24
+    #        altnet 10.0.0.0/8
+    #        altnet 192.168.0.0/24
+    phyint eth2 downstream  ratelimit 0  threshold 1
+    ##ip link show | sed -rn 's/^[0-9]+:\s([^:@]+)@?\S*:.*/phyint \1 disabled/p' >>/etc/igmpproxy/igmpproxy.conf
+    phyint lo disabled
+    phyint eth0 disabled
+    phyint eth1 disabled
+    EOF
+
+	iptables -t filter -A INPUT -d 224.0.0.0/240.0.0.0 -i eth0 -j ACCEPT
+	iptables -t filter -A INPUT -s 224.0.0.0/240.0.0.0 -i eth0 -j ACCEPT
+	iptables -t filter -A FORWARD -d 224.0.0.0/240.0.0.0 -j ACCEPT
+	iptables -t filter -A FORWARD -s 224.0.0.0/240.0.0.0 -j ACCEPT
+	# Increase TTL because without it packets most probably won’t live long enough to pass the router.
+	modprobe ipt_TTL
+	iptables -t mangle -A PREROUTING -d 224.0.0.0/240.0.0.0 -p udp -j TTL --ttl-inc 1
+EOF
+}
+
 iforgot-shell-colours(){
 cat<<EOF
 	There are only 8 colors in general. From man terminfo:
@@ -1718,6 +1743,12 @@ iforgot-xrandr-external-display() {
 	NB the order of options
 	$ xrandr --output VGA1 --mode 1920x1080 --primary --same-as LVDS1 \
 	         --output LVDS1 --mode 1366x768 --fb 1920x1080 --panning 1920x1080
+	EOF
+}
+
+iforgot-imgur-dl-album() {
+	cat <<-EOF
+	Add /zip to the URL.
 	EOF
 }
 

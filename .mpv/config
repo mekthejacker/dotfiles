@@ -92,7 +92,8 @@ terminal=no
 [tv]
 profile-desc="IPTV"
 input-file=/tmp/mpv-tv.fifo
-ao=alsa:device=[hw:0,8]
+# uncomment when tv will work
+#ao=alsa:device=[hw:0,8]
 fs=yes
 vo=opengl
 hwdec=vaapi

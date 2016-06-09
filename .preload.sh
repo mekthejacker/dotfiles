@@ -74,8 +74,12 @@ n=0; while read outp; do
 		|| PRIMARY_OUTPUT=$outp
 done < <(xrandr --screen 0 | sed -nr 's/^(\S+) connected.*/\1/p')
 
-# case $HOSTNAME in 
+# case $HOSTNAME in
 # 	home)
+# # Integrated card
+# 		PRIMARY_OUTPUT=VGA1
+# 		SLAVE_OUTPUT_0=HDMI3
+# # External card
 # 		PRIMARY_OUTPUT=VGA1
 # 		SLAVE_OUTPUT_0=HDMI3
 # 		;;
