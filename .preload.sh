@@ -69,10 +69,10 @@ n=0; while read outp; do
 		|| PRIMARY_OUTPUT=$outp
 done < <(xrandr --screen 0 | sed -nr 's/^(\S+) connected.*/\1/p')
 
-[ $HOSTNAME = home ] && {
-	PRIMARY_OUTPUT=VGA1
-	SLAVE_OUTPUT_0=HDMI3
-}
+#[ $HOSTNAME = home ] && {
+#	PRIMARY_OUTPUT=VGA1
+#	SLAVE_OUTPUT_0=HDMI3
+#}
 
 export ${!SLAVE_OUTPUT_*}
 # Disabling all other outputs except the main one BEFORE
