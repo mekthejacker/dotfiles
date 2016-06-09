@@ -98,3 +98,4 @@ vo=opengl
 hwdec=vaapi
 x11-name=big_screen
 save-position-on-quit=yes
+

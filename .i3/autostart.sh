@@ -9,6 +9,11 @@
 	set -x
 }
 
+xrandr | grep -q 'VGA1 connected' \
+	&& xrandr --output VGA1 --mode 1920x1080 --primary --same-as LVDS1 \
+	          --output LVDS1 --mode 1366x768 --fb 1920x1080 --panning 1920x1080
+
+
 # Temporarily disable pointer while setting layout
 # $1 == <enable|disable>
 pointer_control() {

@@ -1712,6 +1712,15 @@ EOF
 # From http://tech.kulish.com/2007/10/30/ntp-ntpq-output-explained/
 }
 
+iforgot-xrandr-external-display() {
+	cat <<-EOF
+	If LVDS1 is the laptop display with resolution of 1366x768 and VGA1 is external 1080p.
+	NB the order of options
+	$ xrandr --output VGA1 --mode 1920x1080 --primary --same-as LVDS1 \
+	         --output LVDS1 --mode 1366x768 --fb 1920x1080 --panning 1920x1080
+	EOF
+}
+
 #
  #  If you want more, I find these sites helpful:
 #

@@ -328,11 +328,11 @@ bar {
 	output PRIMARY_OUTPUT
 	position top
 	mode dock # hide | dock | invisible
-	tray_output primary # none | primary | <output>
+	tray_output none  # none | primary | <output>
 	workspace_buttons yes
 	strip_workspace_numbers yes
 	status_command ". ~/.i3/generate_json_for_i3bar.sh"
-	wheel_up_cmd nop # disable mouse wheel on workspace buttons
+	wheel_up_cmd nop  # disable mouse wheel on workspace buttons
 	wheel_down_cmd nop
 	colors {
 		background #3c3c3c

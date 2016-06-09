@@ -1,8 +1,11 @@
 ! ~/.Xresources
 !
+! Run ‘xrdb ~/.Xresources’ to properly re-read this file. Check with ‘xrdb -query’
+
+
 ! This is a comment
 !
-! And this is how options may be set
+! SYNTAX
 !	<WM_CLASS>.<optionname>: <value>
 !		Usually urxvt have ‘urxvt’ and ‘URxvt’ as its WM classes.
 !	 	WM_CLASS in the example above may be:
@@ -43,8 +46,12 @@ URxvt.saveLines: 3000
 URxvt.preeditType:Root
 URxvt.secondaryWheel: true
 URxvt.cursorUnderline: false
-URxvt.font: xft:Terminus:autohint=true \
-            xft:DevaVu Sans Mono:autohint=true
+
+! NB the commas between fonts
+! :antialias=true :autohint=true may help, if something.
+URxvt.font: xft:Terminus, \
+            xft:DejaVu Sans Mono
+
 URxvt.transparent: true
 URxvt.borderless: true
 URxvt.shading: 35
@@ -58,8 +65,8 @@ URxvt.scrollstyle: plain
 !
 !! These characters are used as delimiters for double-click word selection
 !! by default, but may be overriden
-URxvt.cutchars: `\\\"\'&()*,;<=>?@[]^{|}
-URxvt.perl-ext-common:default,matcher
+URxvt.cutchars: `\\^""''&()*,;<=>?@[]{|}.:+-
+URxvt.perl-ext-common: default,matcher
 URxvt.urlLauncher: xdg-open
 URxvt.underlineURLs: true
 ! NB: 2 = middle mouse button (that will run urls instead of selecting text)

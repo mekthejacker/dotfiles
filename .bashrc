@@ -39,16 +39,83 @@ export MPD_HOST=$HOME/.mpd/socket
 #	|| export PATH="$PATH:~/assembling/android-sdk-linux/platform-tools/:~/assembling/android-sdk-linux/tools/"
 grep -qF '/usr/games/bin/' <<<"$PATH" \
 	|| export PATH="$PATH:/usr/games/bin/"
-export PS1="\[\e[01;34m\]┎ \w\n\[\e[01;34m\]┖ \
-\`echo \"scale=2; \$(cut -d' ' -f2 </proc/loadavg) /\
-    \$(grep ^processor </proc/cpuinfo | wc -l)\" | bc\` \
-\[\e[01;32m\]\
-\`[ \u = \"$ME\" ] \
-    ||{ [ \u = root ] && echo -n \"\[\e[01;31m\]\"; } \
-|| echo -n \"\[\e[01;37m\]\u \"\`\
-\[\e[01;32m\]\
-at \h \
-\[\e[01;34m\]\\$\[\e[00m\] "
+
+gen_prompt() {
+	local \
+		b='\[\e[01;34m\]' \
+		g='\[\e[01;32m\]' \
+		w='\[\e[01;37m\]' \
+		r='\[\e[01;31m\]' \
+		s='\[\e[00m\]' \
+		load_avg=`echo "scale=2; $(cut -d' ' -f2 </proc/loadavg) / $(grep -c ^processor /proc/cpuinfo)" | bc` \
+		git_status= error=
+	export PS1=''
+	[ -v ONE_COMMAND_SHELL ] && {
+		# printf '\33]50;%s\007' "xft:DejaVu Sans mono:autohint=true:antialias=true:pixelsize=14,xft:Kochi Gothic"
+		export PS1="${w}(☛＾ヮ°)☛${s} "  # See ~/.Xresources for urxvt fonts!
+		# printf '\33]50;%s\007' "xft:Terminus,xft:Kochi Gothic"
+		return 0
+	}
+	gen_git_status() {
+		# I don’t need it for my dotfiles and general repos,
+		# it would only mess with my aliases
+		[ "$PWD" -ef "$HOME" ] && {
+			# ▣▤▥▧▩◍◈◇◆◛◚◻◼◽◾
+			return 0
+		}
+		local branch status staged unstaged behind ahead conflicts mark
+		declare -g error git_status
+		status=`gis --porcelain -b 2>/dev/null` || {
+			[ $? -ne 128 ] && {
+				error='Couldn’t get git status.'
+				return 3
+			}|| return 0  # 128 = not a git repo
+		}
+		branch=`git rev-parse --abbrev-ref HEAD  2>/dev/null` && {
+			[ "$branch" = HEAD ] && branch='detached'
+			:
+		}||{
+			error='Couldn’t determine git branch.'
+			return 3
+		}
+		# unpushed=`set -e; exec 2>/dev/null; git --no-pager log --no-color --oneline  @{push}.. | wc -l` || {
+        #     error='Couldn’t get the number of unpushed commits.'
+        #     return 3
+        # }
+		# [ $unpushed -eq 0 ] && unset unpushed
+		# ±̑
+		#           ## master...origin/master [ahead 1, behind 1]  ↓
+		[[ "$status" =~ ^##[^$'\n']+\[(ahead\ ([0-9]+))?(,\ )?(behind ([0-9]+))?\] ]] && {
+			[ "${BASH_REMATCH[2]}" ] && ahead=${BASH_REMATCH[2]}
+			[ "${BASH_REMATCH[5]}" ] && behind=${BASH_REMATCH[5]}
+		}
+		[[ "$status" =~ $'\n'(DD|AU|UD|UA|DU|AA|UU){2}\  ]] && {
+			conflicts=t mark='M'
+		}||{
+			[[ "$status" =~ $'\n'\ ?[MARC]\  ]] && staged=t
+			[[ "$status" =~ $'\n'\?\?\  ]] && unstaged=t
+			[ -v ahead ] && mark='_'  # unpushed commits
+			[ -v staged ] && mark='+'  # added, but not committed
+			[ -v ahead -a -v staged ] && mark='±'
+			[ -v unstaged ] && { [ "$mark" ] && mark+='̃' || mark+=' ̃'; }  # untracked
+			# U+0303 Combining tilde.
+			# U+0302 Combining circumflex and U+0311 Combining inverted breve are fine too.
+		}
+		# Assembling status line
+		git_status=" ${w}${behind:+$behind }$branch${ahead:+ $ahead}${mark:+ $mark}${s}  "
+	}
+	gen_git_status
+	PS1+="${error:+${r}$error${s}\n}"
+	PS1+="${b}┎ $PWD\n${b}┖ $load_avg ${g}"
+	case $USER in
+		"$ME") PS1+="$g";;
+		root) PS1+="$r";;
+		*) PS1+="${w}$USER${g} ";;
+	esac
+	PS1+="at $HOSTNAME"
+	PS1+=" $git_status${b}\\\$${s} "
+}
+export PROMPT_COMMAND="gen_prompt; $PROMPT_COMMAND"
 
 ## Aliases caveats and hints:
 ## 1. All innder double quotes must be escaped
@@ -77,7 +144,23 @@ alias gib='git branch'
 alias gic='git commit'
 alias gica='git commit -a'
 alias gicm='git commit -m'
+alias gict='git commit -t'  # Use a template file
 alias gicam='git commit -am'
+gicat() {
+	[ "$PWD" = "$HOME" ] && {
+		echo 'Cannot run from HOME due to git().' >&2
+		return 3
+	}
+	local cur_worktree commit_desc commit_desc_path
+	cur_worktree=`git rev-parse --show-toplevel`
+	commit_desc="future_commit"
+	commit_desc_path="$cur_worktree/$commit_desc"
+	[ -r "$commit_desc_path" ] || {
+		echo "‘$commit_desc’ wasn’t found in ‘$cur_worktree’!" >&2
+		return 3
+	}
+	git commit -a -t "$commit_desc_path"  # Use a template file
+}
 alias gicamend='git commit -a --amend'  # after editing the wrongly commited files
 alias gico='git checkout'  # checkout may also take args in form [commit] <file>
 alias gif='git fetch'
@@ -138,7 +221,7 @@ alias tmux="tmux -u -f ~/.tmux/config -S $HOME/.tmux/socket"
 # r    ~/bin/run_app.sh    runapp_<app_name>
 # q    ~/.i3/on_quit.sh    on_quit
 # -    prevents the variable from being empty
-export ENV_DEBUG=-paiq
+export ENV_DEBUG=-p
 
 [ ! -v DISPLAY -a "`tty`" = /dev/tty2 ] && {
 	# W! startx IGNORES ~/.xserverrc options if something passed beyond -- !
@@ -150,9 +233,13 @@ export ENV_DEBUG=-paiq
 }
 
 # add to todo list
-tda() { echo "$@" >> ~/todo; }
+tda() { echo "`date +'%_d %b %Y'`  $@" >> ~/todo; }
 # delete from todo list
 tdd() {
+	[ "$*" ] || {
+		tdd `wc -l ~/todo`
+		return 0
+	}
     [ "$1" = '-' ] && echo -n >~/todo || {
         for i in $@; do
             [[ "$i" =~ ^[0-9]+$ ]] && sed -i $1d ~/todo
@@ -194,7 +281,6 @@ one_command_execute() {
 }
 
 [ -v ONE_COMMAND_SHELL ] && {
-	PS1='\[\e[01;37m\](☞＾ヮ°)☞\[\e[00m\] '
 	## This doesn’t work now, so I have to use default binding C-M-e to
 	##   expand aliases before they’ll go to nohup.
 	# shopt -s expand_aliases # actually, this may be needed only inside

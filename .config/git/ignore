@@ -8,4 +8,6 @@
 *.bak
 .desktop
 .desktop.lock
-wat_done
+
+# For the use with ‘gicat’ alias, see ~/bashrc.
+future_commit

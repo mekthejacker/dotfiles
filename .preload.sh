@@ -5,7 +5,7 @@
 # It starts deamons needed to be started before the window manager.
 # ~/.bashrc runs this script for ssh clients.
 
-[ "$HOSTNAME" = paskapuukko ] && xbacklight -set 55
+
 
 [ "${ENV_DEBUG/*p*/}" ] || {
 	exec &>/tmp/envlogs/preload
@@ -14,6 +14,11 @@
 	set -x
 }
 
+[ "$HOSTNAME" = paskapuukko ] && {
+	xbacklight -set 55
+}
+
+echo $DISPLAY
 export STARTUP=t WIDTH=800 HEIGHT=600 DPI=96 PRIMARY_OUTPUT \
 	   GNUPGHOME GPG_TTY PATH XMODIFIERS GTK_IM_MODULE QT_IM_MODULE
 
@@ -69,10 +74,21 @@ n=0; while read outp; do
 		|| PRIMARY_OUTPUT=$outp
 done < <(xrandr --screen 0 | sed -nr 's/^(\S+) connected.*/\1/p')
 
-[ $HOSTNAME = home ] && {
-	PRIMARY_OUTPUT=VGA1
-	SLAVE_OUTPUT_0=HDMI3
-}
+# case $HOSTNAME in 
+# 	home)
+# 		PRIMARY_OUTPUT=VGA1
+# 		SLAVE_OUTPUT_0=HDMI3
+# 		;;
+# 	paskapuukko)
+# 		xrandr | grep -q 'VGA1 connected' && {
+# 			PRIMARY_OUTPUT=VGA1
+# 			SLAVE_OUTPUT_0=LVDS1
+# 		}||{
+# 			PRIMARY_OUTPUT=LVDS1
+# 			SLAVE_OUTPUT_0=VGA1
+# 		}
+# 		;;
+# esac
 
 export ${!SLAVE_OUTPUT_*}
 # Disabling all other outputs except the main one BEFORE
@@ -96,10 +112,10 @@ DPI=`echo "scale=2; dpi=$WIDTH/$width_mm*25.4; scale=0; dpi /= 1; print dpi" | b
 }
 
 # Autofs is laggy and slow.
-grep -qF "$HOME/phone_card" /proc/mounts && sudo /bin/umount $HOME/phone_card
+mountpoint -q "$HOME/phone_card" && sudo /bin/umount $HOME/phone_card
 rm -f $HOME/phone_card
 mkdir -m700 $HOME/phone_card &>/dev/null
-c=0; until grep -q $HOME/phone_card /proc/mounts || {
+c=0; until mountpoint -q "$HOME/phone_card" || {
 	#[ "$HOSTNAME" = paskapuukko ] && break
 	unset found mounted
     # mount with rw,nosuid,nodev,relatime,uid=1000,gid=1000,fmask=0022,dmask=0077,codepage=866,iocharset=iso8859-5,shortname=mixed,showexec,utf8,flush,errors=remount-ro and leav eit as is?
