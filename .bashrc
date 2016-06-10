@@ -194,6 +194,7 @@ alias re=". ~/.bashrc" # re-source
 alias rename="perl-rename"
 alias rename-test="perl-rename -n"
 spr="| curl -F 'sprunge=<-' http://sprunge.us" # add ?<lang> for line numbers
+alias ssh="cat ~/.ssh/config*[^~] >~/.ssh/config; ssh -o SendEnv=LANG -o StrictHostKeyChecking=no"
 #alias td="todo -A "
 #alias tdD="todo -D "
 alias tmux="tmux -u -f ~/.tmux/config -S $HOME/.tmux/socket"
