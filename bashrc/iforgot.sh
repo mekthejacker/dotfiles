@@ -346,7 +346,7 @@ pkill wpa_supplicant
 ifconfig wlan0 down
 ifconfig wlan0 up
 iwconfig wlan0 essid "wpatest"  # channel 7
-wpa_supplicant -B -Dnl8011 -iwlan0 -c/etc/wpa_supplicant.conf  # -D wext
+wpa_supplicant -B -Dnl80211 -iwlan0 -c/etc/wpa_supplicant.conf  # -D wext
 busybox udhcpc -x hostname iamhere -i wlan0  # dhcpcd
 EOF
 # iwconfig has ‘sens’ parameter to send roaming agressiveness. How to do that
@@ -581,6 +581,10 @@ cat <<EOF
 	# Increase TTL because without it packets most probably won’t live long enough to pass the router.
 	modprobe ipt_TTL
 	iptables -t mangle -A PREROUTING -d 224.0.0.0/240.0.0.0 -p udp -j TTL --ttl-inc 1
+
+	# Port forwarding
+	iptables -A PREROUTING -t nat -s 1.1.1.1 -i eth0 -p tcp --dport 80 -j DNAT --to 2.2.2.2:8080
+	iptables -A FORWARD -p tcp -d 2.2.2.2 --dport 8080 -j ACCEPT
 EOF
 }
 
@@ -1464,19 +1468,20 @@ How to find such processes?
 EOF
 }
 
-iforgot-ssh-multiple-commands() {
+iforgot-ssh-pass-a-command() {
 cat <<"EOF"
-Since
-    $ ssh myhost "ls foo; cd bar"
-as well as
-    $ ssh myhost /bin/bash -c 'ls foo; cd bar'
-won’t work as expected, the only way to pass multiple commands is to use herestring
+Use
     $ ssh myhost <<<"ls foo; cd bar"
 or heredoc
     $ ssh myhost <<EOF
           ls foo
           cd bar
       EOF
+since
+    $ ssh myhost "ls foo; cd bar"
+won’t work as expected as well as
+    $ ssh myhost /bin/bash -c 'ls foo; cd bar'
+leaving the only way to pass multiple commands by using herestring or heredoc.
 
 Remember to use "EOF" to prevent early expansion, and <<-EOF to strip tabs, if necessary.
 EOF
@@ -1751,6 +1756,16 @@ iforgot-imgur-dl-album() {
 	Add /zip to the URL.
 	EOF
 }
+
+iforgot-send-mail() {
+	cat<<-EOF
+	sendmail -f from@me.org
+	To: you@suck.org
+	Subject:
+	OHAYOU!
+	EOF
+}
+
 
 #
  #  If you want more, I find these sites helpful:
