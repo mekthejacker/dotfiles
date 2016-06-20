@@ -104,16 +104,16 @@ iforgot-fsck-force-check() {
 }
 
 iforgot-make-a-debug-build() {
-cat <<"EOF"
-	FEATURES="ccache nostrip" \
-		USE="debug" \
-		CFLAGS="…-ggdb" \
-		CXXFLAGS="<CFLAGS>" \
-		emerge $package
-OR
-	gdb --pid <pid>
-	thread apply all bt
-EOF
+	cat <<"EOF"
+	    FEATURES="ccache nostrip" \
+	    USE="debug" \
+	    CFLAGS="$CFLAGS -ggdb" \
+	    CXXFLAGS="$CFLAGS" \
+	    emerge $package
+	OR
+	    gdb --pid <pid>
+	    thread apply all bt
+	EOF
 }
 
 iforgot-read-via-x0() {
@@ -208,6 +208,7 @@ EOF
 
 iforgot-chroot-procedure() {
 cat <<"EOF"
+	# Systemerde requires more!
 	mount -t proc none /mnt/chroot/proc
 	mount --rbind /sys /mnt/chroot/sys
 	mount --rbind /dev /mnt/chroot/dev
@@ -220,7 +221,8 @@ cat <<"EOF"
 		exit
 
 	umount -l /mnt/chroot/dev{/shm,/pts,}
-	umount /mnt/chroot{/boot,/sys,/proc,}
+	umount /mnt/chroot/{boot,proc}
+	umount -l /mnt/chroot{/sys,}
 EOF
 }
 
@@ -1422,13 +1424,14 @@ cat <<"EOF"
 EOF
 }
 
-iforgot-text-utils() {
+iforgot-bash-line-output() {
 cat <<EOF
     fmt — reformat lines to width.
     fold – simple version of the above.
     column – autoformat columns.
     colrm — remove columns.
-    paste – merge lines from two files
+    paste – merge lines from <two <files or <(some) <(commands)
+    pr – should be a columnizer and indenter, but broken.
 EOF
 }
 
@@ -1766,6 +1769,8 @@ iforgot-send-mail() {
 	EOF
 }
 
+
+# Add logrotate -d -vf
 
 #
  #  If you want more, I find these sites helpful:

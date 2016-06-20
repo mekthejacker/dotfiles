@@ -115,7 +115,7 @@ URxvt.underlineColor: #75507B
 !highlightColor: #f0f0f0
 !highlightTextColor: #000000
 
-one_command_shell*geometry: 70x1
+one_command_shell.geometry: 70x1
 one_command_shell.borderless: false
 !!mc_shell.font: xft:Gentium Basic:autohint=true:size=10
 

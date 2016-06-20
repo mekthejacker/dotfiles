@@ -31,6 +31,7 @@ bind Space last-window
 bind v split-window -v
 bind h split-window -h
 bind t command-prompt "rename-window '%%'"
+bind n command-prompt "rename-window '%%'"
 bind r respawn-window
 bind R source-file ~/.tmux/config \; \
         display-message "Done sourcing ~/.tmux/config."
