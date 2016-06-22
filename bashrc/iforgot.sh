@@ -1752,6 +1752,89 @@ iforgot-imgur-dl-album() {
 	EOF
 }
 
+
+iforgot-logrotate() {
+	cat <<-EOF
+	Check logrotate includes
+	    logrotate -d
+
+	Force logroate on a specific file
+	    logrotate -vf /etc/logrotate.d/file
+
+	Default config
+	    weekly
+	    rotate 7
+	    create
+	    dateext
+	    compress
+	    maxsize 500M
+	    compresscmd /usr/bin/xz
+	    compressoptions "-9 --threads=0 --quiet --memlimit=1GiB"
+	    compressext .xz
+	    uncompresscmd /usr/bin/unxz
+	    notifempty
+	    nomail
+	    noolddir
+	    include /etc/logrotate.d
+
+	Example nginx log config
+	/var/log/nginx/*_log {
+	    hourly
+	    maxsize 100M
+	    rotate 10
+	    missingok
+	    sharedscripts
+	    postrotate
+	    nginx -s reopen
+	    endscript
+	}
+	EOF
+}
+
+iforgot-git-commit-ranges() { iforgot-git-ref-names; }
+iforgot-git-ref-names() {
+	cat <<-EOF
+	<sha1>, e.g. dae86e1950b1277e545cee180551750029cfe735, dae86e
+	<describeOutput>, e.g. v1.7.4.2-679-g3bee7fb
+	<refname>, e.g. master, heads/master, refs/heads/master
+	@ alone is a shortcut for HEAD
+	<refname>@{<date>}, e.g. master@{yesterday}, HEAD@{5 minutes ago}
+	<refname>@{<n>}, e.g. master@{1} an ordinal specification enclosed in a brace pair (e.g.  {1}, {15}) specifies the n-th prior value of that ref.
+	@{<n>}, e.g. @{1}
+           You can use the @ construct with an empty ref part to get at a reflog
+           entry of the current branch. For example, if you are on branch blabla
+then @{1} means the same as blabla@{1}.
+	@{-<n>}, e.g. @{-1}
+           The construct @{-<n>} means the <n>th branch/commit checked out before
+           the current one.
+	<rev>^, e.g. HEAD^, v1.5.1^0
+           A suffix ^ to a revision parameter means the first parent of that
+           commit object.  ^<n> means the <n>th parent (i.e.  <rev>^ is
+           equivalent to <rev>^1). As a special rule, <rev>^0 means the commit
+           itself and is used when <rev> is the object name of a tag object that
+           refers to a commit object.
+	<rev>~<n>, e.g. master~3
+           A suffix ~<n> to a revision parameter means the commit object that is
+           the <n>th generation ancestor of the named commit object, following
+           only the first parents. I.e.  <rev>~3 is equivalent to <rev>^^^ which
+           is equivalent to <rev>^1^1^1. See below for an illustration of the
+           usage of this form.
+	<rev>^{/<text>}, e.g. HEAD^{/fix nasty bug}
+           A suffix ^ to a revision parameter, followed by a brace pair that
+           contains a text led by a slash, is the same as the :/fix nasty bug
+           syntax below except that it returns the youngest matching commit which
+           is reachable from the <rev> before ^.
+
+	:/<text>, e.g. :/fix nasty bug
+           A colon, followed by a slash, followed by a text, names a commit whose
+           commit message matches the specified regular expression. This name
+           returns the youngest matching commit which is reachable from any ref.
+           If the commit message starts with a !  you have to repeat that; the
+           special sequence :/!, followed by something else than !, is reserved
+           for now. 
+EOF
+}
+
 #
  #  If you want more, I find these sites helpful:
 #
