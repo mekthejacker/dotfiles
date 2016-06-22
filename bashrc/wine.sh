@@ -58,6 +58,7 @@
 	regedit64() { wine "$@"; }
 	#
 	alias killsteam="pkill -9 -f 'hl2.*'; pkill -9 -f steam"
+	alias killdota="pkill -9f dota2"
 	alias killsszb='sudo -u sszb /usr/bin/killall -9 -u sszb'
 	alias kill-my-semaphores='for i in $(ipcs -s | sed -rn "s/.*\s([0-9]+)\s+'$USER'.*/\1/p"); do ipcrm -s $i; done;'
 	alias kill-sszb-semaphores="for i in $(ipcs -s | sed -rn 's/.*\s([0-9]+)\s+sszb.*/\1/p'); do ipcrm -s $i; done"

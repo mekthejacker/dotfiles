@@ -104,16 +104,16 @@ iforgot-fsck-force-check() {
 }
 
 iforgot-make-a-debug-build() {
-cat <<"EOF"
-	FEATURES="ccache nostrip" \
-		USE="debug" \
-		CFLAGS="…-ggdb" \
-		CXXFLAGS="<CFLAGS>" \
-		emerge $package
-OR
-	gdb --pid <pid>
-	thread apply all bt
-EOF
+	cat <<"EOF"
+	    FEATURES="ccache nostrip" \
+	    USE="debug" \
+	    CFLAGS="$CFLAGS -ggdb" \
+	    CXXFLAGS="$CFLAGS" \
+	    emerge $package
+	OR
+	    gdb --pid <pid>
+	    thread apply all bt
+	EOF
 }
 
 iforgot-read-via-x0() {
@@ -208,6 +208,7 @@ EOF
 
 iforgot-chroot-procedure() {
 cat <<"EOF"
+	# Systemerde requires more!
 	mount -t proc none /mnt/chroot/proc
 	mount --rbind /sys /mnt/chroot/sys
 	mount --rbind /dev /mnt/chroot/dev
@@ -220,7 +221,8 @@ cat <<"EOF"
 		exit
 
 	umount -l /mnt/chroot/dev{/shm,/pts,}
-	umount /mnt/chroot{/boot,/sys,/proc,}
+	umount /mnt/chroot/{boot,proc}
+	umount -l /mnt/chroot{/sys,}
 EOF
 }
 
@@ -346,7 +348,7 @@ pkill wpa_supplicant
 ifconfig wlan0 down
 ifconfig wlan0 up
 iwconfig wlan0 essid "wpatest"  # channel 7
-wpa_supplicant -B -Dnl8011 -iwlan0 -c/etc/wpa_supplicant.conf  # -D wext
+wpa_supplicant -B -Dnl80211 -iwlan0 -c/etc/wpa_supplicant.conf  # -D wext
 busybox udhcpc -x hostname iamhere -i wlan0  # dhcpcd
 EOF
 # iwconfig has ‘sens’ parameter to send roaming agressiveness. How to do that
@@ -581,6 +583,10 @@ cat <<EOF
 	# Increase TTL because without it packets most probably won’t live long enough to pass the router.
 	modprobe ipt_TTL
 	iptables -t mangle -A PREROUTING -d 224.0.0.0/240.0.0.0 -p udp -j TTL --ttl-inc 1
+
+	# Port forwarding
+	iptables -A PREROUTING -t nat -s 1.1.1.1 -i eth0 -p tcp --dport 80 -j DNAT --to 2.2.2.2:8080
+	iptables -A FORWARD -p tcp -d 2.2.2.2 --dport 8080 -j ACCEPT
 EOF
 }
 
@@ -1418,13 +1424,14 @@ cat <<"EOF"
 EOF
 }
 
-iforgot-text-utils() {
+iforgot-bash-line-output() {
 cat <<EOF
     fmt — reformat lines to width.
     fold – simple version of the above.
     column – autoformat columns.
     colrm — remove columns.
-    paste – merge lines from two files
+    paste – merge lines from <two <files or <(some) <(commands)
+    pr – should be a columnizer and indenter, but broken.
 EOF
 }
 
@@ -1464,19 +1471,20 @@ How to find such processes?
 EOF
 }
 
-iforgot-ssh-multiple-commands() {
+iforgot-ssh-pass-a-command() {
 cat <<"EOF"
-Since
-    $ ssh myhost "ls foo; cd bar"
-as well as
-    $ ssh myhost /bin/bash -c 'ls foo; cd bar'
-won’t work as expected, the only way to pass multiple commands is to use herestring
+Use
     $ ssh myhost <<<"ls foo; cd bar"
 or heredoc
     $ ssh myhost <<EOF
           ls foo
           cd bar
       EOF
+since
+    $ ssh myhost "ls foo; cd bar"
+won’t work as expected as well as
+    $ ssh myhost /bin/bash -c 'ls foo; cd bar'
+leaving the only way to pass multiple commands by using herestring or heredoc.
 
 Remember to use "EOF" to prevent early expansion, and <<-EOF to strip tabs, if necessary.
 EOF
@@ -1755,11 +1763,11 @@ iforgot-imgur-dl-album() {
 
 iforgot-logrotate() {
 	cat <<-EOF
-	Check logrotate includes
+	Check logrotate scripts
 	    logrotate -d
 
 	Force logroate on a specific file
-	    logrotate -vf /etc/logrotate.d/file
+	    logrotate -dvf /etc/logrotate.d/file
 
 	Default config
 	    weekly
@@ -1834,6 +1842,16 @@ then @{1} means the same as blabla@{1}.
            for now. 
 EOF
 }
+
+iforgot-send-mail() {
+	cat<<-EOF
+	sendmail -f from@me.org
+	To: you@suck.org
+	Subject:
+	OHAYOU!
+	EOF
+}
+
 
 #
  #  If you want more, I find these sites helpful:

@@ -173,28 +173,28 @@ alias gilog='git log --graph --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Crese
 alias gilog2='git log --pretty=format:"%h %ad | %s%d [%an]" --graph --date=short'
 alias gilog3='git log --all --graph --decorate'
 alias gilogp='git log -p '  # changes in file over time
-alias gim='git submodule'
-alias gima='git submodule add'
-alias gimi='git submodule init'
-alias gims='git submodule status'
-alias gimu='git submodule update'
-alias gimy='git submodule sync'
 alias gipa='git format-patch'  # …origin
 alias gire='git revert'  # revert a specific commit
 alias giread='git revert HEAD'  # reverts the last commit
 alias gire='git revert'
 alias gire='git revert'
 alias gis='git status'
+alias gism='git submodule'
+alias gisma='git submodule add'
+alias gismi='git submodule init'
+alias gisms='git submodule status'
+alias gismu='git submodule update'
+alias gismy='git submodule sync'
 alias gull='git pull'
 alias gush='git push'
 # pinentry doesn’t like scim
 alias gpg="GTK_IM_MODULE= QT_IM_MODULE= gpg"
-alias ls="ls --color=auto"
+alias ls="ls -1h --color=auto"
 alias re=". ~/.bashrc" # re-source
 alias rename="perl-rename"
 alias rename-test="perl-rename -n"
 spr="| curl -F 'sprunge=<-' http://sprunge.us" # add ?<lang> for line numbers
-alias ssh="cat ~/.ssh/config*[^~] >~/.ssh/config; ssh -o SendEnv=LANG -o StrictHostKeyChecking=no"
+alias ssh="cat ~/.ssh/config*[^~] >~/.ssh/config; ssh "
 #alias td="todo -A "
 #alias tdD="todo -D "
 alias tmux="tmux -u -f ~/.tmux/config -S $HOME/.tmux/socket"
@@ -202,7 +202,7 @@ alias tmux="tmux -u -f ~/.tmux/config -S $HOME/.tmux/socket"
 # Though TERM is kept via SSH’s SendEnv,
 #   rxvt-unicode-256color gives messed colours in emacsclient.
 # Other working replacement may be screen-256color. rxvt-basic works as a monochrome screen
-[ -v SSH_CLIENT ] && export TERM=xterm-256color
+#[ -v SSH_CLIENT ] && export TERM=xterm-256color
 
 # Test for an interactive shell.  There is no need to set anything
 # past this point for scp and rcp, and it's important to refrain from
