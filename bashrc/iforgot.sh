@@ -960,7 +960,7 @@ iforgot-nested-x() { echo -e '\tXephyr :108 -resizeable &'; }
 iforgot-eix() {
 cat <<EOF
 Show what’s installed from an overlay
-    $ eix --only-names --in-overlay <overlay>
+    $ eix --only-names --installed-from-overlay <overlay>
 Also helpful
     $ equery has repository sunrise
 Find a package by [category/]name
