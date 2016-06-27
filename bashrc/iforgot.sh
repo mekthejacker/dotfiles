@@ -1775,9 +1775,9 @@ iforgot-logrotate() {
 	    create
 	    dateext
 	    compress
-	    maxsize 500M
+	    maxsize ????M
 	    compresscmd /usr/bin/xz
-	    compressoptions "-9 --threads=0 --quiet --memlimit=1GiB"
+	    compressoptions "-9 --threads=0 --quiet --memlimit=1250MiB"
 	    compressext .xz
 	    uncompresscmd /usr/bin/unxz
 	    notifempty
@@ -1796,6 +1796,10 @@ iforgot-logrotate() {
 	    nginx -s reopen
 	    endscript
 	}
+
+	Use ‘copytruncate’ for generic logs like messages/dmesg/syslog!
+
+	The difference between 
 	EOF
 }
 
