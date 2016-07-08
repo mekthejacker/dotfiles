@@ -1857,6 +1857,13 @@ iforgot-send-mail() {
 }
 
 
+iforgot-screen() {
+	cat <<-"EOF"
+	screen -ls                      – list sessions.
+	screen -r 12345.pts-6.hostname  — attach to a particular session.
+	EOF
+}
+
 #
  #  If you want more, I find these sites helpful:
 #
