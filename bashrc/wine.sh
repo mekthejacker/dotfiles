@@ -10,7 +10,7 @@
 	       SDL_AUDIODRIVER=alsa
 	        __GL_THREADED_OPTIMIZATIONS=1 \
 	        __GL_SYNC_TO_VBLANK=0 \
-	        #__GL_YIELD="NOTHING" \
+	        __GL_YIELD="NOTHING" \
 
 
 	# In order to get output use
@@ -19,13 +19,21 @@
 	#     WINEDEBUG=warn+all wine …
 
 
-	# DESCRIPTION
-	#     This is general function to do all the jobs.
-	# TAKES
-	#     [$@] — list of arguments for wine, winetricks etc.
+	wine64() { wine "$@"; }
+	winetricks() { wine "$@"; }
+	winetricks64() { wine "$@"; }
+	winecfg() { wine "$@"; }
+	winecfg64() { wine "$@"; }
+	regedit() { wine "$@"; }
+	regedit64() { wine "$@"; }
+
+	 # This is a general function to do all the jobs.
+	#    [$@] — list of arguments for wine, winetricks etc.
+	#
 	wine() {
-		local arch=32 binary _funcname
-		[ -v FUNCNAME[1] ] && _funcname=${FUNCNAME[1]} || _funcname=wine
+		local arch=32 binary _funcname=wine
+		[[ -v FUNCNAME[1] && ${FUNCNAME[1]} = @(wine|winecfg|winetricks|regedit|wine64|winecfg64|winetricks64|regedit) ]] \
+			&& _funcname=${FUNCNAME[1]} || _funcname=wine
 		case $_funcname in
 			wine)
 				binary='/usr/bin/wine' ;;
@@ -49,13 +57,6 @@
 		sudo -u sszb -H /bin/rm /home/sszb/.wine${arch//32/}/drive_c/users/sszb/#msgctxt#directory#Desktop/* \
 			/home/sszb/.wine${arch//32/}/drive_c/users/Public/#msgctxt#directory#Desktop/* 2>/dev/null
 	}
-	wine64() { wine "$@"; }
-	winetricks() { wine "$@"; }
-	winetricks64() { wine "$@"; }
-	winecfg() { wine "$@"; }
-	winecfg64() { wine "$@"; }
-	regedit() { wine "$@"; }
-	regedit64() { wine "$@"; }
 	#
 	alias killsteam="pkill -9 -f 'hl2.*'; pkill -9 -f steam"
 	alias killdota="pkill -9f dota2"

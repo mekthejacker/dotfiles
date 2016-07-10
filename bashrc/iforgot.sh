@@ -1856,6 +1856,13 @@ iforgot-send-mail() {
 	EOF
 }
 
+iforgot-firefox-basic-auth() {
+	cat <<-EOF
+	You will probably also want to open File → New private window
+	http://user:pass@example.com
+	EOF
+	# From http://superuser.com/a/458577/191754
+}
 
 iforgot-screen() {
 	cat <<-"EOF"

@@ -9,6 +9,11 @@
 // ---- PERSONAL FAVOURITE ------------------------------------------------------
 //
 
+// Try to automatically resotre tabs after a crash.
+// The number means how many consecutive crashes(?) should be automatically
+//   resored, but the default value of 1 isn’t working.
+// "2" isn’t working either, seems like this feature is broken.
+//user_pref("browser.sessionstore.max_resumed_crashes", 2);
 user_pref("mousewheel.acceleration.factor", 1);
 user_pref("mousewheel.default.delta_multiplier_y", 270);
 user_pref("network.dns.disableIPv6", true);
@@ -38,8 +43,8 @@ user_pref("font.name.sans-serif.ja", "IPAMonaPGothic");
 user_pref("font.name.sans-serif.x-cyrillic", "PT Sans");
 user_pref("font.name.sans-serif.x-western", "PT Sans");
 user_pref("font.name.serif.ja", "IPAMonaPGothic");
-user_pref("font.name.serif.x-cyrillic", "Liberation Serif");
-user_pref("font.name.serif.x-western", "Liberation Serif");
+user_pref("font.name.serif.x-cyrillic", "Linux Libertine Display O");
+user_pref("font.name.serif.x-western", "Linux Libertine Display O");
 user_pref("font.size.variable.ja", 22);
 
 //
