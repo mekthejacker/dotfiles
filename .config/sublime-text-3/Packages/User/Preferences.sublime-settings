@@ -1,5 +1,11 @@
 {
-	"color_scheme": "Packages/Color Scheme - Default/Pastels on Dark.tmTheme",
+	"color_scheme": "Packages/Color Scheme - Default/iPlastic.tmTheme",
 	"dictionary": "Packages/Language - English/en_GB.dic",
-	"font_size": 12
+	"font_face": "DejaVu Sans Mono",
+	"font_options":
+	[
+		"no_italic",
+		"subpixel_antialias"
+	],
+	"font_size": 11
 }
