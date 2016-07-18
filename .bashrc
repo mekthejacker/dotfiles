@@ -1,10 +1,9 @@
-
 # /etc/skel/.bashrc
 #
 # This file is sourced by all *interactive* bash shells on startup,
 # including some apparently interactive shells such as scp and rcp
 # that can't tolerate any output.  So make sure this doesn't display
-# anything or bad things will happen !
+# anything or bad things will happen!
 
 # This is to dispose of old aliases and function definitions before
 #   (re-)sourcing new or rewritten ones.
@@ -41,6 +40,15 @@ export MPD_HOST=$HOME/.mpd/socket
 grep -qF '/usr/games/bin/' <<<"$PATH" \
 	|| export PATH="$PATH:/usr/games/bin/"
 
+
+
+# ┎ (chroot) /
+# ┖ .03 at home #
+#
+#
+# ┎ <if we’re in a chroot’ed environment> <current working directory>
+# ┖ <loadavg> <user if bash host != our hostname> <at hostname>  <git hints>  <# for root|$otherwise>
+#
 gen_prompt() {
 	local \
 		b='\[\e[01;34m\]' \
@@ -49,7 +57,7 @@ gen_prompt() {
 		r='\[\e[01;31m\]' \
 		s='\[\e[00m\]' \
 		load_avg=`echo "scale=2; $(cut -d' ' -f2 </proc/loadavg) / $(grep -c ^processor /proc/cpuinfo)" | bc` \
-		git_status= error=
+		git_status= error= chroot=
 	export PS1=''
 	[ -v ONE_COMMAND_SHELL ] && {
 		# printf '\33]50;%s\007' "xft:DejaVu Sans mono:autohint=true:antialias=true:pixelsize=14,xft:Kochi Gothic"
@@ -107,7 +115,12 @@ gen_prompt() {
 	}
 	gen_git_status
 	PS1+="${error:+${r}$error${s}\n}"
-	PS1+="${b}┎ $PWD\n${b}┖ $load_avg ${g}"
+	[ $UID -eq 0 ] && {
+		# If we are root, check if we’re in a chrooted environment
+		[ "$(stat -c %d:%i )" != "$(stat -c %d:%i /proc/1/root/.)" ] \
+			&& chroot="${s}(chroot) ${b}"
+	}
+	PS1+="${b}┎ $chroot$PWD\n${b}┖ $load_avg ${g}"
 	case $USER in
 		"$ME") PS1+="$g";;
 		root) PS1+="$r";;

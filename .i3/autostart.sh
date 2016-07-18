@@ -89,11 +89,11 @@ fi
 
 pointer_control disable
 
-startup_apps=(mpd "firefox --profile $HOME/.ff" thunar pidgin)
+startup_apps=(mpd "firefox --profile $HOME/.ff" thunar pidgin skype)
 # WIDTH and HEIGHT were set in the ~/.preload.sh
 case $HOSTNAME in
 	home)
-		startup_apps+=(gimp geeqie pidgin redshift)
+		startup_apps+=(gimp geeqie redshift)
 		;;
 	paskapuukko)
 		# startup_apps+=(skype)  # how the fuck does skype switch the workspace by itself?!

@@ -9,11 +9,16 @@
 // ---- PERSONAL FAVOURITE ------------------------------------------------------
 //
 
+// Try to automatically resotre tabs after a crash.
+// The number means how many consecutive crashes(?) should be automatically
+//   resored, but the default value of 1 isn’t working.
+// "2" isn’t working either, seems like this feature is broken.
+//user_pref("browser.sessionstore.max_resumed_crashes", 2);
 user_pref("mousewheel.acceleration.factor", 1);
 user_pref("mousewheel.default.delta_multiplier_y", 270);
 user_pref("network.dns.disableIPv6", true);
 user_pref("general.warnOnAboutConfig", false);
-user_pref("general.useragent.override", "Mozilla/5.0 (X11; Linux x86_64; rv:39.0) Gecko/20100101 Firefox/39.0. Please read a personal appeal from the owner of this browser: ‘Install gentoo, you fat fuck!’");
+//user_pref("general.useragent.override", "Mozilla/5.0 (X11; Linux x86_64; rv:39.0) Gecko/20100101 Firefox/39.0. Please read a personal appeal from the owner of this browser: ‘Install gentoo, you fat fuck!’");
 user_pref("browser.urlbar.clickSelectsAll", false);
 user_pref("network.standard-url.escape-utf8", false);
 // Number of pages firefox keeps prepared to display from the tab history
@@ -38,8 +43,8 @@ user_pref("font.name.sans-serif.ja", "IPAMonaPGothic");
 user_pref("font.name.sans-serif.x-cyrillic", "PT Sans");
 user_pref("font.name.sans-serif.x-western", "PT Sans");
 user_pref("font.name.serif.ja", "IPAMonaPGothic");
-user_pref("font.name.serif.x-cyrillic", "Liberation Serif");
-user_pref("font.name.serif.x-western", "Liberation Serif");
+user_pref("font.name.serif.x-cyrillic", "Linux Libertine Display O");
+user_pref("font.name.serif.x-western", "Linux Libertine Display O");
 user_pref("font.size.variable.ja", 22);
 
 //
@@ -252,7 +257,7 @@ user_pref("reader.parse-on-load.enabled", false);
 user_pref("reader.parse-on-load.force-enabled", false);
 
 // Disable geolocation via Google with acquiring a unique ID and giving to them information about Wi-Fi spots nearby
-user_pref("geo.enabled", false);
+user_pref("geo.enabled", true);
 user_pref("geo.wifi.logging.enabled", false);
 user_pref("geo.wifi.uri", "");
 user_pref("browser.search.geoip.timeout", 0);
