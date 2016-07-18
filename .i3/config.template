@@ -212,10 +212,7 @@ bindcode $mod+49 workspace 0:Main
 ## 1
 bindcode $mod+10 exec --no-startup-id "i3-msg workspace 1:Firefox && { pgrep -u $UID firefox &>/dev/null || { firefox --profile ~/.ff & } }"
 ## 2
-## This is to distinguish emacsclient window running in X and those in
-##   terminals, i.e. to forbid creation of more than one X window while there
-##   can be other emacsclients in terminals. See also ‘ec‘ alias in ~/.bashrc.
-bindcode $mod+11 exec --no-startup-id "i3-msg workspace 2:Emacs && { pgrep -u $UID -f '^emacsclient --al' || { emacsclient --alternate-editor= -c -display $DISPLAY & } }"
+bindcode $mod+11 exec --no-startup-id "i3-msg workspace 2:Sublime && { pgrep -u $UID -fx subl3 || { subl3 & } }"
 ## 3
 bindcode $mod+12 exec --no-startup-id "i3-msg workspace 3:Thunar && { pgrep -u $UID thunar &>/dev/null || { thunar & } }"
 ## 4
@@ -239,7 +236,7 @@ bindsym $mod+Tab workspace back_and_forth
 
 workspace 0:Main         output PRIMARY_OUTPUT
 workspace 1:Firefox      output PRIMARY_OUTPUT
-workspace 2:Emacs        output PRIMARY_OUTPUT
+workspace 2:Sublime      output PRIMARY_OUTPUT
 workspace 3:Thunar       output PRIMARY_OUTPUT
 workspace 4:Geeqie       output PRIMARY_OUTPUT
 workspace 5:Misc         output PRIMARY_OUTPUT
@@ -252,7 +249,7 @@ workspace 10:Outer_space output SLAVE_OUTPUT_0
 ## Move focused container to workspace
 bindcode $mod+Shift+49 move container to workspace 0:Main
 bindcode $mod+Shift+10 move container to workspace 1:Firefox
-bindcode $mod+Shift+11 move container to workspace 2:Emacs
+bindcode $mod+Shift+11 move container to workspace 2:Sublime
 bindcode $mod+Shift+12 move container to workspace 3:Thunar
 bindcode $mod+Shift+13 move container to workspace 4:Geeqie
 bindcode $mod+Shift+14 move container to workspace 5:Misc
@@ -266,7 +263,7 @@ bindsym $mod+Shift+Tab move container to workspace back_and_forth
 
 ## Assigning windows to workspaces
 assign [class="Firefox"] → "1:Firefox"
-assign [class="Emacs"] → "2:Emacs"
+assign [class="Emacs"] → "2:Sublime"
 assign [class="Thunar"] → "3:Thunar"
 assign [class="Geeqie"] → "4:Geeqie"
 assign [class="(?i)libreoffice*"] → "5:Misc"

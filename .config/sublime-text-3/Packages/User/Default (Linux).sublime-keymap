@@ -63,13 +63,13 @@
 
 	{ "keys": ["right"], "command": "move", "args": {"by": "characters", "forward": true} },
 	{ "keys": ["alt+l"], "command": "move", "args": {"by": "characters", "forward": true} },
-	
+
 	{ "keys": ["up"],    "command": "move", "args": {"by": "lines", "forward": false} },
 	{ "keys": ["alt+i"], "command": "move", "args": {"by": "lines", "forward": false} },
-	
+
 	{ "keys": ["down"],  "command": "move", "args": {"by": "lines", "forward": true} },
 	{ "keys": ["alt+k"], "command": "move", "args": {"by": "lines", "forward": true} },
-	
+
 	{ "keys": ["ctrl+alt+j"], "command": "move", "args": {"by": "characters", "forward": false, "extend": true} },
 	{ "keys": ["ctrl+alt+l"], "command": "move", "args": {"by": "characters", "forward": true, "extend": true} },
 	{ "keys": ["ctrl+alt+i"], "command": "move", "args": {"by": "lines", "forward": false, "extend": true} },
@@ -91,7 +91,7 @@
 	{ "keys": ["pageup"], "command": "move", "args": {"by": "pages", "forward": false} },
 	{ "keys": ["alt+u"],  "command": "move", "args": {"by": "pages", "forward": false} },
 
-	{ "keys": ["pagedown"], "command": "move", "args": {"by": "pages", "forward": true} },			
+	{ "keys": ["pagedown"], "command": "move", "args": {"by": "pages", "forward": true} },
 	{ "keys": ["alt+m"],    "command": "move", "args": {"by": "pages", "forward": true} },
 
 	{ "keys": ["shift+pageup"], "command": "move", "args": {"by": "pages", "forward": false, "extend": true} },
@@ -116,7 +116,7 @@
 	{ "keys": ["alt+shift+u"], "command": "move_to", "args": {"to": "bof", "extend": false} },
 
 	{ "keys": ["ctrl+end"], "command": "move_to", "args": {"to": "eof", "extend": false} },
-	{ "keys": ["ctrl+shift+m"], "command": "move_to", "args": {"to": "eof", "extend": false} },
+	{ "keys": ["alt+shift+m"], "command": "move_to", "args": {"to": "eof", "extend": false} },
 
 	{ "keys": ["ctrl+shift+home"], "command": "move_to", "args": {"to": "bof", "extend": true} },
 	{ "keys": ["ctrl+shift+alt+u"], "command": "move_to", "args": {"to": "bof", "extend": true} },
@@ -237,13 +237,15 @@
 		]
 	},
 
-	{ "keys": ["tab"], "command": "reindent", "args": {"single_line": false} },
+	// This needs to be fixed.
+	// I want it to reindent current line or the whole selected region.
+	{ "keys": ["tab"], "command": "reindent", "args": {"single_line": true} },
 	{ "keys": ["ctrl+]"], "command": "indent" },
 	{ "keys": ["ctrl+["], "command": "unindent" },
 
 	{ "keys": ["insert"], "command": "noop" }, //toggle_overwrite
 
-	{ "keys": ["ctrl+l"], "command": "show_overlay", "args": {"overlay": "goto", "text": ":"} }, //"command": "expand_selection", "args": {"to": "line"} 
+	{ "keys": ["ctrl+l"], "command": "show_overlay", "args": {"overlay": "goto", "text": ":"} }, //"command": "expand_selection", "args": {"to": "line"}
 	{ "keys": ["ctrl+d"], "command": "noop" }, //"command": "find_under_expand"
 	{ "keys": ["ctrl+d"], "command": "noop" }, //"command": "find_under_expand_skip"
 	{ "keys": ["ctrl+shift+space"], "command": "noop" },  //"command": "expand_selection", "args": {"to": "scope"}
@@ -266,7 +268,7 @@
 		]
 	},
 
-	{ "keys": ["ctrl+p"], "command": "noop" }, //"command": "show_overlay", "args": {"overlay": "goto", "show_files": true}
+	{ "keys": ["ctrl+p"], "command": "move_to", "args": {"to": "brackets"} }, //"command": "show_overlay", "args": {"overlay": "goto", "show_files": true}
 	{ "keys": ["ctrl+shift+p"], "command": "show_overlay", "args": {"overlay": "command_palette"} },
 	{ "keys": ["ctrl+alt+p"], "command": "prompt_select_workspace" },
 	{ "keys": ["ctrl+r"], "command": "noop" }, //"command": "show_overlay", "args": {"overlay": "goto", "text": "@"}
@@ -645,13 +647,13 @@
 	{ "keys": ["ctrl+shift+9"], "command": "move_to_group", "args": { "group": 8 } },
 	{ "keys": ["ctrl+0"], "command": "focus_side_bar" },
 
-	{ "keys": ["ctrl+k", "ctrl+up"], "command": "new_pane" },
-	{ "keys": ["ctrl+k", "ctrl+shift+up"], "command": "new_pane", "args": {"move": false} },
-	{ "keys": ["ctrl+k", "ctrl+down"], "command": "close_pane" },
-	{ "keys": ["ctrl+k", "ctrl+left"], "command": "focus_neighboring_group", "args": {"forward": false} },
-	{ "keys": ["ctrl+k", "ctrl+right"], "command": "focus_neighboring_group" },
-	{ "keys": ["ctrl+k", "ctrl+shift+left"], "command": "move_to_neighboring_group", "args": {"forward": false} },
-	{ "keys": ["ctrl+k", "ctrl+shift+right"], "command": "move_to_neighboring_group" },
+	{ "keys": ["ctrl+x", "ctrl+shift+n"], "command": "new_pane" },
+	{ "keys": ["ctrl+x", "ctrl+n"], "command": "new_pane", "args": {"move": false} },
+	{ "keys": ["ctrl+x", "alt+w"], "command": "close_pane" },
+	{ "keys": ["ctrl+x", "ctrl+j"], "command": "focus_neighboring_group", "args": {"forward": false} },
+	{ "keys": ["ctrl+x", "ctrl+l"], "command": "focus_neighboring_group" },
+	{ "keys": ["ctrl+x", "ctrl+shift+j"], "command": "move_to_neighboring_group", "args": {"forward": false} },
+	{ "keys": ["ctrl+x", "ctrl+shift+l"], "command": "move_to_neighboring_group" },
 
 	{ "keys": ["alt+1"], "command": "select_by_index", "args": { "index": 0 } },
 	{ "keys": ["alt+2"], "command": "select_by_index", "args": { "index": 1 } },
@@ -776,3 +778,4 @@
 		]
 	}
 ]
+

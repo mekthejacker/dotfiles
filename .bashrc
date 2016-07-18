@@ -1,10 +1,9 @@
-
 # /etc/skel/.bashrc
 #
 # This file is sourced by all *interactive* bash shells on startup,
 # including some apparently interactive shells such as scp and rcp
 # that can't tolerate any output.  So make sure this doesn't display
-# anything or bad things will happen !
+# anything or bad things will happen!
 
 # This is to dispose of old aliases and function definitions before
 #   (re-)sourcing new or rewritten ones.

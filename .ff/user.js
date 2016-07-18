@@ -18,7 +18,7 @@ user_pref("mousewheel.acceleration.factor", 1);
 user_pref("mousewheel.default.delta_multiplier_y", 270);
 user_pref("network.dns.disableIPv6", true);
 user_pref("general.warnOnAboutConfig", false);
-user_pref("general.useragent.override", "Mozilla/5.0 (X11; Linux x86_64; rv:39.0) Gecko/20100101 Firefox/39.0. Please read a personal appeal from the owner of this browser: ‘Install gentoo, you fat fuck!’");
+//user_pref("general.useragent.override", "Mozilla/5.0 (X11; Linux x86_64; rv:39.0) Gecko/20100101 Firefox/39.0. Please read a personal appeal from the owner of this browser: ‘Install gentoo, you fat fuck!’");
 user_pref("browser.urlbar.clickSelectsAll", false);
 user_pref("network.standard-url.escape-utf8", false);
 // Number of pages firefox keeps prepared to display from the tab history
@@ -257,7 +257,7 @@ user_pref("reader.parse-on-load.enabled", false);
 user_pref("reader.parse-on-load.force-enabled", false);
 
 // Disable geolocation via Google with acquiring a unique ID and giving to them information about Wi-Fi spots nearby
-user_pref("geo.enabled", false);
+user_pref("geo.enabled", true);
 user_pref("geo.wifi.logging.enabled", false);
 user_pref("geo.wifi.uri", "");
 user_pref("browser.search.geoip.timeout", 0);
