@@ -560,19 +560,19 @@ iforgot-iptables() {
 }
 
 iforgot-iptables-multicast-forward() {
-	cat <<-EOF
-	cat <<-EOF >/etc/igmpproxy/igmpproxy.conf
-	quickleave
-	phyint vlan102 upstream  ratelimit 0  threshold 1
-	altnet 192.168.12.0/24
-	#        altnet 10.0.0.0/8
-	#        altnet 192.168.0.0/24
-	phyint eth2 downstream  ratelimit 0  threshold 1
-	##ip link show | sed -rn 's/^[0-9]+:\s([^:@]+)@?\S*:.*/phyint \1 disabled/p' >>/etc/igmpproxy/igmpproxy.conf
-	phyint lo disabled
-	phyint eth0 disabled
-	phyint eth1 disabled
-	EOF
+	cat <<-EOF | sed -r 's/^\s*//g'
+	    cat <<-EOF >/etc/igmpproxy/igmpproxy.conf
+	    quickleave
+        phyint vlan102 upstream  ratelimit 0  threshold 1
+	    altnet 192.168.12.0/24
+	    #        altnet 10.0.0.0/8
+	    #        altnet 192.168.0.0/24
+	    phyint eth2 downstream  ratelimit 0  threshold 1
+	    ##ip link show | sed -rn 's/^[0-9]+:\s([^:@]+)@?\S*:.*/phyint \1 disabled/p' >>/etc/igmpproxy/igmpproxy.conf
+	    phyint lo disabled
+	    phyint eth0 disabled
+	    phyint eth1 disabled
+	    EOF
 
 	iptables -t filter -A INPUT -d 224.0.0.0/240.0.0.0 -i eth0 -j ACCEPT
 	iptables -t filter -A INPUT -s 224.0.0.0/240.0.0.0 -i eth0 -j ACCEPT
@@ -1861,9 +1861,8 @@ iforgot-git-ref-names() {
 
 iforgot-send-mail() {
 	cat<<-EOF
-	sendmail -f from@me.org
-	To: you@suck.org
-	Subject:
+	sendmail -f from@me.org -t you@suck.org
+	Subject: EHLO
 	OHAYOU!
 	EOF
 }

@@ -186,8 +186,8 @@ alias vm-streamer='spicec -h 127.0.0.1 -p 7003 -t Streamer'
 # ,if=virtio
 #-drive file=$HOME/fake.qcow2,if=virtio \
 #-drive file=/home/soft_win/virtio-win-0.1-81.iso,media=cdrom,index=1 \
-alias vm-w="qemu-graphic	-smp 1,cores=2,threads=1 -m 1512 -drive file=/home/$ME/desktop/virtio-win-0.1.102.iso,media=cdrom,index=1 \
-	-vga qxl -spice addr=192.168.0.1,port=5903,disable-ticketing \
+alias vm-w="qemu-graphic	-smp 1,cores=1,threads=1 -m 1512 -drive file=/home/$ME/desktop/virtio-win-0.1.102.iso,media=cdrom,index=1 \
+	-vga qxl -spice addr=192.168.5.1,port=5903,disable-ticketing \
 	-qmp unix:$HOME/qmp-sock-shindaws,server,nowait \
 	-name 'Win_XP,process=vm-winxp' -rtc base=localtime -usbdevice tablet \
 	-drive file=$HOME/vm_winxp.img,if=ide \
@@ -205,7 +205,7 @@ alias vm-w="qemu-graphic	-smp 1,cores=2,threads=1 -m 1512 -drive file=/home/$ME/
 #    -netdev user,id=mynet0,smb=/home/$ME/desktop,smbserver=10.0.2.4 \
 #        -device virtio-net,netdev=mynet0"
 
-alias vm-wc='spicec -h 192.168.0.1 -p 5903 -t QEMU_WinXP____Shift_F11'
+alias vm-wc='spicec -h 192.168.5.1 -p 5903 -t QEMU_WinXP____Shift_F11'
 alias vm-wq='~/bin/qemu-shell/qmp-shell ~/qmp-sock-shindaws'
 
 vm-ts-mother-setup() {
