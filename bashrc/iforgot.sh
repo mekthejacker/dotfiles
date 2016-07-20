@@ -560,19 +560,19 @@ iforgot-iptables() {
 }
 
 iforgot-iptables-multicast-forward() {
-	cat <<-EOF
-	cat <<-EOF >/etc/igmpproxy/igmpproxy.conf
-	quickleave
-	phyint vlan102 upstream  ratelimit 0  threshold 1
-	altnet 192.168.12.0/24
-	#        altnet 10.0.0.0/8
-	#        altnet 192.168.0.0/24
-	phyint eth2 downstream  ratelimit 0  threshold 1
-	##ip link show | sed -rn 's/^[0-9]+:\s([^:@]+)@?\S*:.*/phyint \1 disabled/p' >>/etc/igmpproxy/igmpproxy.conf
-	phyint lo disabled
-	phyint eth0 disabled
-	phyint eth1 disabled
-	EOF
+	cat <<-EOF | sed -r 's/^\s*//g'
+	    cat <<-EOF >/etc/igmpproxy/igmpproxy.conf
+	    quickleave
+        phyint vlan102 upstream  ratelimit 0  threshold 1
+	    altnet 192.168.12.0/24
+	    #        altnet 10.0.0.0/8
+	    #        altnet 192.168.0.0/24
+	    phyint eth2 downstream  ratelimit 0  threshold 1
+	    ##ip link show | sed -rn 's/^[0-9]+:\s([^:@]+)@?\S*:.*/phyint \1 disabled/p' >>/etc/igmpproxy/igmpproxy.conf
+	    phyint lo disabled
+	    phyint eth0 disabled
+	    phyint eth1 disabled
+	    EOF
 
 	iptables -t filter -A INPUT -d 224.0.0.0/240.0.0.0 -i eth0 -j ACCEPT
 	iptables -t filter -A INPUT -s 224.0.0.0/240.0.0.0 -i eth0 -j ACCEPT
@@ -1861,9 +1861,8 @@ iforgot-git-ref-names() {
 
 iforgot-send-mail() {
 	cat<<-EOF
-	sendmail -f from@me.org
-	To: you@suck.org
-	Subject:
+	sendmail -f from@me.org -t you@suck.org
+	Subject: EHLO
 	OHAYOU!
 	EOF
 }
@@ -1886,31 +1885,32 @@ iforgot-screen() {
 
 iforgot-remote-desktop-with-x11vnc() {
 	cat<<-EOF
-Package names:
-    x11vnc — server for X11
-    tightvnc — probably a better implementation of a server
+	Package names:
+	    x11vnc — server for X11
+	    tightvnc — probably a better implementation of a server
 
-On the remote host:
-    x11vnc -storepasswd YourPasswordHere /tmp/vncpass
-    x11vnc -display :0 -rfbauth /tmp/vncpass
+	On the remote host:
+	    x11vnc -storepasswd YourPasswordHere /tmp/vncpass
+	    x11vnc -display :0 -rfbauth /tmp/vncpass
 
-On local host:
-    vncviewer remote-hostname:0
+	On local host:
+	    vncviewer remote-hostname:0
 
-Starting with ssh:
-    ssh -t -L 5900:localhost:5900 far-host 'x11vnc -localhost -display :0'
+	Starting with ssh:
+	    ssh -t -L 5900:localhost:5900 far-host 'x11vnc -localhost -display :0'
 
-Interesting options
-    -shared
-    -forever
-EOF
+	Interesting options
+	    -shared
+	    -forever
+	EOF
 }
 
 iforgot-openssl-key-remove-password() {
 	cat <<-EOF
 	mv a.key a.key.env
 	openssl rsa  <a.key.enc  >a.key
-EOF
+	EOF
+}
 
 iforgot-sublime-log-commands() {
 	cat <<-EOF
