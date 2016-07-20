@@ -1886,31 +1886,32 @@ iforgot-screen() {
 
 iforgot-remote-desktop-with-x11vnc() {
 	cat<<-EOF
-Package names:
-    x11vnc — server for X11
-    tightvnc — probably a better implementation of a server
+	Package names:
+	    x11vnc — server for X11
+	    tightvnc — probably a better implementation of a server
 
-On the remote host:
-    x11vnc -storepasswd YourPasswordHere /tmp/vncpass
-    x11vnc -display :0 -rfbauth /tmp/vncpass
+	On the remote host:
+	    x11vnc -storepasswd YourPasswordHere /tmp/vncpass
+	    x11vnc -display :0 -rfbauth /tmp/vncpass
 
-On local host:
-    vncviewer remote-hostname:0
+	On local host:
+	    vncviewer remote-hostname:0
 
-Starting with ssh:
-    ssh -t -L 5900:localhost:5900 far-host 'x11vnc -localhost -display :0'
+	Starting with ssh:
+	    ssh -t -L 5900:localhost:5900 far-host 'x11vnc -localhost -display :0'
 
-Interesting options
-    -shared
-    -forever
-EOF
+	Interesting options
+	    -shared
+	    -forever
+	EOF
 }
 
 iforgot-openssl-key-remove-password() {
 	cat <<-EOF
 	mv a.key a.key.env
 	openssl rsa  <a.key.enc  >a.key
-EOF
+	EOF
+}
 
 iforgot-sublime-log-commands() {
 	cat <<-EOF
@@ -1922,5 +1923,3 @@ iforgot-sublime-log-commands() {
 #  If you want more, I find these sites helpful:
 #
 # https://www.pantz.org
-
-
