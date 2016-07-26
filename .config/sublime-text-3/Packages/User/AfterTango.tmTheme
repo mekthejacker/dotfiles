@@ -6,6 +6,56 @@
 	<string>deterenkelt</string>
 	<key>name</key>
 	<string>AfterTango</string>
+    <!--
+                          On concepts of making a colour theme
+
+
+        I mostly write in bash,  so it’s a theme *mostly* oriented  on use with
+        ShellScriptImproved.
+
+        When I was selecting colours  for constructions,  I wanted to make some-
+        thing  light  and unobtrusive. That’s  why  I left  what is distinctive
+        enough white. The colour should help you see  the part an eye has a dif-
+        ficulty  to see,  and not turning  the screen into a motley puddle near
+        a paint factory.
+
+        I’ve gathered together  every scope  related  to regexes, globs and pat-
+        terns and painted  the ruling constructions green.  $var,  ${}  and $''
+        are coloured the same blue colour,  because of similarity  of their mea-
+        ning – a string substitution.  $() on the other hand  is painted violet,
+        because  it’s  a subshell  call. Strings, heredocs and escaped  symbols
+        are painted yellow, dark yellow and light orange. Escape sequences look
+        distinctive,  because around them  it’s only white and green.  Construc-
+        tions related to string substitution  inside of ${} are painted reddish.
+        I’d avoid that blue-red  combination, because  it’s plagued  from being
+        used everywhere. But if it’s just a little, it’s alright. Nothing would
+        seem more distinctive for this purpose.
+
+        Now about conception of spanning with colour.
+        Scopes  like strings and subshell  calls – should we  paint  everything
+        in the scope the same colour, highlight every part or do it selectively?
+        The answer is we should have as little nestings as possible. In situati-
+        ons like $( … $() … ) highlighting  the inner scope  may be a good idea,
+        but several colours  for the same thing  confuse the brain, and a diffe-
+        rent tone  won’t help, because it will  most probably  look  either too
+        bright or to dark. I think that everything except for
+          - variable expansions;
+          - escape sequences;
+          - regular expressions;
+          - and, maybe, nested scopes of the same type;
+        should be painted the colour of the scope. Because
+            $(echo some long message)
+        won’t look integral,  if echo will be  painted  a colour different from
+        the scope. The eye reads ‘$(echo’  as one word,  one construction,  and
+        several colours will tear it apart.  Of course, one may use $( echo … ),
+        i.e.  with spaces,  to avoid that,  but this  sparseness  rarely  looks
+        appropriate  to me.  The next case  is "$(echo …)" – when double quotes
+        span over  a subshell call,  they are not distinctive at all.  And when
+        there is  an escape sequence in a string,  it is not distinctive enough:
+            echo -e "\n\n--- Hello \n"
+        I  slowly come to a thought,  that  strings  shouldn’t  be painted  any
+        colour at all.
+    -->
     <key>settings</key>
     <array>
         <dict>
@@ -20,7 +70,7 @@
                 <key>background</key>
                 <string>#303030</string>
                 <key>foreground</key>
-                <string>#f0f0f0</string>
+                <string>#eeeeec</string>
                 <key>invisibles</key>
                 <string>#f00</string>
                 <key>lineHighlight</key>
@@ -124,6 +174,7 @@
                 <string>#edd400</string>
             </dict>
         </dict>
+        <!--
         <dict>
             <key>name</key>
             <string>Number</string>
@@ -134,7 +185,7 @@
                 <key>foreground</key>
                 <string>#d0d0d0</string>
             </dict>
-        </dict>
+        </dict>-->
         <dict>
             <key>name</key>
             <string>Built-in constant</string>
@@ -161,7 +212,7 @@
             <key>name</key>
             <string>Variable</string>
             <key>scope</key>
-            <string>variable, meta.reset.color string.quoted variable.other.bracket.shell, string.quoted.single.dollar.shell</string>
+            <string>variable, meta.reset.color string.quoted variable.other.bracket.shell,  string.quoted.single.dollar.shell, variable.other.bracket.shell meta.reset.color variable.other.bracket.shell</string>
             <key>settings</key>
             <dict>
 				<key>foreground</key>
@@ -173,30 +224,19 @@
             <string>Keyword</string>
             <key>scope</key>
             <string>keyword</string>
-            <key>settings</key>
-            <dict>
-                <key>fontStyle</key>
-                <string>bold</string>
-                <key>foreground</key>
-                <string>#d0d0d0</string>
-            </dict>
-        </dict>
-        <dict>
-            <key>name</key>
-            <string>Keyword operators</string>
-            <key>scope</key>
-            <string>keyword</string>
+
             <key>settings</key>
             <dict>
                 <key>fontStyle</key>
                 <string></string>
                 <key>foreground</key>
-                <string>#d0d0d0</string>
+                <string>#d3d7cf</string>
             </dict>
+
         </dict>
         <dict>
             <key>name</key>
-            <string>Keyword shell directives</string>
+            <string>Shell directives (echo, set, declare…)</string>
             <key>scope</key>
             <string>keyword.other.shell</string>
             <key>settings</key>
@@ -209,7 +249,7 @@
         </dict>
         <dict>
             <key>name</key>
-            <string>Keyword</string>
+            <string>Semicolon operator ';'</string>
             <key>scope</key>
             <string>keyword.operator.list.shell</string>
             <key>settings</key>
@@ -420,11 +460,11 @@
             <key>settings</key>
             <dict>
                 <key>background</key>
-                <string>#F92672</string>
+                <string>#ef2929</string>
                 <key>fontStyle</key>
                 <string>bold</string>
                 <key>foreground</key>
-                <string>#F8F8F0</string>
+                <string>#efefef</string>
             </dict>
         </dict>
         <dict>
@@ -653,11 +693,12 @@
             <key>name</key>
             <string>Subshells</string>
             <key>scope</key>
-            <string>string.interpolated.backtick.shell, string.interpolated.backtick.shell meta.reset.color, string.interpolated.dollar.shell, string.interpolated.dollar.shell meta.reset.color</string>
+            <string>string.interpolated.backtick.shell, string.interpolated.backtick.shell meta.reset.color, string.interpolated.dollar.shell, string.interpolated.dollar.shell meta.reset.color, string.interpolated.backtick.shell support.function.external.shell, string.interpolated.dollar.shell support.function.external.shell, string.interpolated.backtick.shell support.function.builtin.shell, string.interpolated.dollar.shell support.function.builtin.shell, string.interpolated.backtick.shell support.command-switch.shell, string.interpolated.dollar.shell support.command-switch.shell, string.interpolated.backtick.shell meta.reset.color support.command-switch.shell, string.interpolated.dollar.shell meta.reset.color support.command-switch.shell
+            </string>
             <key>settings</key>
             <dict>
                 <key>foreground</key>
-                <string>#f57900</string>
+                <string>#ad7fa8</string><!--<string>#f57900</string>-->
             </dict>
         </dict>
         <dict>
@@ -679,7 +720,7 @@
             <key>settings</key>
             <dict>
                 <key>foreground</key>
-                <string>#e9b86e</string>
+                <string>#fcaf3e</string>
             </dict>
         </dict>
         <dict>
@@ -801,7 +842,7 @@
             <key>settings</key>
             <dict>
                 <key>fontStyle</key>
-                <string>bold</string>
+                <string></string>
                 <key>foreground</key>
                 <string>#d0d0d0</string>
             </dict>
@@ -832,7 +873,7 @@
             <key>settings</key>
             <dict>
                 <key>fontStyle</key>
-                <string>bold</string>
+                <string></string>
                 <key>foreground</key>
                 <string>#d0d0d0</string>
             </dict>

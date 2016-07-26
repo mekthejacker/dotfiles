@@ -56,7 +56,8 @@ gen_prompt() {
 		w='\[\e[01;37m\]' \
 		r='\[\e[01;31m\]' \
 		s='\[\e[00m\]' \
-		load_avg=`echo "scale=2; $(cut -d' ' -f2 </proc/loadavg) / $(grep -c ^processor /proc/cpuinfo)" | bc` \
+		load_avg=`echo "scale=2;  $(cut -d' ' -f2 </proc/loadavg) \
+		                         /$(grep -c ^processor /proc/cpuinfo)" | bc` \
 		git_status= error= chroot=
 	export PS1=''
 	[ -v ONE_COMMAND_SHELL ] && {
@@ -94,7 +95,7 @@ gen_prompt() {
 		# [ $unpushed -eq 0 ] && unset unpushed
 		# ±̑
 		#           ## master...origin/master [ahead 1, behind 1]  ↓
-		[[ "$status" =~ ^##[^$'\n']+\[(ahead\ ([0-9]+))?(,\ )?(behind ([0-9]+))?\] ]] && {
+		[[ "$status" =~ ^($'\t')##[^$'\n']+\[(ahead\ ([0-9]+))?(,\ )?(behind ([0-9]+))?\] ]] && {
 			[ "${BASH_REMATCH[2]}" ] && ahead=${BASH_REMATCH[2]}
 			[ "${BASH_REMATCH[5]}" ] && behind=${BASH_REMATCH[5]}
 		}

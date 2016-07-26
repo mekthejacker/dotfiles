@@ -9,7 +9,7 @@
 # It accepts commands in runtime, which allows to change its behaviour without
 #   restart. It can also restore the state it had when it was terminated, so
 #   it’s just suited to be put somewhere in autostart script.
-# wallpaper_setter.sh © 2014 deterenkelt
+# wallpaper_setter.sh © 2014–2016 deterenkelt
 
 # This program is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published
@@ -39,118 +39,135 @@ if [ -v D -a ! -z "$str" ]; then
 		LOGFILE="$HOME/wallpaper_server.log"
 	}
 fi
+
+lock=/tmp/wallpaper_setter.lock
+
 show_usage() {
-cat <<"EOF"
-Usage:
+	cat <<-"EOF"
+	Usage:
 
-Starting daemon:
-./wallpaper_setter.sh -S [-qUBls] -d directory
+	Starting as daemon:
+	./wallpaper_setter.sh -S -d directory [daemon options]
 
-Sending commands to daemon:
-./wallpaper_setter.sh [-q] -b|-i|-k|-m|-[f]n|-p|
-                      -r|-R directory|-u|w
+	Sending commands to daemon:
+	./wallpaper_setter.sh [client options]
 
-To get information:
-./wallpaper_setter.sh -h|-H|-v
+	Get helpful information:
+	./wallpaper_setter.sh -h|-H|-v|-i
 
 
-Parameters:
--b amount      Set or adjust brightness of the current image. The value must be
-               enclosed in range [-1..1]. To increase or decrease brightness,
-               - or + sign must precede the value, e.g. -0.2, +0.1 etc.
--B amount      Initial brightness value to be used when setting the next
-               wallpaper.
--d directory   A directory where wallpapers stored.
--f             Force action. At current state using this key in addition
-               to ‘-n’ will cancel the effect of ‘-k’ and set a new wallpaper.
--h             Show this help.
--H             Briefly explain how this script works with examples.
--i             Show path to the current wallpaper.
--k             Keep current wallpaper. Ignore commands that try to set a new
-               wallpaper, i.e. ‘-n’ commands. The main purpose is to override
-               a cron job that automates changing.
--l             Collection limit. The maximum amount of images stored in history.
-               Set to 0 in order to make it unlimited. If unset, then it’s
-               equal to 5 by default.
--m             Change mode in which current image is shown on the screen.
-               Available modes are the ones ‘hsetroot’ uses: fill, full, center
-               and tile.
--n             Change to the next (random) wallpaper.
--p             Move back to the previous wallpaper in the history.
--q             Be quiet. No output will be done, so it’s safe to use in a cron
-               job.
--r             Restrict to subdirectory. Calls GUI interface with a list
-               of subdirectories to pick. After selection wallpapers will be
-               taken only from selected directory (and its subdirectories).
-               This option also forces new wallpaper to be chosen and set
-               from the new directory. This option implies ‘-u’.
--R directory   CLI version of the above. Instead of calling GUI, sets
-               restriction to the directory passed as argument.
--s             Scale images that are smaller than screen to fill it (saving
-               proportions), instead of placing them in center in scale 1:1.
--S             Start as server.
--u             Update the internal list of files in the directory it currently
-               looks for wallpapers.
--v             Print version and legal information.
--w             Redraw current wallpaper. Useful in autostart script if this
-               script is left hanging in the background for some reason.
--z directory   Refresh symbolic link to the current wallpaper in the directory
-               on changing. And if it doesn’t exist, create one.
+	Info
+	――――
+	-i             Shows path to the current wallpaper.
+	-h             Shows this help.
+	-H             Briefly explains how this script works with examples.
+	-v             Prints version and legal information.
 
-The order of keys is important!
-Report bugs to https://github.com/deterenkelt/dotfiles/issues
-EOF
+	Daemon options
+	――――――――――――――
+	-S             Starts as a daemon.
+	-d directory   Initial directory to search wallpapers for.
+
+
+	Client options
+	――――――――――――――
+
+	-b amount      Sets or adjust brightness  of the current  image.  The value
+	               must be enclosed in the range [-1..1]. To increase  or decre-
+	               ase brightness,  -  or  +  sign must precede  the value, e.g.
+	               -0.2, +0.1 etc.
+	-r             Restricts to subdirectory.  Calls GUI interface  with a list
+	               of subdirectories  to pick. After  selection wallpapers will
+	               be taken  only from selected  directory  (and its subdirecto-
+	               ries). This option  also forces  new wallpaper  to be chosen
+	               and set  from the new directory.  This  option  implies ‘-u’.
+	-R directory   CLI  version  of the above.  Instead  of calling  GUI,  sets
+	               restriction to the directory passed as the argument.
+	-u             Updates  the internal  list of files in the directory it cur-
+	               rently looks for wallpapers.
+	-w             Redraws  current  wallpaper.  Useful  in  autostart  scripts,
+	               if this script  is left hanging  in the background  for some
+	               reason.
+
+	Options for both the daemon and the client
+	――――――――――――――――――――――――――――――――――――――――――
+	-B amount      Sets  the initial brightness value  for  the next  wallpaper.
+	-f             Forces  an action.  At the  current  state  using  this  key
+	               in addition  to ‘-n’  will cancel the effect of ‘-k’ and set
+	               a new wallpaper.
+	-k             Keeps current  wallpaper.  Ignore  commands  that try to set
+	               a new wallpaper, i.e. ‘-n’ commands. The main purpose  is to
+	               override a cron job that automates changing.
+	-l             Sets a limit on the collection size. I.e. the maximum number
+	               of images,  that are stored  in history.  Set to 0  in order
+	               to make it  unlimited.  If  unset, the  limit  is equal to 5,
+	               which is the default.
+	-m             Changes mode in which  current  image is shown  on the screen.
+	               Available modes  are the ones  ‘hsetroot’ uses:  fill,  full,
+	               center and tile.
+	-n             Set up the next (random) wallpaper.
+	-p             Moves back in the history to previously set wallpaper.
+	-q             Be quiet.  Nothing will be printed to the output, so it’d be
+	               safe to use in a cron job.
+	-s             Scales images that are smaller than screen to fill it (saving
+	               proportions), instead of placing them in center in scale 1:1.
+	-z directory   Refreshes symbolic link to the current wallpaper in the dire-
+	               ctory  on changing.  And if it  doesn’t  exist,  creates one.
+
+	The order of keys is important!
+	Report bugs to https://github.com/deterenkelt/dotfiles/issues
+	EOF
 }
 
 explain_how_this_works() {
-cat <<"EOF"
-Brief explanation of how it supposed to run.
-——————————————————————————————————————
-First, the script must be started in the background with ‘-d’ and ‘-e’ options,
-  specifying the directory containing wallpapers and (optionally)
-  an error handling utility.
-  ([nohup] ./wallpaper_setter.sh -e "Xdialog --msgbox \"%m\"" 300x100
-                                -d ~/my_favourite_walpapers) &
-  This will be the daemon part. All the calls described below are calls to the
-  already running daemon.
-  Do not specify the directory for them, as the server already keeps it, and
-    specifying one another time will lead to another running server using
-    the same pipes and unforseen consequences™.
-Then some jobs may be put in the crontab file (open it with ‘crontab -e’).
-  # to change wallpaper every ten minutes and produce no messages in case of
-  #   errors or if current wallpaper must be kept.
-  */10 * * * * /path/to/wallpaper_setter.sh -qn
-  # wallpapers for daytime
-  0 5 * * * /path/to/wallpaper_setter.sh -R ~/daytime_wallpapers/
-  # wallpapers for nighttime
-  0 20 * * * /path/to/wallpaper_setter.sh -R ~/nighttime_wallpapers/
-  # update the list daily
-  0 0 * * * /path/to/wallpaper_setter.sh -u
-There can also be used the ‘-e’ option, if you want to get error messages on
-  your desktop instead of getting them on crontab e-mail.
+	cat <<-"EOF"
+	Brief explanation on how it’s supposed to run
+	―――――――――――――――――――――――――――――――――――――――――――――
+	First, the script must be started in the background with ‘-d’ option,
+	specifying the directory containing wallpapers
+	    ([nohup] ./wallpaper_setter.sh -d ~/my_favourite_wallpapers) &
 
-Signals
-  This script has two hooks end user may find handy to use:
-  - on SIGUSR1 script will export its data to files.
-  - on SIGUSR2 it will export data and reload itself. For example, if there is
-    a new version then, instead of restarting it manually with typing
-    all the necessary keys or copypasting them, it’s enough to replace
-    the script file and execute
-      pkill -USR2 -f 'wallpaper_setter.sh'
-    or even
-      pkill -USR2 -f wallp
-    if you’re sure it will not kill any other processes.
-EOF
+	This would be the daemon part. All the calls described below are calls
+	to the already running daemon.
+
+	Do not specify the directory for them, as the server already keeps it, and
+	specifying one another time will lead to another running server using
+	the same pipes and unforseen consequences™.
+
+	Then some jobs may be put in the crontab file (open it with ‘crontab -e’).
+	    # To change wallpaper every ten minutes and produce no messages in case
+	    # of errors or if current wallpaper must be kept.
+	    */10 * * * * /path/to/wallpaper_setter.sh -qn
+	    # wallpapers for daytime
+	    0 5 * * * /path/to/wallpaper_setter.sh -R ~/daytime_wallpapers/
+	    # wallpapers for nighttime
+	    0 20 * * * /path/to/wallpaper_setter.sh -R ~/nighttime_wallpapers/
+	    # update the list daily
+	    0 0 * * * /path/to/wallpaper_setter.sh -u
+
+	Signals
+	―――――――
+	  This script has two hooks end user may find handy to use:
+	  - on SIGUSR1 script will export its data to files.
+	  - on SIGUSR2 it will export data and reload itself. For example, if there is
+	    a new version then, instead of restarting it manually with typing
+	    all the necessary keys or copypasting them, it’s enough to replace
+	    the script file and execute
+	      pkill -USR2 -f 'wallpaper_setter.sh'
+	    or even
+	      pkill -USR2 -f wallp
+	    if you’re sure it will not kill any other processes.
+	EOF
 }
 
 show_version() {
-cat <<EOF
-wallpaper_setter.sh $VERSION
-Copyright © 2014 deterenkelt
-License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-This is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
-EOF
+	cat <<-EOF
+	wallpaper_setter.sh $VERSION
+	Copyright © 2014–2016 deterenkelt
+	License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+	This is free software: you are free to change and redistribute it.
+	There is NO WARRANTY, to the extent permitted by law.
+	EOF
 }
 
 [ ${BASH_VERSINFO[0]:-0} -eq 4 ] &&
@@ -204,15 +221,24 @@ send_command() {
 	local command=$1 try=0 c=0 partial_success success
 	# while there are more than 1 clients hanging wait for them to finish.
 	# It’s to prevent from simultaneous writing to the rxpipe
-	while [ "`pgrep -cf "wallpaper_setter.sh\s+-[^S]"`" -gt 1 ] \
-		  && \
-		  [ "`ps -o pid= --sort=lstart -$(pgrep -f "wallpaper_setter.sh\s+-[^S]") | head -n1`" != $$ ]; do
+	# while [ "`pgrep -cf "wallpaper_setter.sh\s+-[^S]"`" -gt 1 ] \
+	# 	  && \
+	# 	  [ "`ps -o pid= --sort=lstart -$(pgrep -f "wallpaper_setter.sh\s+-[^S]") | head -n1`" != $$ ]; do
+	# 	sleep 15
+	# 	[ $((++c)) -gt 4 ] && {
+	# 		ermes "Quitting after 1 minute of waiting."
+	# 		return 7
+	# 	}
+	# done
+	while [ -e $lock ]; do
 		sleep 15
 		[ $((++c)) -gt 4 ] && {
 			ermes "Quitting after 1 minute of waiting."
 			return 7
 		}
 	done
+	touch $lock || exit 3
+	trap "rm $lock; trap - RETURN" RETURN
 	until [ -v partial_success ]; do
 		# Add timestamp as 1st field? Commands may pile up.
 		# Add directive to flush buffer on the server side?
@@ -264,34 +290,34 @@ while getopts ':b:B:d:e:fhHikl:mnNpqrR:Sqsuvw' option; do
 				exit 10
 			}
 			;;
-		e)
-			# T! To test passing of the action try these options
-			#    -d ~/ -e "echo message: ‘%m’ action: ‘%a’" -d nonexisted_dir
-			# This should output
-			# message: ‘./.i3/wallpaper_setter.sh: No such dir: nonexisted_dir.’
-			# action: ‘./.i3/wallpaper_setter.sh  "-d"  "/home/user/"  "-e"
-			#          "echo -e \"message: ‘%m’\naction: ‘%a’\""  "-d"
-			#          "nonexisted_dir" ’
-			[ "$OPTARG" ] || {
-				echo 'Please set an error reporting utility via ‘-e’ option.' >&2
-				exit 11
-			}
-			for param in "$@"; do
-				# 4×\ per 3×escaping = 1×\ as it was on output like in ‘\n’
-				param="${param//\\/\\\\\\\\\\\\}"
-				# ———"——— for ‘"’ to become ‘\’+‘"’
-				param="${param//\"/\\\\\\\\\\\\\\\"}"
-				param=${param//\//\\\/}
-				param=${param//\'/\\\'}
-				param=${param//\&/\\\&}
-				param=${param//\%/\\\%}
-				# Array would be nicer here, but it messes with quotes adding
-				#   its own, so it’s better to make it just a string.
-				params="$params \\\\\"$param\\\\\" "
-			done
-			ERR_CMD=`echo -n "$OPTARG" |\
-			         sed -r "s/%a/${0//\//\\\/} ${params} \&/g"`
-			;;
+		# e)
+		# 	# T! To test passing of the action try these options
+		# 	#    -d ~/ -e "echo message: ‘%m’ action: ‘%a’" -d nonexisted_dir
+		# 	# This should output
+		# 	# message: ‘./.i3/wallpaper_setter.sh: No such dir: nonexisted_dir.’
+		# 	# action: ‘./.i3/wallpaper_setter.sh  "-d"  "/home/user/"  "-e"
+		# 	#          "echo -e \"message: ‘%m’\naction: ‘%a’\""  "-d"
+		# 	#          "nonexisted_dir" ’
+		# 	[ "$OPTARG" ] || {
+		# 		echo 'Please set an error reporting utility via ‘-e’ option.' >&2
+		# 		exit 11
+		# 	}
+		# 	for param in "$@"; do
+		# 		# 4×\ per 3×escaping = 1×\ as it was on output like in ‘\n’
+		# 		param="${param//\\/\\\\\\\\\\\\}"
+		# 		# ———"——— for ‘"’ to become ‘\’+‘"’
+		# 		param="${param//\"/\\\\\\\\\\\\\\\"}"
+		# 		param=${param//\//\\\/}
+		# 		param=${param//\'/\\\'}
+		# 		param=${param//\&/\\\&}
+		# 		param=${param//\%/\\\%}
+		# 		# Array would be nicer here, but it messes with quotes adding
+		# 		#   its own, so it’s better to make it just a string.
+		# 		params="$params \\\\\"$param\\\\\" "
+		# 	done
+		# 	ERR_CMD=`echo -n "$OPTARG" |\
+		# 	         sed -r "s/%a/${0//\//\\\/} ${params} \&/g"`
+		#	;;
 		f)
 			FORCE_COMMANDS=t
 			;;
@@ -418,7 +444,7 @@ import_collection() {
 					&& [[ "$lines" =~ ^[0-9]+$ ]] \
 					&& [ $lines -ge 2 ] \
 					&& local index=${f##*.} && {
-					collection[$index]="`<$f`"
+					collection[index]="`<$f`"
 				} || ermes "Collection file ‘$f’ cannot be read or is broken."
 			done
 		}

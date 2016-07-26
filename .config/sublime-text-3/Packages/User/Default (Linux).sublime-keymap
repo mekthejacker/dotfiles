@@ -649,7 +649,7 @@
 
 	{ "keys": ["ctrl+x", "ctrl+shift+n"], "command": "new_pane" },
 	{ "keys": ["ctrl+x", "ctrl+n"], "command": "new_pane", "args": {"move": false} },
-	{ "keys": ["ctrl+x", "alt+w"], "command": "close_pane" },
+	{ "keys": ["ctrl+x", "ctrl+w"], "command": "close_pane" },
 	{ "keys": ["ctrl+x", "ctrl+j"], "command": "focus_neighboring_group", "args": {"forward": false} },
 	{ "keys": ["ctrl+x", "ctrl+l"], "command": "focus_neighboring_group" },
 	{ "keys": ["ctrl+x", "ctrl+shift+j"], "command": "move_to_neighboring_group", "args": {"forward": false} },

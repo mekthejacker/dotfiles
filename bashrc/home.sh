@@ -19,6 +19,21 @@ alias okiru='rm /tmp/okiru'
 alias rt="urxvtc -title rtorrent -hold \
                  -e /bin/bash -c 'chmod o+rw `tty` \
                     && sudo -u rtorrent -H tmux -u -S /home/rtorrent/.tmux/socket attach' &"
+
+wacom-enable() { wacom-devcontrol enable; }
+wacom-disable() { wacom-devcontrol disable; }
+ # Disables or enabled wacom devices
+#    $1 – <enable|disable>
+wacom-devcontrol() {
+	# echo DISPLAY=$DISPLAY
+	local dev
+	while read dev; do
+		[ "$1" = enable ] \
+			&& echo "Enabling ‘$dev’." \
+			|| echo "Disabling ‘$dev’"
+		xinput --$1 "$dev"
+	done < <(xinput --list --name-only | grep Wacom)
+}
 # For temporary freeing the connection from torrents.
 rt-continue() { rt-stop; }
 rt-stop() {

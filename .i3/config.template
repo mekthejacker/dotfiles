@@ -264,6 +264,7 @@ bindsym $mod+Shift+Tab move container to workspace back_and_forth
 ## Assigning windows to workspaces
 assign [class="Firefox"] → "1:Firefox"
 assign [class="Emacs"] → "2:Sublime"
+assign [class="(?i)subl3"] → "2:Sublime"
 assign [class="Thunar"] → "3:Thunar"
 assign [class="Geeqie"] → "4:Geeqie"
 assign [class="(?i)libreoffice*"] → "5:Misc"

@@ -20,10 +20,18 @@ kbdd
 
 # I don’t map z x c v b becasue can press them accidentally.
 # Decrease brush size
-xsetwacom --set 'Wacom Bamboo 2FG 6x8 Finger pad' Button 3 'key F5'
-# Increase brush size
-xsetwacom --set 'Wacom Bamboo 2FG 6x8 Finger pad' Button 8 'key F7'
-# Swap colors
-xsetwacom --set 'Wacom Bamboo 2FG 6x8 Finger pad' Button 9 'key F3'
+touch='Wacom Bamboo 2FG 6x8 Finger touch'
+pad='Wacom Bamboo 2FG 6x8 Pad pad'
 # Undo
-xsetwacom --set 'Wacom Bamboo 2FG 6x8 Finger pad' Button 1 'key +ctrl z -ctrl'
+xsetwacom --set "$pad" Button 3 'key z'
+# Reset canvas rotation
+xsetwacom --set "$pad" Button 8 'key +shift 1 -shift'
+# Swap colors
+xsetwacom --set "$pad" Button 9 'key f13'
+# Default colours
+xsetwacom --set "$pad" Button 1 'key f14'
+# Disable touch
+xsetwacom --set "$touch" Touch off
+
+# Stylus buttons work as middle and right mouse buttons,
+# I’m not sure how to catch the via xev.
