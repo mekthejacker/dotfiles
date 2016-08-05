@@ -17,6 +17,10 @@
 user_pref("mousewheel.acceleration.factor", 1);
 user_pref("mousewheel.default.delta_multiplier_y", 270);
 user_pref("network.dns.disableIPv6", true);
+// Disable old plugin warning – sometimes the window with buttons
+// to temoporarily or permanently allow flash on this site is shown
+// cut with only ~30px of the left part shown or it is not shown at all.
+user_pref("extensions.blocklist.enabled", false);
 user_pref("general.warnOnAboutConfig", false);
 //user_pref("general.useragent.override", "Mozilla/5.0 (X11; Linux x86_64; rv:39.0) Gecko/20100101 Firefox/39.0. Please read a personal appeal from the owner of this browser: ‘Install gentoo, you fat fuck!’");
 user_pref("browser.urlbar.clickSelectsAll", false);

@@ -1165,7 +1165,7 @@ iforgot-tail-print-from-nth-line() {
 	EOF
 }
 
-iforgot-combine-images-together() {
+iforgot-convert-combine-images-together() {
 	cat <<-EOF
 	Use convert from imagemagick.
 	convert  img1.png  img2.png img3.png -append out.png
@@ -1439,7 +1439,7 @@ iforgot-bash-line-output() {
 	EOF
 }
 
-iforgot-nginx-hashed-passwords() { echo -e '\topenssl passwd -apr1'; }
+iforgot-nginx-generate-a-hashed-password() { echo -e '\topenssl passwd -apr1'; }
 
 iforgot-bash-fast-replace() {
 	cat <<-"EOF"
@@ -1811,6 +1811,8 @@ iforgot-logrotate() {
 
 	Use ‘copytruncate’ for generic logs like messages/dmesg/syslog!
 
+	/var/lib/logrotate.status   ← what and when was rotated
+
 	The difference between
 	EOF
 }
@@ -1860,7 +1862,7 @@ iforgot-git-ref-names() {
 }
 
 iforgot-send-mail() {
-	cat<<-EOF
+	cat <<-EOF
 	sendmail -f from@me.org -t you@suck.org
 	Subject: EHLO
 	OHAYOU!
@@ -1884,7 +1886,7 @@ iforgot-screen() {
 
 
 iforgot-remote-desktop-with-x11vnc() {
-	cat<<-EOF
+	cat <<-EOF
 	Package names:
 	    x11vnc — server for X11
 	    tightvnc — probably a better implementation of a server
@@ -1915,6 +1917,32 @@ iforgot-openssl-key-remove-password() {
 iforgot-sublime-log-commands() {
 	cat <<-EOF
 	sublime.log_commands(True)
+	EOF
+}
+
+iforgot-ffmpeg-create-a-video-from-one-picture-and-one-track() {
+	cat <<-EOF
+	ffmpeg -loop 1 -i image.jpg -i audio.wav \
+	       -c:v libx264 -c:a aac -b:a 192k \
+	       -tune stillimage -strict experimental out.mp4
+
+	??? -pix_fmt yuv420p -shortest
+	EOF
+}
+
+iforgot-sshfs() {
+	cat <<-EOF
+	sshfs user@host:/some/dir /local/dir
+	fusermount -u /local/dir
+	EOF
+}
+
+iforgot-bonding() {
+	cat <<-EOF
+	cat /sys/class/net/bond0/bonding/mode
+
+	cat /proc/net/bonding/bond0  - To get true MAC addresses of slave inter-
+	                               faces without destroying the bond.
 	EOF
 }
 

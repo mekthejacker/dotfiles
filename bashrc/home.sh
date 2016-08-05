@@ -22,7 +22,7 @@ alias rt="urxvtc -title rtorrent -hold \
 
 wacom-enable() { wacom-devcontrol enable; }
 wacom-disable() { wacom-devcontrol disable; }
- # Disables or enabled wacom devices
+ # Disables or enables wacom devices
 #    $1 – <enable|disable>
 wacom-devcontrol() {
 	# echo DISPLAY=$DISPLAY

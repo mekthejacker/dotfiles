@@ -1,6 +1,6 @@
 [
 	//{ "keys": ["ctrl+q"], "command": "exit" },
-
+	{ "keys": ["ctrl+x"], "command": "unbound" },
 	{ "keys": ["ctrl+shift+n"], "command": "new_window" },
 	{ "keys": ["ctrl+q"], "command": "close_window" },
 	{ "keys": ["ctrl+x","ctrl+f"], "command": "prompt_open_file" },
@@ -26,16 +26,18 @@
 	{ "keys": ["delete"], "command": "right_delete" },
 
 	{ "keys": ["enter"], "command": "insert", "args": {"characters": "\n"} },
-	{ "keys": ["ctrl+m"], "command": "run_macro_file", "args": {"file": "res://Packages/Default/Add Line.sublime-macro"} },
+	{ "keys": ["ctrl+m"], "command": "insert", "args": {"characters": "\n"} },
 	{ "keys": ["shift+enter"], "command": "insert", "args": {"characters": "\n"} },
 	{ "keys": ["keypad_enter"], "command": "insert", "args": {"characters": "\n"} },
 	{ "keys": ["shift+keypad_enter"], "command": "insert", "args": {"characters": "\n"} },
+	{ "keys": ["ctrl+enter"], "command": "run_macro_file", "args": {"file": "res://Packages/Default/Add Line.sublime-macro"} },
+
 
 	{ "keys": ["ctrl+z"], "command": "undo" },
 	{ "keys": ["ctrl+shift+z"], "command": "redo" },
-	{ "keys": ["ctrl+y"], "command": "redo_or_repeat" },
-	{ "keys": ["ctrl+u"], "command": "soft_undo" },
-	{ "keys": ["ctrl+shift+u"], "command": "soft_redo" },
+	{ "keys": ["ctrl+y"], "command": "unbound" }, //redo_or_repeat" },
+	{ "keys": ["ctrl+u"], "command": "unbound" }, //soft_undo" },
+	{ "keys": ["ctrl+shift+u"], "command": "unbound" }, //soft_redo" },
 
 	{ "keys": ["shift+delete"], "command": "cut" },
 	{ "keys": ["ctrl+insert"], "command": "copy" },
@@ -649,7 +651,7 @@
 
 	{ "keys": ["ctrl+x", "ctrl+shift+n"], "command": "new_pane" },
 	{ "keys": ["ctrl+x", "ctrl+n"], "command": "new_pane", "args": {"move": false} },
-	{ "keys": ["ctrl+x", "ctrl+w"], "command": "close_pane" },
+	{ "keys": ["ctrl+x", "ctrl+q"], "command": "close_pane" },
 	{ "keys": ["ctrl+x", "ctrl+j"], "command": "focus_neighboring_group", "args": {"forward": false} },
 	{ "keys": ["ctrl+x", "ctrl+l"], "command": "focus_neighboring_group" },
 	{ "keys": ["ctrl+x", "ctrl+shift+j"], "command": "move_to_neighboring_group", "args": {"forward": false} },

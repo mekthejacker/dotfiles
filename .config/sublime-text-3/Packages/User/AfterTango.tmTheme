@@ -262,6 +262,19 @@
         </dict>
         <dict>
             <key>name</key>
+            <string>${#var} – length</string>
+            <key>scope</key>
+            <string>keyword.operator.length.shell</string>
+            <key>settings</key>
+            <dict>
+                <key>fontStyle</key>
+                <string></string>
+                <key>foreground</key>
+                <string>#729fcf</string>
+            </dict>
+        </dict>
+        <dict>
+            <key>name</key>
             <string>Shell regex</string>
             <key>scope</key>
             <string>keyword.control.group.regexp, keyword.operator.regexp, keyword.control.anchors.regexp, keyword.control.set.regexp, keyword.operator.quantifier.regexp, meta.scope.case-pattern.shell, keyword.operator.glob.shell, keyword.other.any.regexp</string>
@@ -831,7 +844,7 @@
                 <key>fontStyle</key>
                 <string>bold</string>
                 <key>foreground</key>
-                <string>#FF0000</string>
+                <string>#d0d0d0</string>
             </dict>
         </dict>
         <dict>

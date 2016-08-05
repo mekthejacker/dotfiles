@@ -93,7 +93,7 @@ at-msg() {
 #   $1 — magnet link
 #   $2 — path to resulting .torrent file
 magnet-to-torrent() {
-	[ "$*" ] || {
+	[ -z "$*" -o $# -ne 2 ] && {
 		cat <<EOF
 Usage: magnet-to-torrent <magnet link> <new file path>
 EOF

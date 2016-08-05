@@ -1,0 +1,16 @@
+{
+	"bootstrapped": true,
+	"in_process_packages":
+	[
+	],
+	"installed_packages":
+	[
+		"ColorSchemeEditor",
+		"DiffTabs",
+		"FileDiffs",
+		"Generic Config",
+		"Package Control",
+		"PackageResourceViewer",
+		"ShellScriptImproved"
+	]
+}
