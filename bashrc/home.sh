@@ -226,7 +226,7 @@ alias vm-wq='~/bin/qemu-shell/qmp-shell ~/qmp-sock-shindaws'
 vm-ts-mother-setup() {
 	[ -r "$1" ] \
 		&& file="$1" \
-		|| file=`ls ~/work/lifestream/minimal-sysrcd/sysresccd-*.iso | tail -n1`
+		|| file=`ls ~/work/lifestream/minimal-sysrcd/sysrcd-*.iso | tail -n1`
 	[ -f "$file" ] || {
 		echo "No such file: ‘$file’." >&2
 		return 3
@@ -254,17 +254,3 @@ alias vm-pxe-client-setup="qemu-system-x86_64  -enable-kvm \
 	-name 'vm-pxe-clinet-setup,process=vm-pxe-client-setup' \
 	-netdev vde,id=pxelan,sock=/tmp/vde.ctl \
 		-device virtio-net-pci,netdev=pxelan,mac=BA:C1:47:2B:4C:14"
-
-
-vm-moms() {
-	qemu-system-x86_64 -enable-kvm \
-	                   -cpu host \
-                       -smp 1,cores=4,threads=2,maxcpus=16 \
-                       -boot order=dc \
-                       -m 4096 \
-                       -name 'vm-moms,process=vm-moms' \
-                       -drive "file=/home/soft_lin/install-amd64-minimal-20160414.iso,media=cdrom,index=0" \
-                       -drive "file=$HOME/moms.img,media=disk,format=raw,if=ide,index=1" \
-                       -netdev vde,id=pxelan,sock=/tmp/vde.ctl \
-                       -device virtio-net-pci,netdev=pxelan,mac=BA:C1:47:BA:C1:47
-}

@@ -271,3 +271,47 @@ java-site-exception() {
 	echo "Added $c hosts."
 }
 # Thanks, Krishna!
+
+
+ffmpeg-webm-from-one-picture() {
+	set -x
+	ffmpeg -y -i "$1" -i "$2" -c:v libvpx  -c:a libvorbis -b:a 192k -tune stillimage -strict experimental "$3.webm"
+	set +x
+}
+
+ # Forwards local ports via $1 to $2.
+#
+ssh-ipmi() {
+    local gw=$1 ipmi=$2 found
+    [ "$mode" = ilo ] \
+        && ports=(80 443 17988 17990) \
+        || ports=(80 443 623 5900)
+    # We’d usually want to bind $ipmi to a local address, such as 127.0.0.x,
+    # with the last octet of $ipmi left as is.
+    o=${ipmi##*.}
+    pgrep -f "ssh.*-L\s*127\.0\.0\.$o:" &>/dev/null && {
+        # Our preferred octet is occupied, looking for the first available.
+        for ((i=0; i<255; i++));do
+            for ((j=1; j<254; j++)); do
+                [ $i -eq 0 -a $j -eq 1 ] && continue  # skip for 127.0.0.1:80
+                pgrep -f "ssh.*-L\s*127\.0\.$i\.$j:" &>/dev/null || {
+                    found=t
+                    break 2
+                }
+            done
+        done
+        [ -v found ] || {
+            echo 'Error: Couldn’t find a free address in 127.0/16.' >&2
+            return 3
+        }
+        local_addr=127.0.$i.$j
+        :
+    }|| local_addr=127.0.0.$o
+    ssh -Nf -C $gw -L $local_addr:${ports[0]}:$ipmi:${ports[0]} \
+                   -L $local_addr:${ports[1]}:$ipmi:${ports[1]} \
+                   -L $local_addr:${ports[2]}:$ipmi:${ports[2]} \
+                   -L $local_addr:${ports[3]}:$ipmi:${ports[3]}
+    pgrep -af "ssh.*$gw\s+-L\s*$local_addr:.*:$ipmi:"
+}
+ssh-ipmi-clear() { pkill -9 -f "ssh.*-L.*"; }
+ssh-ilo() { mode=ilo ssh-ipmi "$@"; }

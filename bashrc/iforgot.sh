@@ -953,7 +953,13 @@ iforgot-hex-to-dec-conversion() {
 	# http://www.cyberciti.biz/faq/linux-unix-convert-hex-to-decimal-number/
 }
 
-iforgot-nested-x() { echo -e '\tXephyr :108 -resizeable &'; }
+iforgot-nested-xorg() {
+	cat <<-"EOF"
+	Xephyr :108 -dpi 300 -screen 5760x3240 &   # -resizeable
+	DISPLAY=:108 firefox &>/dev/null &
+	DISPLAY=:108 scrot
+	EOF
+}
 
 iforgot-eix() {
 	cat <<-EOF
@@ -1944,6 +1950,13 @@ iforgot-bonding() {
 	cat /proc/net/bonding/bond0  - To get true MAC addresses of slave inter-
 	                               faces without destroying the bond.
 	EOF
+}
+
+iforgot-ip() {
+	ip neigh [IPv4 address] – show ARP table or entry for a particular address
+	ip maddr – add|del|sh <Multicast address> [dev <iface>] – adds a multicast
+	           address for listening, or removes it.  Doesn’t subscribe to mul-
+	           ticast for IGMP.
 }
 
 #
