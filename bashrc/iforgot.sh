@@ -954,11 +954,19 @@ iforgot-hex-to-dec-conversion() {
 }
 
 iforgot-nested-xorg() {
-	cat <<-"EOF"
-	Xephyr :108 -dpi 300 -screen 5760x3240 &   # -resizeable
-	DISPLAY=:108 firefox &>/dev/null &
-	DISPLAY=:108 scrot
+cat <<"EOF"
+Xephyr :108 -dpi 300 -screen 5760x3240 &   # -resizeable
+DISPLAY=:108 firefox --profile ~/.mozilla/firefox/highdpi.profile &>/dev/null &
+xbrc="$HOME/.mozilla/firefox/highdpi.profile/.xbindkeys.rc"
+	cat <<-"EOF" >$xbrc
+	; bind shift + vertical scroll to horizontal scroll events
+	(xbindkey '(shift "b:4") "xte 'mouseclick 6'")
+	(xbindkey '(shift "b:5") "xte 'mouseclick 7'")
 	EOF
+DISPLAY=:108 xbindkeys -f $xbrc
+DISPLAY=:108
+DISPLAY=:108 scrot
+EOF
 }
 
 iforgot-eix() {

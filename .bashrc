@@ -56,8 +56,7 @@ gen_prompt() {
 		w='\[\e[01;37m\]' \
 		r='\[\e[01;31m\]' \
 		s='\[\e[00m\]' \
-		load_avg=`echo "scale=2;  $(cut -d' ' -f2 </proc/loadavg) \
-		                         /$(grep -c ^processor /proc/cpuinfo)" | bc` \
+		timestamp=`date +%H:%M`
 		git_status= error= chroot=
 	export PS1=''
 	[ -v ONE_COMMAND_SHELL ] && {
@@ -121,7 +120,7 @@ gen_prompt() {
 		[ "$(stat -c %d:%i )" != "$(stat -c %d:%i /proc/1/root/.)" ] \
 			&& chroot="${s}(chroot) ${b}"
 	}
-	PS1+="${b}┎ $chroot$PWD\n${b}┖ $load_avg ${g}"
+	PS1+="${b}┎ $chroot$PWD\n${b}┖ $timestamp ${g}"
 	case $USER in
 		"$ME") PS1+="$g";;
 		root) PS1+="$r";;
