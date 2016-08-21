@@ -56,7 +56,7 @@ gen_prompt() {
 		w='\[\e[01;37m\]' \
 		r='\[\e[01;31m\]' \
 		s='\[\e[00m\]' \
-		timestamp=`date +%H:%M`
+		timestamp=`date +%H:%M` \
 		git_status= error= chroot=
 	export PS1=''
 	[ -v ONE_COMMAND_SHELL ] && {
