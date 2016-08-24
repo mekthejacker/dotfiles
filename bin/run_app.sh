@@ -194,6 +194,11 @@ case $app_name in
 		run_app /usr/bin/mpdscribble \
 			~/.mpdscribble/mpdscribble.conf.gpg
 		;;
+	mpv)
+		mpc pause
+		/usr/bin/mpv "$@"
+		mpc play
+		;;
 	pidgin)
 		run_app /usr/bin/pidgin
 #		run_app /usr/bin/pidgin \
