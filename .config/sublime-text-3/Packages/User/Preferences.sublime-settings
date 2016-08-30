@@ -1,21 +1,4 @@
 {
-	"added_words":
-	[
-		"Данное",
-		"Сервис",
-		"База",
-		"Оператор",
-		"Панель",
-		"Сервиса",
-		"Сервисом",
-		"Оператора",
-		"сгенерировать",
-		"Аннотация",
-		"Этот",
-		"Базе",
-		"веб",
-		"Управлять"
-	],
 	"always_prompt_for_file_reload": false,
 	"always_show_minimap_viewport": false,
 	"animation_enabled": true,
