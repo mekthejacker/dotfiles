@@ -961,7 +961,7 @@ cat <<"EOF"
 Xephyr :108 -dpi 300 -screen 5760x3240 &   # -resizeable
 # Alternative.
 #Xephyr :108 -dpi 1800 -screen 15000x7000
-DISPLAY=:108 firefox --profile ~/.mozilla/firefox/highdpi.profile &>/dev/null &
+DISPLAY=:108 /usr/bin/firefox --profile ~/.mozilla/firefox/highdpi.profile &>/dev/null &
 xbrc="$HOME/.mozilla/firefox/highdpi.profile/.xbindkeys.rc"
 	cat <<-"EOF" >$xbrc
 	; bind shift + vertical scroll to horizontal scroll events
