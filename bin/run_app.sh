@@ -197,7 +197,7 @@ case $app_name in
 	mpv)
 		# Stop mpd playing for regular mpv instances,
 		# but do not control those mpv instances, that are encoding processes.
-		# When you make webms like me with the lua script for conversion,
+		# When you make webms with the lua script for conversion,
 		# that background mpv that does encoding would try to pause the already
 		# paused mpd, and when the conversion is done it will… right, unpause it.
 		[[ "$*" =~ ^.*\ --ovc=.*$ ]] || {
@@ -208,7 +208,9 @@ case $app_name in
 		/usr/bin/mpv "$@"
 		result=$?
 		[ -v control_mpd -a -v mpd_caught_playing ] && mpc play >/dev/null
-		exit $result
+		exit $result  # or else the first pass of mpv encoder process may end with 1
+		              # and the second pass will never start,
+		              # leaving us with a half-baked webm.
 		;;
 	pidgin)
 		run_app /usr/bin/pidgin
