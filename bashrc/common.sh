@@ -315,3 +315,11 @@ ssh-ipmi() {
 }
 ssh-ipmi-clear() { pkill -9 -f "ssh.*-L.*"; }
 ssh-ilo() { mode=ilo ssh-ipmi "$@"; }
+
+ # Creates a backup of ~/.ff
+#
+firefox-backup() {
+	echo 'Make sure you have uninstalled all old add-ons!'
+	# Clean the cache
+	rm -rf ~/.ff/cache2/*
+}

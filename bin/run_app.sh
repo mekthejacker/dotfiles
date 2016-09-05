@@ -195,9 +195,20 @@ case $app_name in
 			~/.mpdscribble/mpdscribble.conf.gpg
 		;;
 	mpv)
-		mpc pause
+		# Stop mpd playing for regular mpv instances,
+		# but do not control those mpv instances, that are encoding processes.
+		# When you make webms like me with the lua script for conversion,
+		# that background mpv that does encoding would try to pause the already
+		# paused mpd, and when the conversion is done it will… right, unpause it.
+		[[ "$*" =~ ^.*\ --ovc=.*$ ]] || {
+			control_mpd=t
+			mpc |& sed -n '2s/playing//;T;Q1' || mpd_caught_playing=t
+		}
+		[ -v control_mpd ] && mpc pause >/dev/null
 		/usr/bin/mpv "$@"
-		mpc play
+		result=$?
+		[ -v control_mpd -a -v mpd_caught_playing ] && mpc play >/dev/null
+		exit $result
 		;;
 	pidgin)
 		run_app /usr/bin/pidgin

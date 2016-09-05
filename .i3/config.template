@@ -272,6 +272,11 @@ assign [class="Soffice"] → "5:Misc"
 assign [class="^qemu*"] → "5:Misc"
 assign [class="spicec"] → "5:Misc"
 assign [class="com-sun-javaws-Main"] → "5:Misc"
+
+# iLO
+assign [class="sun-awt-X11-XFramePeer"] → "5:Misc"
+assign [class="java-lang-Thread"] → "5:Misc"
+
 assign [class="screenshot_preview"] → "5:Misc"
 assign [class="GNS3"] → "5:Misc"
 assign [class="Xephyr"] → "5:Misc"
