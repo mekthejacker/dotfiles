@@ -1913,11 +1913,15 @@ iforgot-remote-desktop-with-x11vnc() {
 	    tightvnc — probably a better implementation of a server
 
 	On the remote host:
+	1. Create hashed password
 	    x11vnc -storepasswd YourPasswordHere /tmp/vncpass
+	2. Start VNC server, it must write PORT=XXXX in the output.
 	    x11vnc -display :0 -rfbauth /tmp/vncpass
 
-	On local host:
-	    vncviewer remote-hostname:0
+	On the local host:
+	    remmina
+	or poorer choice,
+	    vncviewer remote-hostname:XXXX
 
 	Starting with ssh:
 	    ssh -t -L 5900:localhost:5900 far-host 'x11vnc -localhost -display :0'
