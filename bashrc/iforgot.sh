@@ -958,10 +958,12 @@ cat <<"EOF"
 # At 1500–1800 dpi Xephyr window refuses to take its actual size,
 # but scrot still works. Though a horisontal part that’s out of the visible
 # view, may appear white. If that happens, scroll the browser window.
-Xephyr :108 -dpi 300 -screen 5760x3240 &   # -resizeable
+Xephyr :108 -dpi 300 -screen 3413x1920 &   # -resizeable
 # Alternative.
-#Xephyr :108 -dpi 1800 -screen 15000x7000
-DISPLAY=:108 /usr/bin/firefox --profile ~/.mozilla/firefox/highdpi.profile &>/dev/null &
+#Xephyr :108 -dpi 1800 -screen 20480x11520
+DISPLAY=:108 /usr/bin/vivaldi &>/dev/null &
+# Firefox has problems
+#DISPLAY=:108 /usr/bin/firefox --profile ~/.mozilla/firefox/highdpi.profile &>/dev/null &
 xbrc="$HOME/.mozilla/firefox/highdpi.profile/.xbindkeys.rc"
 	cat <<-"EOF" >$xbrc
 	; bind shift + vertical scroll to horizontal scroll events
