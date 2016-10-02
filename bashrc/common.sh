@@ -323,3 +323,20 @@ firefox-backup() {
 	# Clean the cache
 	rm -rf ~/.ff/cache2/*
 }
+
+ # Creates a video from a picture and an audio file
+#  $1 – a picture
+#  $2 – an audio file
+#
+ffmpeg-1-picture() {
+	webm_name=`basename "$2"`
+	ffmpeg -y -i "$1" -c:v libvpx-vp9 -b 5000k -an -aq-mode 0 \
+	       -pass 1 -speed 4 -threads 1 -tile-columns 0 -frame-parallel 0 \
+	       -g 9999 -tune stillimage -strict experimental -f webm /dev/null \
+	&& ffmpeg -y -i "$1" -i "$2" -c:v libvpx-vp9 -b:v 5000k -c:a libvorbis -b:a 192k \
+	          -pass 2 -speed 0 -threads 1 -tile-columns 0 -frame-parallel 0 \
+	          -auto-alt-ref 1 -lag-in-frames 25 -tune stillimage -strict experimental "${webm_name%.*}.webm"
+}
+
+#'/home/picts/screens/umineko no naku koro ni/shot0002.png'
+# /home/music/Kashiwa\ Daisuke/Kashiwa\ Daisuke\ -\ \(2009\)\ 5\ Dec.\ \[CXCA-1246\]/02.\ Kashiwa\ Daisuke\ -\ Requiem.mp3

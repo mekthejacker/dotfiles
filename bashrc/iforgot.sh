@@ -362,17 +362,6 @@ iforgot-wifi-scan() {
 	echo -e "\tiwlist wlan0 scanning"
 }
 
-iforgot-ffmpeg-2-pass-vbr-encoding() {
-	cat <<-"EOF"
-	ffmpeg -y -i "$input_file" -an -pass 1 -threads 3 \
-	-vcodec libx264 -vpre slow_firstpass "$tmpfile"
-
-	ffmpeg -y -i "$input-file" \
-	-acodec libfaac -ar 44100 -ab 192k \
-	-pass 2 -threads 3 \
-	-vcodec libx264 -b 2000k -vpre slow "$tmpfile" "$output-file"
-	EOF
-}
 
 iforgot-ffmpeg-opts-for-encoding() {
 	cat <<-EOF
@@ -781,17 +770,6 @@ iforgot-pdf-grep() {
 	EOF
 }
 
-iforgot-ffmpeg-add-image-to-video() {
-	cat <<-"EOF"
-	# Add five seconds of video
-	ffmpeg -loop 1 -f image2 -i image.png -r 30 -t 5 image.webm
-	# Create input file for ffmpeg
-	find -iname "*.webm" -printf "file '%p'\n" | sort >inp
-	# Catenating the files
-	ffmpeg -f concat -i inp -codec copy output.webm
-	EOF
-}
-
 iforgot-voip-via-netcat() {
 	cat <<-"EOF"
 	(read; echo; rec --buffer 17 -q -w -s -r 48000 -c 1 -t raw -)|netcat -u -l -p 8888|(read; play -w -s -r 48000 --buffer 17 -t raw -)
@@ -853,10 +831,6 @@ iforgot-grub-update() {
 
 iforgot-git-update-submodule-each-and-every-one() {
 	echo 'git submodule foreach git pull origin master'
-}
-
-iforgot-convert-audio-with-ffmpeg() {
-	echo -e "\tffmpeg -i audio.ogg -acodec mp3 newfile.mp3"
 }
 
 iforgot-check-unicode-symbol() {
@@ -1916,7 +1890,13 @@ iforgot-remote-desktop-with-x11vnc() {
 	1. Create hashed password
 	    x11vnc -storepasswd YourPasswordHere /tmp/vncpass
 	2. Start VNC server, it must write PORT=XXXX in the output.
-	    x11vnc -display :0 -rfbauth /tmp/vncpass
+	    x11vnc -display :0 -auth /tmp/kde-kdm/xauth-106-_0 -noxdamage -forever -rfbauth /tmp/vncpass
+	             \           \                               \          \        \
+	              \           \                               \          \        \_ password
+	               \           \                               \          \_ don’t quit after client disconnects
+	                \           \                               \_ remove glitches
+	                 \           \_ auth file is necessary for xdm/gdm/kdm
+	                  \_ :0 is the default and may be omitted
 
 	On the local host:
 	    remmina
@@ -1947,9 +1927,15 @@ iforgot-sublime-log-commands() {
 
 iforgot-ffmpeg-create-a-video-from-one-picture-and-one-track() {
 	cat <<-EOF
-	ffmpeg -loop 1 -i image.jpg -i audio.wav \
+	ffmpeg -i image.jpg -i audio.wav \
 	       -c:v libx264 -c:a aac -b:a 192k \
 	       -tune stillimage -strict experimental out.mp4
+
+
+	       -crf 0   REQUIRES   -b:v 0
+	       -crf 0   REQUIRES   -b:v 0
+	       -crf 0   REQUIRES   -b:v 0
+
 
 	??? -pix_fmt yuv420p -shortest
 	EOF
