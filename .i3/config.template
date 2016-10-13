@@ -300,6 +300,7 @@ for_window [class="URxvt" instance="one_command_shell"] floating enable
 #for_window [class="URxvt" instance="one_command_shell"] new float 1pixel
 for_window [class="spicec"] floating disable
 for_window [class="Xdialog"] floating enable
+for_window [class="Xephyr"] floating enable
 for_window [class="at_msg"] floating enable
 for_window [instance=at_msg] sticky enable
 for_window [class="Yad"] floating enable
