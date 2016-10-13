@@ -89,7 +89,7 @@ fi
 
 pointer_control disable
 
-startup_apps=(mpd "firefox --profile $HOME/.ff" thunar pidgin skype)
+startup_apps=(mpd "firefox --profile $HOME/.ff" thunar pidgin)
 # WIDTH and HEIGHT were set in the ~/.preload.sh
 case $HOSTNAME in
 	home)
