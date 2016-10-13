@@ -100,7 +100,7 @@
 		"no_italic",
 		"subpixel_antialias"
 	],
-	"font_size": 11,
+	"font_size": 12,
 	"gpu_window_buffer": "auto",
 	"gutter": true,
 	"highlight_line": true,

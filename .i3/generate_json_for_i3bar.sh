@@ -502,7 +502,7 @@ get_schedule() {
 		[ $dayofmonth -ge 15 ] \
 			&& [ -z "`find ~/ -maxdepth 1 -name sent -mtime -$((dayofmonth-14)) 2>/dev/null`" ] \
 			&& schedule="${schedule:+${schedule}\n}"'{ "full_text": "♒",
-\t  "color": "'$blue'",
+\t  "color": "'$red'",
 \t  "separator": false },'
 		# Waking a certain someone
 		# 5 6 * * 1-6 touch /tmp/okiru

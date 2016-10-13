@@ -96,6 +96,7 @@ bindsym $mod+Return exec urxvtc
 ## One-command urxvtc instance, it is a replacement for dmenu (also see ~/.bashrc and ~/.Xresources)
 bindcode $mod+27 exec --no-startup-id /bin/bash -c 'export ONE_COMMAND_SHELL=t && urxvtc -name one_command_shell'
 
+# Hello, @wakarimasen!
 
 ## F1       Toggle MPD play/pause
 bindcode $mod+67 exec --no-startup-id mpc toggle
@@ -131,6 +132,12 @@ bindcode $mod+96 exec --no-startup-id eval mpc single
 bindcode $mod+Control+71 exec --no-startup-id xbacklight -dec 5
 ## C+F8     Brightness up
 bindcode $mod+Control+74 exec --no-startup-id xbacklight -inc 5
+
+## C-F9     Mute
+bindcode $mod+Control+75 exec --no-startup-id ~/bin/mute.sh
+## C+F10    Unmute
+bindcode $mod+Control+76 exec --no-startup-id ~/bin/mute.sh unmute
+
 ## C-F11    Eject
 bindcode $mod+Control+95 exec --no-startup-id eject
 ## C-F12    Call the caret back
@@ -306,7 +313,7 @@ for_window [instance=at_msg] sticky enable
 for_window [class="Yad"] floating enable
 for_window [class="Convert Script"] floating enable
 for_window [class="com-sun-javaws-Main"] floating disable
-
+for_window [class="(?i)skype-bin"] → sticky disable
 
 ## Window border style
 new_window none
