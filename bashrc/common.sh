@@ -137,12 +137,13 @@ compress-screenshot() {
 # Copies current MPD playlist to a specified folder.
 copy-playlist() {
 	err() { echo "$1" >&2; [ "$2" ] && return $2; }  # $1 — message; $2 — return code
-	local cur_pl='current' dest="/run/media/$ME/PHONE_CARD/Sounds/Music/" \
+	local cur_pl='current' dest="$HOME/desktop/music/" \
 		  pl_dir pl library_path got_a_sane_reply
 	pl_dir=`sed -nr 's/^\s*playlist_directory\s+"(.+)"\s*$/\1/p' ~/.mpd/mpd.conf`
 	[ "$pl_dir" ] || err 'mpd.conf doesn’t have playlist_directory?' 3
 	library_path=`sed -nr 's/^\s*music_directory\s+"(.+)"\s*$/\1/p' ~/.mpd/mpd.conf`
 	library_path="${library_path/#\~/$HOME}"
+	rm -r $dest/*
 	eval [ -d "$pl_dir" ] \
 		|| err 'Playlist directory is indeterminable.' 4
 	eval [ -d "$library_path" ] \

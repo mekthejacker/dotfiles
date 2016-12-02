@@ -786,7 +786,7 @@
             <key>name</key>
             <string>Shell - variable</string>
             <key>scope</key>
-            <string>variable.other.normal.shell, variable.other.positional.shell, variable.other.bracket.shell, variable.other.special.shell, variable.other.loop.shell, variable.other.c-style.shell</string>
+            <string>variable.other.normal.shell, variable.other.positional.shell, variable.other.bracket.shell, variable.other.special.shell, variable.other.loop.shell, variable.other.c-style.shell, meta.variable.assigned.shell</string>
             <key>settings</key>
             <dict>
                 <key>fontStyle</key>
