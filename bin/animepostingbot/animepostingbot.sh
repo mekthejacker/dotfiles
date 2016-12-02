@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 # animepostingbot.sh
 # A bot using API to post files on GNU/Social network.
