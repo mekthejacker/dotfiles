@@ -339,5 +339,12 @@ ffmpeg-1-picture() {
 	          -auto-alt-ref 1 -lag-in-frames 25 -tune stillimage -strict experimental "${webm_name%.*}.webm"
 }
 
-#'/home/picts/screens/umineko no naku koro ni/shot0002.png'
-# /home/music/Kashiwa\ Daisuke/Kashiwa\ Daisuke\ -\ \(2009\)\ 5\ Dec.\ \[CXCA-1246\]/02.\ Kashiwa\ Daisuke\ -\ Requiem.mp3
+ # $1 – filename
+#
+update_version() {
+	[ -w "$1" ] || {
+		echo "$1 is not a writeable file!" >&2
+		exit 3
+	}
+	sed -ri "s/^VERSION=('|\").*('|\")\s*/VERSION='`date +%Y%m%d-%H%M`'/" "$1"
+}
