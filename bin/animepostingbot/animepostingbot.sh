@@ -26,7 +26,7 @@
 
 set -f
 mydir=`dirname "$0"`
-rc="$mydir/animepostigbot.rc.sh"
+rc="$mydir/animepostingbot.rc.sh"
 used_files="$mydir/used"
 problem_files="$mydir/problems"
 touch "$used_files"
@@ -41,6 +41,7 @@ blacklist=(
 # Absolute paths to root dirs with pictures.
 dirs=()
 pre="$rc:"$'\n'
+VERSION='20161203-0159'
 
 . "$rc"
 for var in username password proto server media_upload_url making_post_url attachment_url older_than dirs remember_files; do
@@ -119,7 +120,7 @@ find_an_image() {
 		all) mime='.*';;
 	esac
 
-	unset image_found
+	unset image_found file split_path show_name show_name_hashtag middle_hashtags filename
 	[ -v D -a -r "$D" ] && {
 		# Simulate file, show how it’s going to be parsed
 		image_found=t
@@ -155,18 +156,18 @@ find_an_image() {
 		stripped="${file##$dir}"
 		[ "$stripped" != "$file" ] && middle_tags=$stripped && break
 	done
-	unset MAPFILE; readarray -t < <(echo "$stripped" | sed -r 's~^/~~;s~/~\n~g')
-	[ ${#MAPFILE[@]} -gt 1 ] && {
-		show_name=`make_name "${MAPFILE[0]}"`
+	readarray -t split_path < <(echo "$stripped" | sed -r 's~^/~~;s~/~\n~g')
+	[ ${#split_path[@]} -gt 1 ] && {
+		show_name=`make_name "${split_path[0]}"`
 		show_name_hashtag=`make_hashtag "$show_name"`
 		unset middle_hashtags
-		for ((i=1; i< $(( ${#MAPFILE[@]}-1 )); i++)); do
-			middle_hashtags+=(`make_hashtag "${MAPFILE[i]}"`)  # #macro, #art, #misc
+		for ((i=1; i< $(( ${#split_path[@]}-1 )); i++)); do
+			middle_hashtags+=(`make_hashtag "${split_path[i]}"`)  # #macro, #art, #misc
 		done
 	}
-	filename="${MAPFILE[-1]}"
+	filename="${split_path[-1]}"
 	[ -v D -a -r "$D" ] && {
-		declare -p stripped MAPFILE show_name show_name_hashtag middle_hashtags filename
+		declare -p stripped split_path show_name show_name_hashtag middle_hashtags filename
 		exit 0
 	}
 	# declare -p show_name show_name_hashtag middle_hashtags
