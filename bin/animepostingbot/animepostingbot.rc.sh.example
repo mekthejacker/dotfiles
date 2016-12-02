@@ -1,0 +1,36 @@
+# animepostingbot.rc.sh
+#
+# Config file for animepostingbot.sh
+# The syntax of this file is bash.
+
+
+username='username'
+password='password'
+proto='https://'
+server='gs.domain.com'
+# URL to which file upload must go
+media_upload_url='/api/statusnet/media/upload'
+# URL at which we post status message
+making_post_url='/api/statuses/update.xml'
+# Part of the URL between $server and /$media_id to mention
+#   attachments in the status message.
+attachment_url='/attachment'
+# Number of files to remember in used_files
+remember_files=1000
+# Comment pause_secs to always run once.
+# Leave uncommented to run in cycle every 1 hour 23 minutes.
+pause_secs=$((60*83))
+# Found files must be older than this number of days
+older_than=40
+message_additional_text=$'\n'$'\n''!anipics'
+# Exclude patterns for `grep -E`
+blacklist+=(
+    '*pattern1*'
+    '*pattern2*'
+    )
+# Absolute paths
+dirs=(
+    '/home/picts/manga'
+    '/home/picts/animu'
+    '/home/picts/screenshots'
+    )
