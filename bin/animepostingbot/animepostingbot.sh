@@ -1,46 +1,81 @@
 #! /bin/bash
 
+# animepostingbot.sh
+# A bot using API to post files on GNU/Social network.
+# animepostingbot.sh © 2016 deterenkelt.
+
+# This program is free software; you can redistribute it and/or modify it
+#   under the terms of the GNU General Public License as published
+#   by the Free Software Foundation; either version 3 of the License,
+#   or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+#   but without any warranty; without even the implied warranty
+#   of merchantability or fitness for a particular purpose. See the
+#   GNU General Public License for more details.
+
+
+ # tested with
+#
+# GNU bash-4.3.39
+# GNU sed-4.2.2
+# GNU grep-2.21
+# GNU find-4.5.14
+# GNU coreutils-8.24
+#     curl-7.43
+
 set -f
 mydir=`dirname "$0"`
+rc="$mydir/animepostigbot.rc.sh"
 used_files="$mydir/used"
 problem_files="$mydir/problems"
 touch "$used_files"
-# Number of files to remember in used_files
-remember_files=1000
 readarray -t used_cache < "$used_files"
-username='ywic'
-password='OrraOrraOrra~~! You shits better respect your waifus!'
-proto='https://'
-server='gs.smuglo.li'
-media_upload_url='/api/statusnet/media/upload'
-making_post_url='/api/statuses/update.xml'
-attachment_url='/attachment'
-# Comment pause to run once
-# Leave uncommented to run in cycle.
-pause_secs=$((60*83))
-[ -v pause_secs ] || do_once=t
-# Found files must be older than this number of days
-older_than=40
-older_than_secs=$((60*60*24*$older_than))
 file=''
 message=''
-message_additional_text=$'\n'$'\n''!anipics'
 # Exclude patterns for `grep -E`
 blacklist=(
-	# Template:
-	# '*pattern*'
 	'*/.Trash-*'
 	'*/lost+found*'
-	'*toradora*'
-	'*binbougami*'
-	'*durara*'
 	)
-# Absolute paths
-dirs=(
-	'/home/picts/manga'
-	'/home/picts/animu'
-	'/home/picts/screens'
-	)
+# Absolute paths to root dirs with pictures.
+dirs=()
+pre="$rc:"$'\n'
+
+. "$rc"
+for var in username password proto server media_upload_url making_post_url attachment_url older_than dirs remember_files; do
+	[ -v $var ] || {
+		echo "${pre}Variable $var should be set in animepostingbot.rc.sh!" >&2
+		exit 3
+	}
+done
+[ -v pause_secs ] && {
+	[[ "$pause_secs" =~ ^[0-9]{1,9}$ ]] || {
+		echo "${pre}Variable pause_secs is set, but it should be a number!" >&2
+		exit 3
+	}
+}
+[[ "$remember_files" =~ ^[0-9]{1,6}$ ]] || {
+	echo "${pre}Variable remember_files should be a number!" >&2
+	exit 3
+}
+[[ "$older_than" =~ ^[0-9]{1,4}$ ]] || {
+	echo "${pre}Variable older_than should be a number!" >&2
+	exit 3
+}
+for _d in ${dirs[@]}; do
+	[ -d "$_d" ] || {
+		echo "${pre}Wrong directory specified in the dir array: $_d" >&2
+		exit 3
+	}
+done
+[ ${#dirs[@]} -eq 0 ] && {
+	echo "${pre}Specify at least one directory in the dirs array"
+}
+
+[ -v pause_secs ] || do_once=t
+older_than_secs=$((60*60*24*$older_than))
+
 # 1/5 chance to attach a webm
 [ `shuf -i 0-4 -n 1` -eq 0 ] && addwebm=t
 exts="-iname *.jpg -o -iname *.jpeg -o -iname *.png -o -iname *.gif -o -iname *.tiff -o -iname *.webm"
@@ -167,7 +202,7 @@ upload_file() {
 				return 1
 			}||{
 				message="${message:+$message$'\n'$'\n'}$_message $proto$server$attachment_url/$media_id"
-				echo "Uploaded file $file\n  with media id $media_id."
+				echo -e "Uploaded file $file\n  with media id $media_id."
 			}
 		:
 	}||	echo "Error while uploading file $file" | tee -a "$problem_files" >&2
