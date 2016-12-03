@@ -41,7 +41,7 @@ blacklist=(
 # Absolute paths to root dirs with pictures.
 dirs=()
 pre="$rc:"$'\n'
-VERSION='20161203-0159'
+VERSION='20161203-1557'
 
 . "$rc"
 for var in username password proto server media_upload_url making_post_url attachment_url older_than dirs remember_files; do
