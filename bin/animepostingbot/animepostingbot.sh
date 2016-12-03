@@ -116,7 +116,7 @@ find_an_image() {
 	local mode="$@" mime=''
 	case "$mode" in
 		image|'') mode=image; mime='image';;
-		webm)  mime='video' webm_hashtag='webm';;
+		webm)  mime='video' webm_hashtag='#webm';;
 		all) mime='.*';;
 	esac
 
@@ -178,7 +178,7 @@ find_an_image() {
 	[ "$show_name_hashtag" ] && webm_hashtag=" $webm_hashtag"
 
 	read -r -d '' _message <<-EOF
-	Name: $filename${newline:-}${show_name_hashtag:-}${middle_hashtags:-}${webm_hashtag:-}
+	$filename${newline:-}${show_name_hashtag:-}${middle_hashtags:-}${webm_hashtag:-}
 	EOF
 }
 
