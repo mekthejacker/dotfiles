@@ -41,7 +41,7 @@ blacklist=(
 # Absolute paths to root dirs with pictures.
 dirs=()
 pre="$rc:"$'\n'
-VERSION='20161203-1557'
+VERSION='20161204-0329'
 
 . "$rc"
 for var in username password proto server media_upload_url making_post_url attachment_url older_than dirs remember_files; do
@@ -115,9 +115,9 @@ update_file_list() {
 find_an_image() {
 	local mode="$@" mime=''
 	case "$mode" in
-		image|'') mode=image; mime='image';;
-		webm)  mime='video' webm_hashtag='#webm';;
-		all) mime='.*';;
+		image|'') local mode=image; mime='image';;
+		webm)  local mime='video' webm_hashtag='#webm';;
+		all) local mime='.*';;
 	esac
 
 	unset image_found file split_path show_name show_name_hashtag middle_hashtags filename
