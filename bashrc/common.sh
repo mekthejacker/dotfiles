@@ -284,15 +284,27 @@ ffmpeg-webm-from-one-picture() {
 #
 ssh-ipmi() {
     local gw=$1 ipmi=$2 found
-    [ "$mode" = ilo ] \
-        && ports=(80 443 17988 17990) \
-        || ports=(80 443 623 5900)
+    case "$mode" in
+    	''|ipmi)
+			# 80, 443 – webiface
+			# 623 – java?
+			# 5900 – virtual disk I/O?
+			ports=(80 443 623 5900)
+    		;;
+		ilo)
+			# 80, 443 – webiface
+			# 763 – moonshot cartridge iLO
+			# 17988 – java?
+			# 17990 – virtual disk I/O?
+			ports=(80 443 763 17988 17990)
+			;;
+	esac
     # We’d usually want to bind $ipmi to a local address, such as 127.0.0.x,
     # with the last octet of $ipmi left as is.
     o=${ipmi##*.}
     pgrep -f "ssh.*-L\s*127\.0\.0\.$o:" &>/dev/null && {
         # Our preferred octet is occupied, looking for the first available.
-        for ((i=0; i<255; i++));do
+        for ((i=0; i<255; i++)); do
             for ((j=1; j<254; j++)); do
                 [ $i -eq 0 -a $j -eq 1 ] && continue  # skip for 127.0.0.1:80
                 pgrep -f "ssh.*-L\s*127\.0\.$i\.$j:" &>/dev/null || {
@@ -314,8 +326,9 @@ ssh-ipmi() {
                    -L $local_addr:${ports[3]}:$ipmi:${ports[3]}
     pgrep -af "ssh.*$gw\s+-L\s*$local_addr:.*:$ipmi:"
 }
-ssh-ipmi-clear() { pkill -9 -f "ssh.*-L.*"; }
+ssh-clear() { pkill -9 -f "ssh.*-L.*"; }
 ssh-ilo() { mode=ilo ssh-ipmi "$@"; }
+ssh-moonsht-ilo() { mode=moonsht-ilo ssh-ipmi "$@"; }
 
  # Creates a backup of ~/.ff
 #

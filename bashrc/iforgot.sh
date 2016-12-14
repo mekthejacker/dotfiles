@@ -682,6 +682,10 @@ iforgot-record-my-desktop() {
 	cat <<-"EOF"
 	ffmpeg -y  -f x11grab -video_size 1600x875 -framerate 25 -i :0.0+0,25 -f alsa -ac 2 -i hw:0 -async 1 -b:v 1000k -vcodec libx264 -crf 0 -preset ultrafast -acodec pcm_s16le /tmp/output.mkv
 
+	-crf 0   requires   -b:v 0   !!!
+	-crf 0   requires   -b:v 0   !!!
+	-crf 0   requires   -b:v 0   !!!
+
 	P.S. Don’t forget to switch mpv’s -vo to opengl-hq or something for ffmpeg to be able to catch its output.
 	EOF
 }

@@ -77,8 +77,6 @@ done
 [ -v pause_secs ] || do_once=t
 older_than_secs=$((60*60*24*$older_than))
 
-# 1/5 chance to attach a webm
-[ `shuf -i 0-4 -n 1` -eq 0 ] && addwebm=t
 exts="-iname *.jpg -o -iname *.jpeg -o -iname *.png -o -iname *.gif -o -iname *.tiff -o -iname *.webm"
 start_time=`date +%s`
 
@@ -224,7 +222,8 @@ while :; do
 	find_an_image
 	[ -v D_no_upload ] || upload_file
 
-	[ -v addwebm ] && {
+	# 1/5 chance to attach a webm
+	[ `shuf -i 0-4 -n 1` -eq 0 ] && {
 		echo 'Going to add a webm!'
 		find_an_image webm
 		[ -v D_no_upload ] || upload_file
