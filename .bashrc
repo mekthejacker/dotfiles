@@ -51,6 +51,8 @@ grep -qF '/usr/games/bin/' <<<"$PATH" \
 #
 gen_prompt() {
 	local \
+		last_cmd_exit_code=$? \
+		prompt_char='\\$' \
 		b='\[\e[01;34m\]' \
 		g='\[\e[01;32m\]' \
 		w='\[\e[01;37m\]' \
@@ -127,9 +129,14 @@ gen_prompt() {
 		*) PS1+="${w}$USER${g} ";;
 	esac
 	PS1+="at $HOSTNAME"
-	PS1+=" $git_status${b}\\\$${s} "
+	# Print the prompt character twice if last command exited
+	#   with something other than 0.
+	# echo '$last_cmd_exit_code = ' $last_cmd_exit_code
+	# [ $last_cmd_exit_code -eq 0 ] || prompt_char="\\\$-$last_cmd_exit_code"
+	[ $last_cmd_exit_code -eq 0 ] || prompt_char='\\$\\$'
+	PS1+=" $git_status${b}$prompt_char${s} "
 }
-export PROMPT_COMMAND="gen_prompt; $PROMPT_COMMAND"
+export PROMPT_COMMAND="gen_prompt"
 
 ## Aliases caveats and hints:
 ## 1. All innder double quotes must be escaped
@@ -303,5 +310,9 @@ one_command_execute() {
 	# bind shell-expand-line
 	bind -x '"\C-m":"one_command_execute"'
 }
+
+# . ~/.bashrc should exit with 0.
+:
+
 
 #[ "$TERM" = jfbterm ] && ~/work/lifestream/minimal-sysrcd/deploy/squashfs-root/root/installer/tc-setup.sh --prepare-pxe-client
