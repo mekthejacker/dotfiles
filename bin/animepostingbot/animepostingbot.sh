@@ -111,7 +111,7 @@ update_file_list() {
 }
 
 find_an_image() {
-	local mode="$@" mime=''
+	local mode="$@" mime='' newline=''
 	case "$mode" in
 		image|'') local mode=image; mime='image';;
 		webm)  local mime='video' webm_hashtag='#webm';;
