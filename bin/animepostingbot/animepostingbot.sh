@@ -35,7 +35,7 @@ readarray -t used_cache < "$used_files"
 file=''
 message=''
 pre="$rc:"$'\n'
-VERSION='20170111-0238'
+VERSION='20170111-0244'
 [[ "$REP" =~  ^[0-9]+$ ]] && {
 	in_reply_to_status_id="$REP"
 }
@@ -246,7 +246,7 @@ while :; do
 		[ "$message" ] && curl -u "$username:$password" \
 		                       --data "status=$message${in_reply_to_status_id:+&in_reply_to_status_id=$in_reply_to_status_id}${source:+&source=$source}" \
 		                       $proto$server$making_post_url &>"$log"
-		[ -v REP ] && {
+		[ -v in_reply_to_status_id ] && {
 			reply_to=`sed -nr 's/^\s*<id>([0-9]+)<\/id>\s*$/\1/p;T;Q1' "$log"`
 			[[ "$reply_to" =~ ^[0-9]+$ ]] || {
 				echo 'Cannot get our last post id.' >&2
