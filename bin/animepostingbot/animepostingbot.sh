@@ -35,7 +35,7 @@ readarray -t used_cache < "$used_files"
 file=''
 message=''
 pre="$rc:"$'\n'
-VERSION='20170111-0217'
+VERSION='20170111-0238'
 [[ "$REP" =~  ^[0-9]+$ ]] && {
 	in_reply_to_status_id="$REP"
 }
@@ -184,9 +184,11 @@ find_an_image() {
 	[ "$middle_hashtags" ] && middle_hashtags=" $middle_hashtags"
 	[ "$show_name_hashtag" ] && webm_hashtag=" $webm_hashtag"
 
-	read -r -d '' _message <<-EOF
-	$filename${newline:-}${show_name_hashtag:-}${middle_hashtags:-}${webm_hashtag:-}
-	EOF
+	[ -v special_message ] || {
+		read -r -d '' _message <<-EOF
+		$filename${newline:-}${show_name_hashtag:-}${middle_hashtags:-}${webm_hashtag:-}
+		EOF
+	}
 }
 
  # Keep spaces and capitalize first letters.
@@ -238,7 +240,8 @@ while :; do
 		find_an_image webm
 		[ -v D_no_upload ] || upload_file
 	}
-	message="${message:+$message_prepend_text$message$message_additional_text}"
+	[ -v special_message ] && unset message_additional_text
+	message="${message:+$special_message$message$message_additional_text}"
 	[ -v D_no_upload ] || {
 		[ "$message" ] && curl -u "$username:$password" \
 		                       --data "status=$message${in_reply_to_status_id:+&in_reply_to_status_id=$in_reply_to_status_id}${source:+&source=$source}" \
@@ -263,7 +266,5 @@ while :; do
 			echo "${used_cache[*]}" >"$used_files"
 		}
 	}
-	set -x
 	[ -v do_once ] && break || sleep $pause_secs
-	set +x
 done
