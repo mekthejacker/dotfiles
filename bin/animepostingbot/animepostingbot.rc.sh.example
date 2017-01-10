@@ -22,6 +22,17 @@ remember_files=1000
 pause_secs=$((60*83))
 # Found files must be older than this number of days
 older_than=40
+
+ # Say you’d want to post a hundred or two of smug faces at somebody…
+#  then you’d probably want to
+#  1. Uncomment the line below and edit it.
+#     message_prepend_text='@faggot '$'\n'
+#  2. Also pass REP variable to the script with the post id, like
+#     REP=12345 ./animepostingbot.sh
+#     All the following messages should follow in a chain of replies
+#     to the last posts.
+#  3. Leave only the directory with smug faces in the dir array below.
+
 message_additional_text=$'\n'$'\n''!anipics'
 # Exclude patterns for `grep -E`
 # '*/.Trash-*' and '*/lost+found*' are added automatically.

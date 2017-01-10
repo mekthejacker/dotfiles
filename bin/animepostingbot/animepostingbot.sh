@@ -27,6 +27,7 @@
 set -f
 mydir=`dirname "$0"`
 rc="$mydir/animepostingbot.rc.sh"
+log="$mydir/log"
 used_files="$mydir/used"
 problem_files="$mydir/problems"
 touch "$used_files"
@@ -34,7 +35,11 @@ readarray -t used_cache < "$used_files"
 file=''
 message=''
 pre="$rc:"$'\n'
-VERSION='20170110-2114'
+VERSION='20170111-0217'
+[[ "$REP" =~  ^[0-9]+$ ]] && {
+	in_reply_to_status_id="$REP"
+}
+source='Anibot'
 
 read_rc_file() {
 	local var trash_found lostnfound_found
@@ -233,9 +238,19 @@ while :; do
 		find_an_image webm
 		[ -v D_no_upload ] || upload_file
 	}
-	message="${message:+$message$message_additional_text}"
+	message="${message:+$message_prepend_text$message$message_additional_text}"
 	[ -v D_no_upload ] || {
-		[ "$message" ] && curl -u "$username:$password" --form "status=$message" $proto$server$making_post_url &>/dev/null
+		[ "$message" ] && curl -u "$username:$password" \
+		                       --data "status=$message${in_reply_to_status_id:+&in_reply_to_status_id=$in_reply_to_status_id}${source:+&source=$source}" \
+		                       $proto$server$making_post_url &>"$log"
+		[ -v REP ] && {
+			reply_to=`sed -nr 's/^\s*<id>([0-9]+)<\/id>\s*$/\1/p;T;Q1'`
+			[[ "$new_rep" =~ ^[0-9]+$ ]] || {
+				echo 'Cannot get our last post id.' >&2
+				exit 5
+			}
+			in_reply_to_status_id=$reple_to
+		}
 		# Write new used_files from cache
 		[ -v D ] && echo -e "\n\n\nMessage:\n\n$message" || {
 			overhead=$((${#used_cache[@]} - remember_files))
