@@ -33,46 +33,50 @@ touch "$used_files"
 readarray -t used_cache < "$used_files"
 file=''
 message=''
-# Exclude patterns for `grep -E`
-blacklist=(
-	'*/.Trash-*'
-	'*/lost+found*'
-	)
-# Absolute paths to root dirs with pictures.
-dirs=()
 pre="$rc:"$'\n'
-VERSION='20161204-0329'
+VERSION='20170110-2114'
 
-. "$rc"
-for var in username password proto server media_upload_url making_post_url attachment_url older_than dirs remember_files; do
-	[ -v $var ] || {
-		echo "${pre}Variable $var should be set in animepostingbot.rc.sh!" >&2
+read_rc_file() {
+	local var trash_found lostnfound_found
+	. "$rc"
+	for var in username password proto server media_upload_url making_post_url attachment_url older_than dirs remember_files; do
+		[ -v $var ] || {
+			echo "${pre}Variable $var should be set in animepostingbot.rc.sh!" >&2
+			exit 3
+		}
+	done
+	[ -v pause_secs ] && {
+		[[ "$pause_secs" =~ ^[0-9]{1,9}$ ]] || {
+			echo "${pre}Variable pause_secs is set, but it should be a number!" >&2
+			exit 3
+		}
+	}
+	[[ "$remember_files" =~ ^[0-9]{1,6}$ ]] || {
+		echo "${pre}Variable remember_files should be a number!" >&2
 		exit 3
 	}
-done
-[ -v pause_secs ] && {
-	[[ "$pause_secs" =~ ^[0-9]{1,9}$ ]] || {
-		echo "${pre}Variable pause_secs is set, but it should be a number!" >&2
+	[[ "$older_than" =~ ^[0-9]{1,4}$ ]] || {
+		echo "${pre}Variable older_than should be a number!" >&2
 		exit 3
 	}
-}
-[[ "$remember_files" =~ ^[0-9]{1,6}$ ]] || {
-	echo "${pre}Variable remember_files should be a number!" >&2
-	exit 3
-}
-[[ "$older_than" =~ ^[0-9]{1,4}$ ]] || {
-	echo "${pre}Variable older_than should be a number!" >&2
-	exit 3
-}
-for _d in ${dirs[@]}; do
-	[ -d "$_d" ] || {
-		echo "${pre}Wrong directory specified in the dir array: $_d" >&2
-		exit 3
+	for _d in ${dirs[@]}; do
+		[ -d "$_d" ] || {
+			echo "${pre}Wrong directory specified in the dir array: $_d" >&2
+			exit 3
+		}
+	done
+	[ ${#dirs[@]} -eq 0 ] && {
+		echo "${pre}Specify at least one directory in the dirs array"
 	}
-done
-[ ${#dirs[@]} -eq 0 ] && {
-	echo "${pre}Specify at least one directory in the dirs array"
+	for i in ${blacklist[@]}; do
+		[ "$i" = '*/.Trash-*' ] && trash_found=t
+		[ "$i" = '*/lost+found*' ] && lostnfound_found=t
+	done
+	[ -v trash_found ] || blacklist+=('*/.Trash-*')
+	[ -v lostnfound_found ] || blacklist+=('*/lost+found*')
 }
+
+read_rc_file
 
 [ -v pause_secs ] || do_once=t
 older_than_secs=$((60*60*24*$older_than))
@@ -215,6 +219,7 @@ while :; do
 	# Update file list once per day
 	new_time=`date +%s`
 	[ "$((new_time-start_time))" -gt $((60*60*24)) ] && {
+		read_rc_file
 		update_file_list
 		start_time=$new_time
 	}

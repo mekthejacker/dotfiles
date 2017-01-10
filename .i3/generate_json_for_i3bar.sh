@@ -41,7 +41,7 @@ ping_successful='Unknown'  #  /
 
 # module settings
 ACTIVE_WINDOW_NAME_MAX_LENGTH=50
-FREE_SPACE_MPOINTS='/home / /usr'
+FREE_SPACE_MPOINTS='/home /mnt/video / /usr'
 FREE_SPACE_YELLOW_POINT=5
 FREE_SPACE_RED_POINT=1
 
@@ -380,7 +380,11 @@ get_battery_status() {
 	}
 }
 
+ccount=1
 get_internet_status() {
+	# echo Count=$ccount
+	let ccount++
+	# set -x
 	local wait_time=5 # ping_successful # ← local?
 	[ $TIMEOUT_STEP -eq 0 -o $((TIMEOUT_STEP % wait_time)) -eq 0 ] && {
 		unset HAS_INTERNETS
@@ -391,35 +395,50 @@ get_internet_status() {
 				HAS_INTERNETS=t
 				# This block is _intended_ to be empty
 				internet_status=''
-			elif [ "$PING_HOST" != "$GOOGLE_DNS" -a ! -v ping_successful ]; then
-				# We pinged our gateway and it wasn’t successful.
-				#   Maybe the problem is on our side? I.e. bad cable.
-				internet_status='{ "full_text": "∿",
-\t  "color": "'$yellow'",
-\t  "separator":false },'
-			else
-				# We pinged google and it wasn’t successful, or we’re in transi-
-				#   tion from gateway check (that was successful) to google DNS
-				#   check.
-				internet_status='{ "full_text": "∿",
+			elif [ "$PING_HOST" = "$GOOGLE_DNS" -a ! -v ping_successful ]; then
+				internet_status='{ "full_text": "∿ NO INET",
 \t  "color": "'$red'",
 \t  "separator":false },'
+			elif [ "$PING_HOST" != "$GOOGLE_DNS" -a -v ping_successful ]; then
+				internet_status='{ "full_text": "∿ GW OK",
+\t  "separator":false },'
+set -x
+			elif [ "$PING_HOST" != "$GOOGLE_DNS" -a ! -v ping_successful ]; then
+				# We pinged our gateway and it was unsuccessful.
+				#   Maybe the problem is on our side? I.e. bad cable.
+				internet_status='{ "full_text": "∿ CAN’T PING GW",
+\t  "color": "'$yellow'",
+\t  "separator":false },'
 			fi
+set +x
 			exec {PINGOUT}<&-
 		}
 		[ -v COPROC ] || {
+			declare -p PINGOUT &>/dev/null && exec {PINGOUT}<&-
+			# This is also initial setup – Google DNS and no successful ping yet (obviously)
 			if [ "$PING_HOST" = "$GOOGLE_DNS" -a ! -v ping_successful ]; then
-				PING_HOST=$(route -n | sed -rn 's/^0\.0\.0\.0\s+(\S+)\s.*/\1/p;T;Q')  # default gateway IP
+				# First ping our default gateway.
+				PING_HOST=`ip ro sh to exact 0/0 | sed -rn '1 s/.*via (\S+) .*/\1/p;T;Q1'` && {
+					internet_status='{ "full_text": "∿ NO DEFAULT GW",
+\t  "color": "'$yellow'",
+\t  "separator":false },'
+					local dont_ping=t
+				}
 			elif [ "$PING_HOST" != "$GOOGLE_DNS" -a -v ping_successful ]; then
+				internet_status='{ "full_text": "∿ GW OK",
+\t  "separator":false },'
 				PING_HOST=$GOOGLE_DNS
 			fi
-			coproc ping -W 15 -q -n -c1 $PING_HOST
-			# <& duplicates input file descriptors,
-			# >& duplicates output file descriptors, They both work here.
-			# {braces} are important.
-			exec {PINGOUT}<&${COPROC[0]}
+			[ -v dont_ping ] || {
+				coproc ping -W 15 -q -n -c1 $PING_HOST
+				# <& duplicates input file descriptors,
+				# >& duplicates output file descriptors, They both work here.
+				# {braces} are important.
+				exec {PINGOUT}<&${COPROC[0]}
+			}
 		}
 	}
+	# set +x
 }
 
 # RELIES UPON:
@@ -501,7 +520,7 @@ get_schedule() {
 		# Sending water counters data
 		[ $dayofmonth -ge 15 ] \
 			&& [ -z "`find ~/ -maxdepth 1 -name sent -mtime -$((dayofmonth-14)) 2>/dev/null`" ] \
-			&& schedule="${schedule:+${schedule}\n}"'{ "full_text": "♒",
+			&& schedule="${schedule:+${schedule}\n\t}"'{ "full_text": "♒",
 \t  "color": "'$red'",
 \t  "separator": false },'
 		# Waking a certain someone
@@ -509,7 +528,7 @@ get_schedule() {
 		case $dayofweek in
 			Понедельник|Вторник|Среда|Четверг|Пятница) # Mon–Fri
 				[ $hour -eq 6 -a $minutes -ge 5 ] && [ -e /tmp/okiru ] \
-					&& schedule="${schedule:+${schedule}\n}"'{ "full_text": "起きる",
+					&& schedule="${schedule:+${schedule}\n\t}"'{ "full_text": "起きる",
 \t  "color": "'$green'",
 \t  "separator": false },'
 				;;

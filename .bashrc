@@ -32,7 +32,7 @@ ulimit -Sn 4096
 set -b # report exit status of background jobs immediately
 
 export EIX_LIMIT=0
-export EDITOR="emacsclient -c -nw"
+export EDITOR="nano"
 export LESS='-R -M --shift 5 -x4'
 export MPD_HOST=$HOME/.mpd/socket
 #grep -qF '/assembling/' <<<"$PATH" \
@@ -96,7 +96,7 @@ gen_prompt() {
 		# [ $unpushed -eq 0 ] && unset unpushed
 		# ±̑
 		#           ## master...origin/master [ahead 1, behind 1]  ↓
-		[[ "$status" =~ ^($'\t')##[^$'\n']+\[(ahead\ ([0-9]+))?(,\ )?(behind ([0-9]+))?\] ]] && {
+		[[ "$status" =~ ^$'\t'?##[^$'\n']+\[(ahead\ ([0-9]+))?(,\ )?(behind ([0-9]+))?\] ]] && {
 			[ "${BASH_REMATCH[2]}" ] && ahead=${BASH_REMATCH[2]}
 			[ "${BASH_REMATCH[5]}" ] && behind=${BASH_REMATCH[5]}
 		}
@@ -119,7 +119,7 @@ gen_prompt() {
 	PS1+="${error:+${r}$error${s}\n}"
 	[ $UID -eq 0 ] && {
 		# If we are root, check if we’re in a chrooted environment
-		[ "$(stat -c %d:%i )" != "$(stat -c %d:%i /proc/1/root/.)" ] \
+		[ "$(stat -c %d:%i '/')" != "$(stat -c %d:%i '/proc/1/root/.')" ] \
 			&& chroot="${s}(chroot) ${b}"
 	}
 	PS1+="${b}┎ $chroot$PWD\n${b}┖ $timestamp ${g}"

@@ -967,9 +967,9 @@ iforgot-eix() {
 	Find pacakges by description in a particular category
 	$ eix -S "viewer" -C app-text
 
-	-c
-	-Ac
-	-ec
+
+	-c   compact view
+
 
 	EOF
 }

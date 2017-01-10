@@ -24,7 +24,8 @@ pause_secs=$((60*83))
 older_than=40
 message_additional_text=$'\n'$'\n''!anipics'
 # Exclude patterns for `grep -E`
-blacklist+=(
+# '*/.Trash-*' and '*/lost+found*' are added automatically.
+blacklist=(
     '*pattern1*'
     '*pattern2*'
     )

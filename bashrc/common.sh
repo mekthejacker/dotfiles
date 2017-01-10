@@ -354,10 +354,47 @@ ffmpeg-1-picture() {
 
  # $1 – filename
 #
-update_version() {
+update-version() {
+	set -x
 	[ -w "$1" ] || {
 		echo "$1 is not a writeable file!" >&2
 		exit 3
 	}
-	sed -ri "s/^VERSION=('|\").*('|\")\s*/VERSION='`date +%Y%m%d-%H%M`'/" "$1"
+	sed -ri "s/^VERSION=(\'|\").*(\'|\")\s*/VERSION='`date +%Y%m%d-%H%M`'/" "$1"
+	set +x
+}
+
+rec-my-desktop-nobar() { rec-my-desktop nobar; }
+rec-my-desktop-nobar-audio() { rec-my-desktop nobar audio; }
+rec-my-desktop-audio() { rec-my-desktop audio; }
+rec-my-desktop-audio-nobar() { rec-my-desktop audio nobar; }
+ # Records desktop with ffmpeg
+#  TAKES:
+#    rec-my-desktop [nobar] [audio] [crf0|crf18|bv1m|bv2m|bv3m|bv4m]
+rec-my-desktop() {
+	set -x
+	local adj w h audio bitrate \
+	      crf0=' -b:v 0 -crf 0 ' \
+	      crf18=' -b:v 0 -crf 18' \
+	      bv1m=' -b:v 1000k ' \
+	      bv2m=' -b:v 2000k' \
+	      bv3m=' -b:v 3000k' \
+	      bv4m=' -b:v 4000k'
+	# If we don’t want i3bar to get in the video
+	[ "$1" = nobar ] && { adj='+0,25'; shift; }
+	[ "$1" = audio ] && { audio='-f alsa -ac 2 -i hw:0 -async 1 -acodec pcm_s16le'; shift; }
+	# If we use adjustment, height must be decreased accordingly
+	[ -v adj ] && h=$((HEIGHT - 25)) || h=$HEIGHT  # I set WIDTH and HEIGHT in ~/.preload.sh
+	w=$WIDTH  # width is WIDTH anyway
+	if   [ "$1" = crf0 ]; then bitrate=$crf0
+	elif [ "$1" = crf18 ]; then bitrate=$crf18
+	elif [ "$1" = bv1m ]; then bitrate=$bv1m
+	elif [ "$1" = bv2m ]; then bitrate=$bv2m
+	elif [ "$1" = bv3m ]; then bitrate=$bv3m
+	elif [ "$1" = bv4m ]; then bitrate=$bv4m
+	else
+		[ $h -ge 720 ] && bitrate=$bv2m || bitrate=$bv1m
+	fi
+	ffmpeg -y -f x11grab -s ${w}x$h -framerate 30 -i $DISPLAY$adj -vcodec libx264 $bitrate -preset ultrafast /tmp/output.mkv
+	set +x
 }

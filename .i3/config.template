@@ -169,10 +169,10 @@ bindcode --release $mod+39 exec --no-startup-id ". ~/bin/screenshot.sh"
 bindcode --release $mod+Shift+39 exec --no-startup-id ". ~/bin/screenshot.sh -jpeg"
 
 ## a (window)
-bindcode --release $mod+38 exec --no-startup-id ". ~/bin/screenshot.sh -window"
-bindcode --release $mod+Control+38 exec --no-startup-id ". ~/bin/screenshot.sh -window -delay"
-#bindcode --release $mod+Shift+38 exec --no-startup-id ". ~/bin/screenshot.sh -window -indexed"
-#bindcode --release $mod+Mod1+38 exec --no-startup-id ". ~/bin/screenshot.sh -window -jpeg"
+bindcode   --release  $mod+38          exec  --no-startup-id  ". ~/bin/screenshot.sh -window"
+bindcode   --release  $mod+Control+38  exec  --no-startup-id  ". ~/bin/screenshot.sh -window -delay"
+#bindcode  --release  $mod+Shift+38    exec  --no-startup-id  ". ~/bin/screenshot.sh -window -indexed"
+#bindcode  --release  $mod+Mod1+38     exec  --no-startup-id  ". ~/bin/screenshot.sh -window -jpeg"
 
 ## z (area)
 bindcode --release $mod+52 exec --no-startup-id ". ~/bin/screenshot.sh -area"
