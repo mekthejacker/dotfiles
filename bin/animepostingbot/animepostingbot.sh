@@ -244,12 +244,12 @@ while :; do
 		                       --data "status=$message${in_reply_to_status_id:+&in_reply_to_status_id=$in_reply_to_status_id}${source:+&source=$source}" \
 		                       $proto$server$making_post_url &>"$log"
 		[ -v REP ] && {
-			reply_to=`sed -nr 's/^\s*<id>([0-9]+)<\/id>\s*$/\1/p;T;Q1'`
-			[[ "$new_rep" =~ ^[0-9]+$ ]] || {
+			reply_to=`sed -nr 's/^\s*<id>([0-9]+)<\/id>\s*$/\1/p;T;Q1' "$log"`
+			[[ "$reply_to" =~ ^[0-9]+$ ]] || {
 				echo 'Cannot get our last post id.' >&2
 				exit 5
 			}
-			in_reply_to_status_id=$reple_to
+			in_reply_to_status_id=$reply_to
 		}
 		# Write new used_files from cache
 		[ -v D ] && echo -e "\n\n\nMessage:\n\n$message" || {
@@ -263,5 +263,7 @@ while :; do
 			echo "${used_cache[*]}" >"$used_files"
 		}
 	}
+	set -x
 	[ -v do_once ] && break || sleep $pause_secs
+	set +x
 done
