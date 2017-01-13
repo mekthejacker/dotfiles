@@ -211,7 +211,7 @@ exec {txpipe_fd}<>$txpipe
 ermes() {
 #	which ${ERR_CMD%% *} &>/dev/null \
 	#		&& eval exec `echo "$ERR_CMD" | sed -r "s~([^\])%m~\1${0//\//\\/}: ${1//\//\\/}~"` \
-	[ -v BE_QUIET ] || notify-send -a wallpaper "${0##*/}" "$1"
+	[ -v BE_QUIET ] || notify-send --hint int:transient:1 -t 3500 -a wallpaper "${0##*/}" "$1"
 	echo -e "Error: $1." >&2
 }
 
@@ -727,7 +727,7 @@ while read -u $rxpipe_fd; do
 		keep_current_wallpaper)
 			echo "ACK $REPLY" > $txpipe
 			KEEP_CURRENT_WALLPAPER=t
-			[ -v BE_QUIET ] || notify-send -t2 "" "Keeping current wallpaper."
+			[ -v BE_QUIET ] || notify-send --hint int:transient:1 -t 3500 "${0##*/}" "Keeping current wallpaper."
 			echo "DONE $REPLY" > $txpipe
 			;;
 		next_command_be_quiet)

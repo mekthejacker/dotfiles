@@ -44,7 +44,7 @@
 #	    that is already set up and running.
 
 set -x
-exec &>/tmp/envlogsscr
+# exec &>/tmp/envlogsscr
 
 # for scrot exec command
 export FORMAT INDEXED DISPLAY OPEN_IN_GIMP

@@ -137,12 +137,13 @@ compress-screenshot() {
 # Copies current MPD playlist to a specified folder.
 copy-playlist() {
 	err() { echo "$1" >&2; [ "$2" ] && return $2; }  # $1 — message; $2 — return code
-	local cur_pl='current' dest="/run/media/$ME/PHONE_CARD/Sounds/Music/" \
+	local cur_pl='current' dest="$HOME/desktop/music/" \
 		  pl_dir pl library_path got_a_sane_reply
 	pl_dir=`sed -nr 's/^\s*playlist_directory\s+"(.+)"\s*$/\1/p' ~/.mpd/mpd.conf`
 	[ "$pl_dir" ] || err 'mpd.conf doesn’t have playlist_directory?' 3
 	library_path=`sed -nr 's/^\s*music_directory\s+"(.+)"\s*$/\1/p' ~/.mpd/mpd.conf`
 	library_path="${library_path/#\~/$HOME}"
+	rm -r $dest/*
 	eval [ -d "$pl_dir" ] \
 		|| err 'Playlist directory is indeterminable.' 4
 	eval [ -d "$library_path" ] \
@@ -283,15 +284,27 @@ ffmpeg-webm-from-one-picture() {
 #
 ssh-ipmi() {
     local gw=$1 ipmi=$2 found
-    [ "$mode" = ilo ] \
-        && ports=(80 443 17988 17990) \
-        || ports=(80 443 623 5900)
+    case "$mode" in
+    	''|ipmi)
+			# 80, 443 – webiface
+			# 623 – java?
+			# 5900 – virtual disk I/O?
+			ports=(80 443 623 5900)
+    		;;
+		ilo)
+			# 80, 443 – webiface
+			# 763 – moonshot cartridge iLO
+			# 17988 – java?
+			# 17990 – virtual disk I/O?
+			ports=(80 443 763 17988 17990)
+			;;
+	esac
     # We’d usually want to bind $ipmi to a local address, such as 127.0.0.x,
     # with the last octet of $ipmi left as is.
     o=${ipmi##*.}
     pgrep -f "ssh.*-L\s*127\.0\.0\.$o:" &>/dev/null && {
         # Our preferred octet is occupied, looking for the first available.
-        for ((i=0; i<255; i++));do
+        for ((i=0; i<255; i++)); do
             for ((j=1; j<254; j++)); do
                 [ $i -eq 0 -a $j -eq 1 ] && continue  # skip for 127.0.0.1:80
                 pgrep -f "ssh.*-L\s*127\.0\.$i\.$j:" &>/dev/null || {
@@ -313,8 +326,9 @@ ssh-ipmi() {
                    -L $local_addr:${ports[3]}:$ipmi:${ports[3]}
     pgrep -af "ssh.*$gw\s+-L\s*$local_addr:.*:$ipmi:"
 }
-ssh-ipmi-clear() { pkill -9 -f "ssh.*-L.*"; }
+ssh-clear() { pkill -9 -f "ssh.*-L.*"; }
 ssh-ilo() { mode=ilo ssh-ipmi "$@"; }
+ssh-moonsht-ilo() { mode=moonsht-ilo ssh-ipmi "$@"; }
 
  # Creates a backup of ~/.ff
 #
@@ -338,5 +352,49 @@ ffmpeg-1-picture() {
 	          -auto-alt-ref 1 -lag-in-frames 25 -tune stillimage -strict experimental "${webm_name%.*}.webm"
 }
 
-#'/home/picts/screens/umineko no naku koro ni/shot0002.png'
-# /home/music/Kashiwa\ Daisuke/Kashiwa\ Daisuke\ -\ \(2009\)\ 5\ Dec.\ \[CXCA-1246\]/02.\ Kashiwa\ Daisuke\ -\ Requiem.mp3
+ # $1 – filename
+#
+update-version() {
+	set -x
+	[ -w "$1" ] || {
+		echo "$1 is not a writeable file!" >&2
+		exit 3
+	}
+	sed -ri "s/^VERSION=(\'|\").*(\'|\")\s*/VERSION='`date +%Y%m%d-%H%M`'/" "$1"
+	set +x
+}
+
+rec-my-desktop-nobar() { rec-my-desktop nobar; }
+rec-my-desktop-nobar-audio() { rec-my-desktop nobar audio; }
+rec-my-desktop-audio() { rec-my-desktop audio; }
+rec-my-desktop-audio-nobar() { rec-my-desktop audio nobar; }
+ # Records desktop with ffmpeg
+#  TAKES:
+#    rec-my-desktop [nobar] [audio] [crf0|crf18|bv1m|bv2m|bv3m|bv4m]
+rec-my-desktop() {
+	set -x
+	local adj w h audio bitrate \
+	      crf0=' -b:v 0 -crf 0 ' \
+	      crf18=' -b:v 0 -crf 18' \
+	      bv1m=' -b:v 1000k ' \
+	      bv2m=' -b:v 2000k' \
+	      bv3m=' -b:v 3000k' \
+	      bv4m=' -b:v 4000k'
+	# If we don’t want i3bar to get in the video
+	[ "$1" = nobar ] && { adj='+0,25'; shift; }
+	[ "$1" = audio ] && { audio='-f alsa -ac 2 -i hw:0 -async 1 -acodec pcm_s16le'; shift; }
+	# If we use adjustment, height must be decreased accordingly
+	[ -v adj ] && h=$((HEIGHT - 25)) || h=$HEIGHT  # I set WIDTH and HEIGHT in ~/.preload.sh
+	w=$WIDTH  # width is WIDTH anyway
+	if   [ "$1" = crf0 ]; then bitrate=$crf0
+	elif [ "$1" = crf18 ]; then bitrate=$crf18
+	elif [ "$1" = bv1m ]; then bitrate=$bv1m
+	elif [ "$1" = bv2m ]; then bitrate=$bv2m
+	elif [ "$1" = bv3m ]; then bitrate=$bv3m
+	elif [ "$1" = bv4m ]; then bitrate=$bv4m
+	else
+		[ $h -ge 720 ] && bitrate=$bv2m || bitrate=$bv1m
+	fi
+	ffmpeg -y -f x11grab -s ${w}x$h -framerate 30 -i $DISPLAY$adj -vcodec libx264 $bitrate -preset ultrafast /tmp/output.mkv
+	set +x
+}

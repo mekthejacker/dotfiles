@@ -682,6 +682,10 @@ iforgot-record-my-desktop() {
 	cat <<-"EOF"
 	ffmpeg -y  -f x11grab -video_size 1600x875 -framerate 25 -i :0.0+0,25 -f alsa -ac 2 -i hw:0 -async 1 -b:v 1000k -vcodec libx264 -crf 0 -preset ultrafast -acodec pcm_s16le /tmp/output.mkv
 
+	-crf 0   requires   -b:v 0   !!!
+	-crf 0   requires   -b:v 0   !!!
+	-crf 0   requires   -b:v 0   !!!
+
 	P.S. Don’t forget to switch mpv’s -vo to opengl-hq or something for ffmpeg to be able to catch its output.
 	EOF
 }
@@ -963,9 +967,9 @@ iforgot-eix() {
 	Find pacakges by description in a particular category
 	$ eix -S "viewer" -C app-text
 
-	-c
-	-Ac
-	-ec
+
+	-c   compact view
+
 
 	EOF
 }
@@ -1135,10 +1139,16 @@ iforgot-tcpdump-usage() {
 	All bytes of data within the packet:
 	tcpdump -s 0
 
+
+	 # DEEP SCAN
+	#
 	Filter to match DHCP packets including a specific client MAC address:
 	tcpdump -i br0 -vvv -s 1500 '((port 67 or port 68) and (udp[38:4] = 0x3e0ccf08))'
 	Filter to capture packets sent by the client (DISCOVER, REQUEST, INFORM):
 	tcpdump -i br0 -vvv -s 1500 '((port 67 or port 68) and (udp[8:1] = 0x1))'
+
+	Show Ethernet header:
+	tcpdump -e
 	EOF
 }
 
@@ -1891,7 +1901,7 @@ iforgot-remote-desktop-with-x11vnc() {
 	    x11vnc -storepasswd YourPasswordHere /tmp/vncpass
 	2. Start VNC server, it must write PORT=XXXX in the output.
 	    x11vnc -display :0 -auth /tmp/kde-kdm/xauth-106-_0 -noxdamage -forever -rfbauth /tmp/vncpass
-	             \           \                               \          \        \
+	             \           \                               \          \        \ 
 	              \           \                               \          \        \_ password
 	               \           \                               \          \_ don’t quit after client disconnects
 	                \           \                               \_ remove glitches
@@ -1958,12 +1968,115 @@ iforgot-bonding() {
 }
 
 iforgot-ip() {
+	cat <<-EOF
 	ip neigh [IPv4 address] – show ARP table or entry for a particular address
 	ip maddr – add|del|sh <Multicast address> [dev <iface>] – adds a multicast
 	           address for listening, or removes it.  Doesn’t subscribe to mul-
 	           ticast for IGMP.
+	EOF
 }
 
+iforgot-lowriter-toc-wont-stick-to-top() {
+	cat <<-EOF
+	When the table of contents doesn’t stick to the top, because
+	the cursor stays at the top, like it requires a paragraph there,
+	and it cannot be deleted neither with Delete nor with Backspace,
+	Switch the ToC from read-only to editable, then remove the empty line
+	and ToC should stick to the top now. If it doesn’t, look at the
+	ToC title style, edit ToC → styles.
+	EOF
+}
+
+iforgot-lowriter-pic-caption() {
+	cat <<-EOF
+	Tools → LOWriter → AutoCaption
+	Check ‘LibreOffice Writer Image’.
+	Enter ‘Pic.’ to the Category field.
+	Caption order = Category first.
+	Check new style ‘Pic.’ under Captions (use hierarhy view, it’s good!).
+	EOF
+}
+
+iforgot-lowriter-settings() {
+	cat <<-EOF
+	Tools → Options
+
+	View:
+	Enable Use GL rendireing always.
+	Enable Force GL use.
+
+	Lowriter → View:
+	Enable Smooth scrolling, without smooth scrolling lowriter is hell.
+	EOF
+}
+
+iforgot-lowriter-hints() {
+	cat <<-EOF
+	Outline _numbering_ elements can’t have two different styles
+	  at the same outline level. Actually, ToC itself supports
+	  building levels from outline, indexes and custom-selected styles,
+	  but the numbering in this case is risky. Especially in documents
+	  with a heavy structure, 4–5 subsection levels and bulleted lists.
+	  Because when different styles meet at some 4th level, automatic
+	  numbering doesn’t work, and numbering resets. Continuing previous
+	  list will continue the bulleted list, if it happens to be right before
+	  the header with non-regular style.
+	Attempt to apply different styles to same outline levels is destined
+	  to fail. I have tried to print unready sections and subsections
+	  as grey in ToC, and for that I had to reject the common Outline,
+	  and make my own numbering style and calling it ‘My ToC’. Then I
+	  assigned existing header styles this new numbering style and made
+	  new counterparts for the header styles, ‘inactive’ versions of the
+	  existing headers. They were differing only by name, and inactive
+	  versions of the styles were only to assign them outline levels
+	  from 6 to 10, in order to make them look in ToC identically
+	  to the first five levels, except for the font colour being grey,
+	  to show their unreadiness. But there were three problems:
+	  1. The one this text started with. Numbering was hard to maintain,
+	     sometimes I had to remove bulleted lists to restore the numbering,
+	     then put them again. I already knew maintaining this would be hell.
+	  2. Since the numbering was united, it was impossible to make a style
+	     with outline level 6 to look like ‘1’ and not ‘1.1.1.1.1.1’.
+	     Thus, the idea was already proven unsustainable.
+	  3. ToC didn’t want to apply custom greyed ToC style (ToC had three
+	     styles, for the title, default ToC line for outline levels 1–5
+	     and greyed line for outline levels from 6 to 10). Evaluating was
+	     enabled up to level 10. Though when I only started with a single
+	     style to test, it worked.
+	EOF
+}
+
+
+iforgot-dhcp-procedure() {
+	cat <<-"EOF"
+
+	Client uses UDP 68  —  Server uses UDP 67
+	# Listen all DHCP traffic on a given port
+	tcpdump -i br_lan -nev udp src port 67 or udp src port 68
+
+	# Find rouge DHCP packets from machines,
+	#   that act like a DHCP server, i.e. send DHCP responses
+	#   MAC address here -------------------------------------⋅
+	#   is the true DHCP server.                              v
+	tcpdump -i br_lan -nev udp src port 67 and not ether host a8:39:44:96:fa:b8
+
+	# Capture 100 packets and put rouge ones in /tmp/rouge.
+	tcpdump -i br_lan -nev udp src port 67 and not ether host a8:39:44:96:fa:b8 -U -c 100 >>/tmp/rogue 2>&1 &
+	EOF
+	# http://superuser.com/a/750586/191754
+}
+
+iforgot-ssh-tunnel() {
+	cat <<-EOF
+	При наличии на сервере соответствющего разрешения ("PermitTunnel yes" в sshd_config) ssh позволяет делать VPN-соединение между виртуальным устройством на клиенте и на сервере.
+	Как правило, на клиенте мы запускаем команду ssh не от рута, однако обычный пользователь не имеет права создавать виртуальные интерфейсы. Поэтому первым делом создадим виртуальный интерфейс tap17 для нашего текущего пользователя:
+	$ sudo tunctl -u $(id -u -n) -t tap17
+	Если на сервер по ssh мы идем не под рутом, то ту же самую операцию нужно проделать на сервере для того пользователя, под которым будет выполняться логин.
+	Далее достаточно запустить ssh с указанием опций для построения туннеля:
+	ssh -o Tunnel=ethernet -w 17:17 mylogin@myserver
+	Теперь у нас на клиенте и на сервере есть устройства tap17, которые соединены друг с другом по VPN, как будто это физические интерфейсы, соединенные проводом по ethernet. Можно настраивать их с помощью ifconfig, добавлять в bridge, настраивать NAT и т.д. и т.п.
+	EOF
+}
 #
 #  If you want more, I find these sites helpful:
 #

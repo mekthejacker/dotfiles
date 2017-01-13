@@ -1,6 +1,6 @@
 "3.8.2 (created: 2014/02/13 23:52:43)
 
-set defsearch=g
+"set defsearch=g
 set editor=emacsclient
 set newtab=all
 set "titlestring=Laggy Shit™"

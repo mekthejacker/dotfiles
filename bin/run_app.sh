@@ -136,10 +136,12 @@ app_name=${0##*/}
 
 case $app_name in
 	# NB: only actual binaries with absolute paths here!
-	# firefox)
-	# 	[ -e /usr/bin/firefox-bin ] \
-	# 		&& firefox=/usr/bin/firefox-bin \
-	# 		|| firefox=/usr/bin/firefox
+	firefox)
+		[ -e /usr/bin/firefox-bin ] \
+			&& firefox=/usr/bin/firefox-bin \
+			|| firefox=/usr/bin/firefox
+		$firefox --profile ~/.ff
+		;;
 	# 	if pgrep -f $firefox &>/dev/null; then
 	# 		# Xdialog --msgbox "$*" 0x0
 	# 		# $@ is not a plain link, but firefox understands it.

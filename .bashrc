@@ -32,7 +32,7 @@ ulimit -Sn 4096
 set -b # report exit status of background jobs immediately
 
 export EIX_LIMIT=0
-export EDITOR="emacsclient -c -nw"
+export EDITOR="nano"
 export LESS='-R -M --shift 5 -x4'
 export MPD_HOST=$HOME/.mpd/socket
 #grep -qF '/assembling/' <<<"$PATH" \
@@ -51,6 +51,8 @@ grep -qF '/usr/games/bin/' <<<"$PATH" \
 #
 gen_prompt() {
 	local \
+		last_cmd_exit_code=$? \
+		prompt_char='\\$' \
 		b='\[\e[01;34m\]' \
 		g='\[\e[01;32m\]' \
 		w='\[\e[01;37m\]' \
@@ -94,7 +96,7 @@ gen_prompt() {
 		# [ $unpushed -eq 0 ] && unset unpushed
 		# ±̑
 		#           ## master...origin/master [ahead 1, behind 1]  ↓
-		[[ "$status" =~ ^($'\t')##[^$'\n']+\[(ahead\ ([0-9]+))?(,\ )?(behind ([0-9]+))?\] ]] && {
+		[[ "$status" =~ ^$'\t'?##[^$'\n']+\[(ahead\ ([0-9]+))?(,\ )?(behind ([0-9]+))?\] ]] && {
 			[ "${BASH_REMATCH[2]}" ] && ahead=${BASH_REMATCH[2]}
 			[ "${BASH_REMATCH[5]}" ] && behind=${BASH_REMATCH[5]}
 		}
@@ -117,7 +119,7 @@ gen_prompt() {
 	PS1+="${error:+${r}$error${s}\n}"
 	[ $UID -eq 0 ] && {
 		# If we are root, check if we’re in a chrooted environment
-		[ "$(stat -c %d:%i )" != "$(stat -c %d:%i /proc/1/root/.)" ] \
+		[ "$(stat -c %d:%i '/')" != "$(stat -c %d:%i '/proc/1/root/.')" ] \
 			&& chroot="${s}(chroot) ${b}"
 	}
 	PS1+="${b}┎ $chroot$PWD\n${b}┖ $timestamp ${g}"
@@ -127,9 +129,14 @@ gen_prompt() {
 		*) PS1+="${w}$USER${g} ";;
 	esac
 	PS1+="at $HOSTNAME"
-	PS1+=" $git_status${b}\\\$${s} "
+	# Print the prompt character twice if last command exited
+	#   with something other than 0.
+	# echo '$last_cmd_exit_code = ' $last_cmd_exit_code
+	# [ $last_cmd_exit_code -eq 0 ] || prompt_char="\\\$-$last_cmd_exit_code"
+	[ $last_cmd_exit_code -eq 0 ] || prompt_char='\\$\\$'
+	PS1+=" $git_status${b}$prompt_char${s} "
 }
-export PROMPT_COMMAND="gen_prompt; $PROMPT_COMMAND"
+export PROMPT_COMMAND="gen_prompt"
 
 ## Aliases caveats and hints:
 ## 1. All innder double quotes must be escaped
@@ -303,5 +310,9 @@ one_command_execute() {
 	# bind shell-expand-line
 	bind -x '"\C-m":"one_command_execute"'
 }
+
+# . ~/.bashrc should exit with 0.
+:
+
 
 #[ "$TERM" = jfbterm ] && ~/work/lifestream/minimal-sysrcd/deploy/squashfs-root/root/installer/tc-setup.sh --prepare-pxe-client

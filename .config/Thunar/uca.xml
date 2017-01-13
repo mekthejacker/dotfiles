@@ -1,20 +1,6 @@
 <?xml encoding="UTF-8" version="1.0"?>
 <actions>
 <action>
-	<icon>file-roller</icon>
-	<name>Roll up</name>
-	<unique-id>1441427525534567-4</unique-id>
-	<command>/bin/bash ~/bin/thunar_ca.sh --roll-up %F</command>
-	<description>Adding selected files or directories to archive</description>
-	<patterns>*</patterns>
-	<directories/>
-	<audio-files/>
-	<image-files/>
-	<other-files/>
-	<text-files/>
-	<video-files/>
-</action>
-<action>
 	<icon>insert-image</icon>
 	<name>Convert to JPEG</name>
 	<unique-id>1441427517773665-3</unique-id>
