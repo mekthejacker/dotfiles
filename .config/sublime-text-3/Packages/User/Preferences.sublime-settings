@@ -108,6 +108,9 @@
 	"hot_exit": true,
 	"ignored_packages":
 	[
+		"DiffTabs",
+		"LaTeXTools",
+		"PackageResourceViewer",
 		"Vintage"
 	],
 	"indent_guide_options":

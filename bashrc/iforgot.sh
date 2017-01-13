@@ -500,13 +500,13 @@ iforgot-font-list() {
 iforgot-fsck-with-progressbar() {
 	cat <<-EOF
 	fsck -C -l /dev/sdb3 -- -c -f -y
-	\  \    \          \  \  \_ autoyes
-	\  \    \          \  \_ check even if fs looks clean
-	\  \    \          \_ check for bad blocks
-	\  \    \_ partition with filesystem
-	\  \_ lock the whole-disk device by an exclusive flock(2)
-	\_ use progressbar/completion for checkers that support it
-	(generally ext2/3/4)
+	       \  \    \          \  \  \_ autoyes
+	        \  \    \          \  \_ check even if fs looks clean
+	         \  \    \          \_ check for bad blocks
+	          \  \    \_ partition with filesystem
+	           \  \_ lock the whole-disk device by an exclusive flock(2)
+	            \_ use progressbar/completion for checkers that support it
+	              (generally ext2/3/4)
 	EOF
 }
 
