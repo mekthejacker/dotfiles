@@ -35,7 +35,7 @@ readarray -t used_cache < "$used_files"
 file=''
 message=''
 pre="$rc:"$'\n'
-VERSION='20170113-1656'
+VERSION='20170113-1711'
 [[ "$REP" =~  ^[0-9]+$ ]] && {
 	in_reply_to_status_id="$REP"
 }
@@ -205,7 +205,7 @@ make_hashtag() {
 	local var="$@" prepare=$2
 	[ "$prepare" ] && var=`make_name "$var"`
 	var=${var// /_}
-	echo "#${var//[,.\'\"\&\^\°\!\?\#\$\%\;]/}"
+	echo "#${var//[,.\'\"\&\^\°\!\?\#\$\%\;\+]/}"
 }
 
 upload_file() {
