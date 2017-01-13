@@ -35,7 +35,7 @@ readarray -t used_cache < "$used_files"
 file=''
 message=''
 pre="$rc:"$'\n'
-VERSION='20170113-1643'
+VERSION='20170113-1656'
 [[ "$REP" =~  ^[0-9]+$ ]] && {
 	in_reply_to_status_id="$REP"
 }
@@ -128,7 +128,7 @@ find_an_image() {
 		webm)  local mime='video' webm_hashtag='#webm';;
 		all) local mime='.*';;
 	esac
-
+	echo "    Finding a file of type ‘$mode’…"
 	unset image_found file split_path show_name show_name_hashtag middle_hashtags filename
 	[ -v D -a -r "$D" ] && {
 		# Simulate file, show how it’s going to be parsed
@@ -136,13 +136,7 @@ find_an_image() {
 		file="$D"
 	}
 	iter=0
-	# As looking for an image may take minutes, we better
-	#   get current time here instead of calling `date`
-	#   for each unsuccessful attempt, which may be
-	#   hundreds of thousands.
-	# time_now=`date --date="now" +%s`
 	until [ -v image_found ]; do
-		echo "    Finding a file of type ‘$mode’…"
 		sleep 1  # Avoiding strange behaviour
 		[ $((++iter)) -eq $remember_files ] && return  # Something went wrong
 		chosen_idx=`shuf -i 0-$((${#files[@]}-1)) -n 1`
@@ -165,7 +159,7 @@ find_an_image() {
 			used_cache+=("$file")
 			image_found=t
 			echo "    Found $file."
-			[ $((iter-1)) -eq 0 ] || echo "    …after $((iter-1)) unsuccessful attempts."
+			[ $((iter-1)) -eq 0 ] || echo "    …after $((iter-1)) unsuccessful attempt(s)."
 		}
 	done
 
@@ -270,7 +264,9 @@ while :; do
 			exit 5
 		}
 		[ -v in_reply_to_status_id ] && in_reply_to_status_id=$reply_to
-		echo -e "\n`date +%Y-%M-%d\ %H:%M`\nMade post №$reply_to: $message"
+		echo -e "\n`date +%Y-%M-%d\ %H:%M`\nMade post №$reply_to:\n    ---"
+		echo "$message" | sed -r 's/.*/    &/g; $s/.*/&\n    ---/'
+
 		# Write new used_files from cache
 		[ -v D ] || {
 			overhead=$((${#used_cache[@]} - remember_files))
