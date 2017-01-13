@@ -35,7 +35,7 @@ readarray -t used_cache < "$used_files"
 file=''
 message=''
 pre="$rc:"$'\n'
-VERSION='20170111-0244'
+VERSION='20170113-1643'
 [[ "$REP" =~  ^[0-9]+$ ]] && {
 	in_reply_to_status_id="$REP"
 }
@@ -81,10 +81,11 @@ read_rc_file() {
 	[ -v lostnfound_found ] || blacklist+=('*/lost+found*')
 }
 
+# rc vars are used for pre-checks, so first call must be here,
+#   and not where the cycle starts.
 read_rc_file
 
 [ -v pause_secs ] || do_once=t
-older_than_secs=$((60*60*24*$older_than))
 
 exts="-iname *.jpg -o -iname *.jpeg -o -iname *.png -o -iname *.gif -o -iname *.tiff -o -iname *.webm"
 start_time=`date +%s`
@@ -110,9 +111,10 @@ update_file_list() {
 
 	# Create file list
 	[ -v D_no_files ] || {
+		files=()  # Drop current list on reread.
 		while IFS= read -r -d $'\0'; do
 			files+=("$REPLY")
-		done < <(find -P "${dirs[@]}" ${find_excludes[@]} -type f \( $exts \) -print0)
+		done < <(find -P "${dirs[@]}" ${find_excludes[@]} -type f \( $exts \) -mtime +$older_than -print0)
 		[ ${#files[@]} -eq 0 ] \
 		&& echo 'No files! Will return now…' >&2 \
 		&& exit
@@ -134,28 +136,36 @@ find_an_image() {
 		file="$D"
 	}
 	iter=0
+	# As looking for an image may take minutes, we better
+	#   get current time here instead of calling `date`
+	#   for each unsuccessful attempt, which may be
+	#   hundreds of thousands.
+	# time_now=`date --date="now" +%s`
 	until [ -v image_found ]; do
+		echo "    Finding a file of type ‘$mode’…"
 		sleep 1  # Avoiding strange behaviour
 		[ $((++iter)) -eq $remember_files ] && return  # Something went wrong
 		chosen_idx=`shuf -i 0-$((${#files[@]}-1)) -n 1`
 		file=${files[chosen_idx]}
 		[ -r "$file" ] || {
-			echo -e "Selected file:\n  $file\nis not a readable file! Retrying…" >&2
+			echo -e "        Dropped $file: is not readable." >&2
 			continue
 		}
 		file --mime-type "$file" | sed -rn "s~.* ($mime/\S+)$~\1~;T;Q1" \
-			&& echo 'Mime type mismatch! Retrying…' >&2 \
-			&& continue
-		[ $((`date --date="now" +%s` - `stat --format %Y "$file"`)) -lt $older_than_secs ] \
-			&& echo 'File is too fresh! Retrying…' >&2 \
+			&& echo -e "        Dropped $file: mime type mismatch." >&2 \
 			&& continue
 		unset match_found
 		for ((i=0; i<${#used_cache[@]}; i++)); do
-			[ "$file" = "${used_cache[i]}" ] && match_found=t && break
+			[ "$file" = "${used_cache[i]}" ] && {
+				echo -e "        Dropped $file: it was used in the past $remember_files." >&2
+				match_found=t && break
+			}
 		done
 		[ -v match_found ] || {
 			used_cache+=("$file")
 			image_found=t
+			echo "    Found $file."
+			[ $((iter-1)) -eq 0 ] || echo "    …after $((iter-1)) unsuccessful attempts."
 		}
 	done
 
@@ -205,17 +215,18 @@ make_hashtag() {
 }
 
 upload_file() {
+	echo "    Uploading file: $file"
 	media_upload=`curl -u "$username:$password" --form "media=@$file" $proto$server$media_upload_url 2>/dev/null` && {
 		media_id=`sed -rn '3 s~.*<mediaid>([0-9]+)</mediaid>.*~\1~p;T;Q1'<<<"$media_upload"` \
 			&& {
-				echo "Error: media id is not a valid number." | tee -a "$problem_files" >&2
+				echo "        Error: media id is not a valid number." | tee -a "$problem_files" >&2
 				return 1
 			}||{
 				message="${message:+$message$'\n'$'\n'}$_message $proto$server$attachment_url/$media_id"
-				echo -e "Uploaded file $file\n  with media id $media_id."
+				echo -e "    Uploaded with media id $media_id."
 			}
 		:
-	}||	echo "Error while uploading file $file" | tee -a "$problem_files" >&2
+	}||	echo "    Error while uploading file $file" | tee -a "$problem_files" >&2
 	return 0
 }
 
@@ -230,32 +241,38 @@ while :; do
 		update_file_list
 		start_time=$new_time
 	}
+	echo -en "\n`date +%Y-%M-%d\ %H:%M`\nGoing a make a post!"
+	# 1/5 chance to attach a webm/mp4
+	unset attach_video
+	[ `shuf -i 0-4 -n 1` -eq 0 ] && {
+		echo ' …with a video!'
+		attach_video=t
+	}|| echo
 	unset message
 	find_an_image
 	[ -v D_no_upload ] || upload_file
-
-	# 1/5 chance to attach a webm
-	[ `shuf -i 0-4 -n 1` -eq 0 ] && {
-		echo 'Going to add a webm!'
+	[ -v attach_video ] && {
 		find_an_image webm
 		[ -v D_no_upload ] || upload_file
 	}
+	# special_message is set when in ‘repetitive mode’,
+	# see the explanation in the example rc file.
 	[ -v special_message ] && unset message_additional_text
 	message="${message:+$special_message$message$message_additional_text}"
 	[ -v D_no_upload ] || {
+		echo -e "\n`date +%Y-%M-%d\ %H:%M`\nSending the post…"
 		[ "$message" ] && curl -u "$username:$password" \
 		                       --data "status=$message${in_reply_to_status_id:+&in_reply_to_status_id=$in_reply_to_status_id}${source:+&source=$source}" \
 		                       $proto$server$making_post_url &>"$log"
-		[ -v in_reply_to_status_id ] && {
-			reply_to=`sed -nr 's/^\s*<id>([0-9]+)<\/id>\s*$/\1/p;T;Q1' "$log"`
-			[[ "$reply_to" =~ ^[0-9]+$ ]] || {
-				echo 'Cannot get our last post id.' >&2
-				exit 5
-			}
-			in_reply_to_status_id=$reply_to
+		reply_to=`sed -nr 's/^\s*<id>([0-9]+)<\/id>\s*$/\1/p;T;Q1' "$log"`
+		[[ "$reply_to" =~ ^[0-9]+$ ]] || {
+			echo '    Cannot get our last post id.' >&2
+			exit 5
 		}
+		[ -v in_reply_to_status_id ] && in_reply_to_status_id=$reply_to
+		echo -e "\n`date +%Y-%M-%d\ %H:%M`\nMade post №$reply_to: $message"
 		# Write new used_files from cache
-		[ -v D ] && echo -e "\n\n\nMessage:\n\n$message" || {
+		[ -v D ] || {
 			overhead=$((${#used_cache[@]} - remember_files))
 			[ $overhead -gt 0 ] && {
 				for ((i=0; i<overhead; i++)); do
