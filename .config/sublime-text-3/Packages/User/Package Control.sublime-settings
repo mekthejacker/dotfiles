@@ -2,9 +2,6 @@
 	"bootstrapped": true,
 	"in_process_packages":
 	[
-		"DiffTabs",
-		"LaTeXTools",
-		"PackageResourceViewer"
 	],
 	"installed_packages":
 	[

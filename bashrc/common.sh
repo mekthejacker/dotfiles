@@ -286,17 +286,19 @@ ssh-ipmi() {
     local gw=$1 ipmi=$2 found
     case "$mode" in
     	''|ipmi)
+			# 22 – SSH, duh
 			# 80, 443 – webiface
 			# 623 – java?
 			# 5900 – virtual disk I/O?
-			ports=(80 443 623 5900)
+			ports=(22 80 443 623 5900)
     		;;
 		ilo)
+			# 22 – SSH, duh
 			# 80, 443 – webiface
 			# 763 – moonshot cartridge iLO
 			# 17988 – java?
 			# 17990 – virtual disk I/O?
-			ports=(80 443 763 17988 17990)
+			ports=(22 80 443 763 17988 17990)
 			;;
 	esac
     # We’d usually want to bind $ipmi to a local address, such as 127.0.0.x,

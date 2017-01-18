@@ -35,7 +35,7 @@ readarray -t used_cache < "$used_files"
 file=''
 message=''
 pre="$rc:"$'\n'
-VERSION='20170113-1711'
+VERSION='20170118-0641'
 [[ "$REP" =~  ^[0-9]+$ ]] && {
 	in_reply_to_status_id="$REP"
 }
@@ -102,11 +102,11 @@ start_time=`date +%s`
 
 update_file_list() {
 	[ ${#blacklist[@]} -eq 0 ] || {
-		find_excludes+=( "-not ( -path ${blacklist[0]}" )
+		find_excludes+=( "-not" "(" "-path" "${blacklist[0]}" )
 		for ((i=1; i<${#blacklist[@]}; i++ )); do
-			find_excludes+=("-o -path ${blacklist[i]}")
+			find_excludes+=("-o" "-path" "${blacklist[i]}")
 		done
-		find_excludes+=( "-prune )" )
+		find_excludes+=( "-prune" ")" )
 	}
 
 	# Create file list
@@ -114,10 +114,17 @@ update_file_list() {
 		files=()  # Drop current list on reread.
 		while IFS= read -r -d $'\0'; do
 			files+=("$REPLY")
-		done < <(find -P "${dirs[@]}" ${find_excludes[@]} -type f \( $exts \) -mtime +$older_than -print0)
+		done < <(find -P "${dirs[@]}" "${find_excludes[@]}" -type f \( $exts \) -mtime +$older_than -print0)
 		[ ${#files[@]} -eq 0 ] \
 		&& echo 'No files! Will return now…' >&2 \
 		&& exit
+	}
+	echo "Total files found: ${#files[@]}"
+	[ -v D ] && {
+		echo >"$mydir/file_list"
+		for file in "${files[@]}"; do
+			echo "$file" >>"$mydir/file_list"
+		done
 	}
 }
 

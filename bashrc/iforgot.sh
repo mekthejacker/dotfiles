@@ -1058,9 +1058,9 @@ iforgot-qemu-system-or-user() {
 iforgot-tcpdump-check-multicast() {
 	cat <<-EOF
 	Specific host:
-	tcpdump -i eth0 -s0 -vv host 239.255.255.250
+	tcpdump -tni eth0 -s0 -vv host 239.255.255.250
 	All multicast:
-	tcpdump -i eth0 -s0 -vv net 224.0.0.0/4
+	tcpdump -tni eth0 -s0 -vv net 224.0.0.0/4
 
 	Don’t forget to check smcroute join/leave.
 	EOF
@@ -1087,6 +1087,7 @@ iforgot-tcpdump-usage() {
 	tcpdump -v -X
 	…but including the link level header:
 	tcpdump -v -XX
+
 	Be quiet while capturing packets:
 	tcpdump -q
 	Limit the capture to 100 packets:
@@ -1109,6 +1110,14 @@ iforgot-tcpdump-usage() {
 	tcpdump -r capture.cap
 	The packets using maximum detail of a file called capture.cap:
 	tcpdump -vvv -r capture.cap
+
+	Timestamps
+       17:16:13.258263
+	-t  <no timestamp>
+	-tt  in raw numbers
+	-ttt  Δ between current and previous frame
+	-tttt  = default+date
+	-ttttt  Δ between current and first frame.
 
 	Capture
 	By host:
