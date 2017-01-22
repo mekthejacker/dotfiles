@@ -35,7 +35,7 @@ readarray -t used_cache < "$used_files"
 file=''
 message=''
 pre="$rc:"$'\n'
-VERSION='20170118-0641'
+VERSION='20170122-1038'
 [[ "$REP" =~  ^[0-9]+$ ]] && {
 	in_reply_to_status_id="$REP"
 }
@@ -87,7 +87,7 @@ read_rc_file
 
 [ -v pause_secs ] || do_once=t
 
-exts="-iname *.jpg -o -iname *.jpeg -o -iname *.png -o -iname *.gif -o -iname *.tiff -o -iname *.webm"
+exts=(-iname *.jpg -o -iname *.jpeg -o -iname *.png -o -iname *.gif -o -iname *.tiff -o -iname *.webm)
 start_time=`date +%s`
 
 [ -v D -a -r "$D" ] && {
@@ -114,7 +114,7 @@ update_file_list() {
 		files=()  # Drop current list on reread.
 		while IFS= read -r -d $'\0'; do
 			files+=("$REPLY")
-		done < <(find -P "${dirs[@]}" "${find_excludes[@]}" -type f \( $exts \) -mtime +$older_than -print0)
+		done < <(find -P "${dirs[@]}" "${find_excludes[@]}" -type f \( "${exts[@]}" \) -mtime +$older_than -print0)
 		[ ${#files[@]} -eq 0 ] \
 		&& echo 'No files! Will return now…' >&2 \
 		&& exit
@@ -242,7 +242,7 @@ while :; do
 		update_file_list
 		start_time=$new_time
 	}
-	echo -en "\n`date +%Y-%M-%d\ %H:%M`\nGoing a make a post!"
+	echo -en "\n`date +%Y-%m-%d\ %H:%M`\nGoing a make a post!"
 	# 1/5 chance to attach a webm/mp4
 	unset attach_video
 	[ `shuf -i 0-4 -n 1` -eq 0 ] && {
@@ -261,7 +261,7 @@ while :; do
 	[ -v special_message ] && unset message_additional_text
 	message="${message:+$special_message$message$message_additional_text}"
 	[ -v D_no_upload ] || {
-		echo -e "\n`date +%Y-%M-%d\ %H:%M`\nSending the post…"
+		echo -e "\n`date +%Y-%m-%d\ %H:%M`\nSending the post…"
 		[ "$message" ] && curl -u "$username:$password" \
 		                       --data "status=$message${in_reply_to_status_id:+&in_reply_to_status_id=$in_reply_to_status_id}${source:+&source=$source}" \
 		                       $proto$server$making_post_url &>"$log"
@@ -271,7 +271,7 @@ while :; do
 			exit 5
 		}
 		[ -v in_reply_to_status_id ] && in_reply_to_status_id=$reply_to
-		echo -e "\n`date +%Y-%M-%d\ %H:%M`\nMade post №$reply_to:\n    ---"
+		echo -e "\n`date +%Y-%m-%d\ %H:%M`\nMade post №$reply_to:\n    ---"
 		echo "$message" | sed -r 's/.*/    &/g; $s/.*/&\n    ---/'
 
 		# Write new used_files from cache

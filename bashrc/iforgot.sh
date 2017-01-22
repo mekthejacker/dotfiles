@@ -396,7 +396,7 @@ iforgot-tee-usage() {
 	EOF
 }
 
-iforgot-emoji-drawing() {
+iforgot-kaomoji-drawing() {
 	cat <<-"EOF"
 	▽△　▲▼    sankaku
 	☆★＊      hoshi
@@ -406,7 +406,7 @@ iforgot-emoji-drawing() {
 
 	⚈д⚈ ⌕…⌕ °ヮ° ´Д` ╭(＾▽＾)╯ /(⌃ o ⌃)\ ╰(^◊^)╮ ◜(◙д◙)◝ ʘ‿ʘ  ≖‿≖
 
-	´ ▽ ` )ﾉ  (・∀・ )  (ΘεΘ;)  ╮(─▽─)╭  (≧ω≦)  (´ヘ｀;)  (╯3╰)  (⊙_◎)  (¬▂¬)
+	´ ▽ ` )ﾉ  (・∀・ )  (ΘεΘ;)  ╮(─▽─)╭  (≧ω≦)  (´ヘ｀ ;)  (╯3╰)  (⊙_◎)  (¬▂¬)
 
 	(つд⊂)
 
