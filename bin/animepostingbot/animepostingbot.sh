@@ -35,7 +35,7 @@ readarray -t used_cache < "$used_files"
 file=''
 message=''
 pre="$rc:"$'\n'
-VERSION='20170122-1038'
+VERSION='20170131-2115'
 [[ "$REP" =~  ^[0-9]+$ ]] && {
 	in_reply_to_status_id="$REP"
 }
@@ -93,11 +93,11 @@ start_time=`date +%s`
 [ -v D -a -r "$D" ] && {
 	# If we debug and pass a file name, print out the data, not upload anything.
 	echo "Enabling debugging with file=$D"
-	D_no_upload=t
+	[ -v Dnu ] && D_no_upload=t
 	D_no_files=t
 }
 
-[ -v D ] && unset pause_secs  # Make it one shot for debugging.
+[ -v D ] && do_once=t  # Make it one shot for debugging.
 
 
 update_file_list() {
@@ -186,7 +186,7 @@ find_an_image() {
 	filename="${split_path[-1]}"
 	[ -v D -a -r "$D" ] && {
 		declare -p stripped split_path show_name show_name_hashtag middle_hashtags filename
-		exit 0
+		# exit 0
 	}
 	# declare -p show_name show_name_hashtag middle_hashtags
 	declare -g _message
@@ -204,7 +204,7 @@ find_an_image() {
 
  # Keep spaces and capitalize first letters.
 #
-make_name() { sed -r 's/(^.)/\U\1/g' <<<"$@"; }
+make_name() { sed -r 's/(^.)/\U\1/g; s~[\(\)\&\;]~~g' <<<"$@"; }
 
  # Removing spaces and adding ‘#’ in front.
 #
@@ -212,7 +212,15 @@ make_hashtag() {
 	local var="$@" prepare=$2
 	[ "$prepare" ] && var=`make_name "$var"`
 	var=${var// /_}
-	echo "#${var//[,.\'\"\&\^\°\!\?\#\$\%\;\+]/}"
+	echo "#${var//[,.\'\"\&\^\°\!\?\#\$\%\;\+\(\)\{\}]/}"
+}
+
+ # Final cleaning of the message for GNU Social
+#  For some reason, GNU Social doesn’t like ampersands.
+#  &ampl; is not an option. Maybe that’s curl? Too lazy to check.
+#
+cleanmsg4gs() {
+	declare -g message=${message//&/}
 }
 
 upload_file() {
@@ -245,10 +253,12 @@ while :; do
 	echo -en "\n`date +%Y-%m-%d\ %H:%M`\nGoing a make a post!"
 	# 1/5 chance to attach a webm/mp4
 	unset attach_video
-	[ `shuf -i 0-4 -n 1` -eq 0 ] && {
-		echo ' …with a video!'
-		attach_video=t
-	}|| echo
+	[ -r "$D" ] || {
+		[ `shuf -i 0-4 -n 1` -eq 0 ] && {
+			echo ' …with a video!'
+			attach_video=t
+		}|| echo
+	}
 	unset message
 	find_an_image
 	[ -v D_no_upload ] || upload_file
@@ -262,9 +272,12 @@ while :; do
 	message="${message:+$special_message$message$message_additional_text}"
 	[ -v D_no_upload ] || {
 		echo -e "\n`date +%Y-%m-%d\ %H:%M`\nSending the post…"
-		[ "$message" ] && curl -u "$username:$password" \
-		                       --data "status=$message${in_reply_to_status_id:+&in_reply_to_status_id=$in_reply_to_status_id}${source:+&source=$source}" \
-		                       $proto$server$making_post_url &>"$log"
+		[ "$message" ] && {
+			cleanmsg4gs
+			curl -u "$username:$password" \
+		         --data "status=$message${in_reply_to_status_id:+&in_reply_to_status_id=$in_reply_to_status_id}${source:+&source=$source}" \
+		         $proto$server$making_post_url &>"$log"
+		}
 		reply_to=`sed -nr 's/^\s*<id>([0-9]+)<\/id>\s*$/\1/p;T;Q1' "$log"`
 		[[ "$reply_to" =~ ^[0-9]+$ ]] || {
 			echo '    Cannot get our last post id.' >&2

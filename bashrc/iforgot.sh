@@ -404,7 +404,7 @@ iforgot-kaomoji-drawing() {
 	米※       kome
 	益        yaku
 
-	⚈д⚈ ⌕…⌕ °ヮ° ´Д` ╭(＾▽＾)╯ /(⌃ o ⌃)\ ╰(^◊^)╮ ◜(◙д◙)◝ ʘ‿ʘ  ≖‿≖
+	(⚈益⚈) (⌕…⌕) ( °ヮ°) (´Д ` ) ╭(＾▽＾)╯ /(⌃ o ⌃)\ ╰(^◊^)╮ ◜(◙д◙)◝ (ʘ‿ʘ)  (≖‿≖)
 
 	´ ▽ ` )ﾉ  (・∀・ )  (ΘεΘ;)  ╮(─▽─)╭  (≧ω≦)  (´ヘ｀ ;)  (╯3╰)  (⊙_◎)  (¬▂¬)
 
@@ -2090,3 +2090,11 @@ iforgot-ssh-tunnel() {
 #  If you want more, I find these sites helpful:
 #
 # https://www.pantz.org
+
+iforgot-bash-check-file-size-while-process-running() {
+	cat <<-"EOF"
+	while [ -d /proc/34536 ]; do echo -en "\r\e[K`ls -sh /virt/lxc/CTs/portalcms.tar`" ; sleep 10; done
+
+	(In certain cases you may use `pv` instead)
+	EOF
+}
