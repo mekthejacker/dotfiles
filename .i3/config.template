@@ -180,8 +180,9 @@ bindcode --release $mod+52 exec --no-startup-id ". ~/bin/screenshot.sh -area"
 bindcode --release $mod+Shift+52 exec --no-startup-id ". ~/bin/screenshot.sh -area -indexed"
 #bindcode --release $mod+Mod1+52 exec --no-startup-id ". ~/bin/screenshot.sh -area -jpeg"
 
-## Y — show currently playing song in MPD
-bindcode $mod+29 exec --no-startup-id eval 'notify-send --hint int:transient:1 -t 3500 "mpd" "`mpc | head -n1`"'
+ # y — show currently playing song in MPD
+#
+bindcode $mod+29 exec --no-startup-id eval '~/bin/mpc_show_playing_song.sh'
 
 #
  #  Wallpaper_setter.sh block

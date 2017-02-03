@@ -2098,3 +2098,7 @@ iforgot-bash-check-file-size-while-process-running() {
 	(In certain cases you may use `pv` instead)
 	EOF
 }
+
+iforgot-ctrl-key-in-the-term() {
+	echo 'In a standard terminal, ctrl is defined to send the ASCII code of the key you press minus 64 (this is why ctrl-J (74) sends newline (10) and ctrl-I (73) sends tab (9), for example).'
+}

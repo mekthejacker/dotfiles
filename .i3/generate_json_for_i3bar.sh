@@ -36,7 +36,9 @@ TIMEOUT_MAX=30 # the actual timeout is one second; TIMEOUT_MAX introduces
                # local timeouts, ‘wait_time’ variable.
 SEPARATOR_CHAR='·'  # U+00B7 https://en.wikipedia.org/wiki/Interpunct
 GOOGLE_DNS='8.8.4.4'
-PING_HOST="$GOOGLE_DNS"    #  — preset for the first time
+YANDEX_DNS1='77.88.8.8'
+YANDEX_DNS2='77.88.8.1'
+PING_HOST="$YANDEX_DNS1"    #  — preset for the first time
 ping_successful='Unknown'  #  /
 
 # module settings
