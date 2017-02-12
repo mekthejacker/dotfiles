@@ -6,10 +6,10 @@
 	"installed_packages":
 	[
 		"ColorSchemeEditor",
+		"Compare Side-By-Side",
 		"DiffTabs",
 		"FileDiffs",
 		"Generic Config",
-		"LaTeXTools",
 		"Package Control",
 		"PackageResourceViewer",
 		"ShellScriptImproved"

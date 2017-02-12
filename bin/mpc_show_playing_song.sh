@@ -16,7 +16,15 @@ secs_left=$(( `date --date="$duration" -u +%s` - `date --date="$cur_time" -u +%s
 declare -p secs_left
 # Stripping unneccesary 00:0 and 00:0 ← the order is important!
 time_left=`date --date="@$secs_left" -u +%H:%M:%S | sed -r 's/^00:0//;s/^00://'`
+time_left+=" left."
 msg="$song
 $time_left"
 
-notify-send --hint int:transient:1 -t 3500 mpd "$msg"
+# Variations
+# notify-send --hint int:transient:1 -t 3500 mpd "$msg"
+# notify-send --hint int:transient:1 -t 3500 " " "$msg"
+notify-send --hint int:transient:1 -t 3500 "$song" "$time_left"
+
+# --hint int:transient:1 is to make this message pass the notification stack.
+# The stack isn’t infinite and if it’s full, which is at about 20 messages,
+# you won’t be able to see any new messages until you MANUALLY CLEAN it.

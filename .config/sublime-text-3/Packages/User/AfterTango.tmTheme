@@ -372,9 +372,9 @@
             <key>settings</key>
             <dict>
                 <key>fontStyle</key>
-                <string></string>
+                <string>bold</string>
                 <key>foreground</key>
-                <string>#d0d0d0</string>
+                <string>#80ff79</string><!--#dbe7ff 5fff57-->
             </dict>
         </dict>
         <dict>

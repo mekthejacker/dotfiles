@@ -61,8 +61,8 @@ while [ "$1" ]; do
 		-indexed) INDEXED=t ;;
 		-jpeg) FORMAT='jpeg -q 92' ;; # JPEG quality
 		*)
-			notify-send -t 2000 -i error "Unknown option to $0: “$1”."
-			exit 3;;
+			notify-send --hint int:transient:1 -t 3500 -i error "$0" "Unknown option: ‘$1’."
+			exit 5;;
 	esac
 	shift
 done
