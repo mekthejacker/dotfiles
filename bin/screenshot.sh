@@ -43,7 +43,7 @@
 #	atd
 #	    that is already set up and running.
 
-set -x
+# set -x
 # exec &>/tmp/envlogsscr
 
 # for scrot exec command
