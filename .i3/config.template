@@ -96,8 +96,6 @@ bindsym $mod+Return exec urxvtc
 ## One-command urxvtc instance, it is a replacement for dmenu (also see ~/.bashrc and ~/.Xresources)
 bindcode $mod+27 exec --no-startup-id /bin/bash -c 'export ONE_COMMAND_SHELL=t && urxvtc -name one_command_shell'
 
-# Hello, @wakarimasen!
-
 ## F1       Toggle MPD play/pause
 bindcode $mod+67 exec --no-startup-id mpc toggle
 ## F2       Add the currently playing song to a playlist
