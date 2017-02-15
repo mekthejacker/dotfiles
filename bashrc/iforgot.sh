@@ -2102,3 +2102,12 @@ iforgot-bash-check-file-size-while-process-running() {
 iforgot-ctrl-key-in-the-term() {
 	echo 'In a standard terminal, ctrl is defined to send the ASCII code of the key you press minus 64 (this is why ctrl-J (74) sends newline (10) and ctrl-I (73) sends tab (9), for example).'
 }
+
+iforgot-nginx-who-serves-this-domain() {
+	cat <<-EOF
+	When you suspect, that the requests are served by some other server.
+
+	# tail -fn0 /var/log/nginx/*log | grep -F 'MY_IP_ADDRESS' -C1
+	$ wget -O- --no-check-certificate  https://problem.domain.com
+	EOF
+}

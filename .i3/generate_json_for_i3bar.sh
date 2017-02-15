@@ -48,8 +48,10 @@ FREE_SPACE_YELLOW_POINT=5
 FREE_SPACE_RED_POINT=1
 
 # Decrypt Gmail authentication data
-eval `gpg -qd ~/.env/private_data.sh.gpg 2>/dev/null \
-      | grep -E '^GMAIL_(USERNAME|PASSWORD)'`
+#eval `gpg -qd ~/.env/private_data.sh.gpg 2>/dev/null \
+#      | grep -E '^GMAIL_(USERNAME|PASSWORD)'`
+eval `grep -E '^GMAIL_(USERNAME|PASSWORD)' ~/.env/private_data.sh`
+
 
 # 1. Let’s call each element of the status bar a ‘module’.
 # 2. Then each module consists of a variable, which will contain related JSON
@@ -449,6 +451,7 @@ get_gmail() {
 	local wait_time=5 gmail_server_reply letters_unread
 	[ $TIMEOUT_STEP -eq 0 -o $((TIMEOUT_STEP % wait_time)) -eq 0 ] && {
 		unset gmail
+		set -x
 		if [ -v HAS_INTERNETS ]; then
 			gmail_server_reply=`curl --connect-timeout $wait_time \
 			-su $GMAIL_USERNAME:$GMAIL_PASSWORD \
