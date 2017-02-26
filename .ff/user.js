@@ -50,7 +50,10 @@ user_pref("font.name.serif.ja", "IPAMonaPGothic");
 user_pref("font.name.serif.x-cyrillic", "Linux Libertine Display O");
 user_pref("font.name.serif.x-western", "Linux Libertine Display O");
 user_pref("font.size.variable.ja", 22);
-
+user_pref("browser.chrome.toolbar_tips", false);
+user_pref("layout.css.grid.enabled", true);
+//Enable multiprocessing.
+user_pref("extensions.e10sBlockedByAddons", false);
 //
 // --- CACHES ----------------------------------------------------------------
 //

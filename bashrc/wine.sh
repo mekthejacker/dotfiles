@@ -79,6 +79,7 @@
 	alias s="taskset -c 1-3 steam"
 	alias teamviewer="pushd /home/soft_win/teamviewer_8_portable; wine TeamViewer.exe; popd"
 	alias wog="/bin/bash -c '{ pushd /home/games/WorldOfGoo; ./WorldOfGoo.bin64; popd; }'"
+	alias wow='wine /home/sszb/.wine/drive_c/Program\ Files/WOW\ Slider/WOWSlider.exe'
 	alias zeus="pushd /home/games/Poseidon; wine Zeus.exe; popd"
 
 	wineprefix-setup64() { wineprefix-setup "$@"; }
