@@ -122,12 +122,15 @@ get_test() {
 #    Having it enabled makes the log grow and fill /tmp until there’s
 #    no space left.
 get_envdebug_status() {
-	[ "$ENV_DEBUG" = '+' ] || local status='+'
-	envdebug_status='{ "full_text": "'$status'",
+	unset envdebug_status
+	[ "$ENV_DEBUG" = '+' ] || {
+		local status='ENV_DEBUG'
+		envdebug_status='{ "full_text": "'$status'",
 \t  "markup": "pango",
 \t  "color": "'$red'",
 \t  "urgent": "true",
 \t  "separator": false },'
+	}
 }
 
 # NOTE:
@@ -203,7 +206,7 @@ get_free_space() {
 				&& inner_separator=" $_not_used_" \
 				|| unset inner_separator # This comma appears between blocks
 			                             #   showing mountpoints.
-			read total free <<< `df -BG -P "${present_mpoints[$i]}" |\
+			read -d '' total free <<< `df -BG -P "${present_mpoints[$i]}" |\
 			  sed -rn '$ s/^\S+\s+([0-9]+)G\s+\S+\s+([0-9]+)G.*$/\1\n\2/p'`
 			unset color_tag
 			if [ $free -le $FREE_SPACE_RED_POINT ]; then

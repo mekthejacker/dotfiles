@@ -752,7 +752,7 @@ iforgot-wcpe-station-time-zone-difference() {
 	echo -8
 }
 
-iforgot-libreoffice-writer-images() {
+iforgot-lowriter-images() {
 	cat <<-EOF
 	When an image is inserted in a libreoffice writer document, lowriter uses 90 dpi (not desktop resolution) by default. Thus, while importing an SVG file in GIMP it’s necesary to set corresponding dpi and count appropriate width according to that. GIMP advises 1000px width by default, but that gives 282.24 mm of width after import to libreoffice. ESPD doc width excluding fields is 180 mm. After import to lowriter, in the document body image will look awry even if you guess the 100 % scale right. But it only seems like it, after the export to PDF with lossless image compression it’ll look as it should.
 	EOF
@@ -1987,40 +1987,54 @@ iforgot-ip() {
 
 iforgot-lowriter-toc-wont-stick-to-top() {
 	cat <<-EOF
-	When the table of contents doesn’t stick to the top, because
-	the cursor stays at the top, like it requires a paragraph there,
-	and it cannot be deleted neither with Delete nor with Backspace,
-	Switch the ToC from read-only to editable, then remove the empty line
-	and ToC should stick to the top now. If it doesn’t, look at the
-	ToC title style, edit ToC → styles.
 	EOF
 }
 
-iforgot-lowriter-pic-caption() {
-	cat <<-EOF
-	Tools → LOWriter → AutoCaption
-	Check ‘LibreOffice Writer Image’.
-	Enter ‘Pic.’ to the Category field.
-	Caption order = Category first.
-	Check new style ‘Pic.’ under Captions (use hierarhy view, it’s good!).
-	EOF
-}
 
 iforgot-lowriter-settings() {
 	cat <<-EOF
-	Tools → Options
+	# Tools → Options
 
-	View:
-	Enable Use GL rendireing always.
-	Enable Force GL use.
+	→ View
+	  Enable Use GL rendireing always.
+	  Enable Force GL use.
 
-	Lowriter → View:
-	Enable Smooth scrolling, without smooth scrolling lowriter is hell.
+	→ LO Writer → View:
+	  Enable Smooth scrolling, without smooth scrolling lowriter is hell.
+
+	→ LO Writer → AutoCaption
+	  Check ‘LibreOffice Writer Image’.
+	  Enter ‘Pic.’ to the Category field.
+	  Caption order = Category first.
+	  Check new style ‘Pic.’ under Captions (use hierarhy view, it’s good!).
+
+	→ LO Writer → Compatibility
+	  Uncheck:
+	      Use printer metrics…
+	      Add spacing between paragraphs and tables (messes!)
+	      Add paragraph and table spacing at tops of pages (messes! Adds
+	        vertical space for headers that should stick to the top!)
+	      Openoffice 1.1…
+	      Do not add leading space… (uncheck so it would add it – it’s
+	        space between lines, so upper and lower elements would not cross)
+	      Protect form
+	  Check:
+	      Add paragraph and table spaces at bottom of table cells (? is that
+	        really helpful or messes? I don’t remember)
+	      Consider wrapping style when positioning objects.
+	      Expand word space on lines… in justified paragraphs.
 	EOF
 }
 
-iforgot-lowriter-hints() {
+iforgot-lowriter-how-not-to-do() {
 	cat <<-EOF
+	When the table of contents doesn’t stick to the top, because
+	  the cursor stays at the top, like it requires a paragraph there,
+	  and it cannot be deleted neither with Delete nor with Backspace,
+	  Switch the ToC from read-only to editable, then remove the empty line
+	  and ToC should stick to the top now. If it doesn’t, look at the
+	  ToC title style, edit ToC → styles.
+
 	Outline _numbering_ elements can’t have two different styles
 	  at the same outline level. Actually, ToC itself supports
 	  building levels from outline, indexes and custom-selected styles,
@@ -2030,6 +2044,7 @@ iforgot-lowriter-hints() {
 	  numbering doesn’t work, and numbering resets. Continuing previous
 	  list will continue the bulleted list, if it happens to be right before
 	  the header with non-regular style.
+
 	Attempt to apply different styles to same outline levels is destined
 	  to fail. I have tried to print unready sections and subsections
 	  as grey in ToC, and for that I had to reject the common Outline,
@@ -2110,4 +2125,22 @@ iforgot-nginx-who-serves-this-domain() {
 	# tail -fn0 /var/log/nginx/*log | grep -F 'MY_IP_ADDRESS' -C1
 	$ wget -O- --no-check-certificate  https://problem.domain.com
 	EOF
+}
+
+iforgot-find-deleted-unlinked-files-that-hold-disk-space() {
+	cat <<-"EOF"
+	The problem is that a file was deleted, but some process continues to write
+	  to that file, `df` shows that 100% is used, but results from `du` do not
+	  sum up to 100% usage.
+
+	Show files that have <1 links to the filesystem:
+	  lsof +L1
+
+	On a specific filesystem:
+	  lsof +aL1 /var/log/
+	EOF
+}
+
+iforgot-ftp() {
+	echo lftp
 }

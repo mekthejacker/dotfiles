@@ -82,12 +82,11 @@
 	alias wow='wine /home/sszb/.wine/drive_c/Program\ Files/WOW\ Slider/WOWSlider.exe'
 	alias zeus="pushd /home/games/Poseidon; wine Zeus.exe; popd"
 
-	wineprefix-setup64() { wineprefix-setup "$@"; }
-
 	#
 	# IT DOESN’T WORK PROPERLY FOR WINE64 YET
 	#
 	# [$1] — '--setoptonly' = quit after setting options
+	#wineprefix-setup64() { wineprefix-setup "$@"; }
 	wineprefix-setup() {
 		[ ${FUNCNAME[1]} = wineprefix-setup64 ] \
 			&& local WINEARCH=win64 WINEPREFIX=/home/sszb/.wine64 \
@@ -120,17 +119,18 @@
 			[glsl]=enabled # Enable glsl shaders //disabled (may be faster)
 			[multisampling]=enabled # Enable Direct3D multisampling //disabled
 			[mwo]=force # Set DirectInput MouseWarpOverride to force //disable,enabled
-			[psm]=enabled # Set PixelShaderMode to enabled //disabled
+			[psm]=3 # Supported shader model version // <0|1|2|3>
 			[sound]=alsa # Set sound driver to ALSA //disabled,oss,coreaudio (mac)
 			[strictdrawordering]=enabled # //disabled (may make things faster), fixes severe glitches in DE:HR, Tombraider 2013, Metro 2033 etc.
 			[videomemorysize]=$((`nvidia-settings --query $DISPLAY/VideoRam | sed -nr '2s/.*\s([0-9]+)\.$/\1/p'`/1024)) # in MiB
 			[vsm]=hardware # Set VertexShaderMode to hardware
+			[win7]=  # Windows version // <win31|win95|win98|win2k|winxp|win2k3|vista|win7>
 		)
 		[ -v options[ddr] ] || exit 3 # enjoy your fglrx/nouveau/whatever
 		for option in "${!options[@]}"; do
 			value=${options[$option]}
-			echo -e "\n${w}---] $option$s=$value$s"
-			sudo -u sszb -H winetricks "$option=$value" >/dev/null \
+			echo -e "\n${w}---] $option$s${value:+=$value}$s"
+			sudo -u sszb -H winetricks "$option${value:+=$value}" >/dev/null \
 				&& echo -e "$w---] [${g}OK${w}]$s" \
 				|| echo -e "$w---] [${r}FAIL${w}]$s"
 		done

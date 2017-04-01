@@ -137,7 +137,7 @@ compress-screenshot() {
 # Copies current MPD playlist to a specified folder.
 copy-playlist() {
 	err() { echo "$1" >&2; [ "$2" ] && return $2; }  # $1 — message; $2 — return code
-	local cur_pl='current' dest="$HOME/desktop/music/" \
+	local cur_pl='current' dest="$HOME/desktop/gn5-music/" \
 		  pl_dir pl library_path got_a_sane_reply
 	pl_dir=`sed -nr 's/^\s*playlist_directory\s+"(.+)"\s*$/\1/p' ~/.mpd/mpd.conf`
 	[ "$pl_dir" ] || err 'mpd.conf doesn’t have playlist_directory?' 3

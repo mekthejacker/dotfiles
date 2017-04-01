@@ -33,7 +33,7 @@ done <  <(find "$MPD_PLAYLIST_DIR" -iname "*.m3u" -print0)
 if [ -v CREATE_NEW_PLAYLIST -o ${#available_playlists[@]} -eq 0 ]; then
 	reply=$(Xdialog --title 'Creating a new playlist' \
 	                --backtitle 'Creating a new playlist' \
-	                --inputbox 'New playlist name:' 300x100 '.m3u' ) \
+	                --inputbox 'New playlist name:' 400x150 '.m3u' 2>&1) \
 		&& echo "$current_song_path" > "$MPD_PLAYLIST_DIR/$reply"
 else
 	latest_pl=$(ls -t1 "$MPD_PLAYLIST_DIR" | head -n1)

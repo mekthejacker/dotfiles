@@ -54,6 +54,8 @@ user_pref("browser.chrome.toolbar_tips", false);
 user_pref("layout.css.grid.enabled", true);
 //Enable multiprocessing.
 user_pref("extensions.e10sBlockedByAddons", false);
+user_pref("extensions.e10sBlocksEnabling",false);
+
 //
 // --- CACHES ----------------------------------------------------------------
 //
