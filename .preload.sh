@@ -20,15 +20,8 @@
 
 echo $DISPLAY
 export STARTUP=t WIDTH=800 HEIGHT=600 DPI=96 PRIMARY_OUTPUT \
-	   GNUPGHOME GPG_TTY PATH XMODIFIERS GTK_IM_MODULE QT_IM_MODULE
+	   PATH XMODIFIERS GTK_IM_MODULE QT_IM_MODULE
 
-# There’s actually no need in this, since in _my_ case I load SCIM after I do
-#   first decrypting operations with GPG, so SCIM won’t interfere with
-#   pinentry in any way. But there is this bug when you can’t input anything
-#   in pinentry if SCIM is active, I may forget something, change the order
-#   of actions or you may stumble upon this makeing your own ~/.preload.sh,
-#   so just let it be here and use $gpg, not gpg.
-alias gpg="GTK_IM_MODULE= QT_IM_MODULE= gpg"
 # Starting zenity progress window to be aware when lags come from
 #   if they appear.
 pipe=/tmp/x_preloading_pipe
@@ -115,46 +108,6 @@ DPI=`echo "scale=2; dpi=$WIDTH/$width_mm*25.4; scale=0; dpi /= 1; print dpi" | b
 	xte 'mouseclick 1'
 }
 
-# Autofs is laggy and slow.
-mountpoint -q "$HOME/phone_card" && sudo /bin/umount $HOME/phone_card
-rm -f $HOME/phone_card
-mkdir -m700 $HOME/phone_card &>/dev/null
-c=0; until mountpoint -q "$HOME/phone_card" || {
-	#[ "$HOSTNAME" = paskapuukko ] && break
-	unset found mounted
-    # mount with rw,nosuid,nodev,relatime,uid=1000,gid=1000,fmask=0022,dmask=0077,codepage=866,iocharset=iso8859-5,shortname=mixed,showexec,utf8,flush,errors=remount-ro and leav eit as is?
-	disk=`sudo /sbin/findfs LABEL=PHONE_CARD`
-	found_res=$?
-	[ $found_res -eq 0 ] && found=t
-	[ -v found ] && sudo /bin/mount -t vfat -o users,fmask=0111,dmask=0000,rw,codepage=866,iocharset=iso8859-5,utf8 $disk $HOME/phone_card && mounted=t
-	}; do
-	days=$((c/60/60/24))
-	[ $days -eq 0 ] && days=
-	hours=$((c/60/60))
-	[ $hours -eq 0 ] && hours=
-	mins=$((c/60))
-	[ $mins -eq 0 ] && mins=
-	secs=$((c++%60))
-	push_the_bar "Waiting for ~/phone_card to appear ${days:+$days days }${hours:+$hours hours }${mins:+$mins minutes and }$secs seconds${found:+\nFound }${mounted:+ Mounted}" -
-	sleep 1
-	pgrep -af 'Xdialog --gauge X preloading started! 630x100' \
-		||{ NO_KEYS=t; break; }
-done
-
-[ -v NO_KEYS ] || {
-	push_the_bar 'Creating /tmp/decrypted'
-	# This directory will be a temporary storage for decrypted files.
-	# /tmp shall be mounted as tmpfs.
-	rm -rf /tmp/decrypted &>/dev/null
-	mkdir -m 700 /tmp/decrypted
-
-	push_the_bar 'Copying GNUPG and SSH keys to the tmpfs'
-	cp -R ~/phone_card/.gnupg /tmp/decrypted/
-	cp -R ~/phone_card/.ssh /tmp/decrypted/
-	chmod -R a-rwx,u=rwX /tmp/decrypted
-	push_the_bar 'Unmounting flash card'
-	sudo /bin/umount $HOME/phone_card && rmdir ~/phone_card
-}
 
 # II. Setting account information
 push_the_bar 'Loading keyboard settings' 33
@@ -162,43 +115,7 @@ push_the_bar 'Loading keyboard settings' 33
 #   for passphrases (this is not needed for SSH sessions)
 [ -v DISPLAY ] && ~/.i3/set_keyboard.sh
 
-[ -v NO_KEYS ] || {
-	push_the_bar 'Checking gpg-agent'
-	GNUPGHOME=/tmp/decrypted/.gnupg
-	pgrep -u $UID gpg-agent || {
-		push_the_bar 'Starting gpg-agent'
-		eval $(gpg-agent --daemon --use-standard-socket )
-	}
-	push_the_bar 'Exporting gpg-agent data'
-	GPG_TTY=`tty`
-
-	## Loading SSH keys.
-	## After I found _very strange_ behaviour of gpg-agent I decided to refuse of
-	##   using it in relation to keeping ssh keys. Even without the agent all
-	##   authentications will still work as they should, if the keys are bound
-	##   to appropriate hosts in ~/.ssh/config.
-	## However, having passphrases in keys along with the need to use gpg-agent
-	##   may bring some troubles. Mine keys don’t have passphrases.
-	##
-	# push_the_bar 'Loading SSH keys.'
-	# for ssh_key in `grep -l 'PRIVATE KEY' ~/.ssh/*`; do
-	## W! Strange bug: after proper key fails to authenticate(!) due to
-	##   error: RSA_public_decrypt failed: error:0407006A:lib(4):func(112):reason(106)
-	##   dwarf_fortress_regions.zip ebug1: ssh_rsa_verify: signature incorrect
-	# gpg-agent may try any other killsteam.sh key.
-	# ssh-add "$ssh_key" </dev/null
-	# done
-	# unset ssh_key
-
-	push_the_bar 'Decrypting user name'
-	eval export `gpg -qd ~/.env/private_data.sh.gpg 2>/dev/null | grep -E '^ME(_FOR_GPG)*\b'`
-
-#	push_the_bar 'Decrypting Box account information'  # http://box.com
-#	gpg -qd --output /tmp/decrypted/secrets.`date +%s` ~/.davfs2/secrets.gpg
-#	{ ping -c3 8.8.8.8 &>/dev/null \
-#		&& sudo /root/scripts/mount_box.sh $USER \
-#		&& export BOX_MOUNTED=t; } &
-}
+eval `grep -E '^ME=' ~/.env/private_data.sh`
 
 # III. Setting the rest of X environment.
 push_the_bar 'Exporting custom ~/bin into PATH' 66

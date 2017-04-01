@@ -16,6 +16,10 @@ app_name=${0##*/}
 
 case $app_name in
 	# NB: only actual binaries with absolute paths here!
+	mpd)
+		cp ~/.mpd/mpd.conf.common ~/.mpd/mpd.conf
+		cat ~/.mpd/mpd.conf.$HOSTNAME >>~/.mpd/mpd.conf
+		;;
 	firefox)
 		[ -e /usr/bin/firefox-bin ] \
 			&& firefox=/usr/bin/firefox-bin \

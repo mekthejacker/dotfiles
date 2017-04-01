@@ -37,18 +37,9 @@ wait_for_program () {
 }
 
 # Cleaning before new session.
-# This is a well-known bug, emacsclient cannot connect to the daemon after X
-#   have been restarted.
-# Though, it works in a gentoo-way: via init scripts,
-#   like ‘/etc/init.d/emacs.username’.
-# This gives us the last solution: to run it from tmux session, if we want
-#   to keep our configuration away from messing with system configuration,
-#   be it init scripts or whatever.
-#   pkill -9 emacsclient
-pkill -9 emacsclient
 
-# Because we can close terminals holding root’s iftops, but not them.
-sudo /usr/bin/killall iftop
+# Because we can close the terminal that holds root’s cbm, but not the cbm itself.
+sudo /usr/bin/killall cbm
 
 # Applications that need to be started before layout setting:
 #   urxvtd, tmux and emacs daemon in tmux.
@@ -122,9 +113,6 @@ urxvtc -hold -title 'htop' -e htop
 xte "mousemove $(( WIDTH/2 ))  $(( 3*HEIGHT/4 ))"
 xte 'mouseclick 1'  # …and focus it.
 
-iface_configs=(`ls ~/.iftop/$HOSTNAME.*[^~]`)  # ls -B doesn’t work here.
-[ ${#iface_configs} -gt 1 -a $WIDTH -ge 1600 ] && iftops_need_their_own_container=t
-
 i3-msg split h
 # ╔═════╗ # ╔═══════╗
 # ║     ║ # ║       ║
@@ -132,48 +120,13 @@ i3-msg split h
 # ║  ⋅  ║ # ║   │   ║  # htop | [iftop container]
 # ╚═════╝ # ╚═══╧═══╝
 
-for ((i=0; i<${#iface_configs[@]}; i++)); do
-	urxvtc -hold -title ${iface_configs[i]##*.} \
-		   -e sudo /usr/sbin/iftop -c "${iface_configs[i]}"
-	[ $i -eq 0 -a -v iftops_need_their_own_container ] && \
-		i3-msg split h
-done
+urxvtc -hold -title 'Interface bandwidths' -e sudo /usr/bin/cbm
 # ╔═════════════════╗
 # ║                 ║
-# ╠━━━━━━━━┳━━┯━━┯━━╣
-# ║  htop  ┃  │  │  ║  (Possible variation if there are 3 iftop configs and WIDTH >= 1600)
-# ╚════════╩══╧══╧══╝
-# ╔═══════════════╗
-# ║               ║
-# ╠━━━┯━━━┯━━━┯━━━╣
-# ║   │   │   │   ║  (Possible variation if there are 3 htop configs and WIDTH < 1600.
-# ╚═══╧═══╧═══╧═══╝   htop and iftops are in the same container)
-[ ${#iface_configs[@]} -gt 0 ] && {
-	[ -v iftops_need_their_own_container ] && {
-		# move to the first iftop window
-		# ╔═════════════════╗ # ╔═════════════════╗
-		# ║                 ║ # ║                 ║
-		# ║                 ║ # ║                 ║
-		# ╠━━━━━━━━┳━━┯━━┯━━╣ # ╠━━━━━━━━┳━━━━━━━━╣
-		# ║        ┃⋅ │  │  ║ # ║        ┃––+––+––║  ← tabs
-		# ║        ┃  │  │  ║ # ║        ┃        ║
-		# ╚════════╩══╧══╧══╝ # ╚════════╩════════╝
-		xte "mousemove $(( 9*WIDTH/16 )) $(( 3*HEIGHT/4 ))"
-		:
-	}||{
-		# move to the htop window to make it active tab, or it will be some iftop window
-		# ╔═══════════════╗ # ╔═══════════════╗
-		# ║               ║ # ║               ║
-		# ║               ║ # ║               ║
-		# ╠━━━┯━━━┯━━━┯━━━╣ # ╠━━━━━━━━━━━━━━━╣
-		# ║⋅  │   │   │   ║ # ║–––+–––+–––+–––║  ← tabs
-		# ║   │   │   │   ║ # ║               ║
-		# ╚═══╧═══╧═══╧═══╝ # ╚═══════════════╝
-		xte "mousemove $(( 1*WIDTH/16 )) $(( 3*HEIGHT/4 ))"
-	}
-	xte 'mouseclick 1'
-	i3-msg layout tabbed
-}
+# ╠━━━━━━━━┳━━━━━━━━╣
+# ║  htop  ┃   cbm  ║
+# ╚════════╩════════╝
+
 xte "mousemove $(( WIDTH/2 ))  $(( HEIGHT/4 ))"
 xte 'mouseclick 1'
 # raise upper empty urxvtc up to ≈5/6 of the height
@@ -185,8 +138,8 @@ urxvtc -hold -title tmux -e $tmux attach
 # ║                 ║ # ║        │        ║
 # ║                 ║ # ║        │        ║
 # ╠━━━━━━━━┳━━━━━━━━╣ # ║        │        ║
-# ║        ┃––+––+––║ # ╠━━━━━━━━╈━━━━━━━━╣
-# ║        ┃        ║ # ║        ┃––+––+––║
+# ║        ┃        ║ # ╠━━━━━━━━╈━━━━━━━━╣
+# ║        ┃        ║ # ║        ┃        ║
 # ║        ┃        ║ # ║        ┃        ║
 # ╚════════╩════════╝ # ╚════════╩════════╝
 xte "mousemove $(( WIDTH/4 )) $(( HEIGHT/2 ))"
@@ -201,7 +154,7 @@ urxvtc
 # ║   ⋅    │        ║ # ║        ┃        ║
 # ║        │        ║ # ║        ┃        ║
 # ╠━━━━━━━━╈━━━━━━━━╣ # ╠━━━━━━━━╋━━━━━━━━╣
-# ║        ┃––+––+––║ # ║        ┃––+––+––║
+# ║        ┃        ║ # ║        ┃        ║
 # ║        ┃        ║ # ║        ┃        ║
 # ╚════════╩════════╝ # ╚════════╩════════╝
 xte "mousemove $(( 3*WIDTH/4 )) $(( HEIGHT/2 ))"
@@ -218,7 +171,7 @@ xte 'mouseclick 1'
 # ║        ┃   ⋅    ║ # ║        ┃        ║
 # ║        ┃        ║ # ║        ┃--+--+  ║ ← tmux panes
 # ╠━━━━━━━━╋━━━━━━━━╣ # ╠━━━━━━━━╋━━━━━━━━╣
-# ║        ┃––+––+––║ # ║        ┃––+––+––║
+# ║        ┃        ║ # ║        ┃        ║
 # ║        ┃        ║ # ║        ┃        ║
 # ╚════════╩════════╝ # ╚════════╩════════╝
 
