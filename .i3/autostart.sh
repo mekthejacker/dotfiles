@@ -38,8 +38,8 @@ wait_for_program () {
 
 # Cleaning before new session.
 
-# Because we can close the terminal that holds root’s cbm, but not the cbm itself.
-sudo /usr/bin/killall cbm
+# Because we can close the terminal that holds root’s bwmon, but not the bwmon itself.
+sudo /usr/bin/killall bwmon  # also cbm
 
 # Applications that need to be started before layout setting:
 #   urxvtd, tmux and emacs daemon in tmux.
@@ -91,11 +91,11 @@ case $HOSTNAME in
 		;;
 esac
 
-pgrep -u $UID -f "^bash $HOME/bin/wallpaper_setter/wallpaper_setter.sh -S" \
-	|| { ~/bin/wallpaper_setter/wallpaper_setter.sh -S -B -0.3 -d /home/picts/screens & }
+#pgrep -u $UID -f "^bash $HOME/bin/wallpaper_setter/wallpaper_setter.sh -S" \
+#	|| { ~/bin/wallpaper_setter/wallpaper_setter.sh -S -B -0.3 -d /home/picts/screens & }
 # Urxvtc windows must appear after wallpaper is set, due to their
 #   fake transparency.
-~/bin/wallpaper_setter/wallpaper_setter.sh -w &
+#~/bin/wallpaper_setter/wallpaper_setter.sh -w &
 
 urxvtc --title 'Todo list' -e watch -t -n15 cat -n ~/todo
 # ┌────┐
@@ -120,11 +120,11 @@ i3-msg split h
 # ║  ⋅  ║ # ║   │   ║  # htop | [iftop container]
 # ╚═════╝ # ╚═══╧═══╝
 
-urxvtc -hold -title 'Interface bandwidths' -e sudo /usr/bin/cbm
+urxvtc -hold -title 'Interface bandwidths' -e sudo /usr/bin/bwmon
 # ╔═════════════════╗
 # ║                 ║
 # ╠━━━━━━━━┳━━━━━━━━╣
-# ║  htop  ┃   cbm  ║
+# ║  htop  ┃  bwmon ║
 # ╚════════╩════════╝
 
 xte "mousemove $(( WIDTH/2 ))  $(( HEIGHT/4 ))"
@@ -205,11 +205,11 @@ done
 	pgrep -xu $UID ncmpcpp >/dev/null || urxvtc -name ncmpcpp -e ncmpcpp
 }
 
-crontab -l | grep -qF 'wallpaper_setter.sh' || {
-	echo '*/10 * * * * ~/bin/wallpaper_setter/wallpaper_setter.sh -qn' \
-		>>/var/spool/cron/crontabs/$ME \
-		|| notify-send -t 4000 "${0##*/}" "Couldn’t set crontab file."
-}
+#crontab -l | grep -qF 'wallpaper_setter.sh' || {
+#	echo '*/10 * * * * ~/bin/wallpaper_setter/wallpaper_setter.sh -qn' \
+#		>>/var/spool/cron/crontabs/$ME \
+#		|| notify-send -t 4000 "${0##*/}" "Couldn’t set crontab file."
+#}
 
 # For the automation of setting up sindows on other workspaces,
 #   xdotool windowactivate #WID

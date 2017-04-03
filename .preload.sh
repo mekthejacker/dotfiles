@@ -19,7 +19,7 @@
 }
 
 echo $DISPLAY
-export STARTUP=t WIDTH=800 HEIGHT=600 DPI=96 PRIMARY_OUTPUT \
+export ME STARTUP=t WIDTH=800 HEIGHT=600 DPI=96 PRIMARY_OUTPUT \
 	   PATH XMODIFIERS GTK_IM_MODULE QT_IM_MODULE
 
 # Starting zenity progress window to be aware when lags come from
@@ -55,6 +55,7 @@ Looks like it’s time to reconsider addition policy." 480x95
 	echo $bar_percentage >$pipe
 	echo -e "$pre $1 $post" >$pipe
 }
+hsetroot -solid \#000000 -full "$HOME/.env/wallpapers/`ls -1tr ~/.env/wallpapers/ | tail -n1`" -brightness 0.13
 Xdialog --gauge 'X preloading started!' 630x100 <$pipe &
 
 # I. Initial preparations
@@ -115,7 +116,7 @@ push_the_bar 'Loading keyboard settings' 33
 #   for passphrases (this is not needed for SSH sessions)
 [ -v DISPLAY ] && ~/.i3/set_keyboard.sh
 
-eval `grep -E '^ME=' ~/.env/private_data.sh`
+eval `grep -E '^ME=' ~/.env/private_data.sh`  # see export in the beginning
 
 # III. Setting the rest of X environment.
 push_the_bar 'Exporting custom ~/bin into PATH' 66
