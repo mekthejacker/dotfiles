@@ -59,9 +59,14 @@ hsetroot -solid \#000000 -full "$HOME/.env/wallpapers/`ls -1tr ~/.env/wallpapers
 Xdialog --gauge 'X preloading started!' 630x100 <$pipe &
 
 # I. Initial preparations
-push_the_bar "Cleaning `du -hsx ~/.local/share/gvfs-metadata` gvfs-metadata"
+push_the_bar "Cleaning `du -hsx ~/.local/share/gvfs-metadata | cut -f1` in ~/…/gvfs-metadata"
 rm -rf ~/.local/share/gvfs-metadata
-
+push_the_bar "Cleaning `du -hsx ~/.maildir/new | cut -f1` in ~/.maildir/new"
+find ~/.maildir/new -type f -print0 | xargs -0 -I {} rm -f {}
+push_the_bar "Cleaning `du -hsx ~/.cache/thumbnails | cut -f1` in ~/.cache/thumbnails"
+find  ~/.cache/thumbnails -type f -print0 | xargs -0 -I {} rm -f {}
+push_the_bar "Cleaning `du -hsx ~/.thumbnails | cut -f1` in ~/.thumbnails"
+find  ~/.thumbnails -type f -print0 | xargs -0 -I {} rm -f {}
 push_the_bar 'Retrieving output information'
 n=0; while read outp; do
 	[ -v PRIMARY_OUTPUT ] && eval export SLAVE_OUTPUT_$((n++))=$outp \

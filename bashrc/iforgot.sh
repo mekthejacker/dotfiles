@@ -1477,15 +1477,23 @@ iforgot-git-merge-resolve-conflicts() {
 	EOF
 }
 
-iforgot-tmpfs-no-space-left() {
-	cat <<-EOF
-	If /tmp is mounted as tmpfs, there may be such situation as ‘no space left’
-	while du -hsx say there’s plenty. And df -h at the same time will confirm,
-	that there’s no free space left. What did take that space? Old files, that
-	were removed. Why are they holding space? There are processes that still
-	hold on these files. Kill these processess, and the space will be freed.
-	How to find such processes?
-	$ lsof | grep /tmp | grep deleted   # | while read pid; do kill -9 $pid; done
+iforgot-no-space-left() {
+	cat <<-"EOF"
+	There may be two reasons
+
+	1. Deleted files, that aren’t actually unlinked yet
+	In this case, often met with tmpfs, while du -hsx says that there’s plenty
+	of space, and ‘df’ says there’s none or only a little. 
+	There should be processes that still hold these files and prevent their
+	physical removal from the filesystem. Kill these processess, and the space
+	will be freed. How to find such processes?
+	$ lsof | grep /tmp | grep deleted  # | while read pid; do kill -9 $pid; done
+
+	2. Actual files holding up space
+	Find directories with the largest number of files:
+	$ find /home -xdev -printf '%h\n' | sort | uniq -c | sort -k 1 -n
+	It is usually thumbnails, gvfs-metadata and broken mail, which I prefer
+	to clean before I log in, see ~/.preload.sh.
 	EOF
 }
 
