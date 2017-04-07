@@ -58,7 +58,6 @@ gen_prompt() {
 		w='\[\e[01;37m\]' \
 		r='\[\e[01;31m\]' \
 		s='\[\e[00m\]' \
-		timestamp=`date +%H:%M` \
 		git_status= error= chroot=
 	export PS1=''
 	[ -v ONE_COMMAND_SHELL ] && {
@@ -122,18 +121,25 @@ gen_prompt() {
 		[ "$(stat -c %d:%i '/')" != "$(stat -c %d:%i '/proc/1/root/.')" ] \
 			&& chroot="${s}(chroot) ${b}"
 	}
-	PS1+="${b}┎ $chroot$PWD\n${b}┖ $timestamp ${g}"
+	PS1+="${b}┎ $chroot$PWD\n${b}┖ "
 	case $USER in
-		"$ME") PS1+="$g";;
-		root) PS1+="$r";;
-		*) PS1+="${w}$USER${g} ";;
+		"$ME") 
+			PS1+="$g"
+			;;
+		root)
+			PS1+="$r"
+			prompt_char=$'#'
+			;;
+		*)
+			PS1+="${w}$USER ${b}"
+			;;
 	esac
 	PS1+="at $HOSTNAME"
 	# Print the prompt character twice if last command exited
 	#   with something other than 0.
 	# echo '$last_cmd_exit_code = ' $last_cmd_exit_code
 	# [ $last_cmd_exit_code -eq 0 ] || prompt_char="\\\$-$last_cmd_exit_code"
-	[ $last_cmd_exit_code -eq 0 ] || prompt_char='\\$\\$'
+	[ $last_cmd_exit_code -eq 0 ] || prompt_char="$prompt_char$prompt_char"
 	PS1+=" $git_status${b}$prompt_char${s} "
 }
 export PROMPT_COMMAND="gen_prompt"
@@ -221,7 +227,8 @@ spr="| curl -F 'sprunge=<-' http://sprunge.us" # add ?<lang> for line numbers
 alias ssh="cat ~/.ssh/config*[^~] >~/.ssh/config; ssh "
 #alias td="todo -A "
 #alias tdD="todo -D "
-alias tmux="tmux -u -f ~/.tmux/config -S $HOME/.tmux/socket"
+#alias tmux="tmux -u -f ~/.tmux/config -S $HOME/.tmux/socket"
+alias tmux="tmux -u -f ~/.tmux/config -L dtr"
 
 # Though TERM is kept via SSH’s SendEnv,
 #   rxvt-unicode-256color gives messed colours in emacsclient.

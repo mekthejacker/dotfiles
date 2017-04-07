@@ -54,24 +54,27 @@ sudo /usr/bin/killall bwmon  # also cbm
 # Yes, it seems that the only way to have that shit working between X restarts
 #   and independently of X is to run daemon via init scripts >_>
 pgrep -u $UID urxvtd || urxvtd -q -o -f
-tmux="tmux -u -f $HOME/.tmux/config -S $HOME/.tmux/socket"
+tmux="tmux -u -f $HOME/.tmux/config -L dtr"
 if pgrep -u $UID -f '^tmux.*$' &>/dev/null; then
 	[ "$1" = stop_after_main_workspace ] || {
-		for pane in `$tmux list-windows -t0 | sed -r 's/^([0-9]+):.*/\1/g'`; do
-			$tmux send -t 0:$pane C-c
-			$tmux send -t 0:$pane export\ DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS" ENTER
-			$tmux send -t 0:$pane export\ DISPLAY="$DISPLAY" ENTER
-			$tmux send -t 0:$pane C-c
-		done
+		:
+		#for pane in `$tmux list-windows -t0 | sed -r 's/^([0-9]+):.*/\1/g'`; do
+		#	$tmux send -t 0:$pane C-c
+		#	$tmux send -t 0:$pane export\ DBUS_SESSION_BUS_ADDRESS="$DBUS_SESSION_BUS_ADDRESS" ENTER
+		#	$tmux send -t 0:$pane export\ DISPLAY="$DISPLAY" ENTER
+		#	$tmux send -t 0:$pane C-c
+		#done
 	}
 else
 	$tmux \
-	new -d su \; \
+	new -d -s dtr su \; \
 	set remain-on-exit on \; \
 	neww su \; \
 	set remain-on-exit on \; \
+	neww -n anibot "cd ~/bin/animepostibgbot/; ./animepostingbot.sh" \;
+	set remain-on-exit on \; \
 	select-window -t 0:1
-	# Another user termianl in tmux
+	#Another user termianl in tmux
 	#  neww -n wa-a \; \
 	#  set remain-on-exit on \; \
 fi

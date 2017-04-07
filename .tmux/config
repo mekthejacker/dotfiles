@@ -23,6 +23,8 @@ unbind l
 unbind n
 unbind p
 unbind t
+unbind y
+unbind z
 unbind Space
 bind -r j previous-window
 bind -r l next-window
@@ -34,8 +36,13 @@ bind t command-prompt "rename-window '%%'"
 bind n command-prompt "rename-window '%%'"
 bind r respawn-window
 bind R source-file ~/.tmux/config \; \
-        display-message "Done sourcing ~/.tmux/config."
+       display-message "Done sourcing ~/.tmux/config."
 
+bind y setw synchronize-panes on \; \
+       display-message "Synchronize: ON" 
+bind Y setw synchronize-panes off \; \
+       display-message "Synchronize: OFF"
+bind-key z resize-pane -Z
 ## X window title
 set -g set-titles on
 set -g set-titles-string 'tmux^#{host}'
