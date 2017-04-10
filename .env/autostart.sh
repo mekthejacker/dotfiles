@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # autostart.sh
-# This script is called from ~/.i3/config with ‘exec ~/.i3/autstart.sh’
+# This script is called from ~/.env/config with ‘exec ~/.env/autstart.sh’
 
 [ "${ENV_DEBUG/*a*/}" ] || {
 	exec &>/tmp/envlogs/autostart
@@ -180,13 +180,13 @@ xte 'mouseclick 1'
 
 pointer_control enable
 
-# This is to check whether script is called via hotkey in ~/.i3/config.
+# This is to check whether script is called via hotkey in ~/.env/config.
 [ "$1" = stop_after_main_workspace ] && exit 0
 
 # Some configs decrypted at ~/bin/run_app.sh
 for app in "${startup_apps[@]}"; do
 	# Switch to its workspace to take off urgency hint
-	#	workspace="`sed -nr "s/^bindcode.*exec.*i3-msg\s+workspace\s+([0-9]*:?\S+)\s+.*pgrep\s+-u\s+\\\\\\$UID\s+$app.*\\\$/\1/p" ~/.i3/config`"
+	#	workspace="`sed -nr "s/^bindcode.*exec.*i3-msg\s+workspace\s+([0-9]*:?\S+)\s+.*pgrep\s+-u\s+\\\\\\$UID\s+$app.*\\\$/\1/p" ~/.env/config`"
 
 	# { … & } becasue otherwise ‘&’ will fork to background the whole string
 	#   including subshell created by the left part of ‘||’ statement.

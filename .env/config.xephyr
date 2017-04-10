@@ -96,6 +96,8 @@ bindsym $mod+Return exec urxvtc
 ## One-command urxvtc instance, it is a replacement for dmenu (also see ~/.bashrc and ~/.Xresources)
 bindcode $mod+27 exec --no-startup-id /bin/bash -c 'export ONE_COMMAND_SHELL=t && urxvtc -name one_command_shell'
 
+# Hello, @wakarimasen!
+
 ## F1       Toggle MPD play/pause
 bindcode $mod+67 exec --no-startup-id mpc toggle
 ## F2       Add the currently playing song to a playlist
@@ -167,10 +169,10 @@ bindcode --release $mod+39 exec --no-startup-id ". ~/bin/screenshot.sh"
 bindcode --release $mod+Shift+39 exec --no-startup-id ". ~/bin/screenshot.sh -jpeg"
 
 ## a (window)
-bindcode   --release  $mod+38          exec  --no-startup-id  ". ~/bin/screenshot.sh -window"
-bindcode   --release  $mod+Control+38  exec  --no-startup-id  ". ~/bin/screenshot.sh -window -delay"
-#bindcode  --release  $mod+Shift+38    exec  --no-startup-id  ". ~/bin/screenshot.sh -window -indexed"
-#bindcode  --release  $mod+Mod1+38     exec  --no-startup-id  ". ~/bin/screenshot.sh -window -jpeg"
+bindcode --release $mod+38 exec --no-startup-id ". ~/bin/screenshot.sh -window"
+bindcode --release $mod+Control+38 exec --no-startup-id ". ~/bin/screenshot.sh -window -delay"
+#bindcode --release $mod+Shift+38 exec --no-startup-id ". ~/bin/screenshot.sh -window -indexed"
+#bindcode --release $mod+Mod1+38 exec --no-startup-id ". ~/bin/screenshot.sh -window -jpeg"
 
 ## z (area)
 bindcode --release $mod+52 exec --no-startup-id ". ~/bin/screenshot.sh -area"
@@ -178,9 +180,8 @@ bindcode --release $mod+52 exec --no-startup-id ". ~/bin/screenshot.sh -area"
 bindcode --release $mod+Shift+52 exec --no-startup-id ". ~/bin/screenshot.sh -area -indexed"
 #bindcode --release $mod+Mod1+52 exec --no-startup-id ". ~/bin/screenshot.sh -area -jpeg"
 
- # y — show currently playing song in MPD
-#
-bindcode $mod+29 exec --no-startup-id eval '~/bin/mpc_show_playing_song.sh'
+## Y — show currently playing song in MPD
+bindcode $mod+29 exec --no-startup-id eval 'notify-send --hint int:transient:1 -t 3500 "mpd" "`mpc | head -n1`"'
 
 #
  #  Wallpaper_setter.sh block
@@ -240,16 +241,16 @@ bindcode $mod+19 workspace 10:Outer_space
 ## TAB   Back and forth
 bindsym $mod+Tab workspace back_and_forth
 
-workspace 0:Main         output PRIMARY_OUTPUT
-workspace 1:Firefox      output PRIMARY_OUTPUT
-workspace 2:Sublime      output PRIMARY_OUTPUT
-workspace 3:Thunar       output PRIMARY_OUTPUT
-workspace 4:Geeqie       output PRIMARY_OUTPUT
-workspace 5:Misc         output PRIMARY_OUTPUT
-workspace 6:IM           output PRIMARY_OUTPUT
-workspace 7:Games        output PRIMARY_OUTPUT
-workspace 8:GIMP         output PRIMARY_OUTPUT
-workspace 9:MPD          output PRIMARY_OUTPUT
+workspace 0:Main         output DVI-I-0
+workspace 1:Firefox      output DVI-I-0
+workspace 2:Sublime      output DVI-I-0
+workspace 3:Thunar       output DVI-I-0
+workspace 4:Geeqie       output DVI-I-0
+workspace 5:Misc         output DVI-I-0
+workspace 6:IM           output DVI-I-0
+workspace 7:Games        output DVI-I-0
+workspace 8:GIMP         output DVI-I-0
+workspace 9:MPD          output DVI-I-0
 workspace 10:Outer_space output SLAVE_OUTPUT_0
 
 ## Move focused container to workspace
@@ -289,7 +290,6 @@ assign [class="Xephyr"] → "5:Misc"
 assign [class="Pidgin"] → "6:IM"
 assign [class="Skype"] → "6:IM"
 assign [class="(?i)skype-bin"] → "6:IM"
-assign [class="(?i)skypeforlinux"] → "6:IM"
 assign [class="Wine"] → "7:Games"
 assign [class="Steam"] → "7:Games"
 assign [class="hl2_linux"] → "7:Games"
@@ -307,7 +307,6 @@ for_window [class="URxvt" instance="one_command_shell"] floating enable
 #for_window [class="URxvt" instance="one_command_shell"] new float 1pixel
 for_window [class="spicec"] floating disable
 for_window [class="Xdialog"] floating enable
-for_window [class="Xephyr"] floating enable
 for_window [class="at_msg"] floating enable
 for_window [instance=at_msg] sticky enable
 for_window [class="Yad"] floating enable
@@ -338,7 +337,7 @@ client.urgent               #ad7fa8 #ad7fa8 #ffffff #ff0000
 bar {
 	# verbose yes
 	# separator_symbol ":|:"
-	output PRIMARY_OUTPUT
+	output DVI-I-0
 	position top
 	mode dock # hide | dock | invisible
 	tray_output none  # none | primary | <output>

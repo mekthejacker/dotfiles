@@ -10,7 +10,7 @@
 # In case of troubles: http://forums.gentoo.org/viewtopic-t-858965-highlight-.html
 
 [ "${ENV_DEBUG/*i*/}" ] \
-	&& i3_cmdline='i3 &>/dev/null' \
-	|| i3_cmdline='i3 -V -d all >/tmp/envlogs/i3.stdout 2>/tmp/envlogs/i3.stderr'
+	&& i3_cmdline='i3 -c ~/.env/i3.config &>/dev/null' \
+	|| i3_cmdline='i3 -c ~/.env/i3.config -V -d all >/tmp/envlogs/i3.stdout 2>/tmp/envlogs/i3.stderr'
 
 eval exec ck-launch-session dbus-launch --sh-syntax --exit-with-session $i3_cmdline

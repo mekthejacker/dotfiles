@@ -1,0 +1,23 @@
+man xkbcomp
+
+Export current layout to file:
+  xkbcomp -xkb :0 ./xkbcomp_new.xkb
+Reexport from xkb to xkm format (text → binary)
+  xkbcomp -xkm ./xkbcomp.xkb ./xkbcomp.xkm
+Import layout from file
+  xkbcomp ./xkbcomp.xkm :0
+
+The list of all character names can be found with
+  find /usr/include/X11 -name keysymdef.h
+
+// This type of comment works in .xkb files
+some code // this way, too
+
+xkbcomp appends settings to already existing set just as setxkbmap,
+  so it’s necessary to either rewrite all the changing settings,
+  or clean the X server from xkb alternations. Which means
+  - running
+      setxkbmap -layout us -option -print | xkbcomp - $DISPLAY
+    if the settings were usual setxkbmap;
+  - restarting X server otherwise.
+  Using Xephyr is a nice alternative to the latter.

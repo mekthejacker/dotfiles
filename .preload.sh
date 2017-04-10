@@ -97,7 +97,7 @@ export ${!SLAVE_OUTPUT_*}
 # Disabling all other outputs except the main one BEFORE
 #   gpg spawns pinentry window and autorun messes the workspace
 #   with huge screen spread onto two monitors.
-~/.i3/update_config.sh
+~/.env/update_config.sh
 
 push_the_bar 'Determining width, height and dpi of the primary output'
 # These vars often used in the scripts later, e.g. in ~/bashrc/wine
@@ -119,7 +119,7 @@ DPI=`echo "scale=2; dpi=$WIDTH/$width_mm*25.4; scale=0; dpi /= 1; print dpi" | b
 push_the_bar 'Loading keyboard settings' 33
 # Keyboard setting need to be set before pinentry windows will appear asking
 #   for passphrases (this is not needed for SSH sessions)
-[ -v DISPLAY ] && ~/.i3/set_keyboard.sh
+[ -v DISPLAY ] && ~/.env/set_keyboard.sh
 
 eval `grep -E '^ME=' ~/.env/private_data.sh`  # see export in the beginning
 

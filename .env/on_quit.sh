@@ -5,7 +5,7 @@
 #   100% of CPUs after losing their consoles (they were launched with sudo,
 #   remember?) There is no cure.
 # - gracefully kill firefox (and other apps), that were started from
-#   startup_apps array in ~/.i3/autostart.sh. If firefox altered files
+#   startup_apps array in ~/.env/autostart.sh. If firefox altered files
 #   with private data, he needs some time to check it and ask confirmation
 #   if the altered data seem to have lower size then one loaded at the start.
 #   Earlier versions had problems and wiped the files, so I had to git checkout
@@ -20,7 +20,7 @@
 
 sudo /usr/bin/killall iftop
 
-# [ "`sed -n "/case/,/esac/{s/^\s*$HOSTNAME)/&/p}" ~/.i3/autostart.sh 2>/dev/null`" ] \
+# [ "`sed -n "/case/,/esac/{s/^\s*$HOSTNAME)/&/p}" ~/.env/autostart.sh 2>/dev/null`" ] \
 # 	&& host_name=$HOSTNAME \
 # 	|| host_name='\*'
 # eval `sed -n "/case/,/esac/{    # inside the case statement
@@ -30,7 +30,7 @@ sudo /usr/bin/killall iftop
 #          :n1 n; b b1    # and skip other lines
 #          :q1 Q
 # 		 }
-# 	  }"  ~/.i3/autostart.sh`
+# 	  }"  ~/.env/autostart.sh`
 # Eh-heh… this assumes anything launched from there was wrapped in ~/bin/run_app.sh…
 # for app in ${startup_apps[@]}; do
 # 	# actual app, not bash wrapper, that must continue, NB -9 must be separated

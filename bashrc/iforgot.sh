@@ -2149,6 +2149,12 @@ iforgot-find-deleted-unlinked-files-that-hold-disk-space() {
 	EOF
 }
 
-iforgot-ftp() {
+iforgot-ftp-from-commandline() {
 	echo lftp
+}
+
+iforgot-ssl-check-pem-cert() {
+	cat <<-"EOF"
+	echo | openssl s_client -showcerts -servername sealion.club -connect sealion.club:443 2>/dev/null | openssl x509 -inform pem -noout -text
+	EOF
 }

@@ -20,7 +20,7 @@
 
       ![mpd_playing](img/mpd_playing.png) – when MPD is playing.
 
-  * microphone state (there’s a hotkey in .i3/config to disable it through ALSA);
+  * microphone state (there’s a hotkey in .env/config to disable it through ALSA);
 
       ![mic_disabled](img/mic_disabled.png) – when first ALSA capture device is disabled.
 

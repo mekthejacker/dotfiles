@@ -13,6 +13,9 @@ xkbcomp $xkbcomp_map $DISPLAY
 ## Setting NumLock
 numlockx off
 numlockx on
+# Keyboard auto-repeat on
+# NB "xset r on" doesn’t work.
+xset r 
 ## Start kbdd to keep diferent layouts for each window
 kbdd
 ## Make all keys sticky
