@@ -1,16 +1,9 @@
 #!/usr/bin/env bash
 
 # screenshot.sh
-# A wrapper for scrot.
-# screenshot.sh © 2015 deterenkelt
+# A wrapper for gnome-screenshot.
+# screenshot.sh © 2015–2017 deterenkelt
 
-# Besides the usual features of scrot like
-#
-# - taking screenshots in PNG and JPEG formats (PNG is by default);
-# - using delay which is helpful with taking screenshots of hover windows;
-# - taking an area on the screen;
-# - using only focused window;
-#
 # it aims at additional tasks
 #
 # - delete taken screenshot after ten minutes (helps to not mess the $XDG_DESKTOP_DIR);
@@ -27,12 +20,12 @@
 # and
 #   Super+L_Control
 # as two separate keybindings.
-# See https://github.com/deterenkelt/dotfiles/blob/master/.i3/config.template
+# See https://github.com/deterenkelt/dotfiles/blob/master/.env/i3.config.template
 #  for examples of use.
 
 # DEPENDENCIES
 #	bash >=4.2
-#	scrot
+#	gnome-screenshot
 #	pngcrush
 #	notify-send
 #	    (I use tinynotify-send, it’s a bit incompatible with libnotify’s
@@ -46,23 +39,25 @@
 # set -x
 # exec &>/tmp/envlogsscr
 
-# for scrot exec command
-export FORMAT INDEXED DISPLAY OPEN_IN_GIMP
-
-pushd `xdg-user-dir DESKTOP` # defaults to $HOME
 while [ "$1" ]; do
 	case "$1" in
-		-delay) delay='-d 5' ;; # seconds
+		-delay)
+			delay='-d 5'  # seconds
+			;;
 		-area)
-			area='-s' && sleep 1  # sleep is for the WM
+			area='--area' && sleep 1  # sleep is for the WM
 			OPEN_IN_GIMP=t
 			;;
-		-window) window='-u' ;;
-		-indexed) INDEXED=t ;;
-		-jpeg) FORMAT='jpeg -q 92' ;; # JPEG quality
+		-window)
+			window='--window --remove-border'
+			;;
+		-indexed)
+			INDEXED=t
+			;;
 		*)
 			notify-send --hint int:transient:1 -t 3500 -i error "$0" "Unknown option: ‘$1’."
-			exit 5;;
+			exit 5
+			;;
 	esac
 	shift
 done
@@ -73,23 +68,17 @@ done
 [ -v INDEXED -a -v jpeg ] \
 	&& echo '-indexed and -jpeg cannot be given simultaneously.' >&2 && exit 6
 
-# characters preceded with
-#    $  are interpreted as scrot internals
-#    %  are passed to strftime
-# so $=$$, %=%%, \=\\.
-scrot ${area:-} ${window:-} ${delay:-} %s.${FORMAT:=png} -e '
-	[ "$$FORMAT" = png ] && {
-		pngcrush -reduce -ow -nofilecheck $f \\
-			|| notify-send -l -t 3000 -i error "Failed to pngcrush screenshot" "“$f”"
-		[ -v INDEXED ] && {
-			pngtopam $f | tee /tmp/$n.ppm | pnmcolormap 256 >/tmp/$n_palette.ppm
-			pnmremap -map=/tmp/$n_palette.ppm /tmp/$n.ppm | pnmtopng >$f
-			rm /tmp/$n.ppm /tmp/$n_palette.ppm
-		}
-	}
-	[ -v OPEN_IN_GIMP ] && gimp $f || {
-		viewnior --class="screenshot_preview" $f
-		at "`date --date="+10 minutes" +"%%H:%%M"`" <<<"rm $f"
-	}
-'
-popd
+filename=$HOME/desktop/$(date +%s).png
+gnome-screenshot ${area:-} ${window:-} ${delay:-} --file="$filename"
+pngcrush -reduce -ow -nofilecheck "$filename" \
+	|| notify-send -l -t 3000 -i error "Failed to pngcrush screenshot" "$filename"
+#[ -v INDEXED ] && {
+#	pngtopam "$filename" | tee /tmp/$n.ppm | pnmcolormap 256 >/tmp/$n_palette.ppm
+#	pnmremap -map=/tmp/$n_palette.ppm /tmp/$n.ppm | pnmtopng >$f
+#	rm /tmp/$n.ppm /tmp/$n_palette.ppm
+#}
+[ -v OPEN_IN_GIMP ] && gimp "$filename" || {
+	viewnior --class="screenshot_preview" "$filename"
+	at "`date --date="+10 minutes" +"%H:%M"`" <<<"rm $filename"
+}
+
