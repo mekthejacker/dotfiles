@@ -2,7 +2,7 @@
 
 # animepostingbot.sh
 # A bot using API to post files on GNU/Social network.
-# animepostingbot.sh © 2016 deterenkelt.
+# © 2016–2017 deterenkelt.
 
 # This program is free software; you can redistribute it and/or modify it
 #   under the terms of the GNU General Public License as published
@@ -35,13 +35,14 @@ readarray -t used_cache < "$used_files"
 file=''
 message=''
 pre="$rc:"$'\n'
-VERSION='20170131-2115'
+VERSION='20170422-0824'
 [[ "$REP" =~  ^[0-9]+$ ]] && {
 	in_reply_to_status_id="$REP"
 }
 source='Anibot'
 
 read_rc_file() {
+
 	local var trash_found lostnfound_found
 	. "$rc"
 	for var in username password proto server media_upload_url making_post_url attachment_url older_than dirs remember_files; do
@@ -147,6 +148,7 @@ find_an_image() {
 		sleep 1  # Avoiding strange behaviour
 		[ $((++iter)) -eq $remember_files ] && return  # Something went wrong
 		chosen_idx=`shuf -i 0-$((${#files[@]}-1)) -n 1`
+		echo -e "    `date +%Y-%m-%d\ %H:%M`    iter: $iter;    idx: $chosen_idx"
 		file=${files[chosen_idx]}
 		[ -r "$file" ] || {
 			echo -e "        Dropped $file: is not readable." >&2

@@ -55,7 +55,7 @@ Looks like it’s time to reconsider addition policy." 480x95
 	echo $bar_percentage >$pipe
 	echo -e "$pre $1 $post" >$pipe
 }
-hsetroot -solid \#000000 -full "$HOME/.env/wallpapers/`ls -1tr ~/.env/wallpapers/ | tail -n1`" -brightness 0.13
+~/bin/set_wallpaper.sh
 Xdialog --gauge 'X preloading started!' 630x100 <$pipe &
 
 # I. Initial preparations

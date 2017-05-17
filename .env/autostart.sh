@@ -13,6 +13,7 @@ xrandr | grep -q 'VGA1 connected' \
 	&& xrandr --output VGA1 --mode 1920x1080 --primary --same-as LVDS1 \
 	          --output LVDS1 --mode 1366x768 --fb 1920x1080 --panning 1920x1080
 
+~/bin/set_wallpaper.sh
 
 # Temporarily disable pointer while setting layout
 # $1 == <enable|disable>
@@ -83,7 +84,7 @@ fi
 
 pointer_control disable
 
-startup_apps=(mpd "firefox --profile $HOME/.ff" thunar pidgin skypeforlinux)
+startup_apps=(mpd "firefox --profile $HOME/.ff" thunar pidgin skypeforlinux Telegram)
 # WIDTH and HEIGHT were set in the ~/.preload.sh
 case $HOSTNAME in
 	home)
@@ -192,7 +193,7 @@ for app in "${startup_apps[@]}"; do
 	#   including subshell created by the left part of ‘||’ statement.
 	# (nohup $app) actually needed only for emacs as daemon
 	# Preventing apps that persist between sessions to be runned again
-	pgrep -u $UID -f "^$app\>" >/dev/null || { (nohup $app </dev/null &>/dev/null) & }
+	pgrep -u $UID -f "$app\>" >/dev/null || { (nohup $app </dev/null &>/dev/null) & }
 done
 
 c=0; until mpc &>/dev/null; do

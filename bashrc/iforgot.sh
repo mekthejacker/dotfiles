@@ -523,17 +523,18 @@ iforgot-iptables() {
 	cat <<-"EOF"
 	Destination NAT means, we translate the destination address of a packet to make it go somewhere else instead of where it was originally addressed.
 
-	# iptables -t nat -A  PREROUTING -d 10.10.10.99/32 -j DNAT --to-destination 192.168.1.101
+	# iptables -t nat -A  PREROUTING        -d 10.10.10.99/32                  -j DNAT --to-destination 192.168.1.101:22 --comment "It’s for the fun of it."
+	                                 -p tcp                    --dport 22022
 
 	Source NAT. We want to do SNAT to translate the from address of our reply packets to make them look like they’re coming from 10.10.10.99 instead of 192.168.1.101.
 
-	# iptables -t nat -A POSTROUTING -s 192.168.1.101/32 -j SNAT --to-source 10.10.10.99
+	# iptables -t nat -A POSTROUTING -s 192.168.1.101/32 -j SNAT --to-source 10.10.10.99 --comment "It’s for the fun of it."
 
 	Sometimes SNAT doesn’t suit the task, if the --to-source IP address is dynamic. Iptables can dynamically get the address, if you use MASQUERADE, but it is slower.
 
 	# iptables -t nat -A POSTROUTING -s 10.0.0.0/24 --sport 123[:789] \
-	-d 10.1.0.0/24 --dport 456[:654] \
-	-o OUT_IFACE -j MASQUERADE
+	           -d 10.1.0.0/24 --dport 456[:654] \
+	           -o OUT_IFACE -j MASQUERADE
 
 	To delete a rule, get its number first:
 
@@ -680,7 +681,9 @@ iforgot-create-video-from-image-sequence-with-ffmpeg() {
 
 iforgot-record-my-desktop() {
 	cat <<-"EOF"
-	ffmpeg -y  -f x11grab -video_size 1600x875 -framerate 25 -i :0.0+0,25 -f alsa -ac 2 -i hw:0 -async 1 -b:v 1000k -vcodec libx264 -crf 0 -preset ultrafast -acodec pcm_s16le /tmp/output.mkv
+
+	ffmpeg -y  -f x11grab  -s 1920x1080          -r 30          -i :0.0       -vcodec libx264 -g 60   -keyint_min 30 -b:v 1500k -minrate 1500k -maxrate 1500k -pix_fmt yuv420p -preset slow -tune film -threads 4 -strict normal -bufsize 1500k /tmp/outp.mp4
+	ffmpeg -y  -f x11grab  -video_size 1600x875  -framerate 25  -i :0.0+0,25  -f alsa -ac 2 -i hw:0 -async 1 -b:v 1000k -vcodec libx264 -crf 0 -preset ultrafast -acodec pcm_s16le /tmp/output.mkv
 
 	-crf 0   requires   -b:v 0   !!!
 	-crf 0   requires   -b:v 0   !!!
@@ -1483,7 +1486,7 @@ iforgot-no-space-left() {
 
 	1. Deleted files, that aren’t actually unlinked yet
 	In this case, often met with tmpfs, while du -hsx says that there’s plenty
-	of space, and ‘df’ says there’s none or only a little. 
+	of space, and ‘df’ says there’s none or only a little.
 	There should be processes that still hold these files and prevent their
 	physical removal from the filesystem. Kill these processess, and the space
 	will be freed. How to find such processes?
@@ -1733,8 +1736,12 @@ iforgot-wget() {
 
 iforgot-ntp () {
 	cat <<-EOF
+	Check a specific server:
+	    # ntpdate -q 10.10.10.10
+	Offset must be <1 sec
+
 	Print currently used servers
-	ntpq -p
+	    # ntpq -p
 	remote: peers speficified in the ntp.conf file
 	* = current time source
 	# = source selected, distance exceeds maximum value
@@ -2156,5 +2163,13 @@ iforgot-ftp-from-commandline() {
 iforgot-ssl-check-pem-cert() {
 	cat <<-"EOF"
 	echo | openssl s_client -showcerts -servername sealion.club -connect sealion.club:443 2>/dev/null | openssl x509 -inform pem -noout -text
+	EOF
+}
+
+iforgot-nvidia-settings() {
+	cat <<-"EOF"
+	nvidia-settings -q fsaa --verbose
+	nvidia-settings -q loganiso --verbose
+	firefox file:///usr/share/doc/nvidia-drivers-367.27/html/openglenvvariables.html
 	EOF
 }

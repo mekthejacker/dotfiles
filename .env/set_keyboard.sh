@@ -15,7 +15,7 @@ numlockx off
 numlockx on
 # Keyboard auto-repeat on
 # NB "xset r on" doesn’t work.
-xset r 
+xset r
 ## Start kbdd to keep diferent layouts for each window
 kbdd
 ## Make all keys sticky
@@ -38,3 +38,10 @@ xsetwacom --set "$touch" Touch off
 
 # Stylus buttons work as middle and right mouse buttons,
 # I’m not sure how to catch the via xev.
+
+ # Reset mouse acceleration/threshold
+#  Should be
+#  $ xset q | grep accel
+#  acceleration:  2/1    threshold:  4
+#
+xset m default
