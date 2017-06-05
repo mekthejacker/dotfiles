@@ -2173,3 +2173,25 @@ iforgot-nvidia-settings() {
 	firefox file:///usr/share/doc/nvidia-drivers-367.27/html/openglenvvariables.html
 	EOF
 }
+
+iforgot-pixz() {
+	echo 'tar Oc .wine-for-indesign  |  pixz  -9 >.wine-for-indesign.tar.xz'
+}
+
+iforgot-indesign-table-caption() {
+	cat <<-EOF
+	1. Place a text frame.
+	2. Put a caption of the ‘table caption’ style there.
+	   It should already have ‘Table N’ in front.
+	3. Apply ‘Table caption’ _object_ style.
+	4. Object style should have anchored the text frame to the last line,
+	   and thanks to the setting in the object style, namely
+	   Anchored object options → Position (Inline or above)
+	       Position = Above line
+	           Alignment = Away from Spine
+	           Space before = 0 cm (increasing will add space BEFORE the line we anchor to,
+	                                making both that line and he frame with table caption
+	                                separated from the previous text)
+	           Space after = -1.3 cm (base paragraph has 14 pt, caption 12 pt)
+	EOF
+}

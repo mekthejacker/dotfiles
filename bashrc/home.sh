@@ -4,7 +4,7 @@
 . iforgot.sh
 . wine.sh
 . vm.sh
-. not4public.sh
+. jobu.sh
 
 #
  #  Common aliases
@@ -255,3 +255,14 @@ alias vm-pxe-client-setup="qemu-system-x86_64  -enable-kvm \
 	-name 'vm-pxe-clinet-setup,process=vm-pxe-client-setup' \
 	-netdev vde,id=pxelan,sock=/tmp/vde.ctl \
 		-device virtio-net-pci,netdev=pxelan,mac=BA:C1:47:2B:4C:14"
+
+
+alias vm-u="qemu-graphic	-smp 2,cores=2,threads=1 -m 1512  \
+	-vga qxl -spice addr=192.168.5.1,port=5904,disable-ticketing \
+	-qmp unix:$HOME/qmp-sock-uboo-server,server,nowait \
+	-name 'Uboo-serv,process=vm-uboo-serv' -rtc base=localtime -usbdevice tablet \
+	-drive file=$HOME/desktop/eltex.raw.img,format=raw,if=ide \
+	-drive file=/home/soft_lin/ubuntu-14.04.5-server-amd64.iso,media=cdrom,index=1 \
+	-netdev vde,id=mynet,sock=/tmp/vde.ctl \
+		-device virtio-net-pci,netdev=mynet"
+alias vm-uc="spicec -h 192.168.5.1 -p 5904 -t QEMU_Uboo-serv____Shift_F11"

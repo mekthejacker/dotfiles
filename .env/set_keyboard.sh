@@ -17,6 +17,8 @@ numlockx on
 # NB "xset r on" doesn’t work.
 xset r
 ## Start kbdd to keep diferent layouts for each window
+killall kbdd
+sleep 1
 kbdd
 ## Make all keys sticky
 #xkbset sticky -twokey -latchlock

@@ -35,11 +35,11 @@ readarray -t used_cache < "$used_files"
 file=''
 message=''
 pre="$rc:"$'\n'
-VERSION='20170422-0824'
+VERSION='20170603-0858'
 [[ "$REP" =~  ^[0-9]+$ ]] && {
 	in_reply_to_status_id="$REP"
 }
-source='Anibot'
+[ -v source ] || source='Anibot.sh'
 
 read_rc_file() {
 
@@ -192,15 +192,17 @@ find_an_image() {
 	}
 	# declare -p show_name show_name_hashtag middle_hashtags
 	declare -g _message
-	[ "$show_name_hashtag" -o "$webm_hashtag" ] && newline=$'\n'
-	# Middle hashtags may exist only is show_name_hashtag is set
-	[ "$middle_hashtags" ] && middle_hashtags=" $middle_hashtags"
-	[ "$show_name_hashtag" ] && webm_hashtag=" $webm_hashtag"
+	[ -v no_file_info ] || {
+		[ "$show_name_hashtag" -o "$webm_hashtag" ] && newline=$'\n'
+		# Middle hashtags may exist only is show_name_hashtag is set
+		[ "$middle_hashtags" ] && middle_hashtags=" $middle_hashtags"
+		[ "$show_name_hashtag" ] && webm_hashtag=" $webm_hashtag"
 
-	[ -v special_message ] || {
-		read -r -d '' _message <<-EOF
-		$filename${newline:-}${show_name_hashtag:-}${middle_hashtags:-}${webm_hashtag:-}
-		EOF
+		[ -v special_message ] || {
+			read -r -d '' _message <<-EOF
+			$filename${newline:-}${show_name_hashtag:-}${middle_hashtags:-}${webm_hashtag:-}
+			EOF
+		}
 	}
 }
 
@@ -256,7 +258,7 @@ while :; do
 	# 1/5 chance to attach a webm/mp4
 	unset attach_video
 	[ -r "$D" ] || {
-		[ `shuf -i 0-4 -n 1` -eq 0 ] && {
+		[ ! -v no_media -a `shuf -i 0-4 -n 1` -eq 0 ] && {
 			echo ' …with a video!'
 			attach_video=t
 		}|| echo

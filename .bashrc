@@ -13,7 +13,7 @@ unalias -a
 #     unset -f `declare -F | sed 's/^declare -f //g'`
 # won’t it break something that have been read from /etc/…?
 unset -f `sed -nr "s/^\s*([-_a-zA-Z0-9]+)\(\)\s*\{.*$/\1/p" \
-          ~/.bashrc ~/bashrc/* 2>/dev/null`
+          ~/.bashrc ~/bashrc/* ~/repos/bhlls/bhlls.sh 2>/dev/null`
 
 for opt in autocd cdspell dirspell dotglob extglob globstar \
     no_empty_cmd_completion; do
@@ -123,7 +123,7 @@ gen_prompt() {
 	}
 	PS1+="${b}┎ $chroot$PWD\n${b}┖ "
 	case $USER in
-		"$ME") 
+		"$ME")
 			PS1+="$g"
 			;;
 		root)
@@ -245,6 +245,7 @@ alias tmux="tmux -u -f ~/.tmux/config -L dtr"
 	mkdir -m 700 /tmp/envlogs &>/dev/null # /tmp should be on tmpfs
 }
 # code     file               logfile (under /tmp/envlogs/)
+# +    starts the string
 # x    /usr/bin/X          x (just for the file name, it’s always present)
 # p    ~/.preload.sh       preload
 # i    /usr/bin/i3         i3.stdout + i3.stderr
@@ -264,20 +265,13 @@ export ENV_DEBUG='+'
 	# rm ~/.xorg.conf.suffix &>/dev/null
 }
 
-# add to todo list
-tda() { echo "`date +'%_d %b %Y'`  $@" >> ~/todo; }
-# delete from todo list
-tdd() {
-	[ "$*" ] || {
-		tdd `wc -l ~/todo`
-		return 0
-	}
-    [ "$1" = '-' ] && echo -n >~/todo || {
-        for i in $@; do
-            [[ "$i" =~ ^[0-9]+$ ]] && sed -i $1d ~/todo
-        done
-    }
-}
+ # Sourcing bhlls for err() and info() functions
+#
+NO_CHECK_FOR_SOURCED_SCRIPT=t
+NO_LOGGING=t
+. ~/repos/bhlls/bhlls.sh
+# Returning pathname expansion after bhlls
+set +f
 
 pushd ~/bashrc >/dev/null
 hostnamerc=${HOSTNAME%.*}.sh
@@ -303,13 +297,13 @@ one_command_execute() {
 			local old_first_word="$first_word"
 		} || local all_aliases_expanded=t
 	done
-	(nohup $READLINE_LINE) &
+	(nohup /bin/bash -c "$READLINE_LINE") &
 	local c=0
 	until [ $((c++)) -eq 3 ]; do
 		xdotool search --onlyvisible --pid $! &>/dev/null && break
 		sleep 1
 	done
-	exit
+	exit 0
 }
 
 [ -v ONE_COMMAND_SHELL ] && {

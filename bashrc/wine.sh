@@ -31,7 +31,7 @@
 	#    [$@] — list of arguments for wine, winetricks etc.
 	#
 	wine() {
-		local arch=32 binary _funcname=wine
+		local arch=32 binary _funcname=wine prefix
 		[[ -v FUNCNAME[1] && ${FUNCNAME[1]} = @(wine|winecfg|winetricks|regedit|wine64|winecfg64|winetricks64|regedit) ]] \
 			&& _funcname=${FUNCNAME[1]} || _funcname=wine
 		case $_funcname in
@@ -52,15 +52,23 @@
 				echo 'I am not supposed to run as this command.' >&2
 				return 3
 		esac
-		WINEARCH=win$arch WINEPREFIX=/home/sszb/.wine${arch//32/} sudo -u sszb -H $binary "$@"
+		# If WINEPREFIX is set in the environment, use that specific WINEPREFIX.
+		#   I use specific prefix for InDesign, for example, because I’m afraid
+		#   to accidentally spoil it.
+		# If WINEPREFIX is not set, assume ~sszb/.wine64 if $arch is ‘64’,
+		#   or ~sszb/.wine, if $arch is ‘32’
+		[ -v WINEPREFIX ] && prefix="$WINEPREFIX" || prefix=/home/sszb/.wine${arch//32/}
+		WINEARCH=win$arch WINEPREFIX="$prefix" sudo -u sszb -H $binary "$@"
 		# Clean emulated wine desktop from icons placed by programs
 		sudo -u sszb -H /bin/rm /home/sszb/.wine${arch//32/}/drive_c/users/sszb/#msgctxt#directory#Desktop/* \
 			/home/sszb/.wine${arch//32/}/drive_c/users/Public/#msgctxt#directory#Desktop/* 2>/dev/null
 	}
+	export -f wine
 	#
 	alias killsteam="pkill -9 -f 'hl2.*'; pkill -9 -f steam"
 	alias killdota="pkill -9f dota2"
-	alias killsszb='sudo -u sszb /usr/bin/killall -9 -u sszb'
+	killsszb() { sudo -u sszb /usr/bin/killall -9 -u sszb; }
+	export -f killsszb
 	alias kill-my-semaphores='for i in $(ipcs -s | sed -rn "s/.*\s([0-9]+)\s+'$USER'.*/\1/p"); do ipcrm -s $i; done;'
 	alias kill-sszb-semaphores="for i in $(ipcs -s | sed -rn 's/.*\s([0-9]+)\s+sszb.*/\1/p'); do ipcrm -s $i; done"
 	#
@@ -75,6 +83,7 @@
 	alias hl2-ep2-cm="pushd /home/games/steam/SteamApps/common/CM2013/; wine Launcher_EP2.EXE; popd"
 	alias hl2-cm-conf="pushd /home/games/steam/SteamApps/common/CM2013/; wine Configurator.EXE; popd"
 	alias il2="pushd /home/games/IL2; wine il2fb.exe; popd"
+	alias indesign="pushd /home/games/indesign/Adobe\ InDesign\ CS6; WINEPREFIX=~sszb/.wine-for-indesign wine InDesign.exe; killsszb; popd"
 	alias minimetro="$HOME/assembling/minimetro/MiniMetro*x86_64"
 	alias s="taskset -c 1-3 steam"
 	alias teamviewer="pushd /home/soft_win/teamviewer_8_portable; wine TeamViewer.exe; popd"
