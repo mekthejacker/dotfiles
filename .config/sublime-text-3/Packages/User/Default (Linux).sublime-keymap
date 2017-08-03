@@ -137,7 +137,6 @@
 
 
 	{ "keys": ["ctrl+shift+tab"], "command": "noop" },
-	{ "keys": ["ctrl+tab"], "command": "noop" },
 
 	{ "keys": ["ctrl+a"], "command": "select_all" },
 	{ "keys": ["ctrl+shift+l"], "command": "noop" }, //split_selection_into_lines
@@ -263,6 +262,7 @@
 
 	{ "keys": ["ctrl+enter"], "command": "run_macro_file", "args": {"file": "res://Packages/Default/Add Line.sublime-macro"} },
 	{ "keys": ["ctrl+shift+enter"], "command": "run_macro_file", "args": {"file": "res://Packages/Default/Add Line Before.sublime-macro"} },
+	{ "keys": ["ctrl+shift+t"], "command": "max_pane" },
 	{ "keys": ["enter"], "command": "commit_completion", "context":
 		[
 			{ "key": "auto_complete_visible" },
@@ -272,7 +272,7 @@
 
 	{ "keys": ["ctrl+p"], "command": "move_to", "args": {"to": "brackets"} }, //"command": "show_overlay", "args": {"overlay": "goto", "show_files": true}
 	{ "keys": ["ctrl+shift+p"], "command": "show_overlay", "args": {"overlay": "command_palette"} },
-	{ "keys": ["ctrl+alt+p"], "command": "prompt_select_workspace" },
+	{ "keys": ["ctrl+tab"], "command": "prompt_select_workspace" },
 	{ "keys": ["ctrl+r"], "command": "noop" }, //"command": "show_overlay", "args": {"overlay": "goto", "text": "@"}
 	{ "keys": ["ctrl+g"], "command": "noop" },  //"show_overlay", "args": {"overlay": "goto", "text": ":"} },
 	{ "keys": ["ctrl+;"], "command": "noop" },  //show_overlay", "args": {"overlay": "goto", "text": "#"} },

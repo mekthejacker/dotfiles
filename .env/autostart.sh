@@ -72,7 +72,7 @@ else
 	set remain-on-exit on \; \
 	neww su \; \
 	set remain-on-exit on \; \
-	neww -n anibot "cd ~/bin/animepostibgbot/; ./animepostingbot.sh" \;
+	new -d -s anibot "cd ~/bin/animepostibgbot/; ./animepostingbot.sh" \;
 	set remain-on-exit on \; \
 	select-window -t 0:1
 	#Another user termianl in tmux
@@ -84,7 +84,8 @@ fi
 
 pointer_control disable
 
-startup_apps=(mpd "firefox --profile $HOME/.ff" thunar pidgin skypeforlinux Telegram)
+#startup_apps=(mpd "firefox --profile $HOME/.ff" thunar pidgin Telegram)
+startup_apps=(mpd  thunar pidgin Telegram)
 # WIDTH and HEIGHT were set in the ~/.preload.sh
 case $HOSTNAME in
 	home)
@@ -101,7 +102,7 @@ esac
 #   fake transparency.
 #~/bin/wallpaper_setter/wallpaper_setter.sh -w &
 
-urxvtc --title 'Todo list' -e watch -t -n15 cat -n ~/todo
+urxvtc
 # ┌────┐
 # │    │
 # │    │
@@ -136,7 +137,7 @@ xte 'mouseclick 1'
 # raise upper empty urxvtc up to ≈5/6 of the height
 i3-msg resize grow height 30 px or 30 ppt
 i3-msg split h
-urxvtc -hold -title tmux -e $tmux attach
+urxvtc -hold -title tmux -e /bin/bash -c "$tmux attach; bash"
 # ╔═════════════════╗ # ╔════════╤════════╗
 # ║        ⋅        ║ # ║        │        ║
 # ║                 ║ # ║        │        ║

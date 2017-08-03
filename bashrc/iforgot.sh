@@ -406,7 +406,8 @@ iforgot-kaomoji-drawing() {
 
 	(⚈益⚈) (⌕…⌕) ( °ヮ°) (´Д ` ) ╭(＾▽＾)╯ /(⌃ o ⌃)\ ╰(^◊^)╮ ◜(◙д◙)◝ (ʘ‿ʘ)  (≖‿≖)
 
-	´ ▽ ` )ﾉ  (・∀・ )  (ΘεΘ;)  ╮(─▽─)╭  (≧ω≦)  (´ヘ｀ ;)  (╯3╰)  (⊙_◎)  (¬▂¬)
+	´ ▽ ` )ﾉ  (・∀・ )  (ΘεΘ;)  ╮(─▽─)╭  (≧ω≦)  (´ヘ｀ ;)  (╯3╰)  (⊙_◎)  (¬▂¬) ¬_¬
+	´ ▽ ` )ﾉ  ôヮô  ŎםŎ   ಥ﹏ಥ   ᕙ(⇀‸↼‶)ᕗ   ≧ヮ≦     ☜(ﾟヮﾟ☜)     ヽ(´ｰ｀ )ﾉ       (¬‿¬)
 
 	(つд⊂)
 
@@ -1932,6 +1933,9 @@ iforgot-remote-desktop-with-x11vnc() {
 	                 \           \_ auth file is necessary for xdm/gdm/kdm
 	                  \_ :0 is the default and may be omitted
 
+	  Also for cross-platform connections:
+		-xkb -nomodtweak to solve Shift/layout bugs.
+
 	On the local host:
 	    remmina
 	or poorer choice,
@@ -2194,4 +2198,141 @@ iforgot-indesign-table-caption() {
 	                                separated from the previous text)
 	           Space after = -1.3 cm (base paragraph has 14 pt, caption 12 pt)
 	EOF
+}
+
+iforgot-hugo() {
+	cat <<-"EOF"
+	alias hugo-future="hugo --cleanDestinationDir \
+	                        --ignoreCache \
+		                    --buildDrafts -buildFuture --buildExpired \
+		                    -s ~/repos/goen \
+		                    -c ~/repos/goen/content \
+		                    -d ~/repos/goen/future \
+		                    && hugo server -ws ~/repos/goen -d ~/repos/goen/future"
+	alias hugo-public="hugo --cleanDestinationDir \
+		                    --ignoreCache \
+		                    -s ~/repos/goen \
+		                    -c ~/repos/goen/content \
+		                    -d ~/repos/goen/public"
+
+	Files:
+	/layouts/                     Here are all HTML templates
+	         _index.html          Main page
+	         _default/
+	                  baseof.html
+	                  categories.html
+	                  list.html
+	                  single.html
+	/content/
+	         _index.html          Used for its Front Matter
+
+	Test 404 page like that:
+	http://localhost:1313/404.html
+
+	Date format is peculiar and works under the following rule:
+	//    Jan 2 15:04:05 2006 MST
+	//      | |  |  |  |    |   |
+	//      1 2  3  4  5    6  -7
+	//
+	// Format strings absolutely must adhere to the 1-2-3-4-5-6-7 order:
+	//
+	// Month must be Jan, January, 01, or 1
+	// Date must be 02 or 2
+	// Hour must be 03, 3, or 15
+	// Minute must 04
+	// Second must be 05
+	// Year must be 2006
+	// Timezone must be MST or -7
+
+	EOF
+}
+
+iforgot-sublime-maxpane() {
+	echo -e '\tC-S-t'
+}
+
+iforgot-sublime-autoload() {
+	cat <<-"EOF"
+	/home/dtr/.config/sublime-text-3/Packages/Max_pane_autoload/Max_pane_autoload.py
+	http://sublimetexttips.com/execute-a-command-every-time-sublime-launches/
+	EOF
+}
+
+iforgot-netstat() {
+	cat <<-"EOF"
+	netstat -l    Show only listening sockets. (These are omitted by default.)
+	        -a    Show both listening and non-listening sockets.
+
+	        -p    Show the PID and name of the program to which each socket belongs.
+	        -c    Update info every second
+	        -r    Same as ‘route -n’, useful when ‘route’ is not present.
+	        -g    Show multicast groups that the host is subscribed to.
+	        -M    Display msqueraded connections
+
+	EOF
+}
+
+iforgot-dig() {
+	cat <<-"EOF"
+	dig  [A]  example.com  @dns-server.com
+	      \
+	       \_Record type: A, MX…
+
+	dig MX google.co.uk @ns1.google.com
+	    ;; ANSWER SECTION:
+	    google.co.uk.  10800  IN  MX  10
+	          \          \     \   \   \
+	           \          \     \   \   \_ Priority
+	            \          \     \   \_Record type
+	             \          \     \_Record class: IN(ternet) or CH(aos)
+	              \          \_TTL
+	               \_Domain name in question
+
+	EOF
+	# Source: http://droptips.com/using-dig-to-query-a-specific-dns-server-name-server-directly-linux-bsd-osx
+}
+
+iforgot-rename() {
+	cat <<-"EOF"
+	perl-rename
+
+	-n  dry run
+	-v  verbose
+
+	It works like mv + sed.
+	That means pattern you parse and the resulting name will have exactly
+	  the same type of path (may be absolute!).
+
+	./Иванов, ген.-м., нач. штаба 6-й Армии Киев.-го. особ. воен. округа (Ю.-З. фронта)/17 tild3665-3930-4161-b137-646365326663__3_6__011219410_1517861244130_1.jpg
+	    ->
+	./Иванов, ген.-м., нач. штаба 6-й Армии Киев.-го. особ. воен. округа (Ю.-З. фронта)/Иванов - 17.jpg
+	find . -type f -print0 | xargs -0 -I{} \
+	                         perl-rename -vn 's/\.\/(\S+)(,.*[^\/])\/([0-9]+)\s.*(\.[jJ][pP][eE]?[gG])$/.\/$1$2\/$1 - $3$4/' {}
+
+	EOF
+}
+
+ # Checks if passed certificate matches passed private key
+#  $1 – certificate
+#  $2 – private key
+#
+iforgot-ssl-check-if-cert-and-pk-match() {
+	[ ! -r "$1" -o ! -r "$2" ] && {
+		echo "Check that certificate matches private key"
+		echo "${FUNCNAME[0]} <certificate> <private_key>"
+		return
+	}
+	CERT_NAME="$1"
+	PRIV_NAME="$2"
+
+	# Create the Server Key, CSR, and Certificate
+	echo "*** Generating Server Key, CSR, and Certificate with password"
+	CERT_MODULUS=$(openssl x509 -noout -text -in ${CERT_NAME} -modulus | grep "Modulus=")
+	PRIV_MODULUS=$(openssl rsa -noout -text -in ${PRIV_NAME} -modulus | grep "Modulus=")
+
+	#echo ${CERT_MODULUS}
+	#echo ${PRIV_MODULUS}
+	[ ${CERT_MODULUS} = ${PRIV_MODULUS} ] \
+		&& echo "Certificate match private key" \
+		|| echo "Certificate and private key differ"
 }

@@ -85,7 +85,7 @@
 	alias il2="pushd /home/games/IL2; wine il2fb.exe; popd"
 	alias indesign="pushd /home/games/indesign/Adobe\ InDesign\ CS6; WINEPREFIX=~sszb/.wine-for-indesign wine InDesign.exe; killsszb; popd"
 	alias minimetro="$HOME/assembling/minimetro/MiniMetro*x86_64"
-	alias s="taskset -c 1-3 steam"
+	#alias s="taskset -c 1-3 steam"
 	alias teamviewer="pushd /home/soft_win/teamviewer_8_portable; wine TeamViewer.exe; popd"
 	alias wog="/bin/bash -c '{ pushd /home/games/WorldOfGoo; ./WorldOfGoo.bin64; popd; }'"
 	alias wow='wine /home/sszb/.wine/drive_c/Program\ Files/WOW\ Slider/WOWSlider.exe'

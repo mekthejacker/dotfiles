@@ -266,3 +266,22 @@ alias vm-u="qemu-graphic	-smp 2,cores=2,threads=1 -m 1512  \
 	-netdev vde,id=mynet,sock=/tmp/vde.ctl \
 		-device virtio-net-pci,netdev=mynet"
 alias vm-uc="spicec -h 192.168.5.1 -p 5904 -t QEMU_Uboo-serv____Shift_F11"
+
+
+
+ # Hugo
+#
+alias hugo-future="hugo --cleanDestinationDir \
+	                    --ignoreCache \
+	                    --buildDrafts -buildFuture --buildExpired \
+	                    --verboseLog --logFile hugo.log \
+	                    -s ~/repos/goen \
+	                    -c ~/repos/goen/content \
+	                    -d ~/repos/goen/future \
+	                    && hugo server --buildDrafts -ws ~/repos/goen -d ~/repos/goen/future"
+alias hugo-public="hugo --cleanDestinationDir \
+	                    --ignoreCache \
+	                    -s ~/repos/goen \
+	                    -c ~/repos/goen/content \
+	                    -d ~/repos/goen/public"
+
