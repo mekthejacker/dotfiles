@@ -68,7 +68,7 @@ done
 [ -v INDEXED -a -v jpeg ] \
 	&& echo '-indexed and -jpeg cannot be given simultaneously.' >&2 && exit 6
 
-filename=$HOME/desktop/$(date +%s).png
+filename="$XDG_DESKTOP_DIR/$(date +%s).png"
 gnome-screenshot ${area:-} ${window:-} ${delay:-} --file="$filename"
 pngcrush -reduce -ow -nofilecheck "$filename" \
 	|| notify-send -l -t 3000 -i error "Failed to pngcrush screenshot" "$filename"
