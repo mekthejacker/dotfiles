@@ -982,12 +982,69 @@ iforgot-mkfs-ext4-options() {
 	cat <<-EOF
 	For /boot:
 	# 40–50 MiB should be enough.
+
 	For /:
-	# Actually, 1 mln inodes is enough, 200% is for accidental need for a system in chroot.
-	mkfs.ext4 -j -L "root" $(: -b1024) -O extent,dir_index -N 300000 /dev/sda2
+	# 1. 350K inodes is a minimum for a root FS without /home and ccache.
+	#    Ccache would take 250k inodes for 3.6 Gigs of memory.
+	# 2. If you plan deploying chroots, consider adding another 350K per chroot, better 400K
+	mkfs.ext4 -j -L "root" -b1024 -O extent,dir_index -N 350000 /dev/sda2
+
 	For /home:
 	# For home, the number of inodes is around 500K per TB.
 	mkfs.ext4 -j -L "home" -m0 -O extent,dir_index,sparse_super -N 500000  /dev/sda3
+
+	Latest creating a new / (no /home, ccache=4G):
+	1. After compiling
+	   @system twice
+	# df -h /
+	Filesystem      Size  Used Avail Use% Mounted on
+	/dev/sdc4        40G  3.5G   35G  10% /
+
+	# df -hi /
+	Filesystem     Inodes IUsed IFree IUse% Mounted on
+	/dev/sdc4        480K  315K  166K   66% /
+
+	2. After compiling
+	   ~one third of the @world
+	# df -h /
+	Filesystem      Size  Used Avail Use% Mounted on
+	/dev/sdc4        40G  9.1G   29G  24% /
+
+	# df -hi /
+	Filesystem     Inodes IUsed IFree IUse% Mounted on
+	/dev/sdc4        480K  479K  2.0K  100% /
+
+	3. After compiling almost everything of the @world expect ~20 packages,
+	   that depend on ffmpeg. Also yad, scim-anthy.
+	# df -h /
+	Filesystem      Size  Used Avail Use% Mounted on
+	/dev/sdc4        40G   19G   20G  49% /
+
+	# df -hi /
+	Filesystem     Inodes IUsed IFree IUse% Mounted on
+	/dev/sdc4        960K  752K  209K   79% /
+
+	# CCACHE_DIR="/var/tmp/ccache" ccache -s
+	cache hit (direct)                 44410
+	cache hit (preprocessed)           52245
+	cache miss                        240467
+	cache hit rate                     28.67 %
+	multiple source files                 44
+	compile failed                     12289
+	ccache internal error                  7
+	preprocessor error                  7169
+	can't use precompiled header          82
+	bad compiler arguments              6740
+	unsupported source language           70
+	autoconf compile/link              75586
+	unsupported compiler option         3125
+	unsupported code directive             6
+	output to stdout                      14
+	no input file                      22942
+	cleanups performed                   103
+	files in cache                    243541
+	cache size                           3.6 GB
+	max cache size                       5.0 GB
 	EOF
 }
 

@@ -72,6 +72,7 @@ modules=(
 	# Simply erase or comment a separator, if you don’t need it.
 	[100]=
 	[101]=envdebug_status
+	[125]=mpvencoder
 	[130]=mpd_state
 	[140]=speakers_state
 	[150]=mic_state
@@ -409,7 +410,7 @@ get_internet_status() {
 			elif [ "$PING_HOST" != "$GOOGLE_DNS" -a -v ping_successful ]; then
 				internet_status='{ "full_text": "∿ GW OK",
 \t  "separator":false },'
-set -x
+# set -x
 			elif [ "$PING_HOST" != "$GOOGLE_DNS" -a ! -v ping_successful ]; then
 				# We pinged our gateway and it was unsuccessful.
 				#   Maybe the problem is on our side? I.e. bad cable.
@@ -417,7 +418,7 @@ set -x
 \t  "color": "'$yellow'",
 \t  "separator":false },'
 			fi
-set +x
+# set +x
 			exec {PINGOUT}<&-
 		}
 		[ -v COPROC ] || {
@@ -448,13 +449,25 @@ set +x
 	# set +x
 }
 
+get_mpvencoder() {
+	local wait_time=5 bad_encoder_pids
+	[ $TIMEOUT_STEP -eq 0 -o $((TIMEOUT_STEP % wait_time)) -eq 0 ] && {
+		unset mpvencoder
+		bad_encoder_pids=(`pgrep -f ".*mpv.*ovc.*"`)
+		[ ${#bad_encoder_pids[@]} -ne 0 ] \
+			&& mpvencoder="{ \"full_text\": \"ENC:${bad_encoder_pids[@]}\",
+\t  \"color\": \""$blue"\",
+\t  \"separator\":false },"
+	}
+}
+
 # RELIES UPON:
 #     HAS_INTERNETS
 get_gmail() {
 	local wait_time=5 gmail_server_reply letters_unread
 	[ $TIMEOUT_STEP -eq 0 -o $((TIMEOUT_STEP % wait_time)) -eq 0 ] && {
 		unset gmail
-		set -x
+		# set -x
 		if [ -v HAS_INTERNETS ]; then
 			gmail_server_reply=`curl --connect-timeout $wait_time \
 			-su $GMAIL_USERNAME:$GMAIL_PASSWORD \

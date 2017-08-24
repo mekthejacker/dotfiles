@@ -36,7 +36,7 @@
 #	atd
 #	    that is already set up and running.
 
-# set -x
+ set -x
 # exec &>/tmp/envlogsscr
 
 while [ "$1" ]; do
@@ -54,6 +54,10 @@ while [ "$1" ]; do
 		-indexed)
 			INDEXED=t
 			;;
+		-ocr)
+			area='--area' && sleep 1  # sleep is for the WM
+			OCR=t
+			;;
 		*)
 			notify-send --hint int:transient:1 -t 3500 -i error "$0" "Unknown option: ‘$1’."
 			exit 5
@@ -68,17 +72,29 @@ done
 [ -v INDEXED -a -v jpeg ] \
 	&& echo '-indexed and -jpeg cannot be given simultaneously.' >&2 && exit 6
 
-filename="$XDG_DESKTOP_DIR/$(date +%s).png"
+[ -v OCR ] \
+	&& filename="/tmp/$(date +%s).png" \
+	|| filename="$HOME/desktop/$(date +%s).png"
 gnome-screenshot ${area:-} ${window:-} ${delay:-} --file="$filename"
-pngcrush -reduce -ow -nofilecheck "$filename" \
-	|| notify-send -l -t 3000 -i error "Failed to pngcrush screenshot" "$filename"
+[ -v OCR ] || {
+	pngcrush -reduce -ow -nofilecheck "$filename" \
+		|| notify-send --hint int:transient:1 -t 3000 -i error "Failed to pngcrush screenshot" "$filename"
+}
 #[ -v INDEXED ] && {
 #	pngtopam "$filename" | tee /tmp/$n.ppm | pnmcolormap 256 >/tmp/$n_palette.ppm
 #	pnmremap -map=/tmp/$n_palette.ppm /tmp/$n.ppm | pnmtopng >$f
 #	rm /tmp/$n.ppm /tmp/$n_palette.ppm
 #}
+set -x
+[ -v OCR ] && {
+	luft=50  # requirement by my workplace: give copywriters a range of ‘max chars − 50 … max_chars’
+	chars=`tesseract "$filename" stdout -l eng+rus | wc --chars`
+	min_chars=`echo "scale=0; $chars - $luft" | bc -q`
+	notify-send --hint int:transient:1 -t 3000 -i info "­$min_chars…$chars" "characters"
+	exit
+}
+
 [ -v OPEN_IN_GIMP ] && gimp "$filename" || {
 	viewnior --class="screenshot_preview" "$filename"
 	at "`date --date="+10 minutes" +"%H:%M"`" <<<"rm $filename"
 }
-
