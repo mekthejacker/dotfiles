@@ -85,7 +85,7 @@ gnome-screenshot ${area:-} ${window:-} ${delay:-} --file="$filename"
 #	pnmremap -map=/tmp/$n_palette.ppm /tmp/$n.ppm | pnmtopng >$f
 #	rm /tmp/$n.ppm /tmp/$n_palette.ppm
 #}
-set -x
+
 [ -v OCR ] && {
 	luft=50  # requirement by my workplace: give copywriters a range of ‘max chars − 50 … max_chars’
 	chars=`tesseract "$filename" stdout -l eng+rus | wc --chars`
