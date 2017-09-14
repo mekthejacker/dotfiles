@@ -8,7 +8,7 @@
 ! SYNTAX
 !	<WM_CLASS>.<optionname>: <value>
 !		Usually urxvt have ‘urxvt’ and ‘URxvt’ as its WM classes.
-!	 	WM_CLASS in the example above may be:
+!		WM_CLASS in the example above may be:
 !		- ‘rxvt’, then same options derived from rxvt will work for urxvt;
 !		- ‘URxvt’, these options will not work for rxvt.
 !	<optionname>: <value>
@@ -20,15 +20,38 @@
 !       i.e. any window.
 ! See output of xprop for window class information.
 
-
-!--- Xft settings
+!
+!  Xft settings
+!
+! AA fonts: 0 – no, 1 – yes, -1 is default.
 !
 Xft.antialias: 1
+
+! 0 – no, 1 – yes, -1 is default.
+!
 Xft.hinting: 1
-Xft.hintstyle: hintfull
+
+! hintnone, hintslight, hintmedium, or hintfull.
+!
+Xft.hintstyle: hintmedium
+
+! Subpixel antialiasing:
+! none, rgb, bgr, vrgb, vbgr.
+!
 Xft.rgba: rgb
+
+! lcdnone, lcdlight, lcddefault, lcdlegacy
+! http://www.spasche.net/files/lcdfiltering/
+!
 Xft.lcdfilter: lcddefault
-!Xft.dpi: 92
+
+! Resolution for Xft, in 1024×dots/inch. -1 to use default value.
+!
+Xft.dpi: 101
+
+
+Gtk.CanChangeAccels: true
+
 
 !--- Terminal settings
 !
@@ -49,8 +72,9 @@ URxvt.cursorUnderline: false
 
 ! NB the commas between fonts
 ! :antialias=true :autohint=true may help, if something.
-URxvt.font: xft:Terminus, \
-            xft:DejaVu Sans Mono
+!URxvt.font: xft:DejaVu Sans Mono,\
+!            xft:Terminus
+URxvt.font: xft:Terminus:pixelsize:12
 
 URxvt.transparent: true
 URxvt.borderless: true

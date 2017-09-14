@@ -90,6 +90,7 @@
 	alias wog="/bin/bash -c '{ pushd /home/games/WorldOfGoo; ./WorldOfGoo.bin64; popd; }'"
 	alias wow='wine /home/sszb/.wine/drive_c/Program\ Files/WOW\ Slider/WOWSlider.exe'
 	alias zeus="pushd /home/games/Poseidon; wine Zeus.exe; popd"
+	alias aod="pushd /home/games/age_of_decadence; wine AoD.exe; popd"
 
 	#
 	# IT DOESN’T WORK PROPERLY FOR WINE64 YET

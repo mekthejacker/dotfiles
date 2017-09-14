@@ -95,12 +95,12 @@
 		"CVS"
 	],
 	"font_face": "DejaVu Sans Mono",
+	"font_size": 11.6,
 	"font_options":
 	[
 		"no_italic",
 		"subpixel_antialias"
 	],
-	"font_size": 12,
 	"gpu_window_buffer": "auto",
 	"gutter": true,
 	"highlight_line": true,

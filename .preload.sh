@@ -19,8 +19,21 @@
 }
 
 echo $DISPLAY
-export ME STARTUP=t WIDTH=800 HEIGHT=600 DPI=96 PRIMARY_OUTPUT \
-	   PATH XMODIFIERS GTK_IM_MODULE QT_IM_MODULE
+
+ # PRELOAD_SH is set on the time of running preload.sh, this file.
+#  This is for the helper files to see this variable in the environment
+#    and understand, that we’re on the startup stage. The variable is
+#    unexported at the end of this file.
+#  PRELOAD_SH affects files only in ~/.env and ~/bin.
+#
+export PRELOAD_SH=t \
+       WIDTH=800 HEIGHT=600 \
+       DPI=`xdpyinfo | sed -rn '/screen #0/ {n;n; s/\s*resolution:\s*([0-9]+)x.*/\1/p}'` \
+       PRIMARY_OUTPUT \
+	   PATH \
+	   XMODIFIERS \
+	   GTK_IM_MODULE QT_IM_MODULE \
+	   ME
 
 # Starting zenity progress window to be aware when lags come from
 #   if they appear.
@@ -117,11 +130,14 @@ push_the_bar 'Determining width, height and dpi of the primary output'
 #                                                                     ^ NB the whitespace
 read WIDTH HEIGHT width_mm < <(xrandr | sed -rn 's/^.* connected.* ([0-9]+)x([0-9]+).* ([0-9]+)mm x [0-9]+mm.*$/\1 \2 \3/p; T; Q1' && echo '800 600 211.6')
 DPI=`echo "scale=2; dpi=$WIDTH/$width_mm*25.4; scale=0; dpi /= 1; print dpi" | bc -q`
+# Another way of getting DPI.
+#xdpyinfo | sed -rn '/screen #0/ {n;n; s/\s*resolution:\s*([0-9]+)x.*/\1/p}'
 [ ${#OUTPUTS} -gt 0 ] && {
 	push_the_bar 'Making sure that we operate on the first monitor'
 	xte "mousemove $(( WIDTH/2 ))  $(( HEIGHT/2 ))"
 	xte 'mouseclick 1'
 }
+sed -ri "s/\s*Xft.dpi:.*/Xft.dpi: $DPI/" ~/.Xresources
 
 
 # II. Setting account information
@@ -168,4 +184,4 @@ echo "101" >$pipe
 exec {pipe_fd}<&-
 rm $pipe
 pkill -9 -f Xdialog
-export -n STARTUP
+export -n PRELOAD_SH

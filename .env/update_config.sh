@@ -8,8 +8,8 @@ sed -r "s/PRIMARY_OUTPUT/$PRIMARY_OUTPUT/g" ~/.env/i3.template.config > ~/.env/i
 for slave_substitute in ${!SLAVE_OUTPUT_*}; do
 	declare -n slave=$slave_substitute
 	sed -ri "s/$slave_substitute/$slave/g" ~/.env/i3.config
-	[ -v STARTUP ] && xrandr --output $slave --off
+	[ -v PRELOAD_SH ] && xrandr --output $slave --off
 done
 # Hide the bar if on plasma
 #[ $HOSTNAME = home ] && sed -ri '/bar \{/,/\}/ {s/(^\s*mode\s+)dock/\1hide/}' ~/.env/config
-[ -v STARTUP ] || i3-msg restart
+[ -v PRELOAD_SH ] || i3-msg restart

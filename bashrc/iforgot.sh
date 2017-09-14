@@ -208,23 +208,32 @@ iforgot-draw-me-cool-figlet-fonts() {
 	EOF
 }
 
+ # $1 – chroot dir
+#
 iforgot-chroot-procedure() {
-	cat <<-"EOF"
+	[ "$1" -a -d "$1" ] \
+		&& chroot_dir="$1" \
+		|| {
+			read -p 'What directory is your chroot? > '
+			chroot_dir="$REPLY"
+		}
+	chroot_dir=${chroot_dir%/}
+	cat <<-EOF
 	# Systemerde requires more!
-	mount -t proc none /mnt/chroot/proc
-	mount --rbind /sys /mnt/chroot/sys
-	mount --rbind /dev /mnt/chroot/dev
-	[linux32] chroot /mnt/chroot /bin/bash
+	mount -t proc none $chroot_dir/proc
+	mount --rbind /sys $chroot_dir/sys
+	mount --rbind /dev $chroot_dir/dev
+	[linux32] chroot $chroot_dir /bin/bash
 
 	env-update && source /etc/profile
-	export PS1="(chroot) $PS1"
+	export PS1="(chroot) \$PS1"
 	# mount /boot /usr etc.
 	…
 	exit
 
-	umount -l /mnt/chroot/dev{/shm,/pts,}
-	umount /mnt/chroot/{boot,proc}
-	umount -l /mnt/chroot{/sys,}
+	umount -l $chroot_dir/dev{/shm,/pts,}
+	umount $chroot_dir/{boot,proc}
+	umount -l $chroot_dir{/sys,}
 	EOF
 }
 
@@ -935,26 +944,31 @@ iforgot-hex-to-dec-conversion() {
 	# http://www.cyberciti.biz/faq/linux-unix-convert-hex-to-decimal-number/
 }
 
-iforgot-nested-xorg() {
+iforgot-nested-xorg-xephyr() {
 cat <<"EOF"
-# At 1500–1800 dpi Xephyr window refuses to take its actual size,
-# but scrot still works. Though a horisontal part that’s out of the visible
-# view, may appear white. If that happens, scroll the browser window.
-Xephyr :108 -dpi 300 -screen 3413x1920 &   # -resizeable
-# Alternative.
-#Xephyr :108 -dpi 1800 -screen 20480x11520
-DISPLAY=:108 /usr/bin/vivaldi &>/dev/null &
-# Firefox has problems
-#DISPLAY=:108 /usr/bin/firefox --profile ~/.mozilla/firefox/highdpi.profile &>/dev/null &
-xbrc="$HOME/.mozilla/firefox/highdpi.profile/.xbindkeys.rc"
+	At 1500–1800 dpi Xephyr window refuses to take its actual size,
+	but scrot still works. Though a horisontal part that’s out of the visible
+	view, may appear white. If that happens, scroll the browser window.
+	­
+	$ Xephyr :108 -dpi 300 -screen 3413x1920 &   # -resizeable
+	­
+	Alternative.
+	­
+	$ Xephyr :108 -dpi 1800 -screen 20480x11520
+	DISPLAY=:108 /usr/bin/vivaldi &>/dev/null &
+	­
+	Firefox has problems
+	DISPLAY=:108 /usr/bin/firefox --profile ~/.mozilla/firefox/highdpi.profile &>/dev/null &
+	xbrc="$HOME/.mozilla/firefox/highdpi.profile/.xbindkeys.rc"
 	cat <<-"EOF" >$xbrc
 	; bind shift + vertical scroll to horizontal scroll events
 	(xbindkey '(shift "b:4") "xte 'mouseclick 6'")
 	(xbindkey '(shift "b:5") "xte 'mouseclick 7'")
 	EOF
-DISPLAY=:108 xbindkeys -f $xbrc
-DISPLAY=:108
-DISPLAY=:108 scrot
+	­
+	DISPLAY=:108 xbindkeys -f $xbrc
+	DISPLAY=:108
+	DISPLAY=:108 scrot
 EOF
 }
 
@@ -1045,6 +1059,45 @@ iforgot-mkfs-ext4-options() {
 	files in cache                    243541
 	cache size                           3.6 GB
 	max cache size                       5.0 GB
+
+	After compiling firefox with pgo
+	# df -hi /
+	Filesystem     Inodes IUsed IFree IUse% Mounted on
+	/dev/sdc4        1.5M  1.1M  420K   72% /
+	While…
+	#  CCACHE_DIR="/var/tmp/ccache" ccache -s
+	files in cache                     72649
+	cache size                           3.6 GB
+
+	After cleaning /var/tmp/portage on the dirty firefox-55 +pgo build
+	# df -hi /
+	Filesystem     Inodes IUsed IFree IUse% Mounted on
+	/dev/sdc4        1.5M  652K  829K   45% /
+
+	Firefox + pgo needs 409 000 inodes
+
+	# df -h /
+	Filesystem      Size  Used Avail Use% Mounted on
+	/dev/sdc4        40G   21G   18G  54% /
+	# df -hi /
+	Filesystem     Inodes IUsed IFree IUse% Mounted on
+	/dev/sdc4        1.5M  633K  848K   43% /
+
+	emerge -cav
+	eclean-dist -df
+	eclean-pkg -dn
+	rm -rf /var/tmp/portage/*
+	CCACHE_DIR="/var/tmp/ccache" ccache -C
+
+	# df -h /
+	Filesystem      Size  Used Avail Use% Mounted on
+	/dev/sdc4        40G   15G   23G  40% /
+
+	# df -hi /
+	Filesystem     Inodes IUsed IFree IUse% Mounted on
+	/dev/sdc4        1.5M  553K  928K   38% /
+
+
 	EOF
 }
 
@@ -2392,4 +2445,90 @@ iforgot-ssl-check-if-cert-and-pk-match() {
 	[ ${CERT_MODULUS} = ${PRIV_MODULUS} ] \
 		&& echo "Certificate match private key" \
 		|| echo "Certificate and private key differ"
+}
+
+iforgot-gentoo-upgrade() {
+	cat <<-"EOF"
+	# cp -a /var/lib/portage/world /mnt/chroot//var/lib/portage/world
+	# cp -ra /etc/* /mnt/chroot//etc/
+
+	Find broken symlinks
+	# find /etc/ -xtype l
+
+	See iforgot-chroot-procedure
+	Everything further is chroot
+
+	env-update
+	. /etc/profile
+	emaint sync -a
+	gcc-config -l
+	gcc-config 2
+	binutils-config -l
+	binutils-config 3
+	eselect profile list
+	eselect profile set 4
+
+	DO NOT emerge --sync after this line!
+
+	First compiling @system to get new @system
+	# emerge -NuDave1 @system
+
+	Second, recompiling @system with the new @system to get rid
+	  of incompatibilities and to gain maximum features.
+	Also we build binary packages here for the case something
+	  gets wrong either during build time or after depclean
+
+	emerge -NuDbave1 @system
+
+	EOF
+}
+
+iforgot-home-station() {
+	cat <<-"EOF"
+	home2 cannot boot properly when it loads in EFI mode – some services do not start properly.
+	Needs a new kernel or a system update?
+	EOF
+}
+
+iforgot-world-cleaning() {
+	cat <<-"EOF"
+	shiki-colors themes depend on gnome-colors-common package
+	EOF
+}
+
+iforgot-fonts() {
+	cat <<-"EOF"
+	1. Build freetype without cleartype, infinality and harfbuzz.
+	2. You can use in eselect fontconfig:
+	   10-hinting-full.conf           (basically, any hinting or no-hinting)
+	   10-scale-bitmap-fonts.conf
+	   10-sub-pixel-rgb.conf          (   —»—   , any sub-pixel or no-subpixel)
+	   11-lcdfilter-default.conf       (  —»—   , any lcdfilter)
+	   20-unhint-small-dejavu-sans.conf
+	   20-unhint-small-dejavu-sans-mono.conf
+	   20-unhint-small-dejavu-serif.conf
+	   20-unhint-small-vera.conf
+	   30-metric-aliases.conf
+	   30-urw-aliases.conf
+	   33-TerminusPCFFont.conf
+	   40-nonlatin.conf
+	   44-wqy-zenhei.conf
+	   45-latin.conf
+	   49-sansserif.conf
+	   50-user.conf
+	   51-local.conf
+	   57-dejavu-sans-mono.conf
+	   60-latin.conf
+	   65-fonts-persian.conf
+	   65-nonlatin.conf
+	   69-unifont.conf
+	   80-delicious.conf
+	   90-synthetic.conf
+	3. In ~/.Xresources aa=1, h=1, ht=full, lf=default, rgba=yourrgb, dpi=correctdpi
+	   Basically, any settings you like there.
+	4. DO NOT BUILT, DO NOT ENABLE INFINALITY
+	5. Nice DejaVu Sans Mono could be achieved on point size between 11 and 12, ≈11.5pt.
+
+	Settings in /etc/conf.d/ seem to take preference over those in ~/.Xresources.
+	EOF
 }

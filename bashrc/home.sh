@@ -132,6 +132,10 @@ mpv-tv() {
 alias vivaldi="vivaldi --flag-switches-begin --debug-packed-apps --silent-debugger-extension-api --flag-switches-end"
 alias vivcp="cp -v ~/.config/vivaldi/custom.css  /opt/vivaldi/resources/vivaldi/style/"
 
+copy-yt-playlist() {
+	youtube-dl --ignore-errors --extract-audio --audio-format best "$1"
+}
+
 #
  #  QEMU block
 #

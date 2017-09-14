@@ -28,6 +28,8 @@ map d scroll down
 map   [fullscreen] d scroll down
 map g goto # enter page number, press ‘g’ //_-
 map   [fullscreen] g goto
+map c toggle_page_mode
+map   [fullscreen] c toggle_page_mode
 
 
 # completion-bg "#232323"

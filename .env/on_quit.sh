@@ -1,24 +1,18 @@
 #! /usr/bin/env bash
 
-# This script serves three purposes:
-# - kill iftops that were running in urxvtc windows, because they will load
-#   100% of CPUs after losing their consoles (they were launched with sudo,
-#   remember?) There is no cure.
+# This script serves one purpose:
 # - gracefully kill firefox (and other apps), that were started from
 #   startup_apps array in ~/.env/autostart.sh. If firefox altered files
 #   with private data, he needs some time to check it and ask confirmation
 #   if the altered data seem to have lower size then one loaded at the start.
 #   Earlier versions had problems and wiped the files, so I had to git checkout
 #   them back.
-# - erase /tmp/decrypted before exit, to be sure none of decrypted files are
-#   left when I’m not by the computer.
 
-#[ "${ENV_DEBUG/*q*/}" ] || {
-#	exec &>/tmp/envlogs/on_quit
+[ "${ENV_DEBUG/*q*/}" ] || {
+	exec &>/tmp/envlogs/on_quit
 	set -x
-#}
+}
 
-sudo /usr/bin/killall iftop
 
 # [ "`sed -n "/case/,/esac/{s/^\s*$HOSTNAME)/&/p}" ~/.env/autostart.sh 2>/dev/null`" ] \
 # 	&& host_name=$HOSTNAME \
@@ -48,10 +42,11 @@ sudo /usr/bin/killall iftop
 
 # Preventing firefox from messing the tabs when it closes ungracefully
 pkill firefox
-while true; do
+c=0; while true; do
 	sleep 1
-	pgrep -f firefox &>/dev/null || { sleep 2; break; }
+	pgrep -f firefox &>/dev/null \
+		&& { [ $((c++)) -gt 5 ] && break; } \
+		|| break
 done
 
-rm -rf /tmp/decrypted
 i3-msg exit

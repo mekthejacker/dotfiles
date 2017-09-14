@@ -45,16 +45,15 @@ screenshot-format=jpg
 screenshot-png-compression=9
 ## Just in case I will need jpeg some day.
 screenshot-jpeg-quality=94
-softvol=yes
 ## Sub loading is done via watch.sh
 sub-auto=no
 sub-codepage=enca:ru:en
 ## Disable ass subs for this to take effect
-sub-text-font='DejaVu Sans Mono'
-sub-text-font-size=50
+sub-font='DejaVu Sans Mono'
+sub-font-size=50
 #vo=opengl-hq:scale=ewa_lanczossharp:cscale=ewa_lanczossharp:interpolation:temporal-dither:gamma=0.9:blend-subtitles=yes:target-prim=bt.709:target-trc=srgb
 #vo=opengl-hq:scale=ewa_lanczossharp:cscale=ewa_lanczossharp:interpolation:temporal-dither:gamma=0.9:blend-subtitles=yes:icc-profile="/home/dtr/.env/FULLHD.icm"
-vo=opengl-hq,opengl,vdpau,vaapi,xv
+vo=opengl-hq
 volume=100
 ytdl-format=bestvideo+bestaudio
 
@@ -80,11 +79,6 @@ vo=vdpau:sharpen=.5:denoise=1:deint=4:chroma-deint:pullup
 [protocol.dvdnav]
 input-cursor=yes
 #nocache=yes
-
-[vo.directfb]
-profile-desc="For playing on framebuffer w/o X"
-vo=directfb:buffermode=triple
-monitoraspect=16:9
 
 [encoding]
 terminal=no
