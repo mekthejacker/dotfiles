@@ -132,8 +132,18 @@ mpv-tv() {
 alias vivaldi="vivaldi --flag-switches-begin --debug-packed-apps --silent-debugger-extension-api --flag-switches-end"
 alias vivcp="cp -v ~/.config/vivaldi/custom.css  /opt/vivaldi/resources/vivaldi/style/"
 
-copy-yt-playlist() {
-	youtube-dl --ignore-errors --extract-audio --audio-format best "$1"
+yt-pl-music()     { yt-pl ~/music/yt-playlist          'https://www.youtube.com/playlist?list=PLj9N785l66Hbxm8QRgH_p2ZBjYY7RAuPz'; }
+yt-pl-jap-music() { yt-pl ~/music/Japanese/yt-playlist 'https://www.youtube.com/playlist?list=PLj9N785l66HYQA4iNwPVebka0jFuNuWWb'; }
+yt-pl-sov-music() { yt-pl ~/music/Old/yt-playlist      'https://www.youtube.com/playlist?list=PLj9N785l66HaJGSGeq608HgASjFthz4k1'; }
+yt-pl() {
+	pushd "$1"
+	youtube-dl --ignore-errors \
+	           --extract-audio \
+	           --audio-format best \
+	           --download-archive list_of_downloaded \
+	           --no-post-overwrites \
+	           "$2"
+	popd
 }
 
 #
