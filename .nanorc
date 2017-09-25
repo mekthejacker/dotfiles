@@ -38,6 +38,30 @@ include "/usr/share/nano/php.nanorc"
 #include "/usr/share/nano/gentoo.nanorc" 
 
 set matchbrackets "(<[{)>]}"
-set smooth
 set tabsize 4
 set nowrap
+set autoindent
+# Constantly display the cursor position in the status bar.
+#set constantshow
+set justifytrim
+set linenumbers
+set matchbrackets "(<[{)>]}"
+# Jump to where non-space characters start,
+# or if we’re already there – then to the real beginning of the line.
+set smarthome
+# Smooth scrolling.
+set smooth
+set whitespace "→·"
+set regexp
+# status-bar messages will disappear after 1 keystroke instead of 25.
+set quickblank
+
+# Specify the color combination to use for line numbers.
+set numbercolor brightblue
+set titlecolor white
+set statuscolor brightgreen,black
+
+# Colour formats:
+#   fg/bg
+#  [bright]colour/colour
+# colour may be:  white, black, blue, green, red, cyan, yellow, and magenta.

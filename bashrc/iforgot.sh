@@ -246,24 +246,38 @@ iforgot-smart-immediate-check() {
 	echo -e '\tsmartctl -H /dev/sdX'
 }
 
-iforgot-smart-selftest-short-now() {
+iforgot-smart-selftest-do-short-now() {
 	echo -e '\tsmartctl -t short /dev/sdX'
 }
 
-iforgot-smart-selftest-long-now() {
+iforgot-smart-selftest-do-long-now() {
 	echo -e '\tsmartctl -t long /dev/sdX'
 }
 
-iforgot-smart-selftest-long-later() {
+iforgot-smart-selftest-schedule-long() {
 	echo -e '\tsmartctl -t long -s L/../.././23'
 }
 
-iforgot-smart-selftest-sheduling-syntax() {
+iforgot-smart-selftest-scheduling-syntax() {
 	echo -e "\t man -P\"less -p'^\s+-s REGEXP'\" smartd.conf"
 }
 
-iforgot-mark-bad-sector-with-badblocks() {
+iforgot-bad-blocks() {
 	cat <<-"EOF"
+	tl;dr
+	    Realloc_sector_ct – how much sectors drive noticed to be failing
+	                        to read and remapped them.
+	    Realloc_event_ct  – how much times drive spotted one or a bunch
+	                        of sectors to be failing to read.
+	    Pending_sector    – sectors, which the drive fails to read, and
+	                        cannot remap because of that. Requires it
+	                        to either become readable again, or rewritten
+	                       (Rewrite with zeroes by LBA or the whole drive
+	                        to get rid of them).
+	    Offline_uncorctbl –
+
+	/tl;dr
+
 	If situation looks like this
 
 	# smartctl -a /dev/sda
@@ -2531,4 +2545,19 @@ iforgot-fonts() {
 
 	Settings in /etc/conf.d/ seem to take preference over those in ~/.Xresources.
 	EOF
+}
+
+iforgot-bash-add-array-element-simply() {
+	set -x
+	unset arr
+	arr=(1 2 3)
+	declare -p arr
+	arr[-1]=3a
+	declare -p arr
+	arr+=(4)
+	declare -p arr
+	arr+=( [77]=77 )
+	declare -p arr
+	set +x
+	unset arr
 }

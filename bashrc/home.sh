@@ -140,14 +140,14 @@ yt-pl-music()     { yt-pl ~/music/yt-playlist          'https://www.youtube.com/
 yt-pl-jap-music() { yt-pl ~/music/Japanese/yt-playlist 'https://www.youtube.com/playlist?list=PLj9N785l66HYQA4iNwPVebka0jFuNuWWb'; }
 yt-pl-sov-music() { yt-pl ~/music/Old/yt-playlist      'https://www.youtube.com/playlist?list=PLj9N785l66HaJGSGeq608HgASjFthz4k1'; }
 yt-pl() {
-	local dir="$1" playlist="$2"
+	local dir="$1" playlist="$2" format='aac'  # best|aac|flac|mp3|m4a|opus|vorbis|wav
 	pushd "$dir"
 	# list_of_donwload file will remember which youtube URLs
 	# are already downloaded, so you could download only new playlist items
 	# on sequential runs.
 	youtube-dl --ignore-errors \
 	           --extract-audio \
-	           --audio-format best \
+	           --audio-format "$format" \
 	           --download-archive list_of_downloaded \
 	           --no-post-overwrites \
 	           "$playlist"
@@ -168,11 +168,11 @@ yt-pl() {
 #     from virt-TTY to virt-X: ‘chvt 7’ in the VM window
 #
 # To connect to a vm running spice-vdagent:
-#     $ spicec -h 127.0.0.1 -p 5900
+#     $ spicy -h 127.0.0.1 -p 5900
 # Default bridged network connection
 #     … -netdev user,id=vmnic,hostname=vmdebean -device virtio-net,netdev=vmnic
 # While no qxl driver for Xorg and spice-vdagent installed, -sdl may be used.
-#alias spicec="spicec --hotkeys 'toggle-fullscreen=shift+f11,release-cursor=shift+f12'"
+#alias spicy="spicy --hotkeys 'toggle-fullscreen=shift+f11,release-cursor=shift+f12'"
 # ~/bin/qemu-shell/qmp-shell
 # (QEMU) change ide0-cd ~/path/to/iso.iso
 alias qemu-graphic="qemu-system-x86_64 -daemonize -enable-kvm \
@@ -192,7 +192,7 @@ alias vm-i="qemu-nographic -serial stdio \
 	-initrd \`ls -t /boot/in* | head -n1\` \
 	/dev/zero "
 #\
-#	&& spicec -h 127.0.0.1 -p 5900 -t 'QEMU_initramfs' \
+#	&& spicy -h 127.0.0.1 -p 5900 -t 'QEMU_initramfs' \
 #	; pkill -9 -f qemu
 
 # spice += seamless_migration?
@@ -203,22 +203,12 @@ alias vm-d="qemu-graphic	-smp 1,cores=1,threads=1 -m 1024 \
 	-drive file=$HOME/vm_debean.img,if=virtio \
 	-netdev vde,id=taputapu,sock=/tmp/vde.ctl \
 		-device virtio-net-pci,netdev=taputapu,mac=DE:BE:AD:EB:EA:DE"
-alias vm-dc='spicec -h 127.0.0.1 -p 5901 -t QEMU_Debean'
+alias vm-dc='spicy -h 127.0.0.1 -p 5901 --title=QEMU_Debean'
 alias vm-dq='~/bin/qemu-shell/qmp-shell ~/qmp-sock-vmdebean'
 
-alias vm-f="qemu-graphic	-smp 1,cores=1,threads=1 -m 1024 \
-	-vga qxl -spice addr=127.0.0.1,port=5902,disable-ticketing \
-	-qmp unix:$HOME/qmp-sock-vmfeedawra,server,nowait \
-	-name 'Feedawra,process=vm-feedawra' \
-	-drive file=$HOME/vm_feedawra.img,if=virtio \
-	-netdev vde,id=taputapu,sock=/tmp/vde.ctl \
-		-device virtio-net-pci,netdev=taputapu,mac=FE:ED:AF:EE:DA:FE"
-alias vm-fc='spicec -h 127.0.0.1 -p 5902 -t QEMU_Feedawra'
-alias vm-fq='~/bin/qemu-shell/qmp-shell ~/qmp-sock-vmfeedawra'
-
-alias vm-almafi='spicec -h 127.0.0.1 -p 7001 -t Almafi'
-alias vm-sat='spicec -h 127.0.0.1 -p 7002 -t Sat'
-alias vm-streamer='spicec -h 127.0.0.1 -p 7003 -t Streamer'
+# alias vm-almafi='spicy -h 127.0.0.1 -p 7001 -t Almafi'
+# alias vm-sat='spicy -h 127.0.0.1 -p 7002 -t Sat'
+# alias vm-streamer='spicy -h 127.0.0.1 -p 7003 -t Streamer'
 
 # ,if=virtio
 #-drive file=$HOME/fake.qcow2,if=virtio \
@@ -243,7 +233,7 @@ alias vm-w="qemu-graphic	-smp 1,cores=1,threads=1 -m 1512  \
 #    -netdev user,id=mynet0,smb=/home/$ME/desktop,smbserver=10.0.2.4 \
 #        -device virtio-net,netdev=mynet0"
 
-alias vm-wc='spicec -h 192.168.5.1 -p 5903 -t QEMU_WinXP____Shift_F11'
+alias vm-wc='spicy -h 192.168.5.1 -p 5903 --title=QEMU_WinXP____Shift_F11'
 alias vm-wq='~/bin/qemu-shell/qmp-shell ~/qmp-sock-shindaws'
 
 vm-ts-mother-setup() {
@@ -287,7 +277,7 @@ alias vm-u="qemu-graphic	-smp 2,cores=2,threads=1 -m 1512  \
 	-drive file=/home/soft_lin/ubuntu-14.04.5-server-amd64.iso,media=cdrom,index=1 \
 	-netdev vde,id=mynet,sock=/tmp/vde.ctl \
 		-device virtio-net-pci,netdev=mynet"
-alias vm-uc="spicec -h 192.168.5.1 -p 5904 -t QEMU_Uboo-serv____Shift_F11"
+alias vm-uc="spicy -h 192.168.5.1 -p 5904 --title=QEMU_Uboo-serv____Shift_F11"
 
 
 
@@ -307,3 +297,23 @@ alias hugo-public="hugo --cleanDestinationDir \
 	                    -c ~/repos/goen/content \
 	                    -d ~/repos/goen/public"
 
+fonts-for-vm() {
+	vm_fonts_dir="$HOME/.fonts-for-vm/"
+	mkdir "$vm_fonts_dir" 2>/dev/null
+	local c=0 bad_fonts=() fileoutp_maxlength=$((`tput cols`-10))
+	while read -r -d $'\n'; do
+		[ -r "$REPLY" ] && {
+			cp "$REPLY" "$vm_fonts_dir"
+			echo -en "\r\e[KCopying: ${REPLY:0:$fileoutp_maxlength}"
+			let c++
+			:
+		}||{
+			bad_fonts+=("$REPLY")
+		}
+	done < <( fc-list | sed -rn 's/([^:]+[TtOo][Tt][Ff]):.*/\1/p' )
+	echo -en "\r\e[K$c fonts copied. "
+	[ ${#bad_fonts[@]} -gt 0 ] && for bad_font in "${bad_fonts[@]}"; do
+		echo "$bad_font failed to read."
+	done
+	echo
+}

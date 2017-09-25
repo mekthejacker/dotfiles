@@ -11,7 +11,7 @@ echo '-->'
 echo $@
 echo '<--'
 for filename in "$@"; do
-    if [ -r "$filename" ]; then
+    [ -r "$filename" ] && {
 		[ -d "$filename" ] && {
 			while read -d $'\0' unreadable; do
 				inaccessible[${#inaccessible[@]}]="$unreadable"
@@ -19,7 +19,7 @@ for filename in "$@"; do
 		}
 		[ -v first_file ] || first_file="$filename"
 		:
-	else inaccessible[${#inaccessible[@]}]="$filename";	fi
+	}||{ inaccessible+=("$filename"); }
 done
 
 [ -v inaccessible ] && \
@@ -28,7 +28,6 @@ done
 	&& exit 3
 
 case "$action" in
-#	'--roll-up') was removed in favor of thunar-archive-plugin.
 	'--show-the-font')
 		font_file=`file -i "$first_file" | sed -nr 's/^([^:]+):[^;]+font[^;]+;.*/\1/p'`
 		if [ "$font_file" ]; then
@@ -108,7 +107,7 @@ func1() {
 				exit 4
 			}
 			# set +x
-			eog -f /tmp/font.png
+			xdg-open /tmp/font.png
 			rm /tmp/font.png
 		else
 			Xdialog --msgbox "File ‘$first_file’ doesn’t look like a font file." 0x0
@@ -116,21 +115,45 @@ func1() {
 		fi
 		;;
 	'--convert-to-jpeg')
+set -x
+		Xdialog --ok-label="In here" \
+		        --cancel-label="To Desktop" \
+		        --yesno "Where to place JPEG files?" 400x80 \
+		    && where_to_place='in_here' \
+		    || where_to_place='desktop'
+		[ "$where_to_place" = desktop ] \
+			&& file_path="$DESKTOP"
+		Xdialog --ok-label="Rewrite" \
+		        --cancel-label="Keep old file" \
+		        --yesno "If a file already exists…" 400x80 \
+		    && rewrite='t'
+	    Xdialog --ok-label="Delete" \
+		        --cancel-label="Keep" \
+		        --yesno "Delete source file?" 400x80 \
+		    && delete_source='t'
+		failed_to_convert=0
 		for image in "$@"; do
-			image="${image##*/}"
-			[ -e "$DESKTOP/${image%.*}.jpg" ] && {
-				Xdialog --ok-label="Rewrite" --cancel-label="Cancel" \
-				        --yesno "File ‘$DESKTOP/${image%.*}.jpg’ already exists." 0x0 \
-					|| rm "$DESKTOP/${image%.*}.jpg"
+			image_file="${image##*/}"
+			result_image=${file_path:-${image%/*}}/${image_file%.*}.jpg
+			[ -e "$result_image" -a -v rewrite ] && {
+				# Do not delete the source file by accident
+				[ "$image" -ef "$result_image" ] && continue
+				# Otherwise remove the destination image
+				rm "$result_image"
 			}
-			convert "$image" -quality 92 "$DESKTOP/${image%.*}.jpg" \
-				&& notify-send  -t 2000 'Converted!' \
-				|| notify-send  -t 2000 'Failed to convert…'
+			convert "$image" -quality 96 "$result_image" \
+				&& {
+					[[ `file -b "$result_image"` =~ ^JPEG && -v delete_source ]] \
+						&& rm "$image"
+					:
+				}|| let failed_to_convert++
 		done
+		[ "$failed_to_convert" -gt 0 ] && notify-send -t 2000 "Conversion to JPEG failed" "for $failed_to_convert images."
 		;;
 	'--filename-to-clipboard')
-		xclip <<< `echo "$first_file"` 2>/dev/null ||\
-		Xdialog --msgbox "`[ $? -eq 127 ] && echo 'xclip not found.' || echo 'xclip failed.'`" 0x0
+		xclip <<< `echo "$first_file"` 2>/dev/null \
+			|| Xdialog --msgbox "`[ $? -eq 127 ] && echo 'xclip not found.' \
+			|| echo 'xclip failed.'`" 0x0
 		;;
 	'--show-files')
 		# For testing purposes

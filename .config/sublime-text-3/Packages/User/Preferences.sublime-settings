@@ -94,13 +94,16 @@
 		".hg",
 		"CVS"
 	],
+	// "font_face": "Terminus",
+	// "font_face": "IosevkaCC Light",
 	"font_face": "DejaVu Sans Mono",
-	"font_size": 11.6,
 	"font_options":
 	[
 		"no_italic",
 		"subpixel_antialias"
 	],
+	// "font_size": 14,
+	"font_size": 11.6,
 	"gpu_window_buffer": "auto",
 	"gutter": true,
 	"highlight_line": true,
@@ -141,7 +144,7 @@
 	"rulers":
 	[
 	],
-	"save_on_focus_lost": false,
+	"save_on_focus_lost": true,
 	"scroll_past_end": true,
 	"scroll_speed": 1.0,
 	"shift_tab_unindent": false,

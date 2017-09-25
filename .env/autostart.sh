@@ -55,7 +55,7 @@ sudo /usr/bin/killall bwmon  # also cbm
 # Yes, it seems that the only way to have that shit working between X restarts
 #   and independently of X is to run daemon via init scripts >_>
 pgrep -u $UID urxvtd || urxvtd -q -o -f
-tmux="tmux -u -f $HOME/.tmux/config -L dtr"
+tmux="tmux -u -f $HOME/.tmux/config -L $USER"
 if pgrep -u $UID -f '^tmux.*$' &>/dev/null; then
 	[ "$1" = stop_after_main_workspace ] || {
 		:
@@ -68,23 +68,22 @@ if pgrep -u $UID -f '^tmux.*$' &>/dev/null; then
 	}
 else
 	$tmux \
-	new -d -s dtr su \; \
+	new -d -s $USER su \; \
 	set remain-on-exit on \; \
 	neww su \; \
 	set remain-on-exit on \; \
-	new -d -s anibot "cd ~/bin/animepostibgbot/; ./animepostingbot.sh" \;
+	new -d -s anibot "cd ~/bin/animepostingbot/; ./animepostingbot.sh" \;
 	set remain-on-exit on \; \
-	select-window -t 0:1
-	#Another user termianl in tmux
-	#  neww -n wa-a \; \
-	#  set remain-on-exit on \; \
+	neww -n hbot "cd ~/bin/hpostingbot/; ./animepostingbot.sh" \;
+	set remain-on-exit on \; \
+	select-window -t $USER:^  # session:window ^=leftmost $=rightmost
 fi
 
 [ "$DISPLAY" = ":108" ] && exit 0  # stop here if it’s a Xephyr window
 
 pointer_control disable
 
-startup_apps=(mpd "firefox --profile $HOME/.ff" thunar pidgin telegram) # skypeforlinux
+startup_apps=(mpd "firefox --profile $HOME/.ff" thunar pidgin telegram-desktop) # skypeforlinux
 # WIDTH and HEIGHT were set in the ~/.preload.sh
 case $HOSTNAME in
 	home)
@@ -179,6 +178,17 @@ xte 'mouseclick 1'
 # ║        ┃        ║ # ║        ┃        ║
 # ╚════════╩════════╝ # ╚════════╩════════╝
 
+for wsp in '1:Firefox' \
+           '2:Sublime' \
+           '3:Thunar' \
+           '4:Geeqie' \
+           '5:Misc' \
+           '6:IM' \
+           '8:GIMP'; do
+    i3-msg workspace "$wsp"
+    i3-msg layout tabbed
+done
+i3-msg workspace '0:Main'
 pointer_control enable
 
 # This is to check whether script is called via hotkey in ~/.env/config.
@@ -208,6 +218,16 @@ done
 	pgrep -xu $UID mpdscribble || mpdscribble
 	pgrep -xu $UID ncmpcpp >/dev/null || urxvtc -name ncmpcpp -e ncmpcpp
 }
+
+ # Take off urgent hints
+#
+sleep 5; for win in $(wmctrl -l | awk -F' ' '{print $1}'); do wmctrl -i -r $win -b remove,demands_attention; done
+
+ # Run C-S-t in Sumblime to switch on max payne
+#
+#
+
+
 
 #crontab -l | grep -qF 'wallpaper_setter.sh' || {
 #	echo '*/10 * * * * ~/bin/wallpaper_setter/wallpaper_setter.sh -qn' \

@@ -12,4 +12,6 @@ for slave_substitute in ${!SLAVE_OUTPUT_*}; do
 done
 # Hide the bar if on plasma
 #[ $HOSTNAME = home ] && sed -ri '/bar \{/,/\}/ {s/(^\s*mode\s+)dock/\1hide/}' ~/.env/config
-[ -v PRELOAD_SH ] || i3-msg restart
+[ -v PRELOAD_SH ] || {
+	[ "$1" = '--restart-i3' ] && { i3-msg restart; :; } || i3-msg reload
+}

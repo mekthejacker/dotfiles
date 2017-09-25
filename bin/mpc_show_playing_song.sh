@@ -8,6 +8,10 @@ unset song cur_time duration;
 # Extracting data from the first two lines of mpc output
 IFS=$'\n'  read -r -d $''  song cur_time duration  < <(mpc | sed -rn '1 {N; s/(.*)\n.* ([0-9:]+)\/([0-9:]+) \([0-9]+%\)/\1\n\2\n\3/p}')
 declare -p song cur_time duration
+# In case it’s a file path, strip preceding dirs.
+song=${song##*/}
+# String longer than 18 symbols can’t fit into Libnotify window.
+[ ${#song} -gt 18 ] && song=${song:0:17}…
 # Prepending MM:SS with 00:, because `date` will think we give it HH:MM.
 [[ "${cur_time//:/}" =~ :.*$ ]] || cur_time="00:$cur_time"
 [[ "${duration//:/}" =~ :.*$ ]] || duration="00:$duration"
@@ -23,7 +27,7 @@ $time_left"
 # Variations
 # notify-send --hint int:transient:1 -t 3500 mpd "$msg"
 # notify-send --hint int:transient:1 -t 3500 " " "$msg"
-notify-send --hint int:transient:1 -t 3500 "$song" "$time_left"
+notify-send -t 4200 "$song" "$time_left"
 
 # --hint int:transient:1 is to make this message pass the notification stack.
 # The stack isn’t infinite and if it’s full, which is at about 20 messages,

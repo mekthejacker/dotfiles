@@ -77,16 +77,6 @@ rm -rf ~/.local/share/gvfs-metadata
 push_the_bar "Cleaning `du -hsx ~/.maildir/new | cut -f1` in ~/.maildir/new"
 find ~/.maildir/new -type f -print0 | xargs -0 -I {} rm -f {}
 
- # ~/.cache/tumbnails is used by geeqie, that doesn’t respect XDG_CACHE_HOME.
-#  thunar uses XDG_CACHE_HOME in /tmp/$USER/.cache and thumbs are lost after restart.
-#
-#push_the_bar "Cleaning `du -hsx ~/.cache/thumbnails | cut -f1` in ~/.cache/thumbnails"
-#find  ~/.cache/thumbnails -type f -print0 | xargs -0 -I {} rm -f {}
-
- # This directory is not used any more.
-#
-#push_the_bar "Cleaning `du -hsx ~/.thumbnails | cut -f1` in ~/.thumbnails"
-#find  ~/.thumbnails -type f -print0 | xargs -0 -I {} rm -f {}
 push_the_bar "Cleaning /tmp"
 find  /tmp -type d \( -iname ".com.vivaldi*" -o -iname ".org.chromium*" -o -iname "i3-$USER*" -o -iname "clipboardcache*" \) -print0 | xargs -0 -I {} rm -f {}
 push_the_bar 'Retrieving output information'
@@ -172,7 +162,7 @@ done
 
 push_the_bar 'Loading ~/.Xresources to Xorg'
 xrdb ~/.Xresources
-push_the_bar 'Helping X server to find localized Terminus'
+push_the_bar 'Helping X server to find localised Terminus'
 xset +fp /usr/share/fonts/terminus && xset fp rehash
 push_the_bar 'Disabling screensaver'
 xset s off
