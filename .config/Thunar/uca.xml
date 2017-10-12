@@ -10,15 +10,6 @@
 	<image-files/>
 </action>
 <action>
-	<icon>format-text-italic</icon>
-	<name>Show the font</name>
-	<unique-id>1441427510508615-2</unique-id>
-	<command>/bin/bash ~/bin/thunar_ca.sh --show-the-font %f</command>
-	<description>Draw text with selected font</description>
-	<patterns>*</patterns>
-	<other-files/>
-</action>
-<action>
 	<icon>edit-copy</icon>
 	<name>Filename to clipboard</name>
 	<unique-id>1441427502475348-1</unique-id>
@@ -30,5 +21,15 @@
 	<other-files/>
 	<text-files/>
 	<video-files/>
+</action>
+<action>
+	<icon>edit-clear-all-symbolic.symbolic</icon>
+	<name>glue-images</name>
+	<unique-id>1507579230296122-3</unique-id>
+	<command>/bin/bash ~/bin/thunar_ca.sh --glue-images %F</command>
+	<description>Make a new image composed from several other.</description>
+	<patterns>*</patterns>
+	<directories/>
+	<image-files/>
 </action>
 </actions>

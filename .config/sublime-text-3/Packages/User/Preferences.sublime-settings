@@ -97,6 +97,7 @@
 	// "font_face": "Terminus",
 	// "font_face": "IosevkaCC Light",
 	"font_face": "DejaVu Sans Mono",
+	// "font_face": "Bitstream Charter",
 	"font_options":
 	[
 		"no_italic",

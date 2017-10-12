@@ -1,6 +1,38 @@
+# ~/.config/zathura/zathurarc
+#
+#      This file CANNOT RECOGNISE COMMENTS THAT HAVE SPACES BEFORE ‘#’!
+#               Start comments only from the first symbol
+#                        and after the setting.
+
+
+
+#  Interface
+#
+
+set synctex true
+set window-title-basename true
+set guioptions shv
+set statusbar-bg "#303030"
+set statusbar-fg "#d0d0d0"
+set font "Terminus 12"
+set default-bg "#303030"
+set default-fg "#d0d0d0"
+
+#  defines the gap in pixels between each rendered page.
+#
+set page-padding 7
+
+set selection-clipboard clipboard # primary
+
+
+
+#  Key mapping
+#
+
 unmap r rotate rotate-cw
 unmap R reload
 unmap G goto
+unmap q
 
 map z zoom out
 map   [fullscreen] z zoom out
@@ -17,19 +49,30 @@ map   [fullscreen] f toggle_fullscreen
 map <C-q> quit
 map   [fullscreen]  <C-q> quit
 
-
-map q scroll top # why it works after one key was passed?
+map q scroll top  # why it works after one key was passed?
 map   [fullscreen] q scroll top
-map e scroll bottom # this works flawlessly >_>
+map e scroll bottom  # this works flawlessly >_>
 map   [fullscreen] e scroll bottom
 map a scroll up
 map   [fullscreen] a scroll up
 map d scroll down
 map   [fullscreen] d scroll down
-map g goto # enter page number, press ‘g’ //_-
-map   [fullscreen] g goto
+#map g goto # enter page number, press ‘g’ //_-
+#map   [fullscreen] g goto
+
 map c toggle_page_mode
 map   [fullscreen] c toggle_page_mode
+
+# Because it is fucking unclear how to switch to a particular mode,
+# one-page or two-page. ‘set pages-per-row 2’ when in one-page layout,
+# will only put the command to the input bar, but will not execute it.
+# The heck?
+#
+map 1 toggle_page_mode
+map   [fullscreen] 1 toggle_page_mode
+map 2 toggle_page_mode
+map   [fullscreen] 2 toggle_page_mode
+
 
 
 # completion-bg "#232323"
@@ -58,15 +101,3 @@ map   [fullscreen] c toggle_page_mode
 # page-padding 1 #  defines the gap in pixels between each rendered page.
 # render-loading-bg #FFFFFF
 # render-loading-fg #000000
-
-
-set synctex true
-set window-title-basename true
-set guioptions shv
-set statusbar-bg "#303030"
-set statusbar-fg "#d0d0d0"
-set font "Terminus 12"
-set default-bg "#303030"
-set default-fg "#d0d0d0"
-set page-padding 7
-set selection-clipboard clipboard # primary

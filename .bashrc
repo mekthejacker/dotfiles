@@ -217,6 +217,57 @@ alias gismu='git submodule update'
 alias gismy='git submodule sync'
 alias gull='git pull'
 alias gush='git push'
+# DESCRIPTION:
+#     Overriding git for $HOME to maintain configs in one public (dotiles)
+#     and one private (general) repo.
+git() {
+	[ "$PWD" = "$HOME" ] && {
+		local opts="--work-tree $HOME --git-dir dotfiles.git" doton=t genon= left=$'\e[D' right=$'\e[C' input_is_ready
+		until [ -v input_is_ready ]; do
+			echo -en "Which repo would you like to operate on? ${doton:+\e[32m}dotfiles${doton:+\e[0m <} ${genon:+> \e[32m}general${genon:+\e[0m} "
+			read -sn1
+			[ "$REPLY" = $'\e' ] && read -sn2 rest && REPLY+="$rest"
+			[ "$REPLY" ] && {
+				case "$REPLY" in
+					"$left")
+						opts="--work-tree $HOME --git-dir dotfiles.git"
+						doton=t; genon=
+						;;
+					"$right")
+						opts="--work-tree $HOME --git-dir general.git"
+						doton=; genon=t
+						;;
+				esac
+				echo -en "\r\e[K" # \K lear line
+			}||{
+				echo
+				input_is_ready=t
+			}
+		done
+	}
+	`which git` $opts "$@"
+}
+
+# DESCRIPTION:
+#     Check if a file in $HOME is in dotfiles of general repo,
+# TAKES:
+#     $1 — file path under $HOME
+isinrepo() {
+	[ "$*" ] || {
+		echo -e "Usage:\t${FUNCNAME[0]} $HOME/…/<filename>\n"
+		return
+	}
+	local found
+	[ "`dotgit ls-files "$1"`" -ef "$1" ] \
+		&& echo "$@: Found in dotfiles." && found=t
+	[ "`gengit ls-files "$1"`" -ef "$1" ] \
+		&& echo "$@: Found in general." && found=t
+	[ -v found ] || {
+		echo "$@: Not found."
+		return 3
+	}
+}
+
 # pinentry doesn’t like scim
 alias gpg="GTK_IM_MODULE= QT_IM_MODULE= gpg"
 alias ls="ls -1h --color=auto"
@@ -225,10 +276,12 @@ alias rename="perl-rename"
 alias rename-test="perl-rename -n"
 spr="| curl -F 'sprunge=<-' http://sprunge.us" # add ?<lang> for line numbers
 alias ssh="cat ~/.ssh/config*[^~] >~/.ssh/config; ssh "
+alias trami="transmission-gtk"
 #alias td="todo -A "
 #alias tdD="todo -D "
 #alias tmux="tmux -u -f ~/.tmux/config -S $HOME/.tmux/socket"
-alias tmux="tmux -u -f ~/.tmux/config -L dtr"
+alias tmux="tmux -u -f ~/.tmux/config -L $USER"
+mpvforcesubs='--sub-font=Roboto --sub-ass-force-style=FontName=Roboto'
 
 # Though TERM is kept via SSH’s SendEnv,
 #   rxvt-unicode-256color gives messed colours in emacsclient.

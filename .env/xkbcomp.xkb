@@ -1106,7 +1106,7 @@ xkb_symbols "pc_us_ru_2_inet(evdev)_group(rctrl_rshift_toggle)_level3(menu_switc
     };
     key <AE05> {
         type= "FOUR_LEVEL",
-        symbols[Group1]= [               5,         percent,    U2012,   U03C9 ] // 3: figure dash  4: ω
+        symbols[Group1]= [               5,         percent,    U032B,   U03C9 ] // 3: emoji D  4: ω
     };
     key <AE06> {
         type= "FOUR_LEVEL",
@@ -1150,8 +1150,8 @@ xkb_symbols "pc_us_ru_2_inet(evdev)_group(rctrl_rshift_toggle)_level3(menu_switc
     };
     key <AD02> {
         type= "FOUR_LEVEL_SEMIALPHABETIC",
-        symbols[Group1]= [               w,               W,    U032B,    NoSymbol ],  // 3: ̫ emoji mouth
-        symbols[Group2]= [    Cyrillic_tse,    Cyrillic_TSE,    U032B,    NoSymbol ]
+        symbols[Group1]= [               w,               W,    U0302,    NoSymbol ],  // 3: combining circumflex for â î û ê ô
+        symbols[Group2]= [    Cyrillic_tse,    Cyrillic_TSE,    U0302,    NoSymbol ]
     };
     key <AD03> {
         type= "FOUR_LEVEL_SEMIALPHABETIC",

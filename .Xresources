@@ -20,24 +20,39 @@
 !       i.e. any window.
 ! See output of xprop for window class information.
 
+
+!!  Xft settings
 !
-!  Xft settings
-!
-! AA fonts: 0 – no, 1 – yes, -1 is default.
-!
+! There are three sources which can affect /how/ you see the text on the screen,
+! in the order of ability to ignore the others, from top to bottom:
+! - Symlinks in /etc/fonts/conf.d/.
+! - ~/.config/fontconfig/conf.d/.
+!   (if 50-user is enabled in conf.d)
+!     Some programs, like font-manager, can change
+!     options there. For example, if you enable autohinting there, your fonts
+!     will be thicker than usual, but that autohinting couldn’t be seen
+!     via `xrdb -query`(!).
+! - /etc/fonts/local.conf (if 51-local is enabled in conf.d)
+! - Settings in ~/.Xresources.
+
+! Antialiasing fonts: 0 – no, 1 – yes, -1 is default.
+! My advice: 1. Or have guaranteed jagged lines.
+
 Xft.antialias: 1
 
-! Autohinting is an old option incompatible with Xft.hintstyle
-!
+! Autohinting is an old option incompatible with Xft.hintstyle.
+! My advice: 0. It only makes everything thick.
+
 Xft.autohint: 0
 
-! 0 – no, 1 – yes, -1 is default.
-!
+! Subpixel hinting: 0 – no, 1 – yes, -1 is default.
+! My advice: of course, yes.
+
 Xft.hinting: 1
 
-! hintnone, hintslight, hintmedium, or hintfull.
-!
-Xft.hintstyle: hintmedium
+! Subpixel hinting type: hintnone, hintslight, hintmedium, or hintfull.
+
+Xft.hintstyle: hintfull
 
 ! Subpixel antialiasing:
 ! none, rgb, bgr, vrgb, vbgr.

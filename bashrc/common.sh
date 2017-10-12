@@ -12,57 +12,6 @@ alias imgur="~/bin/imgur_upload.sh"
 alias dotgit="`which git` --work-tree $HOME --git-dir $HOME/dotfiles.git"
 alias gengit="`which git` --work-tree $HOME --git-dir $HOME/general.git"
 
-# DESCRIPTION:
-#     Overriding git for $HOME to maintain configs in one public (dotiles)
-#     and one private (general) repo.
-git() {
-	[ "$PWD" = "$HOME" ] && {
-		local opts="--work-tree $HOME --git-dir dotfiles.git" doton=t genon= left=$'\e[D' right=$'\e[C' input_is_ready
-		until [ -v input_is_ready ]; do
-			echo -en "Which repo would you like to operate on? ${doton:+\e[32m}dotfiles${doton:+\e[0m <} ${genon:+> \e[32m}general${genon:+\e[0m} "
-			read -sn1
-			[ "$REPLY" = $'\e' ] && read -sn2 rest && REPLY+="$rest"
-			[ "$REPLY" ] && {
-				case "$REPLY" in
-					"$left")
-						opts="--work-tree $HOME --git-dir dotfiles.git"
-						doton=t; genon=
-						;;
-					"$right")
-						opts="--work-tree $HOME --git-dir general.git"
-						doton=; genon=t
-						;;
-				esac
-				echo -en "\r\e[K" # \K lear line
-			}||{
-				echo
-				input_is_ready=t
-			}
-		done
-	}
-	`which git` $opts "$@"
-}
-
-# DESCRIPTION:
-#     Check if a file in $HOME is in dotfiles of general repo,
-# TAKES:
-#     $1 — file path under $HOME
-isinrepo() {
-	[ "$*" ] || {
-		echo -e "Usage:\t${FUNCNAME[0]} $HOME/…/<filename>\n"
-		return
-	}
-	local found
-	[ "`dotgit ls-files "$1"`" -ef "$1" ] \
-		&& echo "$@: Found in dotfiles." && found=t
-	[ "`gengit ls-files "$1"`" -ef "$1" ] \
-		&& echo "$@: Found in general." && found=t
-	[ -v found ] || {
-		echo "$@: Not found."
-		return 3
-	}
-}
-
 at-msg() {
 	local when msg
 	read -p "Examples: ‘+10 mins’, ‘19:30’."$'\n'"When? > " when
@@ -111,29 +60,6 @@ EOF
 	echo "Copied to $2"
 }
 
-# Compresses all png files in CWD
-# $1 — minimum size, under which no compression shall be done
-#      If not set 1M (1MiB) is the default.
-compress-screenshot() {
-	[ "$1" ] && {
-		[[ "$1" =~ ^[0-9]+[KMG]$ ]] && min_size=${1/K/k} \
-			||{ echo "The parameter should conform to that pattern: [0-9]+[KMG]." >&2; return 3; }
-	}|| min_size=1M
-	crush() {
-		which pngcrush &>/dev/null && {
-			pngcrush -reduce "$1" "/tmp/$1"
-			mv "/tmp/$1" "$1"
-		}
-	# which convert &>/dev/null && [ -v JPEG_CONVERSION ] && {
-	# 	convert "$shot" -quality $JPEG_CONVERSION "${shot%.*}.jpg"
-	# 	rm "$shot"
-	# }
-	}
-	export -f crush
-	find  -iname "*.png" -size +$min_size -printf "%f\n" | parallel --eta crush
-	export -nf crush
-}
-
 # Copies current MPD playlist to a specified folder.
 copy-playlist() {
 	err() { echo "$1" >&2; [ "$2" ] && return $2; }  # $1 — message; $2 — return code
@@ -161,7 +87,7 @@ copy-playlist() {
 	[ -w "$dest" ] && {
 		while read filepath; do
 			filepath="${filepath/$library_path/}"
-			cp -v  "$library_path/$filepath" "$dest" || {
+			cp -nv  "$library_path/$filepath" "$dest" || {
 				unset got_a_sane_reply
 				until [ -v got_a_sane_reply ]; do
 					read -n1 -p 'Error on copying. Continue? [Y/n] > '; echo
@@ -242,7 +168,7 @@ rec() {
 	echo -n /tmp/$ts.mp3 | xclip
 }
 
-fpic() { find /home/picts -iname "*$@*"; }
+fpic() { find -L /home/picts -iname "*$@*"; }
 
 # DESCRIPTION:
 #     Adds all hosts in a given subnet to the java exception site list.

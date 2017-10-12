@@ -34,6 +34,7 @@ case $app_name in
 		# When you make webms with the lua script for conversion,
 		# that background mpv that does encoding would try to pause the already
 		# paused mpd, and when the conversion is done it will… right, unpause it.
+		echo "$*" >> ~/what
 		[[ "$*" =~ ^.*\ --ovc=.*$ ]] || {
 			control_mpd=t
 			mpc |& sed -n '2s/playing//;T;Q1' || mpd_caught_playing=t

@@ -1564,12 +1564,6 @@ iforgot-framebuffer-with-utf8() {
 	echo jfbterm
 }
 
-iforgot-bash-regexes() {
-	cat <<-"EOF"
-	man -P "less -p '^\s+\[\['" bash
-	EOF
-}
-
 iforgot-bash-line-output() {
 	cat <<-EOF
 	fmt — reformat lines to width.
@@ -2540,10 +2534,20 @@ iforgot-fonts() {
 	   90-synthetic.conf
 	3. In ~/.Xresources aa=1, h=1, ht=full, lf=default, rgba=yourrgb, dpi=correctdpi
 	   Basically, any settings you like there.
-	4. DO NOT BUILT, DO NOT ENABLE INFINALITY
+	4. DO NOT BUILT, DO NOT ENABLE INFINALITY. BUILD WITHOUT CLEARTYPE if you want slim fonts.
 	5. Nice DejaVu Sans Mono could be achieved on point size between 11 and 12, ≈11.5pt.
+	6. IF YOU UPGRADE FREETYPE FIREFOX MAY HAVE MESSED UP FONTS!
+	7. hinting allows to use subpixels on the display matrix, that means, that
+	   the resolution ‘triples’ or at least ‘doubles’ in the way the red, green and blue
+	   are laid out, usually horizontal way,
 
 	Settings in /etc/conf.d/ seem to take preference over those in ~/.Xresources.
+
+	Fontconfig links:
+	‘2.7 chips with chitty Cleartype’
+	https://www.freetype.org/freetype2/docs/subpixel-hinting.html
+	(old) ‘On hinting, autohinter and stem darkening’
+	https://www.freetype.org/freetype2/docs/text-rendering-general.html
 	EOF
 }
 
@@ -2560,4 +2564,17 @@ iforgot-bash-add-array-element-simply() {
 	declare -p arr
 	set +x
 	unset arr
+}
+
+iforgot-printer-doesnt-work() {
+	cat <<-EOF
+	Disable – enable.
+	Delete printer through CUPS admin panel
+	Remove printer in hplip
+	# hp-setup -r
+	# /etc/init.d/cupsd restart
+	Find printer again.
+	# hp-setup
+	It should be already in CUPS.
+	EOF
 }

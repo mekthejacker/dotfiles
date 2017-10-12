@@ -83,7 +83,13 @@ fi
 
 pointer_control disable
 
-startup_apps=(mpd "firefox --profile $HOME/.ff" thunar pidgin telegram-desktop) # skypeforlinux
+startup_apps=(mpd
+              "firefox --profile $HOME/.ff"
+              thunar
+              pidgin
+              telegram-desktop
+              # skypeforlinux
+              "transmission-gtk -m")
 # WIDTH and HEIGHT were set in the ~/.preload.sh
 case $HOSTNAME in
 	home)
@@ -221,7 +227,10 @@ done
 
  # Take off urgent hints
 #
-sleep 5; for win in $(wmctrl -l | awk -F' ' '{print $1}'); do wmctrl -i -r $win -b remove,demands_attention; done
+sleep 5
+for win in $(wmctrl -l | awk -F' ' '{print $1}'); do
+	wmctrl -i -r $win -b remove,demands_attention
+done
 
  # Run C-S-t in Sumblime to switch on max payne
 #

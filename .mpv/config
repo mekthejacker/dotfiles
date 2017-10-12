@@ -24,7 +24,7 @@ demuxer-mkv-subtitle-preroll=yes
 force-window=yes
 ## precise seeking helps Zehkul’s script
 hr-seek-demuxer-offset=5
-input-unix-socket=~/.mpv/socket
+input-ipc-server=~/.mpv/socket
 ## Suppress status line messages.
 ## mpv like to print a lot when spawned from coproc in watch.sh
 msg-level=all=info
@@ -49,11 +49,11 @@ screenshot-jpeg-quality=94
 sub-auto=no
 sub-codepage=enca:ru:en
 ## Disable ass subs for this to take effect
-sub-font='DejaVu Sans Mono'
+sub-font='Roboto Medium'
 sub-font-size=50
 #vo=opengl-hq:scale=ewa_lanczossharp:cscale=ewa_lanczossharp:interpolation:temporal-dither:gamma=0.9:blend-subtitles=yes:target-prim=bt.709:target-trc=srgb
 #vo=opengl-hq:scale=ewa_lanczossharp:cscale=ewa_lanczossharp:interpolation:temporal-dither:gamma=0.9:blend-subtitles=yes:icc-profile="/home/dtr/.env/FULLHD.icm"
-vo=opengl-hq
+vo=opengl
 volume=100
 ytdl-format=bestvideo+bestaudio
 
@@ -73,8 +73,8 @@ x11-name=big_screen
 ####ac=hwac3,hwdts,hwmpa,
 fs=yes
 
-[interlaced_bluray]
-vo=vdpau:sharpen=.5:denoise=1:deint=4:chroma-deint:pullup
+#[interlaced_bluray]
+#vo=vdpau:sharpen=.5:denoise=1:deint=4:chroma-deint:pullup
 
 [protocol.dvdnav]
 input-cursor=yes
