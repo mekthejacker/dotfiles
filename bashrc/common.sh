@@ -48,7 +48,7 @@ Usage: magnet-to-torrent <magnet link> <new file path>
 EOF
 		return
 	}
-	[[ "$1" =~ xt=urn:btih:([^&/]+) ]] || {
+	[[ "$1" =~ xt=urn:(btih|sha1):([^&/]+) ]] || {
 		echo 'Invalid magnet link!' >&2
 		return 3
 	}
