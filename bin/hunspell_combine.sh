@@ -259,6 +259,11 @@ fi
 
 
  # For English language I recommend using SCOWL dictionaries:
+#
 #  Page: http://wordlist.aspell.net/dicts/
 #  README: http://wordlist.aspell.net/hunspell-readme/
 #  Hunspell dictionaries: https://sourceforge.net/projects/wordlist/files/speller/
+
+ # On how to build Firefox extensions for spellchecking
+#
+# https://developer.mozilla.org/en-US/docs/Mozilla/Creating_a_spell_check_dictionary_add-on
