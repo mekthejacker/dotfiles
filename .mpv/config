@@ -46,7 +46,7 @@ screenshot-png-compression=9
 ## Just in case I will need jpeg some day.
 screenshot-jpeg-quality=94
 ## Sub loading is done via watch.sh
-sub-auto=no
+#sub-auto=no
 sub-codepage=enca:ru:en
 ## Disable ass subs for this to take effect
 sub-font='Roboto Medium'

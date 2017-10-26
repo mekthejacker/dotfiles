@@ -35,7 +35,7 @@ include "/usr/share/nano/css.nanorc"
 include "/usr/share/nano/php.nanorc"
 
 ## makefile .am
-#include "/usr/share/nano/gentoo.nanorc" 
+#include "/usr/share/nano/gentoo.nanorc"
 
 set matchbrackets "(<[{)>]}"
 set tabsize 4

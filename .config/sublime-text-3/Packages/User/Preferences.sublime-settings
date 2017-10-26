@@ -94,16 +94,17 @@
 		".hg",
 		"CVS"
 	],
+	"font_face": "DejaVu Sans Mono",
 	// "font_face": "Terminus",
 	// "font_face": "IosevkaCC Light",
-	"font_face": "DejaVu Sans Mono",
 	// "font_face": "Bitstream Charter",
+	// "font_face": "Iosevka",
 	"font_options":
 	[
 		"no_italic",
 		"subpixel_antialias"
 	],
-	// "font_size": 14,
+	// "font_size": 12,
 	"font_size": 11.6,
 	"gpu_window_buffer": "auto",
 	"gutter": true,
