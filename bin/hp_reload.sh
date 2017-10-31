@@ -95,6 +95,8 @@ delete_printer() {
 		echo 'Couldn’t delete printer' >&2
 		exit 3
 	fi
+	# I also used this before, but it doesn’t seem to be needed.
+	# hp-setup -r
 	return 0
 }
 
@@ -178,12 +180,8 @@ pgrep -x cupsd || {
 		sleep 1
 	done
 	echo -n 'CUPS started! Waiting 3 seconds for it to prepare.'
-	sleep 1; echo -n '.';sleep 1; echo -n '.';sleep 1; echo '.'
+	sleep 1; echo -n '.'; sleep 1; echo -n '.'; sleep 1; echo '.'
 }
-
-# Delete printer from CUPS
-delete_printer
-echo
 
 printer_attached || echo 'Attach the printer to the PC.'
 until printer_attached; do
@@ -196,6 +194,8 @@ read -n1 -p "Does it look like the proper device? [Y/n] > "
 	echo Aborted. >&2
 	exit 3
 }
+echo
+delete_printer
 echo
 disable_smart_install
 until ! printer_attached; do

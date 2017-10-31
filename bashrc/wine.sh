@@ -65,6 +65,10 @@
 	}
 	export -f wine
 	#
+	swine() {
+		pushd /home/games/steam
+		WINEPREFIX=/home/sszb/.wine-steam wine
+	}
 	alias killsteam="pkill -9 -f 'hl2.*'; pkill -9 -f steam"
 	alias killdota="pkill -9f dota2"
 	killsszb() { sudo -u sszb /usr/bin/killall -9 -u sszb; }
