@@ -202,6 +202,11 @@ until ! printer_attached; do
 	sleep 1
 done
 echo 'I see printer detached. Attach it again in 10 seconds.'
+#
+# If you ever be extending this script, note that after the user
+# has powercycled the printer, *_id variables now have stale values.
+# We don’t need them to run hp-setup, though.
+#
 until printer_attached; do
 	sleep 1
 done
