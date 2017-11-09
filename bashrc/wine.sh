@@ -66,8 +66,9 @@
 	export -f wine
 	#
 	swine() {
-		pushd /home/games/steam
-		WINEPREFIX=/home/sszb/.wine-steam wine
+		pushd /home/games/swine
+		WINEPREFIX=/home/sszb/.wine-steam wine Steam.exe
+		popd
 	}
 	alias killsteam="pkill -9 -f 'hl2.*'; pkill -9 -f steam"
 	alias killdota="pkill -9f dota2"
@@ -176,19 +177,21 @@ EOF
 			|| echo -e "$w---] [${r}FAIL${w}]$s"
 		rm /tmp/vd.reg
 
-		echo -e "\n${w}---] Disabling dwrite.dll for steam (bug #31374)."
-		cat <<EOF >/tmp/no-dwrite.reg
-ÿþWindows Registry Editor Version 5.00
+ # Doesn’t seem to be needed for wine 2.14
+#
+# 		echo -e "\n${w}---] Disabling dwrite.dll for steam (bug #31374)."
+# 		cat <<EOF >/tmp/no-dwrite.reg
+# ÿþWindows Registry Editor Version 5.00
 
-[HKEY_CURRENT_USER\Software\Valve\Steam]
-"DWriteEnable"=dword:0
-EOF
-		chmod 644 /tmp/no-dwrite.reg
-		# Strange, but it seems functions cannot into aliases… ;_;
-		sudo -u sszb -H /usr/bin/regedit /tmp/no-dwrite.reg \
-			&& echo -e "$w---] [${g}OK${w}]$s" \
-			|| echo -e "$w---] [${r}FAIL${w}]$s"
-		rm /tmp/no-dwrite.reg
+# [HKEY_CURRENT_USER\Software\Valve\Steam]
+# "DWriteEnable"=dword:0
+# EOF
+# 		chmod 644 /tmp/no-dwrite.reg
+# 		# Strange, but it seems functions cannot into aliases… ;_;
+# 		sudo -u sszb -H /usr/bin/regedit /tmp/no-dwrite.reg \
+# 			&& echo -e "$w---] [${g}OK${w}]$s" \
+# 			|| echo -e "$w---] [${r}FAIL${w}]$s"
+# 		rm /tmp/no-dwrite.reg
 
 		[ "$1" = --setoptsonly ] && return
 

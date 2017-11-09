@@ -29,6 +29,9 @@ case "$action" in
 	'--convert-to-jpeg')
 		~/bin/image_operations.sh conv2jpeg "$@"
 		;;
+	'--pictures-to-video')
+		~/bin/image_operations.sh conv2mp4 "$@"
+		;;
 	'--glue-images')
 		~/bin/image_operations.sh glue "$@"
 		;;

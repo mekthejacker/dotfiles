@@ -426,6 +426,7 @@ iforgot-kaomoji-drawing() {
 	〆        shime
 	米※       kome
 	益        yaku
+	✨        sparkles
 
 	(⚈益⚈) (⌕…⌕) ( °ヮ°) (´Д ` ) ╭(＾▽＾)╯ /(⌃ o ⌃)\ ╰(^◊^)╮ ◜(◙д◙)◝ (ʘ‿ʘ)  (≖‿≖)
 
@@ -2082,18 +2083,26 @@ iforgot-sublime-log-commands() {
 }
 
 iforgot-ffmpeg-create-a-video-from-one-picture-and-one-track() {
-	cat <<-EOF
+	cat <<-"EOF"
 	ffmpeg -i image.jpg -i audio.wav \
-	       -c:v libx264 -c:a aac -b:a 192k \
+	       -c:v libx264 -pix_fmt yuv420p -c:a aac -b:a 192k \
 	       -tune stillimage -strict experimental out.mp4
 
 
-	       -crf 0   REQUIRES   -b:v 0
-	       -crf 0   REQUIRES   -b:v 0
-	       -crf 0   REQUIRES   -b:v 0
+	       -crf  REQUIRES  -b:v 0
+	       -crf  REQUIRES  -b:v 0
+	       -crf  REQUIRES  -b:v 0
 
 
-	??? -pix_fmt yuv420p -shortest
+	The range of the CRF scale is 0–51, where 0 is lossless,
+	  23 is the default, and 51 is worst quality possible.
+	  A lower value generally leads to higher quality,
+	  and a subjectively sane range is 17–28. Consider 17 or 18
+	  to be visually lossless or nearly so; it should look the same
+	  or nearly the same as the input, but it isn't technically
+	  lossless.
+	Most video players are crap and supportonly chroma sampling of 4:2:0
+	  achieved with -pix_fmt yuv420p.
 	EOF
 }
 
@@ -2568,13 +2577,88 @@ iforgot-bash-add-array-element-simply() {
 
 iforgot-printer-doesnt-work() {
 	cat <<-EOF
-	Disable – enable.
-	Delete printer through CUPS admin panel
-	Remove printer in hplip
-	# hp-setup -r
-	# /etc/init.d/cupsd restart
-	Find printer again.
-	# hp-setup
-	It should be already in CUPS.
+	~/bin/reload_printer.sh
 	EOF
+}
+
+iforgot-youtube-shortcuts() {
+	cat <<-"EOF"
+	Playback
+	    ⏯		Space
+	    ⏯		k		(no focus needed)
+	    ⍆		,		cadre forward
+	    ⍅		.		cadre back
+	    ⏪		←		(5 sec)
+	    ⏩		→		(5 sec)
+	    ⏪⏪		j		(10 sec)
+	    ⏩⏩		l		(10 sec)
+	    ⏮		Home
+	    ⏭		End
+	    ⏵↑		>		(raise playing speed)
+	    ⏴↓		<		(lower playing speed)
+
+	Volume
+	    ♬↑		↑
+	    ♬↓		↓
+	    ♬ₓ		m
+
+	Playlist
+	    ⏪		Ctrl + ←		(only in playlist)
+	    ⏩		Ctrl + →		(only in playlist)
+	    ⏪		Shift + P		previously played video
+	    ⏩		Shift + N		play next video
+	    						in recommendations/playlist
+
+	Closed captions
+	    On/Off	C
+	    +size	+
+	    −size	-
+
+	Misc
+
+	f – Fullscreen
+	(Shift+)Tab key – Move forward in player control buttons
+	Num keys 1, 2, 3… 9 – Move playhead to the respective percentage, 10%–90%
+	EOF
+}
+
+iforgot-urxvt-test-font() {
+	cat <<-"EOF"
+	newfont="xft:Terminus:pixelsize=12,xft:Kelvinch"
+	echo -e '\e]710;'${newfont}'\007'
+	EOF
+}
+
+iforgot-ffprobe-help() {
+	cat <<-"EOF"
+	ffprobe -v error -show_format -show_streams input.mp4
+
+	ffprobe -v error -hide_banner \
+	        -show_entries format_tags \
+	        -of default=noprint_wrappers=1
+
+	ffprobe -v error -hide_banner \
+	        -show_entries format=artist \
+	        -of default=noprint_wrappers=1:nokey=1
+
+	https://ffmpeg.org/ffprobe.html
+	EOF
+}
+
+iforgot-gs-grab-following() {
+	cat <<-"EOF"
+	curl -u user:pass "https://*/api/statuses/friends.json"
+	EOF
+}
+
+iforgot-gs-grab-followers() {
+	cat <<-"EOF"
+	curl -u user:pass "https://*/api/statuses/followers.json?count=500"
+
+	Cap on 200 entries, use ?page=N, where N = 0, 1, 2 …
+	EOF
+}
+
+iforgot-json-parser() {
+	echo '	jq'
 }

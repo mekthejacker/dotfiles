@@ -95,7 +95,9 @@ URxvt.cursorUnderline:	false
 ! :antialias=true :autohint=true may help, if something.
 !URxvt.font: xft:DejaVu Sans Mono,\
 !            xft:Terminus
-URxvt.font: xft:Terminus:pixelsize:12
+URxvt.font: xft:Terminus:pixelsize:14,\
+            xft:Kelvinch,\
+            xft:DejaVu Sans Mono
 !URxvt.italicFont:        xft:Bitstream Vera Sans Mono:italic:autohint=true
 !URxvt.boldItalicFont:    xft:Bitstream Vera Sans Mono:bold:italic:autohint=true
 URxvt.transparent: true

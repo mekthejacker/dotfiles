@@ -41,6 +41,9 @@ show_error() {
 	local file=$1 line=$2 lineno=$3
 	echo -e "$file: An error occured!\nLine $lineno: $line" >&2
 }
+# NB single quotes – to prevent early expansion
+trap 'show_error "$BASH_SOURCE" "$BASH_COMMAND" "$LINENO"' ERR
+
 shopt -s extglob
 VERSION='20171031'
 [ $# -ne 0 ] && {

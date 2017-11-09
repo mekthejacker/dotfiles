@@ -98,15 +98,34 @@ wa() {
 		--last-ep --last-ep-command "figlet -t -f $HOME/.fonts/clb6x10 -c" \
 		--last-item-mark '.' \
 		--remember-sub-and-audio-delay \
+		--compat mpv-025x \
 		-s "season %keyword disk disc cd part pt dvd" \
-		-S /home/picts/screens/ \
-		--screenshot-dir-skel="macro,misc" "$@"
+		"$@"
 }
-wa-a() { wa -d /home/video/anime "$@"; }
-# alias wa-alias='wa -d /home/video/anime' ## Redo with aliases? Why did I stick to functions?
-wa-f() { wa -d /home/video/films "$@"; }
-wa-s() { wa -d /home/video/serials "$@"; }
-wa-m() { wa -d /home/video/мультипликация "$@"; }
+wa-a() {
+	wa -d /home/video/anime \
+	   -S /home/picts/screenshots/animu \
+	   --screenshot-dir-skel="subs,art,misc" \
+	   "$@"
+}
+wa-f() {
+	wa -d /home/video/films "$@" \
+	   -S /home/picts/screenshots/films \
+	   --screenshot-dir-skel="subs,art,misc" \
+	   "$@"
+}
+wa-s() {
+	wa -d /home/video/serials "$@"
+	   -S /home/picts/screenshots/serials \
+	   --screenshot-dir-skel="subs,art,misc" \
+	   "$@"
+}
+wa-c() {
+	wa -d /home/video/cartoons "$@"
+	   -S /home/picts/screenshots/cartoons \
+	   --screenshot-dir-skel="subs,art,misc" \
+	   "$@"
+}
 
 # Output on the plasma. See also ~/.i3/config.template for workspace bindings.
 wap() {
@@ -133,17 +152,17 @@ alias vivaldi="vivaldi --flag-switches-begin --debug-packed-apps --silent-debugg
 alias vivcp="cp -v ~/.config/vivaldi/custom.css  /opt/vivaldi/resources/vivaldi/style/"
 
 yt-pl-music() {
-	yt-pl-download.sh \
+	yt_pl_download.sh \
 		~/music/yt-playlist \
 		'https://www.youtube.com/playlist?list=PLj9N785l66Hbxm8QRgH_p2ZBjYY7RAuPz'
 }
 yt-pl-jap-music() {
-	yt-pl-download.sh \
+	yt_pl_download.sh \
 		~/music/Japanese/yt-playlist \
 		'https://www.youtube.com/playlist?list=PLj9N785l66HYQA4iNwPVebka0jFuNuWWb'
 }
 yt-pl-sov-music() {
-	yt-pl-download.sh \
+	yt_pl_download.sh \
 		~/music/Old/yt-playlist \
 		'https://www.youtube.com/playlist?list=PLj9N785l66HaJGSGeq608HgASjFthz4k1'
 }

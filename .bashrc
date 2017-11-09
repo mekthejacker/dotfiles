@@ -34,6 +34,8 @@ set -b # report exit status of background jobs immediately
 export EIX_LIMIT=0
 export EDITOR="nano"
 export LESS='-R -M --shift 5 -x4'
+# Less uses ‘standout’ for search results highlight
+#export LESS_TERMCAP_so=$'\E[01;33;03;40m' # red on black
 export MPD_HOST=$HOME/.mpd/socket
 #grep -qF '/assembling/' <<<"$PATH" \
 #	|| export PATH="$PATH:~/assembling/android-sdk-linux/platform-tools/:~/assembling/android-sdk-linux/tools/"

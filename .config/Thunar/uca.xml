@@ -32,4 +32,13 @@
 	<directories/>
 	<image-files/>
 </action>
+<action>
+	<icon>video-x-generic</icon>
+	<name>Pictures to video</name>
+	<unique-id>1509656429078776-2</unique-id>
+	<command>/bin/bash ~/bin/thunar_ca.sh --pictures-to-video %F</command>
+	<description>Converts a range of pictures to an mp4 file</description>
+	<patterns>*</patterns>
+	<image-files/>
+</action>
 </actions>
