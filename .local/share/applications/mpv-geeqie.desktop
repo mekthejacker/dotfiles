@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+
+Name=mpv-geeqie
+Icon=media-playback-start
+Exec=mpv --x11-name mpv-geeqie-preview --loop-file %f
+
+Categories=X-Geeqie;
+OnlyShowIn=X-Geeqie;

@@ -101,9 +101,9 @@
 	# IT DOESN’T WORK PROPERLY FOR WINE64 YET
 	#
 	# [$1] — '--setoptonly' = quit after setting options
-	#wineprefix-setup64() { wineprefix-setup "$@"; }
+	wineprefix-setup64() { wineprefix-setup "$@"; }
 	wineprefix-setup() {
-		[ ${FUNCNAME[1]} = wineprefix-setup64 ] \
+		[ "${FUNCNAME[1]}" = wineprefix-setup64 ] \
 			&& local WINEARCH=win64 WINEPREFIX=/home/sszb/.wine64 \
 			|| local WINEARCH=win32 WINEPREFIX=/home/sszb/.wine
 		# Maybe some day it will work…

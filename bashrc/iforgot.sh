@@ -2082,25 +2082,82 @@ iforgot-sublime-log-commands() {
 	EOF
 }
 
-iforgot-ffmpeg-create-a-video-from-one-picture-and-one-track() {
+iforgot-ffmpeg-encoding-opts() {
 	cat <<-"EOF"
-	ffmpeg -i image.jpg -i audio.wav \
-	       -c:v libx264 -pix_fmt yuv420p -c:a aac -b:a 192k \
-	       -tune stillimage -strict experimental out.mp4
+	INRES="1145x975"    # input resolution
+	OUTRES="1920x1080"    # output resolution
+	FPS="15"    # target FPS
+	GOP="30"    # i-frame interval, should be double of FPS,
+	GOPMIN="15"    # min i-frame interval, should be equal to fps,
+	THREADS="4"    # max 6
+	CBR="1000k"    # constant bitrate (should be between 1000k - 3000k)
+	QUALITY="ultrafast"    # one of the many FFMPEG preset
+	AUDIO_RATE="44100"
 
+	ffmpeg -hide_banner
+	       -y
+	       -threads $THREADS
+	Input
+	       -i "$audio_track"
+	       -loop 1
+	       -i "$(crop_if_needed "$image")"
 
-	       -crf  REQUIRES  -b:v 0
-	       -crf  REQUIRES  -b:v 0
-	       -crf  REQUIRES  -b:v 0
+	       -f x11grab
+	       -s "$INRES" -r "$FPS"
+	       -i :0.0+528,83
 
+	       -f alsa
+	       -i pulse
+	       -f flv
+	       -ac 2
+	       -ar $AUDIO_RATE
+	Enc. Video
+	       -c:v libx264
+	       -pix_fmt yuv420p
+	       -b:v 0 -crf 18
 
-	The range of the CRF scale is 0–51, where 0 is lossless,
-	  23 is the default, and 51 is worst quality possible.
-	  A lower value generally leads to higher quality,
-	  and a subjectively sane range is 17–28. Consider 17 or 18
-	  to be visually lossless or nearly so; it should look the same
-	  or nearly the same as the input, but it isn't technically
-	  lossless.
+	       -g $((FPS*2))
+	       -keyint_min $FPS
+	       -b:v $CBR
+	       -minrate $CBR
+	       -maxrate $CBR
+	Enc. Audio
+	       -c:a aac -b:a 320k
+
+	Output
+	       -tune stillimage
+	       -strict experimental
+	       -shortest
+	       -movflags +faststart            Optimises mp4 for browsers, so
+	                                         they could start playing ASAP.
+	                                         Moves some chunk, that is usually
+	                                         placed at the end of the file,
+	                                         to the head.
+	                                       Useless for streams.
+	       -profile:v $QUALITY
+	       -level 4.2                      Best settings for High profile,
+	                                       that can be used.
+	       -tune film                      Als o best settings on err…
+	       -s $OUTRES
+	       -thread_queue_size 16
+	       -bufsize $CBR
+
+	       -vf "scale=-1:1080,pad=1920:ih:(ow-iw)/2"
+	Dest
+	       out.mp4
+		   "rtmp://$SERVER.twitch.tv/app/$STREAM_KEY"
+
+	Constant Rate Factor:
+	<<lower is better
+
+             ┌default=23
+             │
+	0     17 │  28        51    63
+	└─────┴──┴──┴─────────┴┄┄┄┄┄┘
+	       \     \         \     \_ if libx264 compiled with 10bit
+	        \     \         \_ if libs264 compiled as 8bit
+	         sane range
+
 	Most video players are crap and supportonly chroma sampling of 4:2:0
 	  achieved with -pix_fmt yuv420p.
 	EOF
