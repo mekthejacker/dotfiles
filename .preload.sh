@@ -35,8 +35,8 @@ export PRELOAD_SH=t \
 	   GTK_IM_MODULE QT_IM_MODULE \
 	   ME
 
-# Starting zenity progress window to be aware when lags come from
-#   if they appear.
+# Starting Xdialog progress window to be aware,
+# when lags come from if they appear.
 pipe=/tmp/x_preloading_pipe
 # It’d be suspicious that it does exist when it shouldn’t.
 [ -p $pipe ] && rm -f $pipe

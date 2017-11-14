@@ -26,13 +26,19 @@ done
 	&& exit 3
 
 case "$action" in
-	'--convert-to-jpeg')
+	'--conv2jpeg')
 		~/bin/image_operations.sh conv2jpeg "$@"
 		;;
-	'--pictures-to-video')
+	'--pngcomp')
+		~/bin/image_operations.sh pngcomp "$@"
+		;;
+	'--conv2mp4')
 		~/bin/image_operations.sh conv2mp4 "$@"
 		;;
-	'--glue-images')
+	'--anigif2mp4')
+		~/bin/image_operations.sh anigif2mp4 "$@"
+		;;
+	'--glue')
 		~/bin/image_operations.sh glue "$@"
 		;;
 	'--filename-to-clipboard')

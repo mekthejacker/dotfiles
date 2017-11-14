@@ -80,7 +80,7 @@
 	alias alice="pushd /home/games/Alice; cp linux_config config.cfg; wine alice.exe; popd"
 	alias arx="pushd /home/Games/Arx\ Fatalis/ ; ./arx -u/home/Games/Arx\ Fatalis/; popd"
 	alias audiosurf="pushd /home/games/audioslurp && wine Launcher.exe && popd"
-	alias banished="pushd /home/games/Banished; wine64 Application.exe; popd"
+	alias banished="pushd /home/games/banished/Banished; wine  Application.exe; popd"
 	alias hegemony="pushd /home/games/hegemony; wine Hegemony\ Gold.exe; popd"
 	alias hitman="pushd /home/sszb/.wine/drive_c/Games/Hitman_Blood_money; wine HitmanBloodMoney.exe; popd"
 	alias hl2-cm="pushd /home/games/steam/SteamApps/common/CM2013/; wine Launcher_EP0.EXE; popd;"

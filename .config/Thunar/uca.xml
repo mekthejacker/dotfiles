@@ -2,11 +2,52 @@
 <actions>
 <action>
 	<icon>insert-image</icon>
-	<name>Convert to JPEG</name>
-	<unique-id>1441427517773665-3</unique-id>
-	<command>/bin/bash ~/bin/thunar_ca.sh --convert-to-jpeg %F</command>
+	<name>imop – conv2jpeg</name>
+	<unique-id>1510458053824703-13</unique-id>
+	<command>/bin/bash ~/bin/thunar_ca.sh --conv2jpeg %F</command>
 	<description>Converts image(s) to JPEG format</description>
 	<patterns>*</patterns>
+	<directories/>
+	<image-files/>
+</action>
+<action>
+	<icon>image-x-generic-symbolic.symbolic</icon>
+	<name>imop – pngcomp</name>
+	<unique-id>1510458108648273-16</unique-id>
+	<command>/bin/bash ~/bin/thunar_ca.sh --pngcomp %F</command>
+	<description>Compress PNG images</description>
+	<patterns>*</patterns>
+	<directories/>
+	<image-files/>
+</action>
+<action>
+	<icon>edit-clear-all-symbolic.symbolic</icon>
+	<name>imop – glue</name>
+	<unique-id>1510458114129004-17</unique-id>
+	<command>/bin/bash ~/bin/thunar_ca.sh --glue %F</command>
+	<description>Make a new image composed from several other.</description>
+	<patterns>*</patterns>
+	<directories/>
+	<image-files/>
+</action>
+<action>
+	<icon>video-x-generic</icon>
+	<name>imop – conv2mp4</name>
+	<unique-id>1510458124514533-18</unique-id>
+	<command>/bin/bash ~/bin/thunar_ca.sh --conv2mp4 %F</command>
+	<description>Converts a range of pictures to an mp4 file</description>
+	<patterns>*</patterns>
+	<directories/>
+	<image-files/>
+</action>
+<action>
+	<icon>camera-video-symbolic</icon>
+	<name>imop – anigif2mp4</name>
+	<unique-id>1510458236442070-20</unique-id>
+	<command>/bin/bash ~/bin/thunar_ca.sh --anigif2mp4 %F</command>
+	<description>Convert each animated GIF to an MP4 file</description>
+	<patterns>*</patterns>
+	<directories/>
 	<image-files/>
 </action>
 <action>
@@ -21,24 +62,5 @@
 	<other-files/>
 	<text-files/>
 	<video-files/>
-</action>
-<action>
-	<icon>edit-clear-all-symbolic.symbolic</icon>
-	<name>glue-images</name>
-	<unique-id>1507579230296122-3</unique-id>
-	<command>/bin/bash ~/bin/thunar_ca.sh --glue-images %F</command>
-	<description>Make a new image composed from several other.</description>
-	<patterns>*</patterns>
-	<directories/>
-	<image-files/>
-</action>
-<action>
-	<icon>video-x-generic</icon>
-	<name>Pictures to video</name>
-	<unique-id>1509656429078776-2</unique-id>
-	<command>/bin/bash ~/bin/thunar_ca.sh --pictures-to-video %F</command>
-	<description>Converts a range of pictures to an mp4 file</description>
-	<patterns>*</patterns>
-	<image-files/>
 </action>
 </actions>
