@@ -273,6 +273,7 @@ isinrepo() {
 # pinentry doesn’t like scim
 alias gpg="GTK_IM_MODULE= QT_IM_MODULE= gpg"
 alias ls="ls -1h --color=auto"
+alias mumble="mumble -style adwaita"
 alias re=". ~/.bashrc" # re-source
 alias rename="perl-rename"
 alias rename-test="perl-rename -n"
