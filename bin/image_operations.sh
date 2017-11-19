@@ -9,7 +9,10 @@ show_usage() {
 	Usage:
 	./image_operations.sh <MODE> <files or directories>
 
-
+	Pass whatever, MODE will throw off any files
+	        incompatible with these
+	               formats
+	                  ↓
 
 	MODE         INPUT FORMATS    OUTPUT
 	—————————    —————————————    ————————————————————————————————————————————
@@ -67,7 +70,7 @@ show_usage() {
 
 	EOF
 
-	# FFMPEG takes care of the proper timing when it converts
+	# FFMPEG-3.4 takes care of the proper timing when it converts
 	# an animated GIF to MP4.
 
 	# You NEED to check the result of anigif2mp4, because
