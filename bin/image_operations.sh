@@ -124,6 +124,8 @@ deps=(notify-send Xdialog stat file mktemp identify ffmpeg)
 #
 # VERBOSE=t
 
+VERSION=20171119
+
 # YOU DON’T NEED TO CHANGE THIS LINE
 notify_send='notify-send --hint int:transient:1 -t 3000 -i info'
 
