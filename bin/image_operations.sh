@@ -524,7 +524,7 @@ unset ${!throwoffs*}
 		mp4_type='one_looped_image'
 	#elif [ -v some_time_in_the_future ];then
 	#	mp4_type='there will be a proper type for slideshow with audio track'
-		# it’s joke
+	#   it’s joke
 	else
 		mp4_type='slideshow'
 	fi
@@ -741,7 +741,6 @@ conv2jpeg() {
  # Doesn’t take arguments. It’s basically a procedure.
 #
 conv2mp4() {
-	# set -x
 	local m artist title ssdir="$tmpdir/slideshow"
 	case $mp4_type in
 		'one_image_plus_track')
@@ -850,7 +849,7 @@ conv2mp4() {
 						for image in "${images[@]}"; do rm "$image"; done \
 							&& $notify_send "Source images removed." \
 							|| $notify_send "Deletion aborted." # just in case something messes
-					                                            # with the file system beside us
+							                                    # with the file system beside us
 					}
 			done
 			;;
