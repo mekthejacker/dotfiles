@@ -42,6 +42,9 @@
 	{ "keys": ["shift+delete"], "command": "cut" },
 	{ "keys": ["ctrl+insert"], "command": "copy" },
 	{ "keys": ["shift+insert"], "command": "paste" },
+	{ "keys": ["ctrl+alt+x"], "command": "cut" },
+	{ "keys": ["ctrl+alt+c"], "command": "copy" },
+	{ "keys": ["ctrl+alt+v"], "command": "paste" },
 
 	// These two key bindings should replace the above three if you'd prefer
 	// the traditional X11 behavior of shift+insert pasting from the primary
@@ -51,8 +54,6 @@
 	//{ "keys": ["shift+delete"], "command": "right_delete" },
 
 	{ "keys": ["ctrl+k"], "command": "cut" },
-
-	{ "keys": ["ctrl+c"], "command": "noop" },
 	{ "keys": ["ctrl+j"], "command": "copy" },
 
 	{ "keys": ["ctrl+y"], "command": "paste" },

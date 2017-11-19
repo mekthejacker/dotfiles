@@ -88,7 +88,7 @@ alias renpy="RENPY_EDIT_PY=~/.renpy/emacs.edit.r.py  renpy"
 	&& export MANPATH="$HOME/.watch.sh/:$MANPATH"
 # Enabling bash-completion for my functions
 . /usr/share/bash-completion/completions/watchsh
-complete -F _watchsh wa-a wa-f wa-s wap-a wap-f wap-s wa-alias
+complete -F _watchsh wa-a wa-f wa-s wa-c wap-a wap-f wap-s wa-alias
 
 wa() {
 	# clb6x10 is installed separately, see the man page for details.
@@ -109,19 +109,19 @@ wa-a() {
 	   "$@"
 }
 wa-f() {
-	wa -d /home/video/films "$@" \
+	wa -d /home/video/films \
 	   -S /home/picts/screenshots/films \
 	   --screenshot-dir-skel="subs,art,misc" \
 	   "$@"
 }
 wa-s() {
-	wa -d /home/video/serials "$@"
+	wa -d /home/video/serials \
 	   -S /home/picts/screenshots/serials \
 	   --screenshot-dir-skel="subs,art,misc" \
 	   "$@"
 }
 wa-c() {
-	wa -d /home/video/cartoons "$@"
+	wa -d /home/video/cartoons \
 	   -S /home/picts/screenshots/cartoons \
 	   --screenshot-dir-skel="subs,art,misc" \
 	   "$@"

@@ -4,41 +4,40 @@
 # A helper script for a file manager like Thunar to work with images.
 # © deterenkelt
 
-[ $# -eq 0 ] || [[ "$1" =~ ^(-h|--help)$ ]] && {
+show_usage() {
 	cat <<-EOF
 	Usage:
-	./image_operations.sh <mode> <FILE 1> .. <FILE N>
+	./image_operations.sh <MODE> <files or directories>
 
-	You can pass directories instead of files.
-	They will be searched, and appropriate files added.
 
-	MODE        INPUT FORMATS    WHAT IT DOES
-	————        —————————————    ————————————
-	conv2jpeg   PNG, TIFF        Converts each file to JPEG.
 
-	glue        JPEG, PNG,       Combines several images into a single JPEG,
-	            GIF (simple),    putting them in a column.
-	            TIFF
+	MODE         INPUT FORMATS    OUTPUT
+	—————————    —————————————    ————————————————————————————————————————————
+	conv2jpeg    PNG, TIFF        Each file converts to JPEG.
 
-	pngcomp     PNG              Optimises size for PNG images.
+	glue         JPEG, PNG,       All images combine into one big JPEG,
+	             GIF (simple),    where they are aligned in a column.
+	             TIFF
 
-	conv2mp4    JPEG, PNG,       Creates a web browser compatible video file.
-	            GIF (simple),    For the formats on the left:
-	            TIFF             1. If multiple files passed, then converts
-	                                this series of images to an mp4 file
-	                                with a rate of 25 frames/second.
-	                             2. If a single file passed, then you could
-	                                choose between
-	                                - mute video, that shows only a still image
-	                                  (you choose the duration);
-	                                - a video with an audio track put over
-	                                  an image (in that case duration will be
-	                                  taken from the audio track).
+	pngcomp      PNG              Same PNG, but with size reduced.
 
-	anigif2mp4  GIF (animated)   3. If the file(s) passed are animated GIF,
-	                                then each file will be converted to mp4
-	                                separately. It is an alias to conv2mp4
-	                                with a restriction to animated GIF only.
+	conv2mp4     JPEG, PNG,       Creates a web browser compatible video file.
+	             GIF (simple),    For the formats on the left:
+	             TIFF             1. If multiple files passed, then converts
+	                                 this series of images to an mp4 file
+	                                 with a rate of 25 frames/second.
+	                              2. If a single file passed, then you could
+	                                 choose between
+	                                 - mute video, that shows only a still
+	                                   image (you choose the duration);
+	                                 - a video with an audio track put over
+	                                   an image (in that case duration will be
+	                                   taken from the audio track).
+
+	anigif2mp4   GIF (animated)   3. If the file(s) passed are animated GIF,
+	                                 then each file will be converted to mp4
+	                                 separately. It is an alias to conv2mp4
+	                                 with a restriction to animated GIF only.
 
 	DEFAULT SETTINGS (that you may change)
 	——————————————————————————————————————
@@ -70,18 +69,60 @@
 
 	# FFMPEG takes care of the proper timing when it converts
 	# an animated GIF to MP4.
+
+	# You NEED to check the result of anigif2mp4, because
+	# conversion from GIF to MP4 has two pitfalls:
+	#   - some GIFs, which second layer and above do not have pixels
+	#     at 0:0, may have such layer SHIFTED, resulting MP4 will be a mess.
+	#   - GIFs which background is transparent will have it white in MP4.
+	#     The edges of the picture and transparency will look ugly and rough
+	#     on white, because usually there’s either some grayish colour
+	#     of the window, or a checkered pattern, which smoothes this edge.
 }
 
 
 set -feE
 shopt -s extglob
+
+on_exit() {
+	echo 101 >$pipe
+	wait $xdialog_pid
+	[ -v tmpdir ] && rm -rf "$tmpdir"
+}
+trap 'on_exit' EXIT TERM INT QUIT KILL
+
 show_error() {
 	local file=$1 line=$2 lineno=$3
 	echo -e "$file: An error occured!\nLine $lineno: $line" >&2
 	notify-send "${BASH_SOURCE##*/}" "Error: check the console."
 }
-# NB single quotes – to prevent early expansion
-trap 'show_error "$BASH_SOURCE" "$BASH_COMMAND" "$LINENO"' ERR
+ # The reason we need this function is because set +e won’t remove the trap.
+#  So after disabling the errexit shell option, we also need to remove that
+#  trap manually and put it back.
+#
+traponerr() {
+	case "$1" in
+		set)
+			# NB single quotes – to prevent early expansion
+			trap 'show_error "$BASH_SOURCE" "$BASH_COMMAND" "$LINENO"' ERR
+			;;
+		unset)
+			# NB trap '' ERR will ignore the signal.
+			#    trap - ERR will reset command to 'show_error "$BASH_SOURCE…'
+			trap '' ERR
+			;;
+	esac
+}
+traponerr set
+
+deps=(notify-send Xdialog stat file mktemp identify ffmpeg)
+
+ # Show a report, when not all files, specified on the command line,
+#  were taken into processing. This will also report simple/animated
+#  GIFs, when they mismatch the $mode – because there’s only one MIME
+#  type for both of them.
+#
+# VERBOSE=t
 
 # YOU DON’T NEED TO CHANGE THIS LINE
 notify_send='notify-send --hint int:transient:1 -t 3000 -i info'
@@ -101,19 +142,6 @@ picture_viewer='viewnior --fullscreen'
 #  Only transient – it will be a bad idea to change codec here.
 #
 ffmpeg='ffmpeg -hide_banner -threads 4'
-
-for bin in notify-send Xdialog stat file mktemp \
-           convert identify pngcrush parallel \
-           ffmpeg  ${media_player%% *} ${picture_viewer%% *}; do
-	which $bin >/dev/null || {
-		echo "$bin wasn’t found." >&2
-		errors=t
-	}
-done
-[ -v errors ] && {
-	notify-send -t 3000 "${BASH_SOURCE##*/}" "Check the console output for errors."
-	exit 3
-}
 
  # Don’t ask, whether I want to overwrite resulting files.
 #  Questions about deleting source files will still be there.
@@ -157,9 +185,6 @@ conv_size_limit_in_bytes=$((conv2jpeg_dont_convert_smaller_than_k*1024))
 pngcomp_dont_compress_if_smaller_than_k=1000 # in KiB
 
 tmpdir=$(mktemp -d)
-clean() { rm -rf "$tmpdir"; }
-trap 'clean' EXIT TERM KILL
-
 
  # We need to see, what image formats are allowed for which mode
 #  To differentiate between gifs and animated gifs, we’ll use
@@ -180,19 +205,22 @@ declare -A allowed_formats_table=(
 	[anigif2mp4]='gif'
 )
 
-case $1 in
+case "$1" in
 	conv2jpeg)
 		# Converts images to JPEG
 		mode=conv2jpeg
+		deps+=(convert)
 		;;
 	pngcomp)
 		# Optimises the size of PNG images
 		mode=pngcomp
+		deps+=(pngcrush parallel)
 		;;
 	glue)
 		# Combines several images into one,
 		# putting them in a column.
 		mode=glue
+		deps+=(convert)
 		;;
 	anigif2mp4)
 		# It is an alias for ‘conv2mp4’, restricted to animated gifs only.
@@ -200,24 +228,42 @@ case $1 in
 		# convert all animated GIF in it to mp4. Without such an alias
 		# user would have to *know all the paths to animated gifs*
 		# in order to pass them to conv2mp4.
-		anigif_is_allowed=t
 		mode=anigif2mp4
+		only_animated_gif=t
+		deps+=(convert)
 		;;
 	conv2mp4)
 		# 1. Creates a video from separate images.
-		#    Basically, a slide show with 25 fps.
+		#    Basically a slide show with 25 fps.
 		# 2. Creates a video, that shows a single image
 		#    with an audio track put over it.
 		# 3. Converts an animated gif to mp4.
 		# 4. Creates a video from a still image with
 		#    set duration (useful for codec testing).
 		mode=conv2mp4
+		deps+=(convert ${media_player%% *} ${picture_viewer%% *})
 		;;
 	*)
-		$notify_send "Unrecognised mode:" "$1"
+		Xdialog --title "Usage – ${BASH_SOURCE##*/}" \
+		        --no-wrap --fixed-font \
+		        --no-cancel \
+		        --textbox - \
+		        800x600 \
+		        <<<$(show_usage | sed -r 's/^/   /g; 1i\\n')
 		exit 3
 esac
 shift
+
+for bin in "${deps[@]}"; do
+	which $bin >/dev/null || {
+		echo "$bin wasn’t found." >&2
+		errors=t
+	}
+done
+[ -v errors ] && {
+	notify-send -t 3000 "Check the console output for errors." "${BASH_SOURCE##*/}"
+	exit 3
+}
 
 progress_window_initialise() {
 	pipe="$tmpdir/progress_window_pipe"
@@ -230,8 +276,9 @@ progress_window_initialise() {
 	        --backtitle "$1" \
 	        --gauge '' \
 	        630x200 \
-	        72% \
+	        0% \
 	        <$pipe &
+	xdialog_pid=$!
 }
 progress_window_upd_text() {
 	local s='XXX'$'\n' arg
@@ -269,6 +316,7 @@ for arg in "$@"; do
 			images+=("$arg")
 		elif [ -d "$arg" ]; then
 			progress_window_initialise "Searching directory: $arg"
+			echo 72% >$pipe
 			while IFS= read -r -d $''; do
 				images+=("$REPLY")
 				subpath=${REPLY#$arg}
@@ -281,7 +329,7 @@ for arg in "$@"; do
 				}
 				progress_window_upd_text "$subpath" "$file" "${#images[@]}"
 			done < <(find -L "$arg" -type f $find_patterns -print0)
-			echo 101 >$pipe
+			echo 101 >$pipe; wait $xdialog_pid
 		else
 			$notify_send 'Argument is not a directory or a file:' "$arg"
 			exit 3
@@ -292,11 +340,10 @@ for arg in "$@"; do
 	fi
 done
 
-echo "Checking images compatibility to ‘$mode’ mode…"
-progress_window_initialise "Checking images compatibility to ‘$mode’ mode…"
+echo "Checking MIME-type compatibility to ‘$mode’ mode…"
+progress_window_initialise "Checking MIME-type compatibility to ‘$mode’ mode…"
 total_files=${#images[@]}
-echo 0 >$pipe
-[ -v test_path ] || test_path='/home/picts/animu/screens/seitokai yakuindomo/*****_with_eraser.gif'
+[ -v test_path ] || test_path=''
 for ((i=0; i<$total_files; i++)); do
 	path=${images[i]}
 	subpath=${path%/*}
@@ -309,7 +356,7 @@ for ((i=0; i<$total_files; i++)); do
 	progress_window_upd_text "$file" "$subpath" "$i/$total_files"
 	[ "$path" = "$test_path" ] && set -x
 	mimetype=$(file -L -b --mime-type "$path")
-	unset image_matches_mode
+	unset image_matches_mode throwoff_reason
 	for format in $allowed_formats; do
 		[ "$mimetype" = "${iformats[$format]}" ] && {
 			# GIF needs an additional check for animation
@@ -323,8 +370,12 @@ for ((i=0; i<$total_files; i++)); do
 					&& giftype=simple \
 					|| giftype=animated
 				set +o pipefail
-				[ $giftype = animated  -a  ! -v anigif_is_allowed ] && {
-					throwoffs+=( ["$path"]='Animated GIF are not allowed in this mode.' )
+				[ $giftype = animated  -a  ! -v only_animated_gif ] && {
+					throwoff_reason='Animated GIF are not allowed in this mode.'
+					break
+				}
+				[ $giftype = simple  -a  -v only_animated_gif ] && {
+					throwoff_reason='Non-animated GIF are not allowed in this mode.'
 					break
 				}
 				case $giftype in
@@ -337,17 +388,20 @@ for ((i=0; i<$total_files; i++)); do
 	done
 	if [ -v image_matches_mode ]; then
 		[ -v first_existing_index ] || first_existing_index=$i
-	else
-		throwoffs+=( ["$path"]="MIME-type $mimetype not allowed in this mode." )
-		unset images[$i]
+	elif [ ! -v throwoff_reason ]; then
+		throwoff_reason="MIME-type $mimetype not allowed in this mode."
 	fi
+	[ -v throwoff_reason ] && {
+		throwoffs+=( ["$path"]="$throwoff_reason" )
+		unset images[$i]
+	}
 	echo $((i*100/total_files)) >$pipe
 	[ "$path" = "$test_path" ] && set +x
 done
-echo 101 >$pipe
+echo 101 >$pipe; wait $xdialog_pid
 
 total_files_after_check=${#images[@]}
-[ ${#throwoffs[@]} -ne 0 ] && {
+[ ${#throwoffs[@]} -ne 0  -a  -v VERBOSE ] && {
 	throwoffs_title="$((total_files-total_files_after_check)) files were thrown off:"
 	for path in "${!throwoffs[@]}"; do
 		throwoffs_list+="$path:"$'\n\t'"${throwoffs["$path"]}"$'\n'
@@ -412,14 +466,16 @@ unset ${!throwoffs*}
 					exit 3
 				}
 				# Audio type confirmed, getting duration.
-				set +e
+				set +eE
+				traponerr unset
 				duration=$(ffprobe -v error -show_format "$audio_track" \
 				           |& sed -rn 's/^duration=([0-9]+).*$/\1/p;T;Q5')
 				[[ $? -eq 5  &&  "$duration" =~ ^[0-9]+$ ]] || {
 					$notify_send "Couldn’t get track duration:" "${audio_track##*/}"
 					exit 3
 				}
-				set -e
+				set -eE
+				traponerr set
 				m=$(ffprobe -v error -hide_banner \
 				            -show_entries format_tags \
 				            -of default=noprint_wrappers=1 \
@@ -781,9 +837,21 @@ conv2mp4() {
 			done
 			;;
 		'anigif2mp4')
-			processed_counter=1
+			processed_counter=0
+			pre_viewer_messages=t
 			total="${#images[@]}"
+			progress_window_initialise "Converting GIF images"
 			for image in "${images[@]}"; do
+				path=$image
+				subpath=${path%/*}
+				file=${path##*/}
+				[ "$subpath" = "$file" ] && unset subpath
+				[ ${#file} -gt 50 ] && {
+					filetail=${file: -10:10}
+					file=${file:0:40}…$filetail
+				}
+				progress_window_upd_text "$file" "$subpath" "$((++processed_counter))/$total"
+				echo "$((processed_counter/100*total))%" >$pipe
 				mp4_filename=${image%.*}.mp4
 				[ -e "$mp4_filename"  -a  ! -v overwrite ] && {
 					$notify_send "File exists, skipping" "${mp4_filename##*/}"
@@ -796,15 +864,36 @@ conv2mp4() {
 				        -strict experimental \
 				        -movflags +faststart \
 				        "$mp4_filename"
+				unset ready
 				until [ -v ready ]; do
+					[ -v pre_viewer_messages ] \
+						&& Xdialog --title "Show original GIF – ${BASH_SOURCE##*/}" \
+						           --backtitle "Comparison between GIF and MP4" \
+						           --no-cancel \
+						           --msgbox "Show the original GIF" \
+						           600x170 \
+						           2>&1
 					$picture_viewer "$image"
+					[ $processed_counter -gt 1 ] && checkbox='Don’t show this again'
+					[ -v pre_viewer_messages ] && {
+						cb_res=$(Xdialog --title "Show the MP4 – ${BASH_SOURCE##*/}" \
+						                 --backtitle "Comparison between GIF and MP4" \
+						                 --no-cancel \
+						                 ${checkbox:+--check "$checkbox"} \
+						                 --msgbox "Show the MP4" \
+						                 600x170 \
+						                 2>&1 )
+						[ "$cb_res" = checked ] && unset pre_viewer_messages
+					}
 					$media_player "$mp4_filename"
 					unset play_again
+					set +eE
+					traponerr unset
 					play_again=$(
 						Xdialog --title "Delete source image? – ${BASH_SOURCE##*/}" \
-						        --backtitle "Image $((processed_counter++))/$total"
+						        --backtitle "Image $processed_counter/$total" \
 						        --ok-label "Delete" \
-						        --cancel-label="Keep and Quit" \
+						        --cancel-label "Keep / Quit" \
 						        --buttons-style text \
 						        --check "Ignore, play the file again" \
 						        --yesno "Delete source file?" \
@@ -812,19 +901,35 @@ conv2mp4() {
 						        2>&1
 						)
 					exit_code=$?
+					set -eE
+					traponerr set
 					[ "$play_again" = checked ] && continue || ready=t
 					if [ $exit_code -eq 0 ]; then
 						rm "$image" \
 							&& $notify_send "Source images removed." \
-							|| $notify_send "Original file kept."  # just in case something messes
-							# with the file system beside us
+							|| $notify_send "Original file kept."
+							# ^-- just in case something messes
+							#     with the file system beside us
 					else
-						echo 'Aborted' >&2
-						$notify_send "Aborted" "${BASH_SOURCE##*/}"
-						exit 3
+						if Xdialog --title "Quit now? – ${BASH_SOURCE##*/}" \
+						           --backtitle "Image skipped" \
+						           --ok-label "Continue" \
+						           --cancel-label="Quit" \
+						           --buttons-style text \
+						           --yesno "$((total-processed_counter)) left. Continue or Quit?" \
+						           600x170 \
+						           2>&1
+						then
+							ready=t
+						else
+							echo 'Aborted' >&2
+							$notify_send "Aborted" "${BASH_SOURCE##*/}"
+							exit 3
+						fi
 					fi
 				done
 			done
+			echo 101 >$pipe; wait $xdialog_pid
 			;;
 	esac
 }
@@ -867,8 +972,9 @@ $mode
 #  10-bit H264        – FF says ‘file is corrupt’
 #  -pix_fmt yuv444p   – FF says ‘file is corrupt’
 
-
--framerate 1/25
--preset veryslow
--vf "scale='min(1280,iw)':-2,format=yuv420p"
+ # Todo:
+#  Adaptive bitrate  – fit more mp3 into size if it’s >192k.
+#  -framerate 1/25  – no player would be able to wind
+#  -preset veryslow  – m-maybe
+#  -vf "scale='min(1280,iw)':-2,format=yuv420p"  – gotta understand how it works first.
 

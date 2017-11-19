@@ -4,7 +4,7 @@ Type=Application
 
 Name=mpv-geeqie
 Icon=media-playback-start
-Exec=mpv --x11-name mpv-geeqie-preview --fs --loop-file %f
+Exec=mpv --x11-name mpv-geeqie-preview --no-input-default-bindings --input-conf=~/.mpv/input-geeqie-preview.conf --fs --loop-file %f
 
 Categories=X-Geeqie;
 OnlyShowIn=X-Geeqie;

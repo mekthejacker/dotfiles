@@ -53,7 +53,7 @@ sub-font-size=50
 #vo=opengl-hq:scale=ewa_lanczossharp:cscale=ewa_lanczossharp:interpolation:temporal-dither:gamma=0.9:blend-subtitles=yes:target-prim=bt.709:target-trc=srgb
 #vo=opengl-hq:scale=ewa_lanczossharp:cscale=ewa_lanczossharp:interpolation:temporal-dither:gamma=0.9:blend-subtitles=yes:icc-profile="/home/dtr/.env/FULLHD.icm"
 vo=opengl
-volume=100
+volume=80
 ytdl-format=bestvideo+bestaudio
 
 

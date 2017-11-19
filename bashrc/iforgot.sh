@@ -433,6 +433,8 @@ iforgot-kaomoji-drawing() {
 	´ ▽ ` )ﾉ  (・∀・ )  (ΘεΘ;)  ╮(─▽─)╭  (≧ω≦)  (´ヘ｀ ;)  (╯3╰)  (⊙_◎)  (¬▂¬) ¬_¬
 	´ ▽ ` )ﾉ  ôヮô  ŎםŎ   ಥ﹏ಥ   ᕙ(⇀‸↼‶)ᕗ   ≧ヮ≦     ☜(ﾟヮﾟ☜)     ヽ(´ｰ｀ )ﾉ       (¬‿¬)
 
+	(•̀ᴗ•́)و
+
 	(つд⊂)
 
 	( ^▽^)σ)~O~)
@@ -2102,8 +2104,9 @@ iforgot-ffmpeg-encoding-opts() {
 	       -loop 1
 	       -i "$(crop_if_needed "$image")"
 
+	       -framerate 60   # NB not -r
 	       -f x11grab
-	       -s "$INRES" -r "$FPS"
+	       -s "$INRES"
 	       -i :0.0+528,83
 
 	       -f alsa
