@@ -11,7 +11,7 @@
 #        glue:  convert;
 #     pngcomp:  pngcrush, parallel;
 #    conv2mp4:  convert,
-#               mpv (or whatever you put in $media_player),
+#               mpv (or whatever media player you put in $media_player),
 #               viewnior (or whatever picture viewer you put in $picture_viewer);
 #  anigif2mp4:  convert.
 #
