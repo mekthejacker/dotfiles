@@ -4,6 +4,19 @@
 # A helper script for a file manager like Thunar to work with images.
 # © deterenkelt
 
+ # Dependencies
+#
+#  common:  notify-send, Xdialog, stat, file, mktemp, identify, ffmpeg;
+#  conv2jpeg:  convert;
+#  glue:  convert;
+#  pngcomp:  pngcrush, parallel;
+#  conv2mp4:  convert,
+#             mpv (or whatever you put in $media_player),
+#             viewnior (or whatever picture viewer you put in $picture_viewer);
+#  anigif2mp4:  convert
+#
+#  P.S. convert and identify are parts of imagemagick package.
+
 show_usage() {
 	cat <<-EOF
 	Usage:
