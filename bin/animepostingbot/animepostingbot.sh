@@ -35,14 +35,13 @@ readarray -t used_cache < "$used_files"
 file=''
 message=''
 pre="$rc:"$'\n'
-VERSION='20170603-0858'
+VERSION='20171123-2305'
 [[ "$REP" =~  ^[0-9]+$ ]] && {
 	in_reply_to_status_id="$REP"
 }
 [ -v source ] || source='Anibot.sh'
 
 read_rc_file() {
-
 	local var trash_found lostnfound_found
 	. "$rc"
 	for var in username password proto server media_upload_url making_post_url attachment_url older_than dirs remember_files; do
@@ -88,7 +87,16 @@ read_rc_file
 
 [ -v pause_secs ] || do_once=t
 
-exts=(-iname *.jpg -o -iname *.jpeg -o -iname *.png -o -iname *.gif -o -iname *.tiff -o -iname *.webm)
+exts=(
+	-iname *.jpg
+	-o -iname *.jpe
+	-o -iname *.jpeg
+	-o -iname *.png
+	-o -iname *.gif
+	-o -iname *.tiff
+	-o -iname *.webm
+	-o -iname *.mp4
+	)
 start_time=`date +%s`
 
 [ -v D -a -r "$D" ] && {
@@ -113,35 +121,43 @@ update_file_list() {
 	# Create file list
 	[ -v D_no_files ] || {
 		files=()  # Drop current list on reread.
-		while IFS= read -r -d $'\0'; do
+		while IFS= read -r -d ''; do
 			files+=("$REPLY")
-		done < <(find -P "${dirs[@]}" "${find_excludes[@]}" -type f \( "${exts[@]}" \) -mtime +$older_than -print0)
+		done < <(find -P "${dirs[@]}" "${find_excludes[@]}" \
+		              -type f \( "${exts[@]}" \) \
+		              -mtime +$older_than -print0)
 		[ ${#files[@]} -eq 0 ] \
 		&& echo 'No files! Will return now…' >&2 \
 		&& exit
 	}
 	echo "Total files found: ${#files[@]}"
-	[ -v D ] && {
-		echo >"$mydir/file_list"
-		for file in "${files[@]}"; do
-			echo "$file" >>"$mydir/file_list"
-		done
-	}
+	echo >"$mydir/file_list"
+	for file in "${files[@]}"; do
+		echo "$file" >>"$mydir/file_list"
+	done
 }
 
-find_an_image() {
-	local mode="$@" mime='' newline=''
+find_a_file() {
+	local mode="$@" mime='' file_basename file_basedir image_found \
+	      video_hashtag hashtags=() special_hashtags=() \
+	      local_hashtags_to_remove=() hashtag_space \
+	      first_newline second_newline third_newline
 	case "$mode" in
-		image|'') local mode=image; mime='image';;
-		webm)  local mime='video' webm_hashtag='#webm';;
-		all) local mime='.*';;
+		image|'') mode='image' mime='image';;
+		video)  mime='video' video_hashtag='#webm';;
+		all) mime='.*';;
 	esac
 	echo "    Finding a file of type ‘$mode’…"
-	unset image_found file split_path show_name show_name_hashtag middle_hashtags filename
+	unset image_found
 	[ -v D -a -r "$D" ] && {
 		# Simulate file, show how it’s going to be parsed
 		image_found=t
-		file="$D"
+		declare -g file="$D"
+		[[ "$file" =~ ^.*(webm|mp4)$ ]] && {
+			mime=video
+			declare -g video=video
+			video_hashtag='#webm'
+		}
 	}
 	iter=0
 	until [ -v image_found ]; do
@@ -174,72 +190,160 @@ find_an_image() {
 
 	for dir in "${dirs[@]}"; do
 		stripped="${file##$dir}"
-		[ "$stripped" != "$file" ] && middle_tags=$stripped && break
+		[ "$stripped" != "$file" ] && done_stripping=t && break
 	done
-	readarray -t split_path < <(echo "$stripped" | sed -r 's~^/~~;s~/~\n~g')
-	[ ${#split_path[@]} -gt 1 ] && {
-		show_name=`make_name "${split_path[0]}"`
-		show_name_hashtag=`make_hashtag "$show_name"`
-		unset middle_hashtags
-		for ((i=1; i< $(( ${#split_path[@]}-1 )); i++)); do
-			middle_hashtags+=(`make_hashtag "${split_path[i]}"`)  # #macro, #art, #misc
+	[ -v done_stripping ] || {
+		echo 'File not in the specified folders? Wrong path?' >&2
+		exit 3
+	}
+	# If what we pass to readarray would be an empty string, then
+	# then readarray forcibly create single – and empty – array element,
+	# which will result in a ghost hashtag later.
+	[ "${stripped%/*}" ] \
+		&& readarray -t hashtags < <( sed -r 's~^/~~;s~/~\n~g' <<<"${stripped%/*}" )
+	file_basename=${stripped##*/}
+	file_basedir=${file%/*}
+	declare -g file
+
+	[ -v D ] && declare -p file file_basename file_basedir hashtags && echo "Hashtags: ${#hashtags[@]}"
+
+	 # 1. Stripping hashtags from bad characters
+	#     and replacing spaces with underscores
+	#
+	[ -v D ] && echo $'\n'Stripping hashtags from bad characters…
+	for ((i=0; i<${#hashtags[@]}; i++)); do
+		hashtags[$i]="${hashtags[i]// /_}"
+		hashtags[$i]="${hashtags[i]//\:/_}"
+		hashtags[$i]="${hashtags[i]//[,.\'\"\&\^\°\!\?\#\$\%\;\+\(\)\{\}]/}"
+	done
+	[ -v D ] && declare -p hashtags && echo "Hashtags: ${#hashtags[@]}"
+
+	 # 2. Capitalise hashtags
+	#
+	[ -v D ] && echo $'\n'Capitalising hashtags…
+	for ((i=0; i<${#hashtags[@]}; i++)); do
+		for capit_mark in "${hashtags_capitalise_after[@]}"; do
+			[ "${hashtags[i]}" = "$capit_mark" -a -v hashtags[$((i+1))] ] && {
+				if [ -v dont_put_each_capitalised_tag_on_a_separate_line ]; then
+					# keep capitalised tags in line and treat like regular tags
+					hashtags[$((i+1))]=${hashtags[$((i+1))]^}
+				else
+					# move them to a separate array, from which they’ll be printed
+					# each on a separate line
+					special_hashtags+=( "${hashtags[$((i+1))]^}" )
+					# since we don’t need this tag in the common array,
+					# mark it for removal by adding to the unwanted tags array
+					local_hashtags_to_remove+=( "${hashtags[$((i+1))]}" )
+				fi
+				break
+			}
 		done
-	}
-	filename="${split_path[-1]}"
-	[ -v D -a -r "$D" ] && {
-		declare -p stripped split_path show_name show_name_hashtag middle_hashtags filename
-		# exit 0
-	}
-	# declare -p show_name show_name_hashtag middle_hashtags
+	done
+	[ -v D ] && declare -p hashtags special_hashtags && echo "Hashtags: ${#hashtags[@]}"
+
+	 # 3. Move to the back less important tags
+	#
+	[ -v D ] && echo $'\n'Moving less important tags to the back
+	items_to_check=${#hashtags[@]}
+	for ((i=0; i<items_to_check; i++)); do
+		for less_important_tag in "${hashtags_to_the_back[@]}"; do
+			[ "${hashtags[i]}" = "$less_important_tag" ] && {
+				buf=${hashtags[i]}
+				for ((j=i+1; j<${#hashtags[@]}; j++)); do
+					hashtags[$((j-1))]=${hashtags[j]}
+				done
+				hashtags[-1]="$buf"
+				let items_to_check--
+				break
+			}
+		done
+	done
+	[ -v D ] && declare -p hashtags && echo "Hashtags: ${#hashtags[@]}"
+
+	 # 4. Removing unneeded tags
+	#     (we do it in the last step, because otherwise we would need
+	#     to catch the holes in the array somehow).
+	#
+	[ -v D ] && echo $'\n'Removing unneeded tags…
+	hashtags_arrlength=${#hashtags[@]}
+	for ((i=0; i<hashtags_arrlength; i++)); do
+		for unneeded_tag in "${hashtags_to_remove[@]}" \
+		                    "${local_hashtags_to_remove[@]}"; do
+			[ "${hashtags[i]}" = "$unneeded_tag" ] \
+				&& unset hashtags[$i] \
+				&& break
+		done
+	done
+	[ -v D ] && declare -p hashtags && echo "Hashtags: ${#hashtags[@]}"
+
+	 # 5. Adding a hash sign to tags
+	#
+	[ -v D ] && echo $'\n'Adding hash signs to what is left…
+	for ((i=0; i<hashtags_arrlength; i++)); do
+		[ -v hashtags[$i] ] \
+			&& hashtags[$i]="#${hashtags[i]}"
+	done
+	for ((i=0; i<${#special_hashtags[@]}; i++)); do
+		[ -v special_hashtags[$i] ] \
+			&& special_hashtags[$i]="#${special_hashtags[i]}"
+	done
+	[ -v D ] && declare -p hashtags special_hashtags
+
+	 # 6. Composing the message
+	#
+	[ -v D ] && echo $'\n'Composing the message
 	declare -g _message
-	[ -v no_file_info ] || {
-		[ "$show_name_hashtag" -o "$webm_hashtag" ] && newline=$'\n'
-		# Middle hashtags may exist only is show_name_hashtag is set
-		[ "$middle_hashtags" ] && middle_hashtags=" $middle_hashtags"
-		[ "$show_name_hashtag" ] && webm_hashtag=" $webm_hashtag"
 
-		[ -v special_message ] || {
-			read -r -d '' _message <<-EOF
-			$filename${newline:-}${show_name_hashtag:-}${middle_hashtags:-}${webm_hashtag:-}
-			EOF
-		}
+	 # Message looks like this:
+	#
+	#  File_name.jpeg <$first_newline>
+	#  #Capitalised_tag1
+	#  #Capitalised_tag2 <$second_newline>
+	#  #various #common #tags <$hashtags_space> <$video_hashtag> <$third_newline>
+	#
+	#  author data from the file named ‘author’. This file must reside
+	#  in the same folder as the image. First line is the name, others
+	#  whatever, put there URL to their blogs/homepages/pawoo and pixiv.
+	[ -v D ] && set -x
+	[ ${#special_hashtags[@]} -gt 0 ] && first_newline=$'\n'
+	[ ${#hashtags[@]} -gt 0  -o  -v video_hashtag ] && second_newline=$'\n'
+	[ ${#hashtags[@]} -gt 0  -a  -v video_hashtag ] && hashtags_space=' '
+	[ -v D ] && set +x
+	author_file="$file_basedir/author"
+	[ -r "$author_file" ] && {
+		third_newline=$'\n'$'\n'
+		author_data="$( sed -r '1 {s/.*/Author: &/}' "$author_file" )"
+	}
+
+	[ -v special_message ] || {
+		message="$file_basename"
+		message+="${first_newline:-}$(IFS=$'\n'; echo "${special_hashtags[*]}")"
+		message+="${second_newline:-}${hashtags[*]}${hashtags_space:-}${video_hashtag:-}"
+		message+="$third_newline$author_data"
 	}
 }
 
- # Keep spaces and capitalize first letters.
-#
-make_name() { sed -r 's/(^.)/\U\1/g; s~[\(\)\&\;]~~g' <<<"$@"; }
-
- # Removing spaces and adding ‘#’ in front.
-#
-make_hashtag() {
-	local var="$@" prepare=$2
-	[ "$prepare" ] && var=`make_name "$var"`
-	var=${var// /_}
-	echo "#${var//[,.\'\"\&\^\°\!\?\#\$\%\;\+\(\)\{\}]/}"
-}
-
- # Final cleaning of the message for GNU Social
-#  For some reason, GNU Social doesn’t like ampersands.
-#  &ampl; is not an option. Maybe that’s curl? Too lazy to check.
-#
-cleanmsg4gs() {
-	declare -g message=${message//&/}
-}
 
 upload_file() {
-	echo "    Uploading file: $file"
-	media_upload=`curl -u "$username:$password" --form "media=@$file" $proto$server$media_upload_url 2>/dev/null` && {
-		media_id=`sed -rn '3 s~.*<mediaid>([0-9]+)</mediaid>.*~\1~p;T;Q1'<<<"$media_upload"` \
-			&& {
+	local file
+	for file in "$@"; do
+		echo "    Uploading file: $file"
+		if media_upload=`curl -u "$username:$password" \
+			                  --form "media=@$file" \
+			                  $proto$server$media_upload_url 2>/dev/null`
+		then
+			if media_id=`sed -rn '3 s~.*<mediaid>([0-9]+)</mediaid>.*~\1~p;T;Q1'<<<"$media_upload"`; then
 				echo "        Error: media id is not a valid number." | tee -a "$problem_files" >&2
 				return 1
-			}||{
-				message="${message:+$message$'\n'$'\n'}$_message $proto$server$attachment_url/$media_id"
+			else
+				media_ids+=("$media_id")
 				echo -e "    Uploaded with media id $media_id."
-			}
-		:
-	}||	echo "    Error while uploading file $file" | tee -a "$problem_files" >&2
+			fi
+		else
+			echo "    Error while uploading file $file" | tee -a "$problem_files" >&2
+			return 1
+		fi
+	done
 	return 0
 }
 
@@ -255,31 +359,41 @@ while :; do
 		start_time=$new_time
 	}
 	echo -en "\n`date +%Y-%m-%d\ %H:%M`\nGoing a make a post!"
-	# 1/5 chance to attach a webm/mp4
-	unset attach_video
+	unset video
 	[ -r "$D" ] || {
+		# 1/5 chance to attach a webm/mp4
 		[ ! -v no_media -a `shuf -i 0-4 -n 1` -eq 0 ] && {
 			echo ' …with a video!'
-			attach_video=t
+			video=video
 		}|| echo
 	}
 	unset message
-	find_an_image
-	[ -v D_no_upload ] || upload_file
-	[ -v attach_video ] && {
-		find_an_image webm
-		[ -v D_no_upload ] || upload_file
+	find_a_file ${video:-}
+	[ -v D_dont_upload ] || {
+		[ -r "$mydir/$pic_to_attach_with_video" ] \
+			&& pic="$mydir/$pic_to_attach_with_video"
+		upload_file ${video:+"$pic"} "$file"
 	}
 	# special_message is set when in ‘repetitive mode’,
 	# see the explanation in the example rc file.
 	[ -v special_message ] && unset message_additional_text
 	message="${message:+$special_message$message$message_additional_text}"
-	[ -v D_no_upload ] || {
+	for media_id in ${media_ids[@]}; do
+		message+=" $proto$server$attachment_url/$media_id"
+	done
+	declare -p message
+	[ -v D_dont_post ] || {
 		echo -e "\n`date +%Y-%m-%d\ %H:%M`\nSending the post…"
 		[ "$message" ] && {
-			cleanmsg4gs
+			# Final cleaning of the message for GNU Social
+			# For some reason, GNU Social doesn’t like ampersands.
+			# &amp; is not an option. Maybe that’s curl? Too lazy to check.
+			declare -g message=${message//&/}
+			data_string+="status=$message"
+			data_string+="${in_reply_to_status_id:+&in_reply_to_status_id=$in_reply_to_status_id}"
+			data_string+="${source:+&source=$source}"
 			curl -u "$username:$password" \
-		         --data "status=$message${in_reply_to_status_id:+&in_reply_to_status_id=$in_reply_to_status_id}${source:+&source=$source}" \
+		         --data "$data_string" \
 		         $proto$server$making_post_url &>"$log"
 		}
 		reply_to=`sed -nr 's/^\s*<id>([0-9]+)<\/id>\s*$/\1/p;T;Q1' "$log"`

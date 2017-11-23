@@ -116,17 +116,17 @@ iforgot-make-a-debug-build() {
 	EOF
 }
 
-iforgot-read-via-x0() {
+iforgot-bash-read-via-x0() {
 	cat <<-"EOF"
 	while IFS= read -r -d $'\0'; do
 		echo "$REPLY"
 	done <  <(find -type f -print0)
 
-	(-d '' also works since \0 is a marker for an empty string.)
+	(-d '' also works since \0 is an ‘end of the string’ marker.)
 	EOF
 }
 
-iforgot-where-is-my-completion() {
+iforgot-bash-where-is-my-completion() {
 	cat <<-"EOF"
 	eselect bashcomp list --global
 	eselect bashcomp enable --global base
@@ -385,23 +385,6 @@ iforgot-wifi-scan() {
 	echo -e "\tiwlist wlan0 scanning"
 }
 
-
-iforgot-ffmpeg-opts-for-encoding() {
-	cat <<-EOF
-	ffmpeg_opts="-vcodec libx264 -b 1024k -s 800x480 \
-	-acodec libfaac -ab 128k \
-	-flags +loop+mv4 -cmp 256 \
-	-partitions +parti4x4+parti8x8+partp4x4+partp8x8+partb8x8 \
-	-me_method hex -me_range 16 \
-	-subq 7 -trellis 1 \
-	-refs 5 -bf 0 \
-	-flags2 +mixed_refs \
-	-coder 0 -g 250 -keyint_min 25 \
-	-sc_threshold 40 \
-	-i_qfactor 0.71 -qmin 10 -qmax 51 -qdiff 4"
-	EOF
-}
-
 iforgot-tee-usage() {
 	cat <<-"EOF"
 	wget -O - http://example.com/dvd.iso \
@@ -638,34 +621,6 @@ iforgot-shell-colours(){
 	EOF
 }
 
-iforgot-webm-conversion() {
-	cat <<-"EOF"
-	ffmpeg -threads 4 -i input.mov \
-	-acodec libvorbis -ac 2 -b:a 192k -ar 44100 \
-	-b:v 1000k -s 640x360 output.webm
-	EOF
-}
-
-iforgot-x264-conversion() {
-	cat <<-EOF
-	ffmpeg -threads 4 -i input.mov \
-	-acodec libfaac -b:a 96k \
-	-vcodec libx264 -vpre slower -vpre main \
-	-level 21 -refs 2 -b:v 345k -bt 345k \
-	-threads 0 -s 640x360 output.mp4
-	EOF
-}
-
-iforgot-image-conversion() {
-	cat <<-EOF
-	ffmpeg  -y -threads 4 -pattern_type glob \
-	-framerate 1/5 -i "file_name_000*.png" \
-	-c:v libvpx -r 1 -pix_fmt yuv420p out.webm
-
-	https://trac.ffmpeg.org/wiki/Create%20a%20video%20slideshow%20from%20images
-	EOF
-}
-
 iforgot-clean-gentoo() {
 	cat <<-EOF
 	# Remove unnecessary packages
@@ -686,7 +641,7 @@ iforgot-cut-video-with-ffmpeg() {
 	+crop
 	-filter:v "crop=WIDTH:HEIGHT:X_OFFSET:Y_OFFSET"
 
-	Webm issues: it ifnores -b:v -minrate -maxrate and -crf. Use -qmin and -qmax.
+	Webm issues: it ignores -b:v -minrate -maxrate and -crf. Use -qmin and -qmax.
 	ffmpeg -y -threads 8 -async 1 \
 	-i /home/video/anime/\[ReinForce\]\ Ergo\ Proxy\ \(BDRip\ 1920x1080\ x264\ FLAC\)/\[ReinForce\]\ Ergo\ Proxy\ -\ 11\ \(BDRip\ 1920x1080\ x264\ FLAC\).mkv  -ss 00:00:00 \
 	-t 00:00:15.849 -b:v 12M -crf 4 -minrate 12M -maxrate 12M -qmin 0 -qmax 0 -vf scale=1280:720 /tmp/out.webm
@@ -698,12 +653,6 @@ iforgot-catenate-video-with-ffmpeg() {
 	find . -iname "part*.webm" | sort >files
 	ffmpeg -y -threads 8 -f concat -i files -c copy -async 1 out.webm
 	EOF
-}
-
-iforgot-create-video-from-image-sequence-with-ffmpeg() {
-	echo 'ffmpeg -y -framerate 1/5 -pattern_type glob_sequence -i "./[Commie] Psycho-Pass 2 - 08 [A844F60A]_%*.png" -c:v libvpx -b:v 500k -r 30 -pix_fmt yuv420p out.webm && mpv out.webm'
-
-	echo Actually, someday they should fix -pattern_type glob and '*.png' and '%d'
 }
 
 iforgot-record-my-desktop() {
@@ -751,7 +700,7 @@ iforgot-mpv-crunchyroll-streaming() {
 }
 
 
-iforgot-audio-recording() {
+iforgot-ffmpeg-audio-recording() {
 	cat <<-EOF
 	Record:
 	arecord -f cd -t wav s.wav
@@ -2163,6 +2112,12 @@ iforgot-ffmpeg-encoding-opts() {
 
 	Most video players are crap and supportonly chroma sampling of 4:2:0
 	  achieved with -pix_fmt yuv420p.
+
+	Based on quality produced from high to low:
+	    libopus > libvorbis >= libfdk_aac > aac > libmp3lame >= eac3/ac3 > libtwolame > vorbis > mp2 > wmav2/wmav1
+
+	Shorter: libopus > libvorbis > aac > libmp3lame >= ac3
+
 	EOF
 }
 

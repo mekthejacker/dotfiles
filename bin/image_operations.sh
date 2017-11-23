@@ -204,10 +204,6 @@ pngcomp_dont_compress_if_smaller_than_k=1000 # in KiB
 
 tmpdir=$(mktemp -d)
 
- # We need to see, what image formats are allowed for which mode
-#  To differentiate between gifs and animated gifs, we’ll use
-#  two different formats.
-#
 declare -A iformats=(
 	[jpeg]='image/jpeg'
 	[png]='image/png'
@@ -741,7 +737,7 @@ conv2jpeg() {
  # Doesn’t take arguments. It’s basically a procedure.
 #
 conv2mp4() {
-	local m artist title ssdir="$tmpdir/slideshow"
+	local m artist title subdir="$tmpdir/slideshow"
 	case $mp4_type in
 		'one_image_plus_track')
 			mp4_filename=${image%.*}.mp4
@@ -763,6 +759,11 @@ conv2mp4() {
 			# 3. most players, including HTML5, can’t play anything,
 			#    that has chroma subsampling other than YUV 4:2:0.
 			# 4. -crf only works with -b:v 0, duh.
+			# 5. If the input -framerate is lower than the output -r
+			#    then ffmpeg will duplicate frames to reach your desired
+			#    output frame rate. If the input -framerate is higher
+			#    than the output -r then ffmpeg will drop frames to reach
+			#    your desired output frame rate.
 			$ffmpeg ${overwrite:+-y} \
 			        -i "$audio_track" \
 			        -loop 1 \
@@ -791,27 +792,30 @@ conv2mp4() {
 			        "$mp4_filename"
 			;;
 		'slideshow')
-			mp4_filename=${images[0]%.*}.mp4
+			mp4_filename=${images[first_existing_index]%.*}.mp4
 			[ -e "$mp4_filename"  -a  ! -v overwrite ] && {
 				$notify_send "File exists, skipping" "${mp4_filename##*/}"
 				exit 3
 			}
 			# This expects, that all the files have same extension!
 			glob_pattern='*.'${images[0]##*.}
+			mkdir "$subdir"
 			for image in "${images[@]}"; do
 				# Check for if the passed images are actually images,
 				# so we couldn’t get ffmpeg error because of garbage input?
 				# [[ "`file -b --mime-type "$image"`" =~ ^image/jpeg$ ]]
-				cp "$(crop_if_needed "$image")" "$ssdir"
+				cp "$(crop_if_needed "$image")" "$subdir"
 			done
-			pushd "$ssdir"
-			$ffmpeg ${overwrite:+-y} \
-			        -framerate 25 \
+			pushd "$subdir"
+			set -x
+			$ffmpeg ${overwrite:+-y} -loglevel verbose \
+			        -framerate 10 \
 			        -pattern_type glob \
 			        -i "$glob_pattern" \
-			        -c:v libx264 -pix_fmt yuv420p -b:v 0 -crf 18 \
+			        -c:v libx264 -pix_fmt yuv420p -b:v 0 -crf 18 -r 10 \
 			        -movflags +faststart \
 			        "$mp4_filename"
+			set +x
 			popd
 			[[ "`file -b --mime-type "$mp4_filename"`" =~ ^video/mp4$ ]] || {
 				$notify_send "Conversion to mp4 failed"
@@ -821,6 +825,8 @@ conv2mp4() {
 			until [ -v ready ]; do
 				$media_player "$mp4_filename"
 				unset play_again
+				set +eE
+				traponerr unset
 				play_again=$(
 					Xdialog --title "Delete source images? – ${BASH_SOURCE##*/}" \
 					        --ok-label "Delete" \
@@ -832,6 +838,8 @@ conv2mp4() {
 					        2>&1
 					)
 				exit_code=$?
+				set -eE
+				traponerr set
 				[ "$play_again" = checked ] && continue || ready=t
 				[ $exit_code -eq 0 ] && {
 						msg='Really delete?'
@@ -851,6 +859,7 @@ conv2mp4() {
 							|| $notify_send "Deletion aborted." # just in case something messes
 							                                    # with the file system beside us
 					}
+				: # avoiding until’s return code greater than 0
 			done
 			;;
 		'anigif2mp4')
@@ -976,7 +985,7 @@ pngcomp() {
 	[ -v overwrite ] && export overwrite
 	export -f crush
 	parallel --eta crush ::: "${images[@]}"
-	export -fn crush
+	export -nf crush
 }
 
  # Executing the corresponding function.
@@ -984,14 +993,24 @@ pngcomp() {
 $mode
 
 
- # Encoding features, that we cannot enable yet:
+ # Encoding features, that we cannot enable yet
 #
 #  10-bit H264        – FF says ‘file is corrupt’
 #  -pix_fmt yuv444p   – FF says ‘file is corrupt’
 
- # Todo:
-#  Adaptive bitrate  – fit more mp3 into size if it’s >192k.
-#  -framerate 1/25  – no player would be able to wind
-#  -preset veryslow  – m-maybe
-#  -vf "scale='min(1280,iw)':-2,format=yuv420p"  – gotta understand how it works first.
+ # Bad ideas, or things, that will only spoil everything
+#
+# -framerate 1/25  – no player would be able to wind the video.
+#
 
+ # Todo:
+#  1. Adaptive bitrate  – fit more mp3 into size if it’s >192k.
+#  2. Showing progress for all modes, when running ffmpeg.
+#  3. User-adjustible -framerate + -r for slideshows? When the result
+#     doesn’t appeal, and adjustment is needed. Note the behaviour
+#     of ffmpeg, when -framerate and -r differ.
+#  4. -preset veryslow or adjustable -preset?
+#  5. -vf "scale='min(1280,iw)':-2,format=yuv420p" instead of cropping?
+#     Would pixelart gif be well?
+#  6. -avoid_negative_ts 1  – maybe it will cure the problem of when
+#     convert_script produces broken files? If we see it too, that is.

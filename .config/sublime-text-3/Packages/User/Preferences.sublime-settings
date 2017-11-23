@@ -95,6 +95,7 @@
 		"CVS"
 	],
 	"font_face": "DejaVu Sans Mono",
+	// "font_face": "Meslo LG M",
 	"font_options":
 	[
 		"no_italic",
