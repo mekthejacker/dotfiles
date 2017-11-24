@@ -35,16 +35,16 @@ readarray -t used_cache < "$used_files"
 file=''
 message=''
 pre="$rc:"$'\n'
-VERSION='20171124-0204'
-[[ "$REP" =~  ^[0-9]+$ ]] && {
-	in_reply_to_status_id="$REP"
-}
+VERSION='20171124-1104'
+[[ "$REP" =~  ^[0-9]+$ ]] && in_reply_to_status_id="$REP"
 [ -v source ] || source='Anibot.sh'
 
 read_rc_file() {
 	local var trash_found lostnfound_found
 	. "$rc"
-	for var in username password proto server media_upload_url making_post_url attachment_url older_than dirs remember_files; do
+	for var in username password proto server media_upload_url \
+	           making_post_url attachment_url older_than \
+	           pause_secs dirs remember_files; do
 		[ -v $var ] || {
 			echo "${pre}Variable $var should be set in animepostingbot.rc.sh!" >&2
 			exit 3
@@ -85,7 +85,7 @@ read_rc_file() {
 #   and not where the cycle starts.
 read_rc_file
 
-[ -v pause_secs ] || do_once=t
+[ -v pause_secs ] || max_runs=1
 
 exts=(
 	-iname *.jpg
@@ -99,14 +99,19 @@ exts=(
 	)
 start_time=`date +%s`
 
-[ -v D -a -r "$D" ] && {
-	# If we debug and pass a file name, print out the data, not upload anything.
-	echo "Enabling debugging with file=$D"
-	[ -v Dnu ] && D_no_upload=t
-	D_no_files=t
+[ -v D ] && {
+	[[ -v D_max_runs && "$D_max_runs" =~ ^[0-9]+$ ]] \
+		&& max_runs=$D_max_runs \
+		|| max_runs=1  # Make it one shot for debugging.
+	[[ -v D_pause_secs && "$D_pause_secs" =~ ^[0-9]+$ ]] \
+		&& pause_secs=$D_pause_secs
+	[ -r "$D" ] && {
+		# If we debug and pass a file name,
+		# print out the data, not upload anything.
+		echo "Enabling debugging with file=$D"
+	}
+	# There is also D_dont_upload and D_dont_post
 }
-
-[ -v D ] && do_once=t  # Make it one shot for debugging.
 
 
 update_file_list() {
@@ -205,7 +210,8 @@ find_a_file() {
 	file_basedir=${file%/*}
 	declare -g file
 
-	[ -v D ] && declare -p file file_basename file_basedir hashtags && echo "Hashtags: ${#hashtags[@]}"
+	[ -v D ] && declare -p file file_basename file_basedir hashtags \
+	         && echo "Hashtags: ${#hashtags[@]}"
 
 	 # 1. Stripping hashtags from bad characters
 	#     and replacing spaces with underscores
@@ -239,7 +245,8 @@ find_a_file() {
 			}
 		done
 	done
-	[ -v D ] && declare -p hashtags special_hashtags && echo "Hashtags: ${#hashtags[@]}"
+	[ -v D ] && declare -p hashtags special_hashtags \
+	         && echo "Hashtags: ${#hashtags[@]}"
 
 	 # 3. Move to the back less important tags
 	#
@@ -258,7 +265,8 @@ find_a_file() {
 			}
 		done
 	done
-	[ -v D ] && declare -p hashtags && echo "Hashtags: ${#hashtags[@]}"
+	[ -v D ] && declare -p hashtags \
+	         && echo "Hashtags: ${#hashtags[@]}"
 
 	 # 4. Removing unneeded tags
 	#     (we do it in the last step, because otherwise we would need
@@ -274,7 +282,8 @@ find_a_file() {
 				&& break
 		done
 	done
-	[ -v D ] && declare -p hashtags && echo "Hashtags: ${#hashtags[@]}"
+	[ -v D ] && declare -p hashtags \
+	         && echo "Hashtags: ${#hashtags[@]}"
 
 	 # 5. Adding a hash sign to tags
 	#
@@ -292,8 +301,6 @@ find_a_file() {
 	 # 6. Composing the message
 	#
 	[ -v D ] && echo $'\n'Composing the message
-	declare -g _message
-
 	 # Message looks like this:
 	#
 	#  File_name.jpeg <$first_newline>
@@ -325,7 +332,7 @@ find_a_file() {
 
 
 upload_file() {
-	local file
+	local file media_upload media_id
 	for file in "$@"; do
 		echo "    Uploading file: $file"
 		if media_upload=`curl -u "$username:$password" \
@@ -350,6 +357,7 @@ upload_file() {
  # Main algorithm starts here
 #
 update_file_list
+runs=0
 while :; do
 	# Update file list once per day
 	new_time=`date +%s`
@@ -359,7 +367,15 @@ while :; do
 		start_time=$new_time
 	}
 	echo -en "\n`date +%Y-%m-%d\ %H:%M`\nGoing a make a post!"
-	unset video
+
+	unset message video file media_ids
+	declare -g message video file media_ids
+	#            ^       ^    ^        ^
+	#            |       |    |        IDs of uploaded attachments
+	#            |       |    Absolute path to the file for upload
+	#            |       Mark of the videofile upload (not an image)
+	#            What will be sent in the --data of the request
+	#
 	[ -r "$D" ] || {
 		# 1/5 chance to attach a webm/mp4
 		[ ! -v no_media -a `shuf -i 0-4 -n 1` -eq 0 ] && {
@@ -367,7 +383,6 @@ while :; do
 			video=video
 		}|| echo
 	}
-	unset message
 	find_a_file ${video:-}
 	[ -v D_dont_upload ] || {
 		[ -r "$mydir/$pic_to_attach_with_video" ] \
@@ -388,12 +403,11 @@ while :; do
 			# Final cleaning of the message for GNU Social
 			# For some reason, GNU Social doesn’t like ampersands.
 			# &amp; is not an option. Maybe that’s curl? Too lazy to check.
-			declare -g message=${message//&/}
-			data_string+="status=$message"
-			data_string+="${in_reply_to_status_id:+&in_reply_to_status_id=$in_reply_to_status_id}"
-			data_string+="${source:+&source=$source}"
+			message="status=${message//&/}"
+			message+="${in_reply_to_status_id:+&in_reply_to_status_id=$in_reply_to_status_id}"
+			message+="${source:+&source=$source}"
 			curl -u "$username:$password" \
-		         --data "$data_string" \
+		         --data "$message" \
 		         $proto$server$making_post_url &>"$log"
 		}
 		reply_to=`sed -nr 's/^\s*<id>([0-9]+)<\/id>\s*$/\1/p;T;Q1' "$log"`
@@ -413,9 +427,8 @@ while :; do
 					unset used_cache[i]
 				done
 			}
-			IFS=$'\n'
-			echo "${used_cache[*]}" >"$used_files"
+			(IFS=$'\n';	echo "${used_cache[*]}" >"$used_files")
 		}
 	}
-	[ -v do_once ] && break || sleep $pause_secs
+	[ $((++runs)) -eq ${max_runs:-0} ] && break || sleep $pause_secs
 done
