@@ -35,7 +35,7 @@ readarray -t used_cache < "$used_files"
 file=''
 message=''
 pre="$rc:"$'\n'
-VERSION='20171124-1104'
+VERSION='20171125-0206'
 [[ "$REP" =~  ^[0-9]+$ ]] && in_reply_to_status_id="$REP"
 [ -v source ] || source='Anibot.sh'
 
@@ -146,7 +146,8 @@ find_a_file() {
 	local mode="$@" mime='' file_basename file_basedir image_found \
 	      video_hashtag hashtags=() special_hashtags=() \
 	      local_hashtags_to_remove=() hashtag_space \
-	      first_newline second_newline third_newline
+	      first_newline second_newline third_newline \
+	      author_file author_data
 	case "$mode" in
 		image|'') mode='image' mime='image';;
 		video)  mime='video' video_hashtag='#webm';;
