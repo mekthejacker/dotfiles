@@ -94,3 +94,10 @@ hashtags_to_the_back=(
  # Some hashtags are undesireable and should be ignored
 #
 hashtags_to_remove=()
+
+ # If a subfolder has a prefix for convenience,
+#  and you would like to not have it in the tag.
+#  For example, if some subdirectories have a common prefix
+#  ‘meme’, to avoid nesting of 878th directory level.
+#
+hashtags_prefixes_to_strip=()

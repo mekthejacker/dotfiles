@@ -416,7 +416,7 @@ iforgot-kaomoji-drawing() {
 	´ ▽ ` )ﾉ  (・∀・ )  (ΘεΘ;)  ╮(─▽─)╭  (≧ω≦)  (´ヘ｀ ;)  (╯3╰)  (⊙_◎)  (¬▂¬) ¬_¬
 	´ ▽ ` )ﾉ  ôヮô  ŎםŎ   ಥ﹏ಥ   ᕙ(⇀‸↼‶)ᕗ   ≧ヮ≦     ☜(ﾟヮﾟ☜)     ヽ(´ｰ｀ )ﾉ       (¬‿¬)
 
-	(•̀ᴗ•́)و
+	(•̀ᴗ•́)و    (⁄ ⁄•⁄ω⁄•⁄ ⁄)
 
 	(つд⊂)
 
@@ -2075,6 +2075,7 @@ iforgot-ffmpeg-encoding-opts() {
 	       -maxrate $CBR
 	Enc. Audio
 	       -c:a aac -b:a 320k
+	       -na
 
 	Output
 	       -tune stillimage

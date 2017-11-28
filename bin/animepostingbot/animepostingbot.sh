@@ -25,6 +25,7 @@
 #     curl-7.43
 
 set -f
+shopt -s extglob
 mydir=`dirname "$0"`
 rc="$mydir/animepostingbot.rc.sh"
 log="$mydir/log"
@@ -35,7 +36,7 @@ readarray -t used_cache < "$used_files"
 file=''
 message=''
 pre="$rc:"$'\n'
-VERSION='20171125-0206'
+VERSION='20171128'
 [[ "$REP" =~  ^[0-9]+$ ]] && in_reply_to_status_id="$REP"
 [ -v source ] || source='Anibot.sh'
 
@@ -219,9 +220,12 @@ find_a_file() {
 	#
 	[ -v D ] && echo $'\n'Stripping hashtags from bad characters…
 	for ((i=0; i<${#hashtags[@]}; i++)); do
-		hashtags[$i]="${hashtags[i]// /_}"
-		hashtags[$i]="${hashtags[i]//\:/_}"
-		hashtags[$i]="${hashtags[i]//[,.\'\"\&\^\°\!\?\#\$\%\;\+\(\)\{\}]/}"
+		hashtags[$i]="${hashtags[i]//+([[:space:][:punct:]])/_}"
+		hashtags[$i]="${hashtags[i]//[^[:word:]]/}"
+		for prefix in '_' ${hashtags_prefixes_to_strip[@]} '_*' ; do
+			hashtags[$i]="${hashtags[i]#$prefix}"
+		done
+		hashtags[$i]="${hashtags[i]//+(_)/_}"
 	done
 	[ -v D ] && declare -p hashtags && echo "Hashtags: ${#hashtags[@]}"
 

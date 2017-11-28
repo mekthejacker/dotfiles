@@ -161,6 +161,17 @@ picture_viewer='viewnior --fullscreen'
 #
 ffmpeg='ffmpeg -hide_banner -threads 4'
 
+ # For conv2mp4 with audio track: audio codec to use.
+#  According to ffmpeg wiki, libopus is best:
+#  libopus > libvorbis > aac > libmp3lame > others
+#  NB: libopus ≠ opus! check with ‘ffmpeg -hide_banner -codecs | grep libopus’
+#
+ffmpeg_acodec='libopus'
+
+ # Bitrate for $ffmpeg_acodec
+#
+ffmpeg_abitrate='192k'
+
  # Don’t ask, whether I want to overwrite resulting files.
 #  Questions about deleting source files will still be there.
 #  Comment to make script ask about overwriting
@@ -751,6 +762,7 @@ conv2mp4() {
 				$notify_send "File exists, skipping" "${mp4_filename##*/}"
 				exit 3
 			}
+			convert "$image" -resize x720 -quality 92 "$tmpdir/t.jpg"
 			# Notes:
 			# 1. Audio track goes as first input – ffmpeg copies metadata
 			#    from the first track by default.
@@ -767,9 +779,9 @@ conv2mp4() {
 			$ffmpeg ${overwrite:+-y} \
 			        -i "$audio_track" \
 			        -loop 1 \
-			        -i "$(crop_if_needed "$image")" \
-			        -c:v libx264 -pix_fmt yuv420p -b:v 0 -crf 18 \
-			        -c:a aac -b:a 192k \
+			        -i "$(crop_if_needed "$tmpdir/t.jpg")" \
+			        -c:v libx264 -pix_fmt yuv420p -b:v 0 -crf 23 \
+			        -c:a $ffmpeg_acodec -b:a $ffmpeg_abitrate \
 			        -tune stillimage \
 			        -strict experimental \
 			        -shortest \
