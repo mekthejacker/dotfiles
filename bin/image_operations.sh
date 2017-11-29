@@ -140,7 +140,7 @@ deps=(notify-send Xdialog stat file mktemp identify ffmpeg)
 #
 # VERBOSE=t
 
-VERSION=20171119
+VERSION=20171130
 
 # YOU DON’T NEED TO CHANGE THIS LINE
 notify_send='notify-send --hint int:transient:1 -t 3000 -i info'
@@ -166,7 +166,7 @@ ffmpeg='ffmpeg -hide_banner -threads 4'
 #  libopus > libvorbis > aac > libmp3lame > others
 #  NB: libopus ≠ opus! check with ‘ffmpeg -hide_banner -codecs | grep libopus’
 #
-ffmpeg_acodec='libopus'
+ffmpeg_acodec='aac'
 
  # Bitrate for $ffmpeg_acodec
 #
