@@ -34,38 +34,6 @@ wacom-devcontrol() {
 		xinput --$1 "$dev"
 	done < <(xinput --list --name-only | grep Wacom)
 }
-# For temporary freeing the connection from torrents.
-rt-continue() { rt-stop; }
-rt-stop() {
-	[ "${FUNCNAME[1]}" = rt-continue ] && local unpause=t || local pause=t
-	local rtstate=$(ps -o state,cmd ax | sed -rn "s:^([DRSTtWXZ])\s+$(which rtorrent).*:\1:p")
-	case "$rtstate" in
-		D) echo 'The process is in uninterruptible sleep (usually I/O). I better not do anything.' >&2
-		   return 3
-		   ;;
-		R|S) [ -v unpause ] \
-		       && echo 'Already running!' \
-		       || sudo -u rtorrent /usr/bin/pkill -STOP -xf /usr/bin/rtorrent;;
-		T) [ -v pause ] \
-		       && echo 'Already paused!' \
-		       || sudo -u rtorrent /usr/bin/pkill -CONT -xf /usr/bin/rtorrent;;
-		t) echo 'The process is stopped by debugger during the tracing. I better not do anything.' >&2
-		   return 4
-		   ;;
-		W) echo '2.6 kernel? Am I on a soap box? /Ghi-hi-hi…/' >&2
-		   return 5
-		   ;;
-		X) echo 'The process seems to be dead.' >&2
-		   return 6
-		   ;;
-		Z) echo 'The process is in zombie state. Impossible to do start or stop.' >&2
-		   return 7
-		   ;;
-		*) echo -e "Cannot recognize process state ‘$rtstate’." >&2
-		   return 8
-		   ;;
-	esac
-}
 
 # Strike the earth!
 alias d='dwarf-fortress'

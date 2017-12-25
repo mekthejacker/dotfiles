@@ -15,7 +15,8 @@ set guioptions shv
 set statusbar-bg "#303030"
 set statusbar-fg "#d0d0d0"
 set font "Terminus 12"
-set default-bg "#303030"
+#set default-bg "#303030"
+set tabbar-focus-bg "#ff0000"
 set default-fg "#d0d0d0"
 
 #  defines the gap in pixels between each rendered page.

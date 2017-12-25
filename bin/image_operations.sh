@@ -110,7 +110,7 @@ trap 'on_exit' EXIT TERM INT QUIT KILL
 show_error() {
 	local file=$1 line=$2 lineno=$3
 	echo -e "$file: An error occured!\nLine $lineno: $line" >&2
-	notify-send "${BASH_SOURCE##*/}" "Error: check the console."
+	notify-send --hint int:transient:1 -t 3000 "${BASH_SOURCE##*/}" "Error: check the console."
 }
  # The reason we need this function is because set +e won’t remove the trap.
 #  So after disabling the errexit shell option, we also need to remove that
@@ -140,7 +140,7 @@ deps=(notify-send Xdialog stat file mktemp identify ffmpeg)
 #
 # VERBOSE=t
 
-VERSION=20171130
+VERSION=20171215
 
 # YOU DON’T NEED TO CHANGE THIS LINE
 notify_send='notify-send --hint int:transient:1 -t 3000 -i info'
@@ -479,13 +479,13 @@ unset ${!throwoffs*}
 		if [ "$attach_audio" ]; then
 			# User pressed OK
 			if [ "$attach_audio" = checked ]; then
-				audio_track=$(Xdialog --title "Choose a track to add – ${BASH_SOURCE##*/}" \
-			    	                  --no-buttons \
-			    	                  --fselect "${image%/*}" 800x600 \
-				                      2>&1)
+				audio_track="$(Xdialog --title "Choose a track to add – ${BASH_SOURCE##*/}" \
+			    	                   --no-buttons \
+			    	                   --fselect "${image%/*}" 800x600 \
+				                       2>&1)"
 				[[ "`file -L -b --mime-type "$audio_track"`" =~ ^audio/[^/]+$ ]] || {
 					Xdialog --title "Error – ${BASH_SOURCE##*/}" \
-					        --backtitle "Not an audio track:"
+					        --backtitle "Not an audio track:" \
 					        --msgbox "$audio_track" \
 					        800x140
 					exit 3
@@ -505,10 +505,12 @@ unset ${!throwoffs*}
 				            -show_entries format_tags \
 				            -of default=noprint_wrappers=1 \
 				            "$audio_track" \
-				    |& sed -rn "s/'/\\'/g;s/^TAG://g;s/^([^=]+)=(.*)$/[\1]='\2'/p" )
+				    |& sed -rn "s/([\(\)'])/\\\1/g;s/^TAG://g;s/^([^=]+)=(.*)$/[\1]='\2'/p" )
 				# I would really like to grab all metadata without eval,
 				# but that doesn’t seem possible with ‘declare -An → m’
+				set -x
 				eval declare -A metadata=( "$m" )
+				set +x
 			else
 				duration=$(( ${hours:-0}*60*60 + ${minutes:-0}*60 + ${seconds:-5} ))
 				[ $duration -eq 0 ] && {
@@ -754,10 +756,8 @@ conv2mp4() {
 			mp4_filename=${image%.*}.mp4
 			# Since ‘Artist – Title.mp4’ would be more convenient,
 			# let’s try to look into the metadata we grabbed from $audio_track.
-			[ "${metadata[artist]}" -a "${metadata[title]}" ] && {
-					mp4_filename="${image%/*}/${metadata[artist]} – ${metadata[title]}.mp4"
-					break
-				}
+			[ "${metadata[artist]}" -a "${metadata[title]}" ] \
+				&& mp4_filename="${image%/*}/${metadata[artist]} – ${metadata[title]}.mp4"
 			[ -e "$mp4_filename"  -a  ! -v overwrite ] && {
 				$notify_send "File exists, skipping" "${mp4_filename##*/}"
 				exit 3
@@ -821,10 +821,11 @@ conv2mp4() {
 			pushd "$subdir"
 			set -x
 			$ffmpeg ${overwrite:+-y} -loglevel verbose \
-			        -framerate 10 \
+			        -framerate 25 \
 			        -pattern_type glob \
 			        -i "$glob_pattern" \
 			        -c:v libx264 -pix_fmt yuv420p -b:v 0 -crf 18 -r 10 \
+			        -tune film \
 			        -movflags +faststart \
 			        "$mp4_filename"
 			set +x
@@ -898,7 +899,7 @@ conv2mp4() {
 				$ffmpeg ${overwrite:+-y} \
 				        -i "$(crop_if_needed "$image")" \
 				        -c:v libx264 -pix_fmt yuv420p -b:v 0 -crf 18 \
-				        -tune stillimage \
+				        -tune film \
 				        -strict experimental \
 				        -movflags +faststart \
 				        "$mp4_filename"

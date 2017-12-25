@@ -20,7 +20,7 @@ case $app_name in
 		cp ~/.mpd/mpd.conf.common ~/.mpd/mpd.conf
 		cat ~/.mpd/mpd.conf.$HOSTNAME >>~/.mpd/mpd.conf
 		sed -ri "s/USER/$USER/" ~/.mpd/mpd.conf
-		/usr/bin/mpd
+		/usr/bin/mpd "$@"
 		;;
 	firefox)
 		[ -e /usr/bin/firefox-bin ] \

@@ -657,15 +657,10 @@ iforgot-catenate-video-with-ffmpeg() {
 
 iforgot-record-my-desktop() {
 	cat <<-"EOF"
+	ffmpeg -y -hide_banner     -framerate 25 -f x11grab -s 1920x1080 -i :0.0     -vcodec libx264 -r 25 -g 50 -keyint_min 25 -b:v 0 -crf 23 -pix_fmt yuv420p -preset ultrafast -tune film -threads 3 -strict normal -bufsize 4500k -an /tmp/outp.mp4
+	# -i :0.0+0,25  -f alsa -ac 2 -i hw:0 -async 1 -acodec pcm_s16le /tmp/output.mkv
 
-	ffmpeg -y  -f x11grab  -s 1920x1080          -r 30          -i :0.0       -vcodec libx264 -g 60   -keyint_min 30 -b:v 1500k -minrate 1500k -maxrate 1500k -pix_fmt yuv420p -preset slow -tune film -threads 4 -strict normal -bufsize 1500k /tmp/outp.mp4
-	ffmpeg -y  -f x11grab  -video_size 1600x875  -framerate 25  -i :0.0+0,25  -f alsa -ac 2 -i hw:0 -async 1 -b:v 1000k -vcodec libx264 -crf 0 -preset ultrafast -acodec pcm_s16le /tmp/output.mkv
-
-	-crf 0   requires   -b:v 0   !!!
-	-crf 0   requires   -b:v 0   !!!
-	-crf 0   requires   -b:v 0   !!!
-
-	P.S. Don’t forget to switch mpv’s -vo to opengl-hq or something for ffmpeg to be able to catch its output.
+	P.S. mpv’s -vo must be switched to opengl-hq for ffmpeg to be able to catch its output.
 	EOF
 }
 

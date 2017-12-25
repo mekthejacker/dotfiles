@@ -16,7 +16,12 @@
 //user_pref("browser.sessionstore.max_resumed_crashes", 2);
 user_pref("mousewheel.acceleration.factor", 1);
 user_pref("mousewheel.default.delta_multiplier_y", 270);
+// Prevent Firefox from leaking DNS requests
+user_pref("network.proxy.socks_remote_dns", true);
+user_pref("network.dns.disablePrefetchFromHTTPS", true);
 user_pref("network.dns.disableIPv6", true);
+// …and IP leaking through WebRTC
+user_pref("media.peerconnection.enabled", false);
 // Disable old plugin warning – sometimes the window with buttons
 // to temoporarily or permanently allow flash on this site is shown
 // cut with only ~30px of the left part shown or it is not shown at all.

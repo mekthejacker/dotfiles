@@ -1,0 +1,4 @@
+# youtube-dl config file
+
+# Do not set mtime to video uploading date.
+--no-mtime

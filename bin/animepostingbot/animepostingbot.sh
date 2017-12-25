@@ -220,11 +220,12 @@ find_a_file() {
 	#
 	[ -v D ] && echo $'\n'Stripping hashtags from bad characters…
 	for ((i=0; i<${#hashtags[@]}; i++)); do
-		hashtags[$i]="${hashtags[i]//+([[:space:][:punct:]])/_}"
-		hashtags[$i]="${hashtags[i]//[^[:word:]]/}"
-		for prefix in '_' ${hashtags_prefixes_to_strip[@]} '_*' ; do
+		for prefix in ${hashtags_prefixes_to_strip[@]}; do
 			hashtags[$i]="${hashtags[i]#$prefix}"
 		done
+		hashtags[$i]="${hashtags[i]//+([[:space:][:punct:]])/_}"
+		hashtags[$i]="${hashtags[i]//[^[:word:]]/}"
+		hashtags[$i]="${hashtags[i]#+(_)}"
 		hashtags[$i]="${hashtags[i]//+(_)/_}"
 	done
 	[ -v D ] && declare -p hashtags && echo "Hashtags: ${#hashtags[@]}"
