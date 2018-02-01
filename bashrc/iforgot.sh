@@ -411,41 +411,38 @@ iforgot-kaomoji-drawing() {
 	益        yaku
 	✨        sparkles
 
-	(⚈益⚈) (⌕…⌕) ( °ヮ°) (´Д ` ) ╭(＾▽＾)╯ /(⌃ o ⌃)\ ╰(^◊^)╮ ◜(◙д◙)◝ (ʘ‿ʘ)  (≖‿≖)
+	(⚈益⚈)    (⌕…⌕)    ( °ヮ°)    (´Д ` )    ╭(＾▽＾)╯
 
-	´ ▽ ` )ﾉ  (・∀・ )  (ΘεΘ;)  ╮(─▽─)╭  (≧ω≦)  (´ヘ｀ ;)  (╯3╰)  (⊙_◎)  (¬▂¬) ¬_¬
-	´ ▽ ` )ﾉ  ôヮô  ŎםŎ   ಥ﹏ಥ   ᕙ(⇀‸↼‶)ᕗ   ≧ヮ≦     ☜(ﾟヮﾟ☜)     ヽ(´ｰ｀ )ﾉ       (¬‿¬)
+	/(⌃ o ⌃)\    ╰(^◊^)╮    ◜(◙д◙)◝    (ʘ‿ʘ)    (≖‿≖)
 
-	(•̀ᴗ•́)و    (⁄ ⁄•⁄ω⁄•⁄ ⁄)
+	´ ▽ ` )ﾉ    (・∀・ )    (ΘεΘ;)    ╮(─▽─)╭    (≧ω≦)
 
-	(つд⊂)
+	(´ヘ｀ ;)    (╯3╰)     (⊙_◎)    (¬▂¬)    ¬_¬
 
-	( ^▽^)σ)~O~)
+	´ ▽ ` )ﾉ  ôヮô  ŎםŎ   ಥ﹏ಥ   ᕙ(⇀‸↼‶)ᕗ   ≧ヮ≦
 
-	キタ━━━(゜∀゜)━━━!!!!!   ‘It’s here’, Kitaa!, a general expression
-	of excitement that something has appeared
-	or happened or ‘I came’.
-	( ˙灬˙ )                Pedo hige
-	(・∀・)~mO               Flash of intuition
-	m9(・∀・)                NO U
-	ヽ(°Д°)ﾉ
-	(╬♉益♉)ﾉ
-	Ԍ──┤ﾕ(#◣д◢)
-	(☞ﾟヮﾟ)☞
-	( `-´)>	                Salute
-	(*ﾟﾉOﾟ)<ｵｵｵｵｫｫｫｫｫｫｫｰｰｰｰｰｲ!	Calling out, "Ooooi!"
-	Σ(゜д゜;)	            Shocked
-	(*´Д`)ﾊｧﾊｧ               Erotic stirring, haa haa
-	(ﾟДﾟ;≡;ﾟДﾟ)
+	☜(ﾟヮﾟ☜)    ヽ(´ｰ｀ )ﾉ    (¬‿¬)
+
+	(•̀ᴗ•́)و    (⁄ ⁄•⁄ω⁄•⁄ ⁄)    ¯\_(ツ)_/¯
+
+	(つд⊂)    ( ^▽^)σ)~O~)
+
+	キタ━━━(゜∀゜)━━━!!!!!
+
+	( ˙灬˙ )   (・∀・)~mO     m9(・∀・) 	ヽ(°Д°)ﾉ    (╬♉益♉)ﾉ
+
+	Ԍ──┤ﾕ(#◣д◢)    (☞ﾟヮﾟ)☞    ( `-´)>    (*ﾟﾉOﾟ)<ｵｵｵｵｫｫｫｫｫｫｫｰｰｰｰｰｲ!
+
+	Σ(゜д゜;)    (*´Д`)ﾊｧﾊｧ    (ﾟДﾟ;≡;ﾟДﾟ)
+
 	( ﾟ∀ﾟ)ｱﾊﾊ八 八 ﾉヽ ﾉヽ ﾉヽ ﾉ ＼  / ＼ / ＼
-	（･∀･)つ⑩
-	щ(ﾟДﾟщ)(屮ﾟДﾟ)屮          Come on
-	（・Ａ・)                ‘That’s bad’
-	(*⌒▽⌒*)
-	＼| ￣ヘ￣|／＿＿＿＿＿＿＿θ☆( *o*)/	Kick
-	(l'o'l)	                Shocked
-	(╯°ロ°）╯  ┻━━┻
-	┬──┬ ﻿ノ( ゜-゜ノ)
+
+	（･∀･)つ⑩     щ(ﾟДﾟщ)(屮ﾟДﾟ)屮
+
+	（・Ａ・)    (*⌒▽⌒*)    ＼| ￣ヘ￣|／＿＿＿＿＿＿＿θ☆( *o*)/
+
+	(l'o'l)     (╯°ロ°）╯  ┻━━┻        ┬──┬ ﻿ノ( ゜-゜ノ)
+
 	EOF
 }
 
@@ -2058,6 +2055,17 @@ iforgot-ffmpeg-encoding-opts() {
 	       -f flv
 	       -ac 2
 	       -ar $AUDIO_RATE
+	Mapping streams
+	       -map 0:1 -map 0:2 -map 1:3
+	            ^ ^
+	            ^ ^---- stream number in input file 0
+	            ^---- input file number
+	        All -map directives specify which INPUT stream from which INPUT
+	        file should be taken (and converted, if needed).
+	        Shortcuts: 0:a,
+	                   0:v,
+	                   0:s.
+	        Docs: https://trac.ffmpeg.org/wiki/Map
 	Enc. Video
 	       -c:v libx264
 	       -pix_fmt yuv420p
@@ -2498,16 +2506,38 @@ iforgot-gentoo-upgrade() {
 
 	DO NOT emerge --sync after this line!
 
-	First compiling @system to get new @system
-	# emerge -NuDave1 @system
+	First compiling @toolchain
+	emerge -NuDav1 @toolchain
 
-	Second, recompiling @system with the new @system to get rid
-	  of incompatibilities and to gain maximum features.
-	Also we build binary packages here for the case something
-	  gets wrong either during build time or after depclean
+	Second, recompiling @toolchain (glibc, binutils, gcc, linux-headers)
+	  with the new @toolchain to get rid of incompatibilities during the
+	  compilation and to gain maximum features. Also we build
+	  binary packages here for:
+	  - it will save time on merging @world with -D later;
+	  - binary packages will save time in a case, if something goes wrong
+	    either during the build time or after depclean.
 
-	emerge -NuDbave1 @system
+	emerge -NuDbav1 @toolchain
 
+	Some rush rebuilding @system instead of @toolchain, but that often fails.
+
+	Rebuilding the world.
+	emerge -NuDkav @world
+
+	Rebuilding the perl packages and the packages linked against libperl.
+	perl-update --all
+	(if something goes wrong, --reallyall)
+
+	IN CASE YOU RUN INTO A DEPHELL
+	    1) if build.log comlains about perl,
+	       run perl-update --all/--reallyall;
+	    2) try to add -e to emerge.
+
+	Post-cleaning
+	rm -rf /var/tmp/portage/*
+	ccache -C
+
+	emerge -av1 @preserved-rebuild
 	EOF
 }
 

@@ -37,11 +37,8 @@ export LESS='-R -M --shift 5 -x4'
 # Less uses ‘standout’ for search results highlight
 #export LESS_TERMCAP_so=$'\E[01;33;03;40m' # red on black
 export MPD_HOST=$HOME/.mpd/socket
-#grep -qF '/assembling/' <<<"$PATH" \
-#	|| export PATH="$PATH:~/assembling/android-sdk-linux/platform-tools/:~/assembling/android-sdk-linux/tools/"
-grep -qF '/usr/games/bin/' <<<"$PATH" \
-	|| export PATH="$PATH:/usr/games/bin/"
-
+[ "${PATH//*$HOME\/bin*/}" ] && export PATH="$HOME/bin:$PATH"
+[ "${PATH//*\/usr\/games\/bin*/}" ] && export PATH="$PATH:/usr/games/bin/"
 
 
 # ┎ (chroot) /
@@ -163,6 +160,8 @@ alias bc="bc -q"
 alias ec="emacsclient -c -nw"
 alias emc="emacsclient"
 alias erc="emacsclient -c -nw ~/.bashrc"
+alias ffmpeg="ffmpeg -hide_banner"
+alias ffprobe="ffprobe -hide_banner"
 alias fm="font-manager"
 alias hu="hugo"
 alias hus="hugo server --watch --source ~/repos/goen/"
@@ -326,7 +325,7 @@ export ENV_DEBUG='+'
 #
 NO_CHECK_FOR_SOURCED_SCRIPT=t
 NO_LOGGING=t
-. ~/repos/bhlls/bhlls.sh
+#. ~/repos/bhlls/bhlls.sh
 # Returning pathname expansion after bhlls
 set +f
 
@@ -340,21 +339,24 @@ one_command_execute() {
 	exec &>/dev/null
 	# TAB completion puts an extra space after the command.
 	READLINE_LINE=${READLINE_LINE%%+([[:space:]])}
-	until [ -v all_aliases_expanded ]; do # recursive alias expansion
-		# Tabulation cahracter may be used in user’s aliases.
-		local first_word=${READLINE_LINE%%[[:space:]]*}
-		[ "$first_word" = "$old_first_word" ] && break # to prevent a loop
-		alias -p | grep -q "^alias $first_word='.*'$" && {
-			local cmd=`alias -p | sed -nr "s/^alias $first_word='(.*)'$/\1/p"`
-			# escape all special characters in the expanded alias is more
-			#   consuming, than just stripping its name and combining
-			#   a new string.
-			READLINE_LINE=${READLINE_LINE/#$first_word/}
-			READLINE_LINE="$cmd $READLINE_LINE"
-			local old_first_word="$first_word"
-		} || local all_aliases_expanded=t
-	done
-	(nohup /bin/bash -c "$READLINE_LINE") &
+	# until [ -v all_aliases_expanded ]; do # recursive alias expansion
+	# 	# Tabulation cahracter may be used in user’s aliases.
+	# 	local first_word=${READLINE_LINE%%[[:space:]]*}
+	# 	[ "$first_word" = "$old_first_word" ] && break # to prevent a loop
+	# 	alias -p | grep -q "^alias $first_word='.*'$" && {
+	# 		local cmd=`alias -p | sed -nr "s/^alias $first_word='(.*)'$/\1/p"`
+	# 		# escape all special characters in the expanded alias is more
+	# 		#   consuming, than just stripping its name and combining
+	# 		#   a new string.
+	# 		READLINE_LINE=${READLINE_LINE/#$first_word/}
+	# 		READLINE_LINE="$cmd $READLINE_LINE"
+	# 		local old_first_word="$first_word"
+	# 	} || local all_aliases_expanded=t
+	# done
+	# 1. Scripts and binaries in $PATH are the easiest things to run.
+	# 2. Shell functions may be run, but must be exported with ‘export -f’.
+	# 3. Aliases cannot be exported and hence cannot be used here.
+	nohup /bin/bash -c "$READLINE_LINE" &>/tmp/one_command_exec_output &
 	local c=0
 	until [ $((c++)) -eq 3 ]; do
 		xdotool search --onlyvisible --pid $! &>/dev/null && break
@@ -371,9 +373,5 @@ one_command_execute() {
 	# bind shell-expand-line
 	bind -x '"\C-m":"one_command_execute"'
 }
-
-# . ~/.bashrc should exit with 0.
-:
-
 
 #[ "$TERM" = jfbterm ] && ~/work/lifestream/minimal-sysrcd/deploy/squashfs-root/root/installer/tc-setup.sh --prepare-pxe-client

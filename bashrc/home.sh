@@ -2,7 +2,7 @@
 
 . common.sh
 . iforgot.sh
-. wine.sh
+. wine-aliases.sh
 . vm.sh
 . jobu.sh
 
@@ -19,6 +19,7 @@ alias okiru='rm /tmp/okiru'
 alias rt="urxvtc -title rtorrent -hold \
                  -e /bin/bash -c 'chmod o+rw `tty` \
                     && sudo -u rtorrent -H tmux -u -S /home/rtorrent/.tmux/socket attach' &"
+alias tld-typofix="pushd ~/bin/typofix/; ./typofix.sh Russian_col4.csv; popd"
 
 wacom-enable() { wacom-devcontrol enable; }
 wacom-disable() { wacom-devcontrol disable; }

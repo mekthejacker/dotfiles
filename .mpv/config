@@ -37,7 +37,7 @@ osd-font-size=30
 osd-fractions=yes
 ## Too many unnecessary files. Enabled in wa alias in ~/bashrc/home.sh
 #save-position-on-quit=yes
-screenshot-template="%F_%P"
+screenshot-template="%F %P"
 screenshot-format=jpg
 #screenshot-format=png
 ## Compressing screenshots while mpv runs is slow,

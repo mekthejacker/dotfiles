@@ -66,3 +66,5 @@ div.hidbord_msgfrom_ {
 @-moz-document domain("vk.com") {
    #ads_left, #left_blocks { display: none !important }
 }
+
+@font-face { font-family: 'SegoeUI'; src: local('PT Sans'); }

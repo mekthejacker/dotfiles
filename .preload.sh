@@ -139,11 +139,6 @@ push_the_bar 'Loading keyboard settings' 33
 eval `grep -E '^ME=' ~/.env/private_data.sh`  # see export in the beginning
 
 # III. Setting the rest of X environment.
-push_the_bar 'Exporting custom ~/bin into PATH' 66
-# In order to have some applications that store data open for everyone
-#   who can boot your PC, there are substitution scripts that decrypt data
-#   from repository and delete them after application is closed.
-PATH="$HOME/bin:$PATH"
 
 push_the_bar 'Launching SCIM'
 LANG='en_US.utf-8' scim -d

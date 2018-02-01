@@ -42,6 +42,13 @@ wait_for_program () {
 # Because we can close the terminal that holds root’s bwmon, but not the bwmon itself.
 sudo /usr/bin/killall bwmon  # also cbm
 
+[ "$1" = stop_after_main_workspace ] && {
+	# On restarting the workspace (when something fucked up keyboard in urxvt again)
+	i3-msg "[workspace=0:Main] kill"
+	pkill -9 -f urxvt
+}
+
+
 # Applications that need to be started before layout setting:
 #   urxvtd, tmux and emacs daemon in tmux.
 # Substitute line:
@@ -67,33 +74,32 @@ if pgrep -u $UID -f '^tmux.*$' &>/dev/null; then
 		#done
 	}
 else
-	$tmux \
-	new -d -s $USER su \; \
-	set remain-on-exit on \; \
-	neww su \; \
-	set remain-on-exit on \; \
-	new -d -s anibot "cd ~/bin/animepostingbot/; ./animepostingbot.sh" \;
-	set remain-on-exit on \; \
-	neww -n hbot "cd ~/bin/hpostingbot/; ./animepostingbot.sh" \;
-	set remain-on-exit on \; \
-	select-window -t $USER:^  # session:window ^=leftmost $=rightmost
+	$tmux new-session -d -s $USER su
+	$tmux set remain-on-exit on
+	$tmux neww su
+	$tmux set remain-on-exit on
+	$tmux new-session -d -s bots "cd ~/bin/animepostingbot/; ./animepostingbot.sh"
+	$tmux set remain-on-exit on
+	$tmux switch-client -t $USER
+	$tmux select-window -t $USER:^
 fi
 
 [ "$DISPLAY" = ":108" ] && exit 0  # stop here if it’s a Xephyr window
 
 pointer_control disable
 
-startup_apps=(mpd
-              "firefox --profile $HOME/.ff"
-              thunar
-              pidgin
-              telegram-desktop
-              # skypeforlinux
-              "transmission-gtk -m")
+startup_apps=(
+	mpd
+	"firefox --profile $HOME/.ff"
+	thunar
+	pidgin
+	telegram-desktop
+	# skypeforlinux
+)
 # WIDTH and HEIGHT were set in the ~/.preload.sh
 case $HOSTNAME in
 	home)
-		startup_apps+=(gimp subl3 geeqie redshift)
+		startup_apps+=(gimp subl3 geeqie retroshare transmission-gtk)
 		;;
 	paskapuukko)
 		# startup_apps+=(skype)  # how the fuck does skype switch the workspace by itself?!
@@ -184,6 +190,10 @@ xte 'mouseclick 1'
 # ║        ┃        ║ # ║        ┃        ║
 # ╚════════╩════════╝ # ╚════════╩════════╝
 
+# This is to check whether script is called via hotkey in ~/.env/config.
+[ "$1" = stop_after_main_workspace ] && exit 0
+
+
 for wsp in '1:Firefox' \
            '2:Sublime' \
            '3:Thunar' \
@@ -197,8 +207,6 @@ done
 i3-msg workspace '0:Main'
 pointer_control enable
 
-# This is to check whether script is called via hotkey in ~/.env/config.
-[ "$1" = stop_after_main_workspace ] && exit 0
 
 # Some configs decrypted at ~/bin/run_app.sh
 for app in "${startup_apps[@]}"; do

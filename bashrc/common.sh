@@ -5,6 +5,7 @@
 # Viruses writers don’t expect that.
 alias firefox='firefox --profile ~/.ff'
 alias imgur="~/bin/imgur_upload.sh"
+alias uguu="~/bin/uguu_upload.sh"
 #
  #  Managing two git repos for ~/, dotfiles is public.
 #
@@ -108,11 +109,6 @@ copy-playlist() {
 	# }
 }
 
-# $1 — filename to fix figure dashes in
-fix-fdash() {
-	[ -w /tmp/c ] && sed -ri 's/^- (.*)$/‒ \1/g' /tmp/c
-}
-
 mount-box() {
 	gpg -qd --output /tmp/decrypted/secrets.`date +%s` ~/.davfs2/secrets.gpg
 	sudo /root/scripts/mount_box.sh $USER &
@@ -199,12 +195,6 @@ java-site-exception() {
 }
 # Thanks, Krishna!
 
-
-ffmpeg-webm-from-one-picture() {
-	set -x
-	ffmpeg -y -i "$1" -i "$2" -c:v libvpx  -c:a libvorbis -b:a 192k -tune stillimage -strict experimental "$3.webm"
-	set +x
-}
 
  # Forwards local ports via $1 to $2.
 #
@@ -325,4 +315,24 @@ rec-my-desktop() {
 	fi
 	ffmpeg -y -f x11grab -s ${w}x$h -framerate 30 -i $DISPLAY$adj -vcodec libx264 $bitrate -preset ultrafast /tmp/output.mkv
 	set +x
+}
+
+ # Copies the path to the currently playing song to clipboard.
+#
+song() {
+	mpd_library_path=$(
+		sed -rn "/^\s*music_directory/ {
+			s/^\s*music_directory\s+\"([^\"]+)\"\s*$/\1/;
+			s%~%$HOME%p
+		}" ~/.mpd/mpd.conf
+	)
+	song_local_path=$(mpc -f '%file%' | head -n1)
+	song_full_path="$mpd_library_path/$song_local_path"
+	if [ -r "$song_full_path" ]; then
+		type xsel &>/dev/null && echo -n $song_full_path | xsel || {
+			type xclip &>/dev/null && echo -n $song_full_path | xclip
+		} || notify-send --hint int:transient:1 -t 3000 'mpd' 'Couldn’t copy path to clipboard.'
+	else
+		notify-send --hint int:transient:1 -t 3000 'mpd' 'Couldn’t retrieve song path.'
+	fi
 }

@@ -36,7 +36,7 @@ readarray -t used_cache < "$used_files"
 file=''
 message=''
 pre="$rc:"$'\n'
-VERSION='20171128'
+VERSION='20180128'
 [[ "$REP" =~  ^[0-9]+$ ]] && in_reply_to_status_id="$REP"
 [ -v source ] || source='Anibot.sh'
 
@@ -393,7 +393,9 @@ while :; do
 	[ -v D_dont_upload ] || {
 		[ -r "$mydir/$pic_to_attach_with_video" ] \
 			&& pic="$mydir/$pic_to_attach_with_video"
-		upload_file ${video:+"$pic"} "$file"
+		until upload_file ${video:+"$pic"} "$file"; do
+			sleep 90
+		done
 	}
 	# special_message is set when in ‘repetitive mode’,
 	# see the explanation in the example rc file.
@@ -412,9 +414,12 @@ while :; do
 			message="status=${message//&/}"
 			message+="${in_reply_to_status_id:+&in_reply_to_status_id=$in_reply_to_status_id}"
 			message+="${source:+&source=$source}"
-			curl -u "$username:$password" \
-		         --data "$message" \
-		         $proto$server$making_post_url &>"$log"
+			until curl -u "$username:$password" \
+		               --data "$message" \
+		               $proto$server$making_post_url &>"$log"
+		    do
+		    	sleep 90
+		    done
 		}
 		reply_to=`sed -nr 's/^\s*<id>([0-9]+)<\/id>\s*$/\1/p;T;Q1' "$log"`
 		[[ "$reply_to" =~ ^[0-9]+$ ]] || {
