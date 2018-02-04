@@ -55,8 +55,8 @@ show_usage() {
 	                                 separately. It is an alias to conv2mp4
 	                                 with a restriction to animated GIF only.
 
-	DEFAULT SETTINGS (that you may change)
-	——————————————————————————————————————
+	HARDCODED DEFAULT SETTINGS (that you still may change)
+	——————————————————————————————————————————————————————
 	Overwrite? – YES      By deafult, overwrites resulting files. You may
 	                      comment ‘force_overwrite=t’ to make the script ask
 	                      you instead.
@@ -84,16 +84,31 @@ show_usage() {
 	EOF
 
 	# FFMPEG-3.4 takes care of the proper timing when it converts
-	# an animated GIF to MP4.
+	# an animated GIF to MP4. Fails rarely.
 
 	# You NEED to check the result of anigif2mp4, because
-	# conversion from GIF to MP4 has two pitfalls:
+	# conversion from GIF to MP4 has four pitfalls:
 	#   - some GIFs, which second layer and above do not have pixels
-	#     at 0:0, may have such layer SHIFTED, resulting MP4 will be a mess.
-	#   - GIFs which background is transparent will have it white in MP4.
-	#     The edges of the picture and transparency will look ugly and rough
-	#     on white, because usually there’s either some grayish colour
-	#     of the window, or a checkered pattern, which smoothes this edge.
+	#     at 0:0, may have such layers SHIFTED IN MP4, resulting video
+	#     will be a dance of cripples.
+	#   - GIFs TRANSPARENT BACKGROUND WILL BE LOST. In the resulting MP4
+	#     background will be while, so the edges of the object on the picture
+	#     will look ALIASED, because usually there’s either some grayish
+	#     colour of the window or a checkered pattern, that smooth that edge.
+	#   - conversion to MP4 may have GLITCHY PLACES, so make sure,
+	#     that you watch the resulting MP4 from the beginning to the end.
+	#     Compare carefully, this script is meant to do this.
+	#   - any type of conversion leads to QUALITY LOSS; hence it’s not
+	#     recommended for animated GIFs. You should ideally have the source
+	#     and cut the video from the source.
+
+	# anigif2mp4 is best to be avoided, and conv2mp4 used instead.
+	#   1. Open GIF in an image editor such as GIMP.
+	#   2. Restore layers (Filters → Animation → Unoptimize)
+	#   3. Export layers as PNG to a clean folder (File → Export layers)
+	#   4. Run conv2mp4 on the image sequence.
+	# This way you will have better control over FPS and less quality loss.
+	# Sometimes this is the only way to convert a nasty GIF.
 }
 
 
@@ -140,7 +155,7 @@ deps=(notify-send Xdialog stat file mktemp identify ffmpeg)
 #
 # VERBOSE=t
 
-VERSION=20171215
+VERSION=20180202
 
 # YOU DON’T NEED TO CHANGE THIS LINE
 notify_send='notify-send --hint int:transient:1 -t 3000 -i info'
@@ -212,6 +227,20 @@ conv_size_limit_in_bytes=$((conv2jpeg_dont_convert_smaller_than_k*1024))
 #  not those lower than one megabyte.
 #
 pngcomp_dont_compress_if_smaller_than_k=1000 # in KiB
+
+ # When combining an mp4 from an image sequence,
+#  one it’s necessary to set the right framerate. If every cadre was taken,
+#  then 24 should be fine for the most cases. On the other hand, if you work
+#  on a sequence taken not by you or it is a recombined GIF with a specific
+#  frame rate, you may want to alter it (usually to a lower FPS, if the
+#  sequence implied frame drop).
+#
+conv2mp4_slideshow_input_framerate=24
+
+ # For all imaginable purposes 24 should be fine,
+#  but let’s make it changeable just in case.
+#
+conv2mp4_slideshow_output_framerate=24
 
 tmpdir=$(mktemp -d)
 
@@ -536,6 +565,25 @@ unset ${!throwoffs*}
 	#   it’s joke
 	else
 		mp4_type='slideshow'
+		conv2mp4_slideshow_input_framerate=$(
+			Xdialog --title "Choose input framerate – ${BASH_SOURCE##*/}" \
+			        --backtitle "MP4 slideshow" \
+			        --rangebox 'Choose input framerate:' \
+			        800x160 \
+			        1 120 24
+			)
+		[[ "$conv2mp4_slideshow_input_framerate" =~ ^[0-9]+$ ]] \
+			|| conv2mp4_slideshow_input_framerate=24
+
+		conv2mp4_slideshow_output_framerate=$(
+			Xdialog --title "Choose output framerate – ${BASH_SOURCE##*/}" \
+			        --backtitle "MP4 slideshow" \
+			        --rangebox 'Choose output framerate:' \
+			        800x160 \
+			        1 120 24
+			)
+		[[ "$conv2mp4_slideshow_output_framerate" =~ ^[0-9]+$ ]] \
+			|| conv2mp4_slideshow_output_framerate=24
 	fi
 }
 
@@ -747,6 +795,27 @@ conv2jpeg() {
 	                      --textbox - 800x600 <<<"$log"
 }
 
+
+ # Checks, if passed filename is a valid, playable MP4 file.
+#  $1 – filename to check.
+#
+mp4_validity_check() {
+	local mp4_filename="$1" mp4_is_bad
+	# The first check is obligatory and fast, but the presence of a correct
+	# mime-type doesn’t guarantee, that the video is playable. This is
+	# often met with mpv encoder, that sometimes produces MP4, which
+	# it then cannot play itself – ffprobe says ‘moov atom not found’.
+	# So there’s a second, slower check.
+	[[ "`file -b --mime-type "$mp4_filename"`" =~ ^video/mp4$ ]] \
+		&& ffprobe "$mp4_filename" &>/dev/null \
+		|| mp4_is_bad=t
+	[ -v mp4_is_bad ] && {
+		$notify_send "Conversion to mp4 failed"
+		rm -f "$mp4_filename"
+		exit 3
+	}
+}
+
  # Doesn’t take arguments. It’s basically a procedure.
 #
 conv2mp4() {
@@ -787,6 +856,7 @@ conv2mp4() {
 			        -shortest \
 			        -movflags +faststart \
 			        "$mp4_filename"
+			mp4_validity_check "$mp4_filename"
 			;;
 		'one_looped_image')
 			mp4_filename=${image%.*}.mp4
@@ -802,6 +872,7 @@ conv2mp4() {
 			        -strict experimental \
 			        -movflags +faststart \
 			        "$mp4_filename"
+			mp4_validity_check "$mp4_filename"
 			;;
 		'slideshow')
 			mp4_filename=${images[first_existing_index]%.*}.mp4
@@ -821,20 +892,17 @@ conv2mp4() {
 			pushd "$subdir"
 			set -x
 			$ffmpeg ${overwrite:+-y} -loglevel verbose \
-			        -framerate 25 \
+			        -framerate $conv2mp4_slideshow_input_framerate \
 			        -pattern_type glob \
 			        -i "$glob_pattern" \
-			        -c:v libx264 -pix_fmt yuv420p -b:v 0 -crf 18 -r 10 \
+			        -c:v libx264 -pix_fmt yuv420p -b:v 0 -crf 18 \
+			        -r $conv2mp4_slideshow_output_framerate \
 			        -tune film \
 			        -movflags +faststart \
 			        "$mp4_filename"
 			set +x
+			mp4_validity_check "$mp4_filename"
 			popd
-			[[ "`file -b --mime-type "$mp4_filename"`" =~ ^video/mp4$ ]] || {
-				$notify_send "Conversion to mp4 failed"
-				rm -f "$mp4_filename"
-				exit 3
-			}
 			until [ -v ready ]; do
 				$media_player "$mp4_filename"
 				unset play_again
@@ -903,6 +971,7 @@ conv2mp4() {
 				        -strict experimental \
 				        -movflags +faststart \
 				        "$mp4_filename"
+				mp4_validity_check "$mp4_filename"
 				unset ready
 				until [ -v ready ]; do
 					[ -v pre_viewer_messages ] \
