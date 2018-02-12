@@ -53,7 +53,7 @@ type curl &>/dev/null || {
 	exit 4
 }
 
-file="$@"
+file="$1"
 
 [[ "$file" =~ ^lastr?$ ]] && { # Last image on the (w?hole) desktop
 	[[ "$file" =~ r$ ]] || maxdepth='-maxdepth 1' # 'r' to make it recursive
@@ -81,7 +81,7 @@ file="$@"
 # 	errors=t
 # 	exit 3
 # }
-file_name=${file##*/}
+[ "$2" = noname ] || file_name=${file##*/}
 file_escaped="${file//\"/\\\"}"
 response=$(curl -i -F name="$file_name" -F file=@"$file" \
 https://uguu.se/api.php?d=upload-tool 2>/dev/null ) || {

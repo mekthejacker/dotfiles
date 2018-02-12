@@ -426,6 +426,7 @@ wineprefix-setup() {
 		unifont   # This font has all glyphs possible
 		vcrun2008 # Required by many apps
 		vcrun2010 # Required by many apps
+		vcrun2012 # Required by many apps
 		vcrun2015 # Required by many apps
 		xact      # X3DAudio1_7.dll issues
 	)

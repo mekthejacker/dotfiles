@@ -99,7 +99,7 @@ startup_apps=(
 # WIDTH and HEIGHT were set in the ~/.preload.sh
 case $HOSTNAME in
 	home)
-		startup_apps+=(gimp subl3 geeqie retroshare transmission-gtk)
+		startup_apps+=(gimp subl3 geeqie transmission-gtk)
 		;;
 	paskapuukko)
 		# startup_apps+=(skype)  # how the fuck does skype switch the workspace by itself?!
@@ -191,7 +191,10 @@ xte 'mouseclick 1'
 # ╚════════╩════════╝ # ╚════════╩════════╝
 
 # This is to check whether script is called via hotkey in ~/.env/config.
-[ "$1" = stop_after_main_workspace ] && exit 0
+[ "$1" = stop_after_main_workspace ] && {
+	pointer_control enable
+	exit 0
+}
 
 
 for wsp in '1:Firefox' \

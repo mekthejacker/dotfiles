@@ -2703,3 +2703,33 @@ iforgot-gs-grab-followers() {
 iforgot-json-parser() {
 	echo '	jq'
 }
+
+iforgot-hunspell-dicts() {
+	cat <<-EOF
+	Page: http://wordlist.aspell.net/dicts/
+	README: http://wordlist.aspell.net/hunspell-readme/
+	Hunspell dictionaries: https://sourceforge.net/projects/wordlist/files/speller/
+
+	See also: ~/bin/hunspell_combine.sh
+	EOF
+}
+
+iforgot-open-trackers-list() {
+	cat <<-EOF
+	udp://tracker.opentrackr.org:1337/announce
+
+	udp://open.demonii.com:1337
+	http://explodie.org:6969/announce
+	http://mgtracker.org:2710/announce
+	http://tracker.tfile.me/announce
+	udp://9.rarbg.com:2710/announce
+	udp://9.rarbg.me:2710/announce
+	udp://9.rarbg.to:2710/announce
+	udp://tracker.coppersurfer.tk:6969/announce
+	udp://tracker.glotorrents.com:6969/announce
+	udp://tracker.leechers-paradise.org:6969/announce
+	udp://tracker.openbittorrent.com:80
+	http://90.180.35.128:6969/annonce
+	udp://90.180.35.128:6969/annonce
+	EOF
+}

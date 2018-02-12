@@ -45,7 +45,7 @@ show_error() {
 trap 'show_error "$BASH_SOURCE" "$BASH_COMMAND" "$LINENO"' ERR
 
 shopt -s extglob
-VERSION='20171031'
+VERSION='20180209'
 [ $# -ne 0 ] && {
 	cat <<-"EOF"
 	Usage:
@@ -92,7 +92,7 @@ get_dev_info() {
 
 delete_printer() {
 	echo "Deleting printer ‘$model’ from CUPS."
-	if lpadmin -x "$model"; then
+	if lpadmin -x "${model// /_}"; then
 		echo 'Printer deleted!'
 	else
 		echo 'Couldn’t delete printer' >&2
@@ -193,7 +193,7 @@ done
 get_dev_info
 echo "Found $model."
 read -n1 -p "Does it look like the proper device? [Y/n] > "
-[[ "$REPLY" =~ ^(|y|Y|)$ ]] || {
+[[ "$REPLY" =~ ^(y|Y|)$ ]] || {
 	echo Aborted. >&2
 	exit 3
 }
