@@ -36,7 +36,7 @@ readarray -t used_cache < "$used_files"
 file=''
 message=''
 pre="$rc:"$'\n'
-VERSION='20180128'
+VERSION='20180212'
 [[ "$REP" =~  ^[0-9]+$ ]] && in_reply_to_status_id="$REP"
 [ -v source ] || source='Anibot.sh'
 
@@ -143,12 +143,18 @@ update_file_list() {
 	done
 }
 
+ # Finds a file among ${files[@]}, that passes certain criteria:
+#  be a video file for example, or be new enough.
+#  requested_pattern may optionally be present in the global env
+#
 find_a_file() {
-	local mode="$@" mime='' file_basename file_basedir image_found \
+	local mode="$1" mime='' \
+	      file_basename file_basedir image_found \
 	      video_hashtag hashtags=() special_hashtags=() \
 	      local_hashtags_to_remove=() hashtag_space \
 	      first_newline second_newline third_newline \
-	      author_file author_data
+	      author_file author_data try __files=( "${files[@]}" ) \
+	      __files_length
 	case "$mode" in
 		image|'') mode='image' mime='image';;
 		video)  mime='video' video_hashtag='#webm';;
@@ -166,13 +172,51 @@ find_a_file() {
 			video_hashtag='#webm'
 		}
 	}
-	iter=0
+
+	 # find_a_file() works on a local copy of ${files[@]},
+	#  that may be reduced, if we want a file with a certain pattern.
+	#
+	[ "$requested_pattern" ] && {
+		echo "    ITERATION: $ITER"
+		# Work on a reduced copy, where are only those files,
+		# that match $requested_pattern.
+		__files_length=${#__files[@]}
+		# shopt -s nocasematch
+		for ((i=0; i<__files_length; i++)); do
+			[[ "${__files[i]}" =~ ^.*$requested_pattern.*$ ]] \
+				|| unset __files[$i]
+		done
+		# shopt -u nocasematch
+		# We now have holes in ${__files[@]}, so we should recreate it,
+		# or shuf on index, that is below, may fail.
+		[ ${#__files[i]} -eq 0 ] && {
+			cat <<-EOF >&2
+
+			ERROR!
+			No files left after filtering by pattern “$requested_pattern”.
+			Check, that the patterns in post_each_nth_time=() do match
+			  the files. Letter case is unimportant, but an extra space is.
+			Check, that the patterns in blocklist=() aren’t filtering
+			  out the wanted files. It may happen, if you chose very short
+			  patterns.
+			EOF
+			exit 3
+		}
+
+		temp_files=( "${__files[@]}" )
+
+		__files=( "${temp_files[@]}" )
+
+		unset temp_files
+	}
+
+	try=0
 	until [ -v image_found ]; do
 		sleep 1  # Avoiding strange behaviour
-		[ $((++iter)) -eq $remember_files ] && return  # Something went wrong
-		chosen_idx=`shuf -i 0-$((${#files[@]}-1)) -n 1`
-		echo -e "    `date +%Y-%m-%d\ %H:%M`    iter: $iter;    idx: $chosen_idx"
-		file=${files[chosen_idx]}
+		[ $((++try)) -eq $remember_files ] && return  # Something went wrong
+		chosen_idx=`shuf -i 0-$((${#__files[@]}-1)) -n 1`
+		echo -e "    `date +%Y-%m-%d\ %H:%M`    try: $try;    idx: $chosen_idx"
+		file=${__files[chosen_idx]}
 		[ -r "$file" ] || {
 			echo -e "        Dropped $file: is not readable." >&2
 			continue
@@ -180,18 +224,18 @@ find_a_file() {
 		file --mime-type "$file" | sed -rn "s~.* ($mime/\S+)$~\1~;T;Q1" \
 			&& echo -e "        Dropped $file: mime type mismatch." >&2 \
 			&& continue
-		unset match_found
+		unset dropped
 		for ((i=0; i<${#used_cache[@]}; i++)); do
 			[ "$file" = "${used_cache[i]}" ] && {
 				echo -e "        Dropped $file: it was used in the past $remember_files." >&2
-				match_found=t && break
+				dropped=t && break
 			}
 		done
-		[ -v match_found ] || {
+		[ -v dropped ] || {
 			used_cache+=("$file")
 			image_found=t
 			echo "    Found $file."
-			[ $((iter-1)) -eq 0 ] || echo "    …after $((iter-1)) unsuccessful attempt(s)."
+			[ $((try-1)) -eq 0 ] || echo "    …after $((try-1)) unsuccessful attempt(s)."
 		}
 	done
 
@@ -363,7 +407,7 @@ upload_file() {
  # Main algorithm starts here
 #
 update_file_list
-runs=0
+ITER=1
 while :; do
 	# Update file list once per day
 	new_time=`date +%s`
@@ -381,14 +425,26 @@ while :; do
 	#            |       |    Absolute path to the file for upload
 	#            |       Mark of the videofile upload (not an image)
 	#            What will be sent in the --data of the request
-	#
+
+	# Roll for a video instead of a picture.
 	[ -r "$D" ] || {
 		# 1/5 chance to attach a webm/mp4
 		[ ! -v no_media -a `shuf -i 0-4 -n 1` -eq 0 ] && {
-			echo ' …with a video!'
+			echo -n ' …with a video!'
 			video=video
-		}|| echo
+		}
 	}
+	unset requested_pattern
+	[ ${#post_each_nth_time[@]} -ne 0 ] && {
+		for n in ${!post_each_nth_time[@]}; do
+			[ $((ITER % n)) -eq 0 ] && {
+				requested_pattern="${post_each_nth_time[n]}"
+				echo -n " …and with pattern №$n!"
+				break
+			}
+		done
+	}
+	echo # \n after all echo -n
 	find_a_file ${video:-}
 	[ -v D_dont_upload ] || {
 		[ -r "$mydir/$pic_to_attach_with_video" ] \
@@ -441,5 +497,6 @@ while :; do
 			(IFS=$'\n';	echo "${used_cache[*]}" >"$used_files")
 		}
 	}
-	[ $((++runs)) -eq ${max_runs:-0} ] && break || sleep $pause_secs
+	[ $((++ITER)) -eq ${max_runs:-0} ] && break || sleep $pause_secs
 done
+

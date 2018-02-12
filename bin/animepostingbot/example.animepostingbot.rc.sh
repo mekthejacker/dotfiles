@@ -101,3 +101,10 @@ hashtags_to_remove=()
 #  ‘meme’, to avoid nesting of 878th directory level.
 #
 hashtags_prefixes_to_strip=()
+
+ # Make each Nth post contain an image (or a video)
+#  with path matching a pattern.
+#  Syntax: [index]="pattern", e.g. [20]="Azumanga"
+#  will make each 20th post be a picture from Azumanga.
+#
+post_each_nth_time=()
