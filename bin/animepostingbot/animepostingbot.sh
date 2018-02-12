@@ -36,7 +36,7 @@ readarray -t used_cache < "$used_files"
 file=''
 message=''
 pre="$rc:"$'\n'
-VERSION='20180212'
+VERSION='20180213'
 [[ "$REP" =~  ^[0-9]+$ ]] && in_reply_to_status_id="$REP"
 [ -v source ] || source='Anibot.sh'
 
@@ -181,12 +181,12 @@ find_a_file() {
 		# Work on a reduced copy, where are only those files,
 		# that match $requested_pattern.
 		__files_length=${#__files[@]}
-		# shopt -s nocasematch
+		shopt -s nocasematch
 		for ((i=0; i<__files_length; i++)); do
 			[[ "${__files[i]}" =~ ^.*$requested_pattern.*$ ]] \
 				|| unset __files[$i]
 		done
-		# shopt -u nocasematch
+		shopt -u nocasematch
 		# We now have holes in ${__files[@]}, so we should recreate it,
 		# or shuf on index, that is below, may fail.
 		[ ${#__files[i]} -eq 0 ] && {
