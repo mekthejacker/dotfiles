@@ -39,10 +39,6 @@ osd-fractions=yes
 #save-position-on-quit=yes
 screenshot-template="%F %P"
 screenshot-format=jpg
-#screenshot-format=png
-## Compressing screenshots while mpv runs is slow,
-##   so compressing is done after with watch.sh
-screenshot-png-compression=9
 screenshot-jpeg-quality=96
 ## Sub loading is done via watch.sh
 #sub-auto=no
