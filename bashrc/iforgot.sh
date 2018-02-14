@@ -2717,7 +2717,6 @@ iforgot-hunspell-dicts() {
 iforgot-open-trackers-list() {
 	cat <<-EOF
 	udp://tracker.opentrackr.org:1337/announce
-
 	udp://open.demonii.com:1337
 	http://explodie.org:6969/announce
 	http://mgtracker.org:2710/announce
@@ -2731,5 +2730,36 @@ iforgot-open-trackers-list() {
 	udp://tracker.openbittorrent.com:80
 	http://90.180.35.128:6969/annonce
 	udp://90.180.35.128:6969/annonce
+	EOF
+}
+
+iforgot-pixiv-image-sequence-download() {
+	cat <<-EOF
+	The animation is a bunch of JPG’s inside a ZIP.
+	Pixiv downloads it and shows as a slideshow.
+
+	How to download the ZIP file:
+	1) Look at the HTML source of:
+	   http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46157029
+	2) Search for “.zip”
+	3) On this particular page, you’ll get 2 results (other animations
+	   might have more links):
+	   http://i2.pixiv.net/img-zip-ugoira/img/2014/09/24/03/20/14/46157029_ugoira600x600.zip
+	   http://i2.pixiv.net/img-zip-ugoira/img/2014/09/24/03/20/14/46157029_ugoira1920x1080.zip
+	4) The first one is scaled down to a width of 600 pixels, so you probably
+	   want the second one with a width of 700 pixels.
+	3) Copy the second link into a text editor, and replace every
+	   \/
+	   with a
+	   /
+	4) Result:
+	   http://i2.pixiv.net/img-zip-ugoira/img/2014/09/24/03/20/14/46157029_ugoira1920x1080.zip
+	5) If you try to download this file, you’ll get a “403 Forbidden” error.
+	6) What you need to do is set the referrer URL in your browser to:
+	   http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46157029
+	   You can do this with referrer spoofing add-ons.
+	   This one’s for Firefox:
+	   https://addons.mozilla.org/en-US/firefox/addon/refcontrol/
+
 	EOF
 }

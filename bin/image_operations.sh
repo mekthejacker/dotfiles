@@ -126,6 +126,7 @@ show_error() {
 	local file=$1 line=$2 lineno=$3
 	echo -e "$file: An error occured!\nLine $lineno: $line" >&2
 	notify-send --hint int:transient:1 -t 3000 "${BASH_SOURCE##*/}" "Error: check the console."
+	return 0
 }
  # The reason we need this function is because set +e won’t remove the trap.
 #  So after disabling the errexit shell option, we also need to remove that
@@ -155,7 +156,7 @@ deps=(notify-send Xdialog stat file mktemp identify ffmpeg)
 #
 # VERBOSE=t
 
-VERSION=20180202
+VERSION=20180214
 
 # YOU DON’T NEED TO CHANGE THIS LINE
 notify_send='notify-send --hint int:transient:1 -t 3000 -i info'
@@ -570,7 +571,8 @@ unset ${!throwoffs*}
 			        --backtitle "MP4 slideshow" \
 			        --rangebox 'Choose input framerate:' \
 			        800x160 \
-			        1 120 24
+			        1 120 24 \
+			        2>&1
 			)
 		[[ "$conv2mp4_slideshow_input_framerate" =~ ^[0-9]+$ ]] \
 			|| conv2mp4_slideshow_input_framerate=24
@@ -580,7 +582,8 @@ unset ${!throwoffs*}
 			        --backtitle "MP4 slideshow" \
 			        --rangebox 'Choose output framerate:' \
 			        800x160 \
-			        1 120 24
+			        1 120 24 \
+			        2>&1
 			)
 		[[ "$conv2mp4_slideshow_output_framerate" =~ ^[0-9]+$ ]] \
 			|| conv2mp4_slideshow_output_framerate=24
@@ -793,6 +796,7 @@ conv2jpeg() {
 	}
 	[ "$log" ] && Xdialog --title "Conversion results – ${BASH_SOURCE##*/}" --no-cancel \
 	                      --textbox - 800x600 <<<"$log"
+	return 0
 }
 
 
@@ -814,6 +818,7 @@ mp4_validity_check() {
 		rm -f "$mp4_filename"
 		exit 3
 	}
+	return 0
 }
 
  # Doesn’t take arguments. It’s basically a procedure.
@@ -1040,6 +1045,7 @@ conv2mp4() {
 			echo 101 >$pipe; wait $xdialog_pid
 			;;
 	esac
+	return 0
 }
 
  # Doesn’t take arguments. It’s basically a procedure.
@@ -1062,12 +1068,14 @@ pngcomp() {
 		else
 			mv "$crushed" "${path%.*}.crushed.png"
 		fi
+		return 0
 	}
 	export tmpdir
 	[ -v overwrite ] && export overwrite
 	export -f crush
 	parallel --eta crush ::: "${images[@]}"
 	export -nf crush
+	return 0
 }
 
  # Executing the corresponding function.
