@@ -194,6 +194,34 @@ ffmpeg_abitrate='192k'
 #
 force_overwrite=t
 
+ # Quality preset
+#  One of: ultrafast, superfast, veryfast, faster, fast,
+#          medium (ffmpeg default preset),
+#          slow, slower, veryslow, placebo.
+#  With ‘medium’ preset output quality is worse than original,
+#  so veryslow is applied.
+#
+ffmpeg_preset='veryslow'
+
+ # Fine-tuning preset
+#  One of:
+#   ⋅ film – use for high quality movie content. Lowers deblocking;
+#   ⋅ animation – good for cartoons; uses higher deblocking
+#     and more reference frames;
+#   ⋅ grain – preserves the grain structure in old, grainy film material;
+#   ⋅ stillimage – good for slideshow-like content;
+#   ⋅ fastdecode – allows faster decoding by disabling certain filters;
+#   ⋅ zerolatency – good for fast encoding and low-latency streaming;
+#
+#  Note, that applying tune=film to preset=medium won’t make the quality
+#  much better. If you seek for quality, then preset > tune.
+#  That said, preset=veryslow and tune=film is the highest.
+#
+#  One-image modes of conv2mp4 force tune=stillimage, you don’t have
+#  to change it manually for them here.
+#
+ffmpeg_tune='film'
+
  # Default quality for resulting JPEG images.
 #  Sane range is 92…96. 100 is close to lossless.
 #
@@ -210,7 +238,7 @@ conv2jpeg_dont_convert_grayscale=t
 #
 conv2jpeg_dont_convert_smaller_than_k=300 # in KiB
 
-# YOU DON’T NEED TO CHANGE THIS LINE
+# DON’T CHANGE THIS LINE, CHANGE THE ONE ABOVE ^
 conv_size_limit_in_bytes=$((conv2jpeg_dont_convert_smaller_than_k*1024))
 
  # Allow conversion to JPEG,
@@ -856,6 +884,7 @@ conv2mp4() {
 			        -i "$(crop_if_needed "$tmpdir/t.jpg")" \
 			        -c:v libx264 -pix_fmt yuv420p -b:v 0 -crf 23 \
 			        -c:a $ffmpeg_acodec -b:a $ffmpeg_abitrate \
+			        -preset $ffmpeg_preset \
 			        -tune stillimage \
 			        -strict experimental \
 			        -shortest \
@@ -873,6 +902,7 @@ conv2mp4() {
 			        -loop 1 \
 			        -i "$(crop_if_needed "$image")" \
 			        -c:v libx264 -pix_fmt yuv420p -b:v 0 -crf 18 \
+			        -preset $ffmpeg_preset \
 			        -tune stillimage \
 			        -strict experimental \
 			        -movflags +faststart \
@@ -902,7 +932,8 @@ conv2mp4() {
 			        -i "$glob_pattern" \
 			        -c:v libx264 -pix_fmt yuv420p -b:v 0 -crf 18 \
 			        -r $conv2mp4_slideshow_output_framerate \
-			        -tune film \
+			        -preset $ffmpeg_preset \
+			        -tune $ffmpeg_tune \
 			        -movflags +faststart \
 			        "$mp4_filename"
 			set +x
@@ -972,7 +1003,8 @@ conv2mp4() {
 				$ffmpeg ${overwrite:+-y} \
 				        -i "$(crop_if_needed "$image")" \
 				        -c:v libx264 -pix_fmt yuv420p -b:v 0 -crf 18 \
-				        -tune film \
+				        -preset $ffmpeg_preset \
+				        -tune $ffmpeg_tune \
 				        -strict experimental \
 				        -movflags +faststart \
 				        "$mp4_filename"
@@ -1104,3 +1136,6 @@ $mode
 #     Would pixelart gif be well?
 #  6. -avoid_negative_ts 1  – maybe it will cure the problem of when
 #     convert_script produces broken files? If we see it too, that is.
+#  7. Maybe 2-pass encoding, but it’s to fit the output to a specific
+#     size with a penalty on quality. Use -crf 0 if the quality needs
+#     to be better.
