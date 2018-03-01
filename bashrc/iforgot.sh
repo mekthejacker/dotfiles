@@ -1508,13 +1508,13 @@ iforgot-framebuffer-with-utf8() {
 	echo jfbterm
 }
 
-iforgot-bash-line-output() {
+iforgot-bash-output-in-lines() {
 	cat <<-EOF
 	fmt — reformat lines to width.
 	fold – simple version of the above.
 	column – autoformat columns.
 	colrm — remove columns.
-	paste – merge lines from <two <files or <(some) <(commands)
+	paste – merge lines from "file1" "file_2" or <(some) <(commands)
 	pr – should be a columnizer and indenter, but broken.
 	EOF
 }
@@ -2122,6 +2122,13 @@ iforgot-ffmpeg-encoding-opts() {
 
 	Shorter: libopus > libvorbis > aac > libmp3lame >= ac3
 
+	Video encoding example (audio, no subs):
+	$ ffmpeg -y -ss 0:17:46.107 -to 0:17:49.318 \
+	            -i /home/video/anime/Slow\ start/\[HorribleSubs\]\ Slow\ Start\ -\ 07\ \[1080p\].mkv \
+	            \
+	            -c:v libx264 -b:v 0 -crf 18 -profile high -level 4.2 -tune film \
+	            -c:a aac -b:a 192k \
+	            /home/picts/animu/screens/slow\ start/\[HorribleSubs\]\ Slow\ Start\ -\ 07\ \[1080p\]\ 0.17.46–0.17.49.mp4
 	EOF
 }
 
@@ -2802,5 +2809,48 @@ iforgot-pixiv-image-sequence-download() {
 	   This one’s for Firefox:
 	   https://addons.mozilla.org/en-US/firefox/addon/refcontrol/
 
+	EOF
+}
+
+iforgot-wine-debug() {
+	cat <<-EOF
+	WINEDEBUG operates on channels, and each of them has messaage classes.
+
+	Example
+	    WINEDEBUG=fixme+all,err+all – “default behaviour”
+	    WINEDEBUG=loaddll – show (equal to +loaddll)
+	    WINEDEBUG=warn+all
+	    WINEDEBUG=trace+dll,warn-relay –
+
+	Channels
+	    all – catches all channels.
+	    loaddll – will show, how dlls actually load.
+	    relay – shows calls between DLLs.
+	    heap – traces heap activity and switches on integrity checks. Doing
+	           a +relay,+heap trace will narrow down where it's happening.
+	There are 410 channels in total.
+
+	Classes
+	    fixme – should(!) tell, what is wrong, unimplemented parts.
+	    err – should(!) tell about things that shouldn’t happen.
+	    warn – should(!) tell, when a function cannot deal with smth.
+	    trace – detailed debugging information.
+	    message – messages oriented on end-user (rarely met).
+
+	In reality, “warn” and “err” classes contain trash info messages,
+	that confuse and complicate the understanding what actually went wrong.
+	For example
+	> err:winediag:wined3d_dll_init Setting multithreaded command stream to 0x1.
+	Tells, that CSMR _actually works_!
+	> warn:ntdll:NtQueryAttributesFile L"\\??\\Z:\\…\\msi.dll" not found (c0000034)
+	Tells, that the library wasn’t found on that path. That doesn’t mean,
+	however, that the file wasn’t found at all: it might be found somewhere
+	else, but the corresponding message is in “trace” class, which is not
+	shown by default.
+
+	Links
+	    https://wiki.winehq.org/Wine_User's_Guide
+	    https://wiki.winehq.org/Wine_Developer's_Guide
+	    https://wiki.winehq.org/Debug_Channels
 	EOF
 }

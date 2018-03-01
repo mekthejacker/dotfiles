@@ -99,7 +99,7 @@ NO_LOGGING=t
 # set -x
 set -feE
 shopt -s extglob
-VERSION="20170128"
+VERSION="20170223"
 
 show_help() {
 	cat <<-EOF
@@ -185,23 +185,31 @@ traponerr set
 	exit 3
 }
 
-unset WINEDEBUG \
-      WINEARCH \
-      __GL_THREADED_OPTIMIZATIONS \
-      __GL_SYNC_TO_VBLANK \
-      __GL_YIELD
-
  # In order to get more output from wine, use
-#  WINEDEBUG=warn  or  WINEDEBUG=warn+all
+#  WINEDEBUG=warn  or  WINEDEBUG=warn+all.
+#  WINEDEBUG=loaddll will show, if some DLL doesn’t load.
 #
-export WINEDEBUG="-all" \
+export WINEDEBUG="${WINEDEBUG:-fixme+all,err+all}" \
        WINEARCH \
        WINEPREFIX \
-       SDL_AUDIODRIVER=alsa
-       __GL_THREADED_OPTIMIZATIONS=1 \
-       __GL_SYNC_TO_VBLANK=0 \
-       __GL_YIELD="NOTHING"
+       SDL_AUDIODRIVER=${SDL_AUDIODRIVER:-alsa} \
+       __GL_THREADED_OPTIMIZATIONS=${__GL_THREADED_OPTIMIZATIONS:-1} \
+       __GL_SYNC_TO_VBLANK=${__GL_SYNC_TO_VBLANK:-0} \
+       __GL_YIELD=${__GL_YIELD:-NOTHING}
 
+
+write_previous_wprefix() {
+	local file="$HOME/.cache/wine.sh/previous_wprefix"
+	[ -w "${file%/*}" ] || mkdir -p "${file%/*}"
+	echo "$1" > "$file" || return 1
+	return 0
+}
+
+read_previous_wprefix() {
+	local file="$HOME/.cache/wine.sh/previous_wprefix"
+	[ -r "$file" ] && echo "$(<"$file")" || return 1
+	return 0
+}
 
  # If WINEPREFIX wasn’t passed through the environment,
 #  find available WINEPREFIX folders in $HOME and fake user’s
@@ -236,8 +244,15 @@ set_wineprefix() {
 			err "No .wine\* folders found in $HOME and /home/$WINEUSER."
 			return 3
 		else
+			# Trying to set the cursor on the previously used wineprefix
+			previous_wprefix=$(read_previous_wprefix)
+			for ((i=0; i<${#prefix_list[@]}; i++)); do
+				[ "${prefix_list[i]}" = "$previous_wprefix" ] \
+					&& prefix_list[$i]="_${prefix_list[i]}_"
+			done
 			menu 'Choose WINEPREFIX' "${prefix_list[@]}"
 			WINEPREFIX="/home/$CHOSEN"
+			write_previous_wprefix "$CHOSEN"
 		fi
 	fi
 	WINEPREFIX_NAME="${WINEPREFIX##*/}"  # .wine32-something or .wine64-smth.
@@ -271,6 +286,12 @@ __wine() {
 	set_wineprefix || return $?
 	case "$run_as" in
 		wine|wine64)
+			# User Guide says that if we call and .exe directly,
+			# wine should be used with options “start” and “/unix”
+			# (with unix paths), i.e
+			#   wine start /unix /path/to/some/windows.exe
+			# But some programs refuse to start this way, and only start
+			# without “start /unix”.
 			[ $WINEARCH = win32 ] \
 				&& binary='/usr/bin/wine' \
 				|| binary='/usr/bin/wine64'
@@ -349,7 +370,7 @@ wineprefix-setup() {
 
 	info "2. Setting wine options"
 	declare -A options=(
-		[csmt]=on
+		[csmt]=on  # Multi-threaded command stream
 		[ddr]=opengl # Set DirectDrawRenderer to opengl //gdi
 		[fontsmooth]=gray # Enable subpixel font smoothing //rgb,bgr,disable
 		# GLSL
@@ -358,11 +379,10 @@ wineprefix-setup() {
 		[glsl]=disabled # Enable glsl shaders
 		[multisampling]=enabled # Enable Direct3D multisampling //disabled
 		[mwo]=force # Set DirectInput MouseWarpOverride to force //disable,enabled
-		[psm]=3 # Supported shader model version // <0|1|2|3>
 		[sound]=alsa # Set sound driver to ALSA //disabled,oss,coreaudio (mac)
 		[strictdrawordering]=disabled # //disabled (may make things faster), fixes severe glitches in DE:HR, Tombraider 2013, Metro 2033 etc.
 		[videomemorysize]=$((`nvidia-settings --query $DISPLAY/VideoRam | sed -nr '2s/.*\s([0-9]+)\.$/\1/p'`/1024)) # in MiB
-		[vsm]=3
+		[vsm]=3  # Supported shader model version // <0|1|2|3>
 		[gsm]=3
 		[psm]=3
 		[win7]=  # Windows version // <win31|win95|win98|win2k|winxp|win2k3|vista|win7>

@@ -156,7 +156,7 @@ deps=(notify-send Xdialog stat file mktemp identify ffmpeg)
 #
 # VERBOSE=t
 
-VERSION=20180214
+VERSION=20180227
 
 # YOU DON’T NEED TO CHANGE THIS LINE
 notify_send='notify-send --hint int:transient:1 -t 3000 -i info'
@@ -182,7 +182,7 @@ ffmpeg='ffmpeg -hide_banner -threads 4'
 #  libopus > libvorbis > aac > libmp3lame > others
 #  NB: libopus ≠ opus! check with ‘ffmpeg -hide_banner -codecs | grep libopus’
 #
-ffmpeg_acodec='aac'
+ffmpeg_acodec='libfdk_aac'
 
  # Bitrate for $ffmpeg_acodec
 #
@@ -882,10 +882,12 @@ conv2mp4() {
 			        -i "$audio_track" \
 			        -loop 1 \
 			        -i "$(crop_if_needed "$tmpdir/t.jpg")" \
-			        -c:v libx264 -pix_fmt yuv420p -b:v 0 -crf 23 \
-			        -c:a $ffmpeg_acodec -b:a $ffmpeg_abitrate \
-			        -preset $ffmpeg_preset \
-			        -tune stillimage \
+			        -c:v libx264 -pix_fmt yuv420p \
+			            -b:v 0  -crf 23 \
+			            -preset:v $ffmpeg_preset  -tune:v stillimage \
+			            -profile:v high  -level 4.2 \
+			        -c:a $ffmpeg_acodec \
+			            -b:a $ffmpeg_abitrate \
 			        -strict experimental \
 			        -shortest \
 			        -movflags +faststart \
@@ -901,9 +903,10 @@ conv2mp4() {
 			$ffmpeg ${overwrite:+-y} \
 			        -loop 1 \
 			        -i "$(crop_if_needed "$image")" \
-			        -c:v libx264 -pix_fmt yuv420p -b:v 0 -crf 18 \
-			        -preset $ffmpeg_preset \
-			        -tune stillimage \
+			        -c:v libx264 -pix_fmt yuv420p \
+			            -b:v 0 -crf 18 \
+			            -preset:v $ffmpeg_preset -tune:v stillimage \
+			            -profile:v high -level 4.2 \
 			        -strict experimental \
 			        -movflags +faststart \
 			        "$mp4_filename"
@@ -930,10 +933,11 @@ conv2mp4() {
 			        -framerate $conv2mp4_slideshow_input_framerate \
 			        -pattern_type glob \
 			        -i "$glob_pattern" \
-			        -c:v libx264 -pix_fmt yuv420p -b:v 0 -crf 18 \
-			        -r $conv2mp4_slideshow_output_framerate \
-			        -preset $ffmpeg_preset \
-			        -tune $ffmpeg_tune \
+			        -c:v libx264 -pix_fmt yuv420p \
+			            -b:v 0 -crf 18 \
+			            -preset:v $ffmpeg_preset  -tune:v $ffmpeg_tune \
+			            -profile:v high  -level 4.2 \
+			            -r $conv2mp4_slideshow_output_framerate \
 			        -movflags +faststart \
 			        "$mp4_filename"
 			set +x
@@ -1002,9 +1006,10 @@ conv2mp4() {
 				}
 				$ffmpeg ${overwrite:+-y} \
 				        -i "$(crop_if_needed "$image")" \
-				        -c:v libx264 -pix_fmt yuv420p -b:v 0 -crf 18 \
-				        -preset $ffmpeg_preset \
-				        -tune $ffmpeg_tune \
+				        -c:v libx264 -pix_fmt yuv420p \
+				            -b:v 0 -crf 18 \
+				            -preset:v $ffmpeg_preset -tune:v $ffmpeg_tune \
+				            -profile:v high -level 4.2 \
 				        -strict experimental \
 				        -movflags +faststart \
 				        "$mp4_filename"

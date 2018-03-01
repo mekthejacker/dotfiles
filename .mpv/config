@@ -23,7 +23,9 @@ cursor-autohide-fs-only=yes
 demuxer-mkv-subtitle-preroll=yes
 force-window=yes
 ## precise seeking helps Zehkul’s script
-hr-seek-demuxer-offset=5
+hr-seek=yes
+hr-seek-demuxer-offset=1.5
+hr-seek-framedrop=no
 input-ipc-server=~/.mpv/socket
 ## Suppress status line messages.
 ## mpv like to print a lot when spawned from coproc in watch.sh

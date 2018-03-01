@@ -1234,8 +1234,8 @@ xkb_symbols "pc_us_ru_2_inet(evdev)_group(rctrl_rshift_toggle)_level3(menu_switc
     };
     key <AC06> {
         type= "FOUR_LEVEL_SEMIALPHABETIC",
-        symbols[Group1]= [               h,               H,          hyphen,        NoSymbol ],  // 3: soft hyphen (appears only when word breaks)
-        symbols[Group2]= [     Cyrillic_er,     Cyrillic_ER,          hyphen,        NoSymbol ]  //    I was using it for spoilers on hanabira imageboards %%-**bold_text**-%%
+        symbols[Group1]= [               h,               H,          U00AD,        NoSymbol ],  // 3: soft hyphen (appears only when word breaks)
+        symbols[Group2]= [     Cyrillic_er,     Cyrillic_ER,          U00AD,        NoSymbol ]  //    I was using it for spoilers on hanabira imageboards %%-**bold_text**-%%
     };
     key <AC07> {
         type= "ALPHABETIC",
