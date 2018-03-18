@@ -1,4 +1,4 @@
-#!/bin/bash
+#! /usr/bin/env bash
 
 # uguu_upload.sh
 # Upload images to uguu.se from the command line.
