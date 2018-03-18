@@ -1362,6 +1362,16 @@ iforgot-find-newer-older() {
 	EOF
 }
 
+iforgot-find-exclude() {
+	cat <<-"EOF"
+	Prune
+	find -mtime -2
+
+	Find the files older than 2 days:
+	find -mtime +2
+	EOF
+}
+
 iforgot-trace-there-and-back() {
 	cat <<-EOF
 	ping -R -c1 XX.XX.XX.XX
@@ -2854,3 +2864,5 @@ iforgot-wine-debug() {
 	    https://wiki.winehq.org/Debug_Channels
 	EOF
 }
+
+iforgot-json-console-parser() { echo -e '\tjq'; }

@@ -1090,7 +1090,9 @@ conv2mp4() {
 glue() {
 	# Ask whether conversion to jpeg needed
 	# Ask about the resulting format: jpg, png, 8-bit/grayscale png
-	convert "${images[@]}" -quality 96  -append "${images[0]%/*}/glued_`date +%s`.jpg"
+	# Horizontal glue uses +append
+	# convert "${images[@]}" -quality 96  -append "${images[0]%/*}/glued_`date +%s`.jpg"
+	convert "${images[@]}" -append "${images[0]%/*}/glued_`date +%s`.png"
 }
 
  # Doesn’t take arguments. It’s basically a procedure.

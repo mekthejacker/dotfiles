@@ -67,4 +67,11 @@ div.hidbord_msgfrom_ {
    #ads_left, #left_blocks { display: none !important }
 }
 
-@font-face { font-family: 'SegoeUI'; src: local('PT Sans'); }
+@font-face { font-family: 'SegoeUI'; src: local('PT Sans') !important; }
+
+@-moz-document domain("githib.com") {
+	pre {
+		-moz-tab-size: 4;
+		tab-size: 4;
+	}
+}

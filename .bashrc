@@ -140,6 +140,7 @@ gen_prompt() {
 	# [ $last_cmd_exit_code -eq 0 ] || prompt_char="\\\$-$last_cmd_exit_code"
 	[ $last_cmd_exit_code -eq 0 ] || prompt_char="$prompt_char$prompt_char"
 	PS1+=" $git_status${b}$prompt_char${s} "
+	:
 }
 export PROMPT_COMMAND="gen_prompt"
 
@@ -273,8 +274,10 @@ isinrepo() {
 # pinentry doesn’t like scim
 alias gpg="GTK_IM_MODULE= QT_IM_MODULE= gpg"
 alias ls="ls -1h --color=auto"
+mpvforcesubs='--sub-font=Roboto --sub-ass-force-style=FontName=Roboto'
 alias mumble="mumble -style adwaita"
 alias re=". ~/.bashrc" # re-source
+alias redsh-cancel="DISPLAY=:0 redshift -O 6300"
 alias rename="perl-rename"
 alias rename-test="perl-rename -n"
 spr="| curl -F 'sprunge=<-' http://sprunge.us" # add ?<lang> for line numbers
@@ -284,7 +287,8 @@ alias trami="transmission-gtk"
 #alias tdD="todo -D "
 #alias tmux="tmux -u -f ~/.tmux/config -S $HOME/.tmux/socket"
 alias tmux="tmux -u -f ~/.tmux/config -L $USER"
-mpvforcesubs='--sub-font=Roboto --sub-ass-force-style=FontName=Roboto'
+alias yout="youtube-dl --write-auto-sub --write-sub --sub-format ass --sub-lang eng"
+
 
 # Though TERM is kept via SSH’s SendEnv,
 #   rxvt-unicode-256color gives messed colours in emacsclient.
@@ -374,4 +378,9 @@ one_command_execute() {
 	bind -x '"\C-m":"one_command_execute"'
 }
 
+
 #[ "$TERM" = jfbterm ] && ~/work/lifestream/minimal-sysrcd/deploy/squashfs-root/root/installer/tc-setup.sh --prepare-pxe-client
+
+#  As the prompt indicates the last command status,
+#  ~/.bashrc should return nicely.
+return 0

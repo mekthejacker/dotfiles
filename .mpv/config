@@ -24,9 +24,9 @@ demuxer-mkv-subtitle-preroll=yes
 force-window=yes
 ## precise seeking helps Zehkul’s script
 hr-seek=yes
-hr-seek-demuxer-offset=1.5
+#hr-seek-demuxer-offset=1.5
 hr-seek-framedrop=no
-input-ipc-server=~/.mpv/socket
+input-ipc-server=/tmp/mpv-socket
 ## Suppress status line messages.
 ## mpv like to print a lot when spawned from coproc in watch.sh
 msg-level=all=info
@@ -40,7 +40,9 @@ osd-fractions=yes
 ## Too many unnecessary files. Enabled in wa alias in ~/bashrc/home.sh
 #save-position-on-quit=yes
 screenshot-template="%F %P"
-screenshot-format=jpg
+# screenshot-format=jpg
+#screenshot-format=png
+#screenshot-png-compression=9
 screenshot-jpeg-quality=96
 ## Sub loading is done via watch.sh
 #sub-auto=no

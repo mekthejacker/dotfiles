@@ -39,7 +39,7 @@ case $app_name in
 			mpc |& sed -n '2s/playing//;T;Q1' || mpd_caught_playing=t
 		}
 		[ -v control_mpd ] && mpc pause >/dev/null
-		/usr/bin/mpv "$@"
+		/usr/bin/mpv "${@//\$/\$}"
 		result=$?
 		[ -v control_mpd -a -v mpd_caught_playing ] && mpc play >/dev/null
 		exit $result  # or else the first pass of mpv encoder process may end with 1
