@@ -78,11 +78,11 @@ if [[ "${2:-}" =~ ^(r|rand)$ ]]; then
 	upload_name="randomname=on"
 else
 	upload_name="${file##*/}"
-	upload_name="name=${upload_name//\"/\\\"}"
+	upload_name="name=$upload_name"
 fi
 
-response=$(curl -i -F "$upload_name"           \
-                   -F file=@"${file//\"/\\\"}"                  \
+response=$(curl -i -F "$upload_name"                           \
+                   -F file=@"$file"                             \
                    'https://uguu.se/api.php?d=upload-tool' 2>&1  ) \
     || { echo "$response"; err 'cURL failed.'; }
 
