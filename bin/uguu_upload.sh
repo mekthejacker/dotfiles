@@ -94,7 +94,7 @@ if [ -v success ]; then
 	echo -e "OK\nLink: $link"
 else
 	echo Fail…
-	err ${response:-unknown}.
+	err ${response:-unknown}
 fi
 
 xdg-open "$link" &
@@ -103,9 +103,9 @@ xdg-open "$link" &
 if [ -v DISPLAY ]; then
 	type xsel &>/dev/null && echo -n "$link" | xsel \
 		|| type xclip &>/dev/null && echo -n "$link" | xclip \
-		|| echo 'haven’t copied to the clipboard: no xsel or xclip.' >&2
+		|| echo 'Didn’t copy to clipboard: no xsel or xclip.' >&2
 else
-	echo 'haven’t copied to the clipboard: DISPLAY is not set.' >&2
+	echo 'Didn’t copy to clipboard: DISPLAY is not set.' >&2
 fi
 
 exit 0
