@@ -81,10 +81,6 @@ else
 	upload_name="name=${upload_name//\"/\\\"}"
 fi
 
-set -x
-# file=$(printf '%q' "$file")
-echo "file=$file"
-
 response=$(curl -i -F "$upload_name"           \
                    -F file=@"${file//\"/\\\"}"                  \
                    'https://uguu.se/api.php?d=upload-tool' 2>&1  ) \
