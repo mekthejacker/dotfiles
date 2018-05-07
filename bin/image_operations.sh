@@ -220,7 +220,7 @@ ffmpeg_preset='veryslow'
 #  One-image modes of conv2mp4 force tune=stillimage, you don’t have
 #  to change it manually for them here.
 #
-ffmpeg_tune='film'
+ffmpeg_tune='animation'
 
  # Default quality for resulting JPEG images.
 #  Sane range is 92…96. 100 is close to lossless.
@@ -299,11 +299,23 @@ case "$1" in
 		mode=pngcomp
 		deps+=(pngcrush parallel)
 		;;
-	glue)
+	glue-*)
 		# Combines several images into one,
 		# putting them in a column.
 		mode=glue
 		deps+=(convert)
+		;;&
+	glue-hor-*)
+		glue_mode='horizontal'
+		;;&
+	glue-ver-*)
+		glue_mode='vertical'
+		;;&
+	glue-hor-png)
+		glue_format='png'
+		;;
+	glue-hor-jpg)
+		glue_format='jpeg'
 		;;
 	anigif2mp4)
 		# It is an alias for ‘conv2mp4’, restricted to animated gifs only.
@@ -524,16 +536,18 @@ unset ${!throwoffs*}
 		stillimage=t
 		image=${images[first_existing_index]}
 		read -d '' hours minutes seconds attach_audio < <(
-			Xdialog --title "Conversion to MP4 – ${BASH_SOURCE##*/}" \
+			Xdialog --stdout \
+			        --title "Conversion to MP4 – ${BASH_SOURCE##*/}" \
 			        --separator $'\n' \
 			        --check "Attach an audiofile (and use its length)" \
 			        --3spinsbox "Duration" 400x170 \
-	    		    0 0010 0 h \
-	    	        0 0059 0 m \
+			        0 0010 0 h \
+			        0 0059 0 m \
 			        0 0059 5 s \
-			        2>&1
+			        ;\
+			echo -e '\0'
 			        # Fields: min max default label
-			) || :
+			)
 		if [ "$attach_audio" ]; then
 			# User pressed OK
 			if [ "$attach_audio" = checked ]; then
@@ -1088,11 +1102,13 @@ conv2mp4() {
  # Doesn’t take arguments. It’s basically a procedure.
 #
 glue() {
+	local switch
 	# Ask whether conversion to jpeg needed
 	# Ask about the resulting format: jpg, png, 8-bit/grayscale png
 	# Horizontal glue uses +append
 	# convert "${images[@]}" -quality 96  -append "${images[0]%/*}/glued_`date +%s`.jpg"
-	convert "${images[@]}" -append "${images[0]%/*}/glued_`date +%s`.png"
+	[ "$glue_mode" = horizontal ] && switch='+' || switch='-'
+	convert "${images[@]}" ${switch}append "${images[0]%/*}/glued_`date +%s`.$glue_format"
 }
 
  # Doesn’t take arguments. It’s basically a procedure.

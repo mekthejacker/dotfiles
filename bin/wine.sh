@@ -95,7 +95,7 @@
 #  Find the lib at https://github.com/deterenkelt/bhlls
 #
 NO_LOGGING=t
-. ~/repos/bhlls/bhlls.sh
+. ~/repos/bahelite/bahelite.sh
 # set -x
 set -feE
 shopt -s extglob

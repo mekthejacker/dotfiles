@@ -9,7 +9,7 @@
 #  Interface
 #
 
-set synctex true
+#set synctex true
 set window-title-basename true
 set guioptions shv
 set statusbar-bg "#303030"
@@ -33,7 +33,11 @@ set selection-clipboard clipboard # primary
 unmap r rotate rotate-cw
 unmap R reload
 unmap G goto
-unmap q
+unmap q quit
+unmap [normal] q quit
+unmap [fullscreen] q quit
+unmap [index] q quit
+#unmap a
 
 map z zoom out
 map   [fullscreen] z zoom out
@@ -50,19 +54,23 @@ map   [fullscreen] f toggle_fullscreen
 map <C-q> quit
 map   [fullscreen]  <C-q> quit
 
-map q scroll top  # why it works after one key was passed?
-map   [fullscreen] q scroll top
+map [normal]     q scroll top  # why it works after one key was passed?
+map [fullscreen] q scroll top
 map e scroll bottom  # this works flawlessly >_>
 map   [fullscreen] e scroll bottom
 map a scroll up
 map   [fullscreen] a scroll up
 map d scroll down
 map   [fullscreen] d scroll down
+map <C-a> navigate previous
+map       [fullscreen] <C-a> navigate previous
+map <C-d> navigate next
+map       [fullscreen] <C-d> navigate next
 #map g goto # enter page number, press ‘g’ //_-
 #map   [fullscreen] g goto
 
-map c toggle_page_mode
-map   [fullscreen] c toggle_page_mode
+#map c toggle_page_mode
+#map   [fullscreen] c toggle_page_mode
 
 # Because it is fucking unclear how to switch to a particular mode,
 # one-page or two-page. ‘set pages-per-row 2’ when in one-page layout,

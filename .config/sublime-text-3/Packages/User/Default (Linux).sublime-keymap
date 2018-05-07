@@ -256,7 +256,7 @@
 	{ "keys": ["ctrl+shift+j"], "command": "noop" }, //"command": "expand_selection", "args": {"to": "indentation"}
 	{ "keys": ["ctrl+shift+a"], "command": "noop" }, //"command": "expand_selection", "args": {"to": "tag"}
 
-	{ "keys": ["alt+."], "command": "close_tag" },
+	{ "keys": ["alt+."], "command": "noop" },  // close_tag
 
 	{ "keys": ["ctrl+alt+q"], "command": "noop" },  //"command": "toggle_record_macro"
 	{ "keys": ["ctrl+alt+shift+q"], "command": "noop" },  //"command": "run_macro"
@@ -277,7 +277,7 @@
 	{ "keys": ["ctrl+r"], "command": "noop" }, //"command": "show_overlay", "args": {"overlay": "goto", "text": "@"}
 	{ "keys": ["ctrl+g"], "command": "noop" },  //"show_overlay", "args": {"overlay": "goto", "text": ":"} },
 	{ "keys": ["ctrl+;"], "command": "noop" },  //show_overlay", "args": {"overlay": "goto", "text": "#"} },
-	{ "keys": ["f12"], "command": "goto_definition" },
+	{ "keys": ["ctrl+alt+d"], "command": "goto_definition" },
 	{ "keys": ["ctrl+shift+r"], "command": "noop" },  //goto_symbol_in_project" },
 	{ "keys": ["alt+-"], "command": "jump_back" },
 	{ "keys": ["alt+shift+-"], "command": "jump_forward" },
@@ -308,9 +308,10 @@
 	// { "keys": ["f4"], "command": "next_result" },
 	// { "keys": ["shift+f4"], "command": "prev_result" },
 
-	{ "keys": ["f6"], "command": "toggle_setting", "args": {"setting": "spell_check"} },
-	{ "keys": ["ctrl+f6"], "command": "next_misspelling" },
-	{ "keys": ["ctrl+shift+f6"], "command": "prev_misspelling" },
+	{ "keys": ["f5"], "command": "toggle_setting", "args": {"setting": "spell_check"} },
+	{ "keys": ["f6"], "command": "prev_misspelling" },
+	{ "keys": ["f7"], "command": "next_misspelling" },
+
 
 	{ "keys": ["ctrl+shift+up"], "command": "noop" }, //swap_line_up" },
 	{ "keys": ["ctrl+shift+down"], "command": "swap_line_down" },
@@ -329,8 +330,8 @@
 
 	{ "keys": ["ctrl+`"], "command": "show_panel", "args": {"panel": "console", "toggle": true} },
 
-	{ "keys": ["alt+/"], "command": "auto_complete" },
-	{ "keys": ["alt+/"], "command": "replace_completion_with_auto_complete", "context":
+	{ "keys": ["alt+n"], "command": "auto_complete" },
+	{ "keys": ["alt+n"], "command": "replace_completion_with_auto_complete", "context":
 		[
 			{ "key": "last_command", "operator": "equal", "operand": "insert_best_completion" },
 			{ "key": "auto_complete_visible", "operator": "equal", "operand": false },
@@ -340,7 +341,7 @@
 
 	{ "keys": ["ctrl+alt+shift+p"], "command": "show_scope_name" },
 
-	{ "keys": ["f7"], "command": "build" },
+	{ "keys": ["f7"], "command": "noop" },
 	// { "keys": ["ctrl+b"], "command": "build" },
 	// { "keys": ["ctrl+shift+b"], "command": "build", "args": {"select": true} },
 	// { "keys": ["ctrl+break"], "command": "exec", "args": {"kill": true} },
@@ -669,10 +670,10 @@
 	{ "keys": ["alt+9"], "command": "select_by_index", "args": { "index": 8 } },
 	{ "keys": ["alt+0"], "command": "select_by_index", "args": { "index": 9 } },
 
-	{ "keys": ["ctrl+b","ctrl+v"], "command": "next_bookmark" },
-	{ "keys": ["ctrl+b","ctrl+r"], "command": "prev_bookmark" },
-	{ "keys": ["ctrl+b","ctrl+b"], "command": "toggle_bookmark" },
-	{ "keys": ["ctrl+b","ctrl+c"], "command": "clear_bookmarks" },
+	{ "keys": ["alt+."], "command": "next_bookmark" },
+	{ "keys": ["alt+,"], "command": "prev_bookmark" },
+	{ "keys": ["alt+/"], "command": "toggle_bookmark" },
+	{ "keys": ["alt+shift+/"], "command": "clear_bookmarks" },
 	{ "keys": ["alt+f2"], "command": "noop" },  //select_all_bookmarks" },
 
 	{ "keys": ["ctrl+alt+;"], "command": "run_macro_file", "args": {"file": "res://Packages/Default/Delete Line.sublime-macro"} },
@@ -698,8 +699,8 @@
 
 	{ "keys": ["alt+shift+w"], "command": "insert_snippet", "args": { "name": "Packages/XML/Snippets/long-tag.sublime-snippet" } },
 
-	{ "keys": ["ctrl+alt+["], "command": "fold" },
-	{ "keys": ["ctrl+alt+]"], "command": "unfold" },
+	{ "keys": ["alt+["], "command": "unfold" },
+	{ "keys": ["alt+]"], "command": "fold" },
 	// { "keys": ["ctrl+k", "ctrl+1"], "command": "fold_by_level", "args": {"level": 1} },
 	// { "keys": ["ctrl+k", "ctrl+2"], "command": "fold_by_level", "args": {"level": 2} },
 	// { "keys": ["ctrl+k", "ctrl+3"], "command": "fold_by_level", "args": {"level": 3} },

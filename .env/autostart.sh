@@ -78,8 +78,8 @@ else
 	$tmux set remain-on-exit on
 	$tmux neww su
 	$tmux set remain-on-exit on
-	$tmux new-session -d -s bots "cd ~/bin/animepostingbot/; ./animepostingbot.sh"
-	$tmux set remain-on-exit on
+	# $tmux new-session -d -s bots "cd ~/bin/animepostingbot/; ./animepostingbot.sh"
+	# $tmux set remain-on-exit on
 	$tmux switch-client -t $USER
 	$tmux select-window -t $USER:^
 fi
@@ -93,8 +93,6 @@ startup_apps=(
 	"firefox --profile $HOME/.ff"
 	thunar
 	pidgin
-	telegram-desktop
-	# skypeforlinux
 )
 # WIDTH and HEIGHT were set in the ~/.preload.sh
 case $HOSTNAME in

@@ -38,6 +38,7 @@ export LESS='-R -M --shift 5 -x4'
 #export LESS_TERMCAP_so=$'\E[01;33;03;40m' # red on black
 export MPD_HOST=$HOME/.mpd/socket
 [ "${PATH//*$HOME\/bin*/}" ] && export PATH="$HOME/bin:$PATH"
+[ "${PATH//*$HOME\/\.env*/}" ] && export PATH="$HOME/.env:$PATH"
 [ "${PATH//*\/usr\/games\/bin*/}" ] && export PATH="$PATH:/usr/games/bin/"
 
 
@@ -74,19 +75,20 @@ gen_prompt() {
 		}
 		local branch status staged unstaged behind ahead conflicts mark
 		declare -g error git_status
-		status=`gis --porcelain -b 2>/dev/null` || {
-			[ $? -ne 128 ] && {
+		if ! status=`gis --porcelain -b 2>/dev/null`; then
+			if [ $? -ne 128 ]; then
 				error='Couldn’t get git status.'
 				return 3
-			}|| return 0  # 128 = not a git repo
-		}
-		branch=`git rev-parse --abbrev-ref HEAD  2>/dev/null` && {
+			else
+				return 0  # 128 = not a git repo
+			fi
+		fi
+		if branch=`git rev-parse --abbrev-ref HEAD  2>/dev/null`; then
 			[ "$branch" = HEAD ] && branch='detached'
-			:
-		}||{
+		else
 			error='Couldn’t determine git branch.'
 			return 3
-		}
+		fi
 		# unpushed=`set -e; exec 2>/dev/null; git --no-pager log --no-color --oneline  @{push}.. | wc -l` || {
         #     error='Couldn’t get the number of unpushed commits.'
         #     return 3
@@ -98,9 +100,9 @@ gen_prompt() {
 			[ "${BASH_REMATCH[2]}" ] && ahead=${BASH_REMATCH[2]}
 			[ "${BASH_REMATCH[5]}" ] && behind=${BASH_REMATCH[5]}
 		}
-		[[ "$status" =~ $'\n'(DD|AU|UD|UA|DU|AA|UU){2}\  ]] && {
+		if [[ "$status" =~ $'\n'(DD|AU|UD|UA|DU|AA|UU){2}\  ]]; then
 			conflicts=t mark='M'
-		}||{
+		else
 			[[ "$status" =~ $'\n'\ ?[MARC]\  ]] && staged=t
 			[[ "$status" =~ $'\n'\?\?\  ]] && unstaged=t
 			[ -v ahead ] && mark='_'  # unpushed commits
@@ -109,7 +111,7 @@ gen_prompt() {
 			[ -v unstaged ] && { [ "$mark" ] && mark+='̃' || mark+=' ̃'; }  # untracked
 			# U+0303 Combining tilde.
 			# U+0302 Combining circumflex and U+0311 Combining inverted breve are fine too.
-		}
+		fi
 		# Assembling status line
 		git_status=" ${w}${behind:+$behind }$branch${ahead:+ $ahead}${mark:+ $mark}${s}  "
 	}
@@ -213,11 +215,12 @@ alias gire='git revert'
 alias gire='git revert'
 alias gis='git status'
 alias gism='git submodule'
-alias gisma='git submodule add'
-alias gismi='git submodule init'
-alias gisms='git submodule status'
-alias gismu='git submodule update'
-alias gismy='git submodule sync'
+alias gism-add='git submodule add'
+alias gism-deinit='git submodule deinit'
+alias gism-init='git submodule init'
+alias gism-s='git submodule status'
+alias gism-upd='git submodule update'
+alias gism-sync='git submodule sync'
 alias gull='git pull'
 alias gush='git push'
 # DESCRIPTION:
@@ -287,7 +290,7 @@ alias trami="transmission-gtk"
 #alias tdD="todo -D "
 #alias tmux="tmux -u -f ~/.tmux/config -S $HOME/.tmux/socket"
 alias tmux="tmux -u -f ~/.tmux/config -L $USER"
-alias yout="youtube-dl --write-auto-sub --write-sub --sub-format ass --sub-lang eng"
+alias yout="youtube-dl --write-sub --sub-format best --sub-lang en"
 
 
 # Though TERM is kept via SSH’s SendEnv,

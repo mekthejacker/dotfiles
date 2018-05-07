@@ -22,10 +22,40 @@
 </action>
 <action>
 	<icon>edit-clear-all-symbolic.symbolic</icon>
-	<name>imop – glue</name>
-	<unique-id>1510458114129004-17</unique-id>
-	<command>/bin/bash ~/bin/thunar_ca.sh --glue %F</command>
-	<description>Make a new image composed from several other.</description>
+	<name>imop – glue-hor-png</name>
+	<unique-id>1522084704957636-1</unique-id>
+	<command>/bin/bash ~/bin/image_operations.sh glue-hor-png  %F</command>
+	<description>Make a new image composed from several others.</description>
+	<patterns>*</patterns>
+	<directories/>
+	<image-files/>
+</action>
+<action>
+	<icon>edit-clear-all-symbolic.symbolic</icon>
+	<name>imop – glue-hor-jpg</name>
+	<unique-id>1522084704957637-1</unique-id>
+	<command>/bin/bash ~/bin/image_operations.sh glue-hor-jpg  %F</command>
+	<description>Make a new image composed from several others.</description>
+	<patterns>*</patterns>
+	<directories/>
+	<image-files/>
+</action>
+<action>
+	<icon>edit-clear-all-symbolic.symbolic</icon>
+	<name>imop – glue-ver-png</name>
+	<unique-id>1522084704957638-1</unique-id>
+	<command>/bin/bash ~/bin/image_operations.sh glue-ver-png  %F</command>
+	<description>Make a new image composed from several others.</description>
+	<patterns>*</patterns>
+	<directories/>
+	<image-files/>
+</action>
+<action>
+	<icon>edit-clear-all-symbolic.symbolic</icon>
+	<name>imop – glue-ver-jpg</name>
+	<unique-id>15220847049576369-1</unique-id>
+	<command>/bin/bash ~/bin/image_operations.sh glue-ver-jpg  %F</command>
+	<description>Make a new image composed from several others.</description>
 	<patterns>*</patterns>
 	<directories/>
 	<image-files/>

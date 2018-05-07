@@ -28,7 +28,8 @@ set -f
 shopt -s extglob
 mydir=`dirname "$0"`
 rc="$mydir/animepostingbot.rc.sh"
-log="$mydir/log"
+curl_log="$mydir/log"
+curl_log="$mydir/log"
 used_files="$mydir/used"
 problem_files="$mydir/problems"
 touch "$used_files"
@@ -36,7 +37,7 @@ readarray -t used_cache < "$used_files"
 file=''
 message=''
 pre="$rc:"$'\n'
-VERSION='20180214'
+VERSION='20180407'
 [[ "$REP" =~  ^[0-9]+$ ]] && in_reply_to_status_id="$REP"
 [ -v source ] || source='Anibot.sh'
 
@@ -44,7 +45,7 @@ read_rc_file() {
 	local var trash_found lostnfound_found
 	. "$rc"
 	for var in username password proto server media_upload_url \
-	           making_post_url attachment_url older_than \
+	           making_post_url older_than \
 	           pause_secs dirs remember_files; do
 		[ -v $var ] || {
 			echo "${pre}Variable $var should be set in animepostingbot.rc.sh!" >&2
@@ -381,20 +382,20 @@ find_a_file() {
 }
 
 
-upload_file() {
-	local file media_upload media_id
+upload_files() {
+	local file media_upload media_url
 	for file in "$@"; do
 		echo "    Uploading file: $file"
 		if media_upload=`curl -u "$username:$password" \
 			                  --form "media=@$file" \
 			                  $proto$server$media_upload_url 2>/dev/null`
 		then
-			if media_id=`sed -rn '3 s~.*<mediaid>([0-9]+)</mediaid>.*~\1~p;T;Q1'<<<"$media_upload"`; then
-				echo "        Error: media id is not a valid number." | tee -a "$problem_files" >&2
+			if media_url=`sed -rn '6 s~.*<media_url>(.+)</media_url>.*~\1~p;T;Q1'<<<"$media_upload"`; then
+				echo "        Error: no media url." | tee -a "$problem_files" >&2
 				return 1
 			else
-				media_ids+=("$media_id")
-				echo -e "    Uploaded with media id $media_id."
+				media_urls+=("$media_url")
+				echo -e "    Uploaded with media url $media_url."
 			fi
 		else
 			echo "    Error while uploading file $file" | tee -a "$problem_files" >&2
@@ -409,6 +410,8 @@ upload_file() {
 update_file_list
 ITER=1
 while :; do
+	upload_tries=3 sending_tries=3
+	unset files_uploaded
 	# Update file list once per day
 	new_time=`date +%s`
 	[ "$((new_time-start_time))" -gt $((60*60*24)) ] && {
@@ -449,16 +452,20 @@ while :; do
 	[ -v D_dont_upload ] || {
 		[ -r "$mydir/$pic_to_attach_with_video" ] \
 			&& pic="$mydir/$pic_to_attach_with_video"
-		until upload_file ${video:+"$pic"} "$file"; do
-			sleep 90
+		until [ -v files_uploaded  -o  $((upload_tries--)) -eq 0 ]; do
+			upload_files ${video:+"$pic"} "$file" \
+				&& files_uploaded=t \
+				|| sleep 90
 		done
+		# May be a disk problem, try another file
+		[ -v files_uploaded ] || continue
 	}
 	# special_message is set when in ‘repetitive mode’,
 	# see the explanation in the example rc file.
 	[ -v special_message ] && unset message_additional_text
 	message="${message:+$special_message$message$message_additional_text}"
-	for media_id in ${media_ids[@]}; do
-		message+=" $proto$server$attachment_url/$media_id"
+	for media_url in ${media_urls[@]}; do
+		message+=" $media_url"
 	done
 	declare -p message
 	[ -v D_dont_post ] || {
@@ -472,18 +479,18 @@ while :; do
 			message+="${source:+&source=$source}"
 			until curl -u "$username:$password" \
 		               --data "$message" \
-		               $proto$server$making_post_url &>"$log"
+		               $proto$server$making_post_url >"$log.stdout" 2>"$log.stderr"
 		    do
 		    	sleep 90
 		    done
 		}
-		reply_to=`sed -nr 's/^\s*<id>([0-9]+)<\/id>\s*$/\1/p;T;Q1' "$log"`
-		[[ "$reply_to" =~ ^[0-9]+$ ]] || {
+		last_post_id=$(cat "$log.stdout" | jq .id)
+		[[ "$last_post_id" =~ ^[0-9]+$ ]] || {
 			echo '    Cannot get our last post id.' >&2
 			exit 5
 		}
-		[ -v in_reply_to_status_id ] && in_reply_to_status_id=$reply_to
-		echo -e "\n`date +%Y-%m-%d\ %H:%M`\nMade post №$reply_to:\n    ---"
+		[ -v in_reply_to_status_id ] && in_reply_to_status_id=$last_post_id
+		echo -e "\n`date +%Y-%m-%d\ %H:%M`\nMade post №$last_post_id:\n    ---"
 		echo "$message" | sed -r 's/.*/    &/g; $s/.*/&\n    ---/'
 
 		# Write new used_files from cache

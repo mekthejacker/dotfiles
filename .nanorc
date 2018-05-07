@@ -40,7 +40,7 @@ include "/usr/share/nano/php.nanorc"
 set matchbrackets "(<[{)>]}"
 set tabsize 4
 set nowrap
-set autoindent
+#set autoindent
 # Constantly display the cursor position in the status bar.
 #set constantshow
 set justifytrim

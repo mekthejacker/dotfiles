@@ -11,10 +11,11 @@ server='gs.domain.com'
 # URL to which file upload must go
 media_upload_url='/api/statusnet/media/upload'
 # URL at which we post status message
-making_post_url='/api/statuses/update.xml'
-# Part of the URL between $server and /$media_id to mention
-#   attachments in the status message.
-attachment_url='/attachment'
+making_post_url='/api/statuses/update.json'
+
+# With Pleroma you have to use the URL of the attachment passed tin the XML
+#   response, so there’s no need for setting $attachment_url.
+
 # Number of files to remember in used_files
 remember_files=30000
 # Comment pause_secs to always run once.

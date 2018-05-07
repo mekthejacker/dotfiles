@@ -39,8 +39,9 @@ osd-font-size=30
 osd-fractions=yes
 ## Too many unnecessary files. Enabled in wa alias in ~/bashrc/home.sh
 #save-position-on-quit=yes
+#screenshot-directory=
 screenshot-template="%F %P"
-# screenshot-format=jpg
+screenshot-format=jpg
 #screenshot-format=png
 #screenshot-png-compression=9
 screenshot-jpeg-quality=96
@@ -52,7 +53,8 @@ sub-font='Roboto Medium'
 sub-font-size=50
 #vo=opengl-hq:scale=ewa_lanczossharp:cscale=ewa_lanczossharp:interpolation:temporal-dither:gamma=0.9:blend-subtitles=yes:target-prim=bt.709:target-trc=srgb
 #vo=opengl-hq:scale=ewa_lanczossharp:cscale=ewa_lanczossharp:interpolation:temporal-dither:gamma=0.9:blend-subtitles=yes:icc-profile="/home/dtr/.env/FULLHD.icm"
-vo=opengl
+vo=gpu
+profile=gpu-hq
 volume=100
 ytdl-format=bestvideo+bestaudio
 
@@ -88,8 +90,8 @@ input-file=/tmp/mpv-tv.fifo
 # uncomment when tv will work
 #ao=alsa:device=[hw:0,8]
 fs=yes
-vo=opengl
-hwdec=vaapi
+vo=gpu
+hwdec=vdpau
 x11-name=big_screen
 save-position-on-quit=yes
 
