@@ -53,8 +53,14 @@ sub-font='Roboto Medium'
 sub-font-size=50
 #vo=opengl-hq:scale=ewa_lanczossharp:cscale=ewa_lanczossharp:interpolation:temporal-dither:gamma=0.9:blend-subtitles=yes:target-prim=bt.709:target-trc=srgb
 #vo=opengl-hq:scale=ewa_lanczossharp:cscale=ewa_lanczossharp:interpolation:temporal-dither:gamma=0.9:blend-subtitles=yes:icc-profile="/home/dtr/.env/FULLHD.icm"
-vo=gpu
-profile=gpu-hq
+
+profile=opengl-hq
+
+ # For mpv >=0.28
+#
+#  #vo=gpu  # vo is “profile” now
+#  profile=gpu-hq
+
 volume=100
 ytdl-format=bestvideo+bestaudio
 

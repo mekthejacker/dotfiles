@@ -95,8 +95,13 @@ delete_printer() {
 	if lpadmin -x "${model// /_}"; then
 		echo 'Printer deleted!'
 	else
-		echo 'Couldn’t delete printer' >&2
-		exit 3
+		if lpinfo --make-and-model "$model" -v ; then
+			# Printer was already deleted and it is connected now.
+			return 0
+		else
+			echo 'Couldn’t delete printer.' >&2
+			exit 3
+		fi
 	fi
 	# I also used this before, but it doesn’t seem to be needed.
 	# hp-setup -r
@@ -106,7 +111,7 @@ delete_printer() {
  # These two functions disable and enable SmartInstall,
 #    a feature that makes it impossible for the Linux HP backend
 #    to see the printer, making it appear as a USB storage.
-#  Dudinea has read those strings in 2011 from grabbing usb port data
+#  Dudinea has read those strings in 2011 when they grabbed usb port data,
 #    thanks be to him. https://bugs.launchpad.net/hplip/+bug/672134/comments/2
 #
 #  The strings we send are hex-coded. In the commented sections is the tab-padded
@@ -204,7 +209,8 @@ disable_smart_install
 until ! printer_attached; do
 	sleep 1
 done
-echo 'I see printer detached. Attach it again in 10 seconds.'
+echo 'I see printer detached. Attach and enable it.'
+echo 'Now waiting for the printer to appear…'
 #
 # If you ever be extending this script, note that after the user
 # has powercycled the printer, *_id variables now have stale values.

@@ -44,9 +44,9 @@ at-msg() {
 #   $2 — path to resulting .torrent file
 magnet-to-torrent() {
 	[ -z "$*" -o $# -ne 2 ] && {
-		cat <<EOF
-Usage: magnet-to-torrent <magnet link> <new file path>
-EOF
+		cat <<-EOF
+		Usage: magnet-to-torrent <magnet link> <new file path>
+		EOF
 		return
 	}
 	[[ "$1" =~ xt=urn:(btih|sha1):([^&/]+) ]] || {

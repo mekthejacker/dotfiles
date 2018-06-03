@@ -1,63 +1,64 @@
 # ~/.config/zathura/zathurarc
 #
-#      This file CANNOT RECOGNISE COMMENTS THAT HAVE SPACES BEFORE ‘#’!
-#               Start comments only from the first symbol
-#                        and after the setting.
-
-
-
-#  Interface
+#  ZATHURA IS QUIRKY!
+#  Read this before you edit the config!
 #
-
-#set synctex true
-set window-title-basename true
-set guioptions shv
-set statusbar-bg "#303030"
-set statusbar-fg "#d0d0d0"
-set font "Terminus 12"
-#set default-bg "#303030"
-set tabbar-focus-bg "#ff0000"
-set default-fg "#d0d0d0"
-
-#  defines the gap in pixels between each rendered page.
+#  1. Comment must go each on its own line.
+#     set font "Terminus 12" # <-- this WON’T WORK.
+#     #      Because of this ^^^^^^^^^^^^^^^^^^^^^^ 
 #
-set page-padding 7
-
-set selection-clipboard clipboard # primary
-
-
-
-#  Key mapping
+#  2. “unmap” removes a key binding COMPLETELY
+#     so use unmap only for the keys you DON’T use,
+#     like for those you press accidentally, and some
+#     built-in action triggers, which you don’t need.
 #
+#  3. Each keybinding has to be repeated twice
+#     for both [normal] and [fullscreen] mode,
+#     if you want same keys to work in both modes.
+#
+#  4. Auto type into input bar:
+#     map <C-o> focus_inputbar ":exec acroread $FILE"
+#     Bind entire commands to keys:
+#     map <C-r> feedkeys ":info<Return>"
+#
+#  5. I don’t know how this works.
 
-unmap r rotate rotate-cw
-unmap R reload
-unmap G goto
-unmap q quit
-unmap [normal] q quit
-unmap [fullscreen] q quit
-unmap [index] q quit
-#unmap a
 
-map z zoom out
+#  Zoom
+#
+map                z zoom out
 map   [fullscreen] z zoom out
-map x zoom in
+map                x zoom in
 map   [fullscreen] x zoom in
-map w zoom 100
+map                w zoom 100
 map   [fullscreen] w zoom 100
-map s adjust_window best-fit
+map                s adjust_window best-fit
 map   [fullscreen] s adjust_window best-fit
-map <C-r> reload
-map   [fullscreen]  <C-r> reload
-map f toggle_fullscreen
-map   [fullscreen] f toggle_fullscreen
-map <C-q> quit
-map   [fullscreen]  <C-q> quit
+map                <A-s> adjust_window width
+map   [fullscreen] <A-s> adjust_window width
 
-map [normal]     q scroll top  # why it works after one key was passed?
-map [fullscreen] q scroll top
-map e scroll bottom  # this works flawlessly >_>
-map   [fullscreen] e scroll bottom
+
+#  Actions
+#
+#  reload
+map                r reload
+map  [fullscreen]  r reload
+#  fullscreen
+map  [normal]      f toggle_fullscreen
+map  [fullscreen]  f toggle_fullscreen
+map  [index]       f toggle_fullscreen
+#  quit
+map  [normal]      <C-q> quit
+map  [fullscreen]  <C-q> quit
+map  [index]       <C-q> quit
+#  print
+map <C-p> feedkeys ":print<Return>"
+#  info
+map i feedkeys ":info<Return>"
+
+
+#  Navigation
+#
 map a scroll up
 map   [fullscreen] a scroll up
 map d scroll down
@@ -66,21 +67,77 @@ map <C-a> navigate previous
 map       [fullscreen] <C-a> navigate previous
 map <C-d> navigate next
 map       [fullscreen] <C-d> navigate next
-#map g goto # enter page number, press ‘g’ //_-
-#map   [fullscreen] g goto
+# enter page number, press ‘g’ //_-
+map  g goto 
+map    [fullscreen] g goto
 
-#map c toggle_page_mode
-#map   [fullscreen] c toggle_page_mode
 
-# Because it is fucking unclear how to switch to a particular mode,
-# one-page or two-page. ‘set pages-per-row 2’ when in one-page layout,
-# will only put the command to the input bar, but will not execute it.
-# The heck?
+#  1 or 2 pages per row  
 #
-map 1 toggle_page_mode
-map   [fullscreen] 1 toggle_page_mode
-map 2 toggle_page_mode
-map   [fullscreen] 2 toggle_page_mode
+map <C-1> toggle_page_mode
+map       [fullscreen] <C-1> toggle_page_mode
+map <C-2> toggle_page_mode
+map       [fullscreen] <C-2> toggle_page_mode
+map <C-f> toggle_page_mode
+
+
+#  Bookmarks, quickmarks, jumplist
+#
+map <C-c> feedkeys ":bmark \"\"<Left>"
+map <C-x> focus_inputbar ":bdelete "
+map <C-z> feedkeys ":blist<Return>"
+#
+map q mark_add
+map e mark_evaluate
+#
+map <A-Left>  jumplist previous
+map <A-Right> jumplist next
+
+
+#  Index (use arrows)
+#
+#map <C-y> toggle_index
+#  can’t get it working.
+#  but at least internal keybindings don’t confuse any more.
+map [index] u navigate_index collapse-all
+map [index] m navigate_index expand-all
+map [index] i navigate_index collapse
+map [index] k navigate_index expand
+map [index] j navigate_index previous
+map [index] l navigate_index next
+
+
+#  Search
+#
+#map / search
+map <C-r> search backward
+map <C-v> search forward
+
+
+#  Appearance
+#
+set window-title-basename true
+set guioptions shv
+set statusbar-bg "#303030"
+set statusbar-fg "#d0d0d0"
+set statusbar-v-padding 40
+set statusbar-h-padding 120
+set font "Terminus 12"
+set default-fg "#d0d0d0"
+# 2e3436
+set default-bg "#292e30"
+
+#  Options
+#
+set incremental-search false
+#  defines the gap in pixels between each rendered page.
+set page-padding 7
+#  May be set to “primary”
+set selection-clipboard clipboard 
+#set synctex true
+set render-loading false
+# default: 40
+set scroll-step 25
 
 
 

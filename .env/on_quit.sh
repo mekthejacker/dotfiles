@@ -1,18 +1,34 @@
 #! /usr/bin/env bash
 
-# This script serves one purpose:
-# - gracefully kill firefox (and other apps), that were started from
-#   startup_apps array in ~/.env/autostart.sh. If firefox altered files
-#   with private data, he needs some time to check it and ask confirmation
-#   if the altered data seem to have lower size then one loaded at the start.
-#   Earlier versions had problems and wiped the files, so I had to git checkout
-#   them back.
+#  on_quit.sh
+#  Kills all containers spawned within an i3 session. This helps programs
+#  like firefox to quit gracefully.
 
 [ "${ENV_DEBUG/*q*/}" ] || {
 	exec &>/tmp/envlogs/on_quit
 	set -x
 }
 
-# Preventing firefox from messing the tabs when it closes ungracefully
+declare -A apps2wait=(
+	[firefox]=
+	[Thunar]=
+	[pidgin]=
+	[gimp]=
+	[wine]=
+	[libreoffice]=
+)
+
 i3-msg '[class=".*"] kill'
+
+until [ -v ready_to_quit ]; do
+	sleep 0.5
+	for app in ${!apps2wait[@]}; do
+		pgrep -af "$app" &>/dev/null || apps2wait[$app]='quit'
+	done
+	ready_to_quit=t
+	for app in ${!apps2wait[@]}; do
+		[ "${apps2wait[$app]}" != 'quit' ] && unset ready_to_quit
+	done
+done
+
 i3-msg exit

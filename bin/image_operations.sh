@@ -957,7 +957,9 @@ conv2mp4() {
 			set +x
 			mp4_validity_check "$mp4_filename"
 			popd
+			mv "$subdir/$mp4_filename" ./
 			until [ -v ready ]; do
+				ls -l "$mp4_filename"
 				$media_player "$mp4_filename"
 				unset play_again
 				set +eE

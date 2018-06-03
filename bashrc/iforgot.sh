@@ -2887,3 +2887,101 @@ iforgot-wine-debug() {
 }
 
 iforgot-json-console-parser() { echo -e '\tjq'; }
+
+iforgot-mime-type-add-new() {
+	cat <<-EOF
+	You need to create two files in the depths of ~/.local/share/mime:
+
+	1. ~/local/share/mime/application/x-my-new-type.xml
+
+	<?xml version="1.0" encoding="utf-8"?>
+	<mime-type
+	    xmlns="http://www.freedesktop.org/standards/shared-mime-info"
+	    type="application/x-my-new-type">
+	<comment>My new type of files</comment>
+	</mime-type>
+
+
+	2. ~/.local/share/mime/packages/x-my-new-type.xml
+
+	<?xml version="1.0" encoding="utf-8"?>
+	<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+	<mime-type type="application/x-my-new-type">
+	<comment>My new type of files</comment>
+	<glob pattern="*.mnt" />
+	</mime-type>
+	</mime-info>
+
+	Once the files have been created, updaate the MIME database:
+	$ update-mime-database ~/.local/share/mime
+
+	EOF
+}
+
+iforgot-djvu-tools() {
+	cat <<-EOF
+	Delete page №1 from a file
+	$ djvm -d filename.djvu 1
+
+	Insert a placeholder page on the 5th page to fix the order, or if pages
+	are missing
+	$ djvm -i main_document.djvu placeholder_file.djvu  5
+
+	Extract page №8, lossless:
+	$ ddjvu -format=tiff -page=8  myfile.djvu myfile.tiff
+
+	PNM can be thought of as proto-24bit-png or proto-8bit-png
+	$ ddjvu -format=pnm -page=8  myfile.djvu myfile.pnm
+
+	Extract lossy tiff:
+	$ ddjvu -format=tiff -quality 96 -page=8  myfile.djvu myfile.tiff
+	EOF
+}
+
+iforgot-pdf-master-pdf-editor() {
+	cat <<-EOF
+	                                                            Free   Paid
+	Create new PDF document from scanner or existing file(s)    +      +
+	Fill PDF forms                                              +      +
+	Add and/or edit bookmarks in PDF files                      +      +
+	Comment and annotate PDF documents                          +      +
+	Split and merge PDF documents                               +      +
+
+	Edit PDF text and images, Create PDF Form                   −      +
+	Optimize PDFs                                               −      +
+	"Paste to Multiple Pages" function                          −      +
+	Add/Edit Document Actions                                   −      +
+	Manage Document JavaScript                                  −      +
+	Page Properties options                                     −      +
+	Sign PDF document with digital signature                    −      +
+	Add Headers and Footers to PDFs                             −      +
+	Add Watermarks to PDFs                                      −      +
+	Add Backgrounds to PDFs                                     −      +
+	256 bit AES encryption                                      −      +
+
+	EOF
+}
+
+iforgot-matrix-clients() {  echo -e 'riot-web, nheko, quaternion';  }
+
+iforgot-wine-bugs() {
+	cat <<-EOF
+
+	1. vcrun20xx doesn’t install
+
+	   a) winetricks can install only x86 version. Not 64.
+	   b) msxml is broken and should be reinstalled. winetricks list-installed
+	      may show it among installed packages, but it still may be broken.
+	      Typically on attempt to install vcrun2012 you’d see
+	          017e:warn:ntdll:NtQueryAttributesFile L"\\??\\Y:\\vcrun2012\\msxml3.dll" not found (c0000034)
+	          017e:warn:module:alloc_module disabling no-exec because of L"msxml3.dll"
+	          017e:err:ole:apartment_getclassobject DllGetClassObject returned error 0x80040111
+	          017e:err:ole:CoGetClassObject no class object {f5078f1b-c551-11d3-89b9-0000f81fe221} could be created for context 0x1
+	          This is code of msxml--------------------------^^^^^^^^ ^^^^ ^^^^ ^^^^ ^^^^^^^^^^^^
+	      Run
+	      $ winetricks --force msxml3
+	      to reinstall it forcefully. Then install vcrun20xx you need.
+
+	2. …
+	EOF
+}

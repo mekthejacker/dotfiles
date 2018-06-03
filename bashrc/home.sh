@@ -12,14 +12,24 @@
 
 # Watering plants and sending water meter data.
 # See "schedule" block in ~/.i3/generate_json_for_i3bar.sh
-alias wtr='touch ~/watered'
-alias snt='touch ~/sent'
-alias okiru='rm /tmp/okiru'
+wtr() { touch ~/watered; }
+snt() { touch ~/sent; }
+okiru() { rm /tmp/okiru; }
 # rtorrent
-alias rt="urxvtc -title rtorrent -hold \
-                 -e /bin/bash -c 'chmod o+rw `tty` \
-                    && sudo -u rtorrent -H tmux -u -S /home/rtorrent/.tmux/socket attach' &"
-alias tld-typofix="pushd ~/bin/typofix/; ./typofix.sh Russian_col4.csv; popd"
+rt() {
+	urxvtc -title rtorrent \
+	       -hold \
+	       -e /bin/bash -c 'chmod o+rw `tty` \
+	                        && sudo -u rtorrent \
+	                                -H tmux \
+	                                -u \
+	                                -S /home/rtorrent/.tmux/socket attach' &
+}
+tld-typofix() {
+	pushd ~/bin/typofix/
+	./typofix.sh Russian_col4.csv
+	popd
+}
 
 wacom-enable() { wacom-devcontrol enable; }
 wacom-disable() { wacom-devcontrol disable; }
@@ -37,16 +47,9 @@ wacom-devcontrol() {
 }
 
 # Strike the earth!
-alias d='dwarf-fortress'
-alias dt='dwarftherapist'
-alias ddt='/bin/bash -c "dwarf-fortress; i3-msg layout tabbed; sleep 15; dwarftherapist; i3-msg focus left"'
-alias dk="pkill -9f '(Dwarf_Fortress|DwarfTherapist)'"
-alias renpy="RENPY_EDIT_PY=~/.renpy/emacs.edit.r.py  renpy"
-# Viruses writers don’t expect that.
-
-#alias sync_fanetbook="sudo -u git /root/scripts/manual_sync.sh fanetbook all"
-#alias sync_external_hdd="sudo /root/scripts/manual_sync.sh rescue all"
-#alias detach_hdd="sudo /etc/udev/rules.d/rescue_mount.sh sud" # sync-umount-detach
+d() { dwarf-fortress; }
+dt() { dwarftherapist; }
+dk() { pkill -9f '(Dwarf_Fortress|DwarfTherapist)';}
 
 #
  #  watch.sh block

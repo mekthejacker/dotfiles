@@ -97,7 +97,7 @@ startup_apps=(
 # WIDTH and HEIGHT were set in the ~/.preload.sh
 case $HOSTNAME in
 	home)
-		startup_apps+=(gimp subl3 geeqie transmission-gtk)
+		startup_apps+=(gimp subl3 geeqie riot-web)
 		;;
 	paskapuukko)
 		# startup_apps+=(skype)  # how the fuck does skype switch the workspace by itself?!
@@ -145,7 +145,17 @@ xte 'mouseclick 1'
 # raise upper empty urxvtc up to ≈5/6 of the height
 i3-msg resize grow height 30 px or 30 ppt
 i3-msg split h
-urxvtc -hold -title tmux -e /bin/bash -c "$tmux attach; bash"
+case $HOSTNAME in
+	home)
+		(nohup transmission-gtk </dev/null &>/dev/null) &
+		until xdotool search --onlyvisible --pid $!; do
+			sleep 0.3
+		done
+		;;
+	*)
+		urxvtc -hold -title tmux -e /bin/bash -c "$tmux attach; bash"
+		;;
+esac
 # ╔═════════════════╗ # ╔════════╤════════╗
 # ║        ⋅        ║ # ║        │        ║
 # ║                 ║ # ║        │        ║
@@ -155,6 +165,7 @@ urxvtc -hold -title tmux -e /bin/bash -c "$tmux attach; bash"
 # ║        ┃        ║ # ║        ┃        ║
 # ║        ┃        ║ # ║        ┃        ║
 # ╚════════╩════════╝ # ╚════════╩════════╝
+
 xte "mousemove $(( WIDTH/4 )) $(( HEIGHT/2 ))"
 xte 'mouseclick 1'
 i3-msg split h
@@ -170,14 +181,15 @@ urxvtc
 # ║        ┃        ║ # ║        ┃        ║
 # ║        ┃        ║ # ║        ┃        ║
 # ╚════════╩════════╝ # ╚════════╩════════╝
+
 xte "mousemove $(( 3*WIDTH/4 )) $(( HEIGHT/2 ))"
 xte 'mouseclick 1'
 i3-msg split v
 i3-msg layout tabbed
+[ "$HOSTNAME" = home ] && {
+	urxvtc -hold -title tmux -e /bin/bash -c "$tmux attach; bash"
+}
 #urxvtc
-#urxvtc -hold -title tmux -e $tmux attach
-xte "mousemove $(( 11*WIDTH/12 )) $(( HEIGHT/2 ))"
-xte 'mouseclick 1'
 # ╔════════╦════════╗ # ╔════════╦════════╗
 # ║––+––+––┃        ║ # ║––+––+––┃––+––+––║
 # ║        ┃        ║ # ║        ┃        ║
@@ -188,24 +200,19 @@ xte 'mouseclick 1'
 # ║        ┃        ║ # ║        ┃        ║
 # ╚════════╩════════╝ # ╚════════╩════════╝
 
+#  Focus the window, just in case
+xte "mousemove $(( 11*WIDTH/12 )) $(( HEIGHT/2 ))"
+xte 'mouseclick 1'
+i3-msg move left
+
+
+
 # This is to check whether script is called via hotkey in ~/.env/config.
 [ "$1" = stop_after_main_workspace ] && {
 	pointer_control enable
 	exit 0
 }
 
-
-for wsp in '1:Firefox' \
-           '2:Sublime' \
-           '3:Thunar' \
-           '4:Geeqie' \
-           '5:Misc' \
-           '6:IM' \
-           '8:GIMP'; do
-    i3-msg workspace "$wsp"
-    i3-msg layout tabbed
-done
-i3-msg workspace '0:Main'
 pointer_control enable
 
 
@@ -241,7 +248,7 @@ for win in $(wmctrl -l | awk -F' ' '{print $1}'); do
 	wmctrl -i -r $win -b remove,demands_attention
 done
 
- # Run C-S-t in Sumblime to switch on max payne
+ # Run C-S-t in Sublime to switch on max payne
 #
 #
 

@@ -51,7 +51,7 @@
 	"default_encoding": "UTF-8",
 	"default_line_ending": "system",
 	"detect_indentation": true,
-	"dictionary": "Packages/Language - English/en_GB.dic",
+	"dictionary": "Packages/Hunspell_dicts/ru-English.dic",
 	"drag_text": true,
 	"draw_centered": false,
 	"draw_indent_guides": true,

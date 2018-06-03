@@ -75,14 +75,12 @@ gen_prompt() {
 		}
 		local branch status staged unstaged behind ahead conflicts mark
 		declare -g error git_status
-		if ! status=`gis --porcelain -b 2>/dev/null`; then
-			if [ $? -ne 128 ]; then
-				error='Couldn’t get git status.'
-				return 3
-			else
-				return 0  # 128 = not a git repo
-			fi
-		fi
+		#  Quit, if PWD is not a git directory.
+		( [ -d .git ] || git rev-parse --git-dir 2>/dev/null ) || return 0
+		status=`gis --porcelain -b 2>/dev/null` || {
+			error='Couldn’t get git status.'
+			return 3
+		}
 		if branch=`git rev-parse --abbrev-ref HEAD  2>/dev/null`; then
 			[ "$branch" = HEAD ] && branch='detached'
 		else
@@ -338,37 +336,51 @@ set +f
 
 pushd ~/bashrc >/dev/null
 hostnamerc=${HOSTNAME%.*}.sh
+#  Exporting functions for one_command_shell
+set -o allexport
 [ -r $hostnamerc ] && . $hostnamerc
+set +o allexport
 popd >/dev/null
 
 # This is for one-command urxvt
 one_command_execute() {
-	exec &>/dev/null
+	# exec &>/dev/null
 	# TAB completion puts an extra space after the command.
 	READLINE_LINE=${READLINE_LINE%%+([[:space:]])}
-	# until [ -v all_aliases_expanded ]; do # recursive alias expansion
-	# 	# Tabulation cahracter may be used in user’s aliases.
-	# 	local first_word=${READLINE_LINE%%[[:space:]]*}
-	# 	[ "$first_word" = "$old_first_word" ] && break # to prevent a loop
-	# 	alias -p | grep -q "^alias $first_word='.*'$" && {
-	# 		local cmd=`alias -p | sed -nr "s/^alias $first_word='(.*)'$/\1/p"`
-	# 		# escape all special characters in the expanded alias is more
-	# 		#   consuming, than just stripping its name and combining
-	# 		#   a new string.
-	# 		READLINE_LINE=${READLINE_LINE/#$first_word/}
-	# 		READLINE_LINE="$cmd $READLINE_LINE"
-	# 		local old_first_word="$first_word"
-	# 	} || local all_aliases_expanded=t
-	# done
-	# 1. Scripts and binaries in $PATH are the easiest things to run.
-	# 2. Shell functions may be run, but must be exported with ‘export -f’.
-	# 3. Aliases cannot be exported and hence cannot be used here.
-	nohup /bin/bash -c "$READLINE_LINE" &>/tmp/one_command_exec_output &
-	local c=0
-	until [ $((c++)) -eq 3 ]; do
-		xdotool search --onlyvisible --pid $! &>/dev/null && break
-		sleep 1
+	until [ -v all_aliases_expanded ]; do # recursive alias expansion
+		# Tabulation cahracter may be used in user’s aliases.
+		local first_word=${READLINE_LINE%%[[:space:]]*}
+		[ "$first_word" = "$old_first_word" ] && break # to prevent a loop
+		alias -p | grep -q "^alias $first_word='.*'$" && {
+			local cmd=`alias -p | sed -nr "s/^alias $first_word='(.*)'$/\1/p"`
+			# escape all special characters in the expanded alias is more
+			#   consuming, than just stripping its name and combining
+			#   a new string.
+			READLINE_LINE=${READLINE_LINE/#$first_word/}
+			READLINE_LINE="$cmd $READLINE_LINE"
+			local old_first_word="$first_word"
+		} || local all_aliases_expanded=t
 	done
+
+	local c=0 c_max=30
+	[ "$(type -t sleep)" = file ] && local sleep_binary_present=t c_max=300
+
+	# 1. Scripts and binaries in $PATH are the easiest things to run.
+	# 2. Shell functions may be executed, but must be exported beforehand
+	#    with ‘export -f’. This is why I use “allexport” above.
+	nohup /bin/bash -c "$READLINE_LINE" &>/tmp/one_command_exec_output &
+
+	 # Use this to wait for programs (not needed for most of them).
+	#
+	# until [ -v time_to_quit ]; do
+	# 	# Search for the child of the bash process we spawned.
+	# 	xdotool search --onlyvisible --pid $(pgrep -P $!) &>/dev/null \
+	# 		&& break
+	# 	[ -v sleep_binary_present ] \
+	# 		&& sleep .1 \
+	# 		|| sleep 1
+	# 	[ $((c++)) -eq $c_max ] && local time_to_quit=t
+	# done
 	exit 0
 }
 
@@ -381,9 +393,9 @@ one_command_execute() {
 	bind -x '"\C-m":"one_command_execute"'
 }
 
-
 #[ "$TERM" = jfbterm ] && ~/work/lifestream/minimal-sysrcd/deploy/squashfs-root/root/installer/tc-setup.sh --prepare-pxe-client
 
 #  As the prompt indicates the last command status,
 #  ~/.bashrc should return nicely.
 return 0
+

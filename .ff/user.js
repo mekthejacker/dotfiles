@@ -82,10 +82,11 @@ user_pref("browser.urlbar.userMadeSearchSuggestionsChoice", true);
 user_pref("browser.urlbar.daysBeforeHidingSuggestionsPrompt", 0);
 user_pref("pdfjs.enableWebGL", true);
 
-//Enable multiprocessing.
+//  Enable multiprocessing.
 user_pref("extensions.e10sBlocksEnabling", false);
 user_pref("extensions.e10sBlockedByAddons", false);
-
+//  Show sensible connection error pages.
+user_pref("browser.xul.error_pages.expert_bad_cert", true);
 
 //
 // --- CACHES ----------------------------------------------------------------
