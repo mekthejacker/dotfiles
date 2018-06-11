@@ -26,6 +26,10 @@ case $app_name in
 		[ -e /usr/bin/firefox-bin ] \
 			&& firefox=/usr/bin/firefox-bin \
 			|| firefox=/usr/bin/firefox
+		#  Cleaning fat caches
+		#  1. DOM volatile data (no, form data is in another file)
+		#     To be deleted once it grwos bigger than 10 MiB.
+		find ~/.ff/ -size +10M -name webappsstore.sqlite -delete
 		$firefox --profile ~/.ff "$@"
 		;;
 	mpv)

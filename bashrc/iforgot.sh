@@ -243,23 +243,33 @@ iforgot-ordinary-user-groups() {
 
 # SMART
 iforgot-smart-immediate-check() {
-	echo -e '\tsmartctl -H /dev/sdX'
+	cat <<-EOF
+	smartctl -H /dev/sdX
+	EOF
 }
 
 iforgot-smart-selftest-do-short-now() {
-	echo -e '\tsmartctl -t short /dev/sdX'
+	cat <<-EOF
+	smartctl -t short /dev/sdX
+	EOF
 }
 
 iforgot-smart-selftest-do-long-now() {
-	echo -e '\tsmartctl -t long /dev/sdX'
+	cat <<-EOF
+	smartctl -t long /dev/sdX
+	EOF
 }
 
 iforgot-smart-selftest-schedule-long() {
-	echo -e '\tsmartctl -t long -s L/../.././23'
+	cat <<-EOF
+	smartctl -t long -s L/../.././23
+	EOF
 }
 
 iforgot-smart-selftest-scheduling-syntax() {
-	echo -e "\t man -P\"less -p'^\s+-s REGEXP'\" smartd.conf"
+	cat <<-EOF
+	man -P "less -p'^\s+-s REGEXP'" smartd.conf
+	EOF
 }
 
 iforgot-bad-blocks() {
@@ -274,79 +284,76 @@ iforgot-bad-blocks() {
 	                        to either become readable again, or rewritten
 	                       (Rewrite with zeroes by LBA or the whole drive
 	                        to get rid of them).
-	    Offline_uncorctbl –
-
+	    Offline_uncorrectable – number of failing sectors, which the drive
+	                        couldn’t fix during an Offline test.
 	/tl;dr
 
-	If situation looks like this
+	If situation looks like this:
 
-	# smartctl -a /dev/sda
-	SMART Attributes Data Structure revision number: 10
-	Vendor Specific SMART Attributes with Thresholds:
-	ID# ATTRIBUTE_NAME          FLAG     VALUE WORST THRESH TYPE      UPDATED  WHEN_FAILED RAW_VALUE
-	…
-	5 Reallocated_Sector_Ct   0x0033   099   099   036    Pre-fail  Always       -       61
-	…
-	197 Current_Pending_Sector  0x0012   100   100   000    Old_age   Always       -       1
-	198 Offline_Uncorrectable   0x0010   100   100   000    Old_age   Offline      -       1
+	    # smartctl -a /dev/sda
+	    SMART Attributes Data Structure revision number: 10
+	    Vendor Specific SMART Attributes with Thresholds:
+	    ID# ATTRIBUTE_NAME          FLAG     VALUE WORST THRESH TYPE      UPDATED  WHEN_FAILED RAW_VALUE
+	    …
+	    5   Reallocated_Sector_Ct   0x0033   099   099   036    Pre-fail  Always       -       61
+	    …
+	    197 Current_Pending_Sector  0x0012   100   100   000    Old_age   Always       -       1
+	    198 Offline_Uncorrectable   0x0010   100   100   000    Old_age   Offline      -       1
+	    …
+	    SMART Self-test log structure revision number 1
+	    Num  Test_Description    Status                  Remaining  LifeTime(hours)  LBA_of_first_error
+	    # 1  Extended offline    Completed: read failure       20%     22638         1670581106
 
-	…
+	Then seeking for a badblock will look like this:
 
-	SMART Self-test log structure revision number 1
-	Num  Test_Description    Status                  Remaining  LifeTime(hours)  LBA_of_first_error
-	# 1  Extended offline    Completed: read failure       20%     22638         1670581106
+	    # badblocks -vs -b512 /dev/sda 1670581106 1670581106
 
-	Then seeking for a badblock will look like that
+	-v – verbose, -s shows progress, -b is block size, 512 since 1670581106
+	is LBA, i.e. sector address and sectors are usually 512 bytes long.
+	First address is the end of the range where badblocks seeks, and the
+	last one points at the start of the range. Also there are useful -n
+	and -w options which mutually exclude themselves – -n safely rewrites
+	block’s contents, -w rewrites it with binary patterns and causes a data
+	loss. By default badblocks does only read-only check.
 
-	badblocks -vs -b512 /dev/sda 1670581106 1670581106
+	If it confirms that the sector is bad, then you need to know
+	- the address (a number, in blocks) where it resides on your partition;
+	- the offset
+	and pass it as the number of the block in the filesystem format,
+	usually it is multiple of 512, e.g. 4096.
 
-	-v – verbose, -s shows progress, -b is block size, 512 since 1670581106 is
-	an LBA, i.e. sector address and sectors are usually are 512 bytes long.
-	First address is the end of the range where badblocks seek, and the last one
-	points at the start of the range. Also there are useful -n and -w options
-	which mutually exclude themselves – -n safely rewrites block’s contents,
-	-w rewrites it with binary patterns and causes data loss. By default
-	badblocks does only read-only check (that works for me).
+	    # fdisk /dev/sda
 
-	If it confirms the sector is truly bad, then we need to get the address
-	in blocks on your partition, the offset, an pass it as the number of block
-	as your filesystem understands, usually it is multiple of 512, e.g. 4096.
-
-	fdisk /dev/sda
-
-	Device Boot      Start         End      Blocks   Id  System
-	/dev/sda1   *          63       80324       40131   83  Linux
-	/dev/sda2           80325   104952644    52436160   83  Linux
-	/dev/sda3       104952645   109161674     2104515   83  Linux
-	/dev/sda4       109162496  1953525167   922181336   83  Linux
+	    Device Boot      Start         End      Blocks   Id  System
+	    /dev/sda1   *          63       80324       40131   83  Linux
+	    /dev/sda2           80325   104952644    52436160   83  Linux
+	    /dev/sda3       104952645   109161674     2104515   83  Linux
+	    /dev/sda4       109162496  1953525167   922181336   83  Linux
 
 	So, the problem LBA belongs to /dev/sda4, now get the offset on that
 	partition.
 
-	echo 'scale=3;(1690581106-109162496)/8' | bc
-	195177326.25
+	    # echo 'scale=3;(1690581106-109162496)/8' | bc
+	    195177326.25
 
-	Fraction part means it is the second sector of eight in that block.
-	(Since one block of 4096 bytes contains 8*512 bytes sectors, 1/8 is
-	0.125 and 2/8 is 0.25)
+	Fractional part (.25) means that it’s the second sector of eight in that block.
+	(Since one block of 4096 bytes contains 8*512 bytes sectors, 1/8 is	0.125
+	and 2/8 is 0.25)
 	The formula is
+	    Bad_LBA − Start_LBA_on_that_partition / (FS_block_size / Sector_size)
+	So, make the list
 
-	<bad_LBA> - <start_LBA_of_its_partition> / (<fs_block_size> / <sector_size>)
-
-	So, produce the list
-
-	echo '(1690581106-109162496)/8' | bc > /tmp/bb_list
+	    # echo '(1690581106-109162496)/8' | bc > /tmp/bb_list
 
 	And call e2fsck
 
-	umount /<mountpoint for partiton with bad LBA>
-	e2fsck -l /tmp/bb_list /dev/sdX
+	    # umount /<mountpoint of the partiton with bad LBA>
+	    # e2fsck -l /tmp/bb_list /dev/sdX
 
-	If e2fsck called with -L option instead of -l, the passed file will rewrite
-	all the list of badblocks contained in the filesystem. That list can be
-	checked with
+	Use -L in place of -l to rewrite the filesystem internal badblock list.
+	You can check that list with
 
-	dumpe2fs -b /dev/sda4
+	    # dumpe2fs -b /dev/sda4
 
 	EOF
 }
@@ -423,7 +430,7 @@ iforgot-kaomoji-drawing() {
 
 	☜(ﾟヮﾟ☜)    ヽ(´ｰ｀ )ﾉ    (¬‿¬)
 
-	(•̀ᴗ•́)و    (⁄ ⁄•⁄ω⁄•⁄ ⁄)    ¯\_(ツ)_/¯
+	(•̀ᴗ•́)و    (⁄ ⁄•⁄ω⁄•⁄ ⁄)    (　-᷄ ω -᷅ )     ¯\_(ツ)_/¯
 
 	⊙﹏⊙    (•⊙ω⊙•)
 
@@ -2523,6 +2530,9 @@ iforgot-ssl-check-if-cert-and-pk-match() {
 
 iforgot-gentoo-upgrade() {
 	cat <<-"EOF"
+	Backup firefox profile
+	$ backup-firefox-profile.sh
+
 	# cp -a /var/lib/portage/world /mnt/chroot//var/lib/portage/world
 	# cp -ra /etc/* /mnt/chroot//etc/
 
@@ -2542,7 +2552,7 @@ iforgot-gentoo-upgrade() {
 	eselect profile list
 	eselect profile set 4
 
-	DO NOT emerge --sync after this line!
+	DO NOT update portage after this line – disable emaint cronjob!
 
 	First compiling @toolchain
 	emerge -NuDav1 @toolchain
@@ -2576,6 +2586,24 @@ iforgot-gentoo-upgrade() {
 	ccache -C
 
 	emerge -av1 @preserved-rebuild
+
+	ARE YOU NOT GOING BACK?
+	Check, that every program works, you’re about to clean old binpackages.
+
+	Every program works on its current version?
+	$ sed -rn '/#  regular programs/,$ s/.*\/(\S+) .*/\1/p' /etc/portage/package.env
+
+	If OK, then
+
+	# eclean distfiles --package-names --deep --fetch-restricted
+	eclean-dist -n -d -f
+
+	# eclean packages --package-names --deep
+	eclean-pkg -n -d
+
+	Add -p to --pretend.
+
+	rm -rf /var/tmp/portage/*
 	EOF
 }
 
@@ -2654,9 +2682,9 @@ iforgot-bash-add-array-element-simply() {
 	unset arr
 }
 
-iforgot-printer-doesnt-work() {
+iforgot-printer-doesnt-work-hp() {
 	cat <<-EOF
-	~/bin/reload_printer.sh
+	~/bin/hp_reload.sh
 	EOF
 }
 
@@ -2983,5 +3011,42 @@ iforgot-wine-bugs() {
 	      to reinstall it forcefully. Then install vcrun20xx you need.
 
 	2. …
+	EOF
+}
+
+iforgot-console-browser() {
+	cat <<-EOF
+	1. w3m
+	2. links -g
+	EOF
+}
+
+iforgot-build-bin-before-update() {
+	cat <<-EOF
+	Before an update, build binary packages:
+	- firefox (and backup profile directory, too!)
+	- freetype + pango + cairo (because rendering bugs)
+	- nvidia-drivers (because an update may be really shitty
+	                  and old version may be removed).
+	- skypeforlinux (various qt/alsa/udev bugs)
+	EOF
+}
+
+iforgot-emerge-marks() {
+	#  Explains * % () in USE-flags
+	man -P "less -p '^\s+--verbose '" emerge
+}
+
+iforgot-gentoo-avoid-compiling-these-to-save-time() {
+	cat <<-EOF
+	llvm
+	Compiling a low-level virtual machine is not necessary for most packages.
+	If you have to do it, disable LLVM
+
+	*kde*
+	phonon
+	*gnome*
+	libreoffice (use libreoffice-bin)
+	firefox (use firefox-bin)
 	EOF
 }

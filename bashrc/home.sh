@@ -1,14 +1,36 @@
 ## sourced from ~/.bashrc
 
 . common.sh
+. gen_prompt.sh
 . iforgot.sh
 . wine-aliases.sh
 . vm.sh
-. jobu.sh
+[ -e jobu.sh ] && . jobu.sh
 
+
+ #  Managing two git repos for ~/, dotfiles is public.
 #
- #  Common aliases
+alias dotgit="`which git` --work-tree $HOME --git-dir $HOME/dotfiles.git"
+alias gengit="`which git` --work-tree $HOME --git-dir $HOME/general.git"
 #
+ # Checks, if a file in $HOME is in dotfiles of general repo,
+#  $1 — file path under $HOME
+#
+isinrepo() {
+	[ "$*" ] || {
+		echo -e "Usage:\t${FUNCNAME[0]} $HOME/…/<filename>\n"
+		return
+	}
+	local found
+	[ "`dotgit ls-files "$1"`" -ef "$1" ] \
+		&& echo "$@: Found in dotfiles." && found=t
+	[ "`gengit ls-files "$1"`" -ef "$1" ] \
+		&& echo "$@: Found in general." && found=t
+	[ -v found ] || {
+		echo "$@: Not found."
+		return 3
+	}
+}
 
 # Watering plants and sending water meter data.
 # See "schedule" block in ~/.i3/generate_json_for_i3bar.sh
@@ -303,3 +325,4 @@ fonts-for-vm() {
 	echo
 }
 
+return 0

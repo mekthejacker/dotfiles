@@ -1,17 +1,149 @@
+# common.sh
 #
- #  Various functions that make the life easier. Kind of an addition to ~/bin.
-#
+#  Aliases and functions common for all hosts.
+#  See also:
+#  - wine-aliases.sh
+#  - $HOSTNAME.sh
 
-# Viruses writers don’t expect that.
+
+
+ # Aliases caveats and hints:
+#  1. All innder double quotes must be escaped
+#     alias preservequotespls="echo \"naive example!\""
+#  2. Every call of subshell must be escaped or it will be executing
+#     at the time this file loads.
+#     alias dontlistmyhomefolderpls="for i in \`ls\`; do ls $i; done"
+#  3. To prevent early expanding of variable names, one can use single
+#     quotes or escaping, or both if situation requires so.
+#     alias hisbashrcpls="sudo -u another_user /bin/bash -c 'nano \$HOME/.bashrc'"
+#  4. Aliases can have multiple lines
+#     alias plsplsplsdontbreak="echo some stuff # this is comment
+#                               echo lol second line # another comment"
+#
+#  Better use functions.
+
+alias bc="bc -q"
+# Check unicode symbols
+chu() { echo -n "$@" | uniname; }  # from uniutils package
+alias ec="emacsclient -c -nw"
+alias emc="emacsclient"
+alias erc="emacsclient -c -nw ~/.bashrc"
+alias ffmpeg="ffmpeg -hide_banner"
+alias ffprobe="ffprobe -hide_banner"
+#  Viruses writers don’t expect that.
 alias firefox='firefox --profile ~/.ff'
+alias fm="font-manager"
+alias hu="hugo"
+alias hus="hugo server --watch --source ~/repos/goen/"
+alias husd="hugo server --watch --source ~/repos/goen/ --buildDrafts --destination ~/repos/goen/dev"
+alias grep="grep --color=auto"
 alias imgur="~/bin/imgur_upload.sh"
+#  pinentry doesn’t like scim
+alias gpg="GTK_IM_MODULE= QT_IM_MODULE= gpg"
+alias ls="ls -1h --color=auto"
+mpvforcesubs='--sub-font=Roboto --sub-ass-force-style=FontName=Roboto'
+alias mumble="mumble -style adwaita"
+alias re=". ~/.bashrc" # re-source
+alias redsh-cancel="DISPLAY=:0 redshift -O 6300"
+alias rename="perl-rename"
+alias rename-test="perl-rename -n"
+spr="| curl -F 'sprunge=<-' http://sprunge.us" # add ?<lang> for line numbers
+alias ssh="cat ~/.ssh/config*[^~] >~/.ssh/config; ssh "
+alias trami="transmission-gtk"
+#alias td="todo -A "
+#alias tdD="todo -D "
+#alias tmux="tmux -u -f ~/.tmux/config -S $HOME/.tmux/socket"
+alias tmux="tmux -u -f ~/.tmux/config -L $USER"
 alias uguu="~/bin/uguu_upload.sh"
-#
- #  Managing two git repos for ~/, dotfiles is public.
-#
+alias xz="pixz"
+alias yout="youtube-dl --write-sub --sub-format best --sub-lang en"
 
-alias dotgit="`which git` --work-tree $HOME --git-dir $HOME/dotfiles.git"
-alias gengit="`which git` --work-tree $HOME --git-dir $HOME/general.git"
+
+ # Git
+#
+alias gash="git stash"
+alias gi='git'
+alias gia='git add'
+alias giaa='git add --all'
+alias gib='git branch'
+alias gic='git commit'
+alias gica='git commit -a'
+alias gicm='git commit -m'
+alias gict='git commit -t'  # Use a template file
+alias gicam='git commit -am'
+gicat() {
+	[ "$PWD" = "$HOME" ] && {
+		echo 'Cannot run from HOME due to git().' >&2
+		return 3
+	}
+	local cur_worktree commit_desc commit_desc_path
+	cur_worktree=`git rev-parse --show-toplevel`
+	commit_desc="future_commit"
+	commit_desc_path="$cur_worktree/$commit_desc"
+	[ -r "$commit_desc_path" ] || {
+		echo "‘$commit_desc’ wasn’t found in ‘$cur_worktree’!" >&2
+		return 3
+	}
+	git commit -a -t "$commit_desc_path"  # Use a template file
+}
+alias gicamend='git commit -a --amend'  # after editing the wrongly commited files
+alias gico='git checkout'  # checkout may also take args in form [commit] <file>
+alias gif='git fetch'
+alias giff='git diff'
+alias giffbase='git diff --base'  # against base file
+alias giffours='git diff --ours'  # against our changes
+alias gifftheirs='git diff --theirs'  # against their changes
+alias gil='git ls-files'
+alias gilog='git log --graph --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue)<%an>%Creset" --abbrev-commit --date=relative'
+alias gilog2='git log --pretty=format:"%h %ad | %s%d [%an]" --graph --date=short'
+alias gilog3='git log --all --graph --decorate'
+alias gilogp='git log -p '  # changes in file over time
+alias gipa='git format-patch'  # …origin
+alias gire='git revert'  # revert a specific commit
+alias giread='git revert HEAD'  # reverts the last commit
+alias gire='git revert'
+alias gire='git revert'
+alias gis='git status'
+alias gism='git submodule'
+alias gism-add='git submodule add'
+alias gism-deinit='git submodule deinit'
+alias gism-init='git submodule init'
+alias gism-s='git submodule status'
+alias gism-upd='git submodule update'
+alias gism-sync='git submodule sync'
+alias gull='git pull'
+alias gush='git push'
+# DESCRIPTION:
+#     Overriding git for $HOME to maintain configs in one public (dotiles)
+#     and one private (general) repo.
+git() {
+	[ "$PWD" = "$HOME" ] && {
+		local opts="--work-tree $HOME --git-dir dotfiles.git" doton=t genon= left=$'\e[D' right=$'\e[C' input_is_ready
+		until [ -v input_is_ready ]; do
+			echo -en "Which repo would you like to operate on? ${doton:+\e[32m}dotfiles${doton:+\e[0m <} ${genon:+> \e[32m}general${genon:+\e[0m} "
+			read -sn1
+			[ "$REPLY" = $'\e' ] && read -sn2 rest && REPLY+="$rest"
+			[ "$REPLY" ] && {
+				case "$REPLY" in
+					"$left")
+						opts="--work-tree $HOME --git-dir dotfiles.git"
+						doton=t; genon=
+						;;
+					"$right")
+						opts="--work-tree $HOME --git-dir general.git"
+						doton=; genon=t
+						;;
+				esac
+				echo -en "\r\e[K" # \K lear line
+			}||{
+				echo
+				input_is_ready=t
+			}
+		done
+	}
+	`which git` $opts "$@"
+}
+
 
 at-msg() {
 	local when msg
@@ -109,17 +241,21 @@ copy-playlist() {
 	# }
 }
 
+
 mount-box() {
 	gpg -qd --output /tmp/decrypted/secrets.`date +%s` ~/.davfs2/secrets.gpg
 	sudo /root/scripts/mount_box.sh $USER &
 }
 
+
 umount-box() {
 	sudo /root/scripts/mount_box.sh $USER umount &
 }
 
-# TAKES:
-#     $1 — file name to upload.
+
+ # Uploads a text file to sprunge
+#  $1 — file name to upload.
+#
 spr() {
 	[ -r "$1" ] || {
 		echo 'Pass a file name to paste.'
@@ -132,15 +268,14 @@ spr() {
 }
 
 
-# TAKES:
-#     $1 — file to encrypt. Encrypted version will be palced along with it.
+ # Encrypts a file with GPG
+#  $1 — file to encrypt. Encrypted version will be palced along with it.
+#
 gpg-enc() {
 	GTK_IM_MODULE= QT_IM_MODULE= gpg \
 		--batch -se --output $1.gpg --yes -R *$ME_FOR_GPG $1
 }
 
-# Check unicode symbols
-chu() { echo -n "$@" | uniname; }  # from uniutils package
 
 arecord-mixed() {
 	set -x
@@ -154,8 +289,9 @@ arecord-mixed() {
 	set +x
 }
 
-# DESCRIPTION
-#    Records sound from microphone and converts it to mp3
+
+ # Records sound from microphone and converts it to mp3
+#
 rec() {
 	local ts
 	ts=`date +%s`
@@ -164,12 +300,15 @@ rec() {
 	echo -n /tmp/$ts.mp3 | xclip
 }
 
+
+ # Find a picture or webm
+#
 fpic() { find -L /home/picts -iname "*$@*"; }
 
-# DESCRIPTION:
-#     Adds all hosts in a given subnet to the java exception site list.
-# TAKES:
-#     $1 — A net address without the last octet, 192.168.2 for example.
+
+ # Adds all hosts in a given subnet to the java exception site list.
+#  $1 — A net address without the last octet, 192.168.2 for example.
+#
 java-site-exception() {
 	local exception_list=$HOME/.java/deployment/security/exception.sites \
 	      exceptions o site e match c
@@ -247,75 +386,6 @@ ssh-ipmi() {
 ssh-clear() { pkill -9 -f "ssh.*-L.*"; }
 ssh-ilo() { mode=ilo ssh-ipmi "$@"; }
 ssh-moonsht-ilo() { mode=moonsht-ilo ssh-ipmi "$@"; }
-
- # Creates a backup of ~/.ff
-#
-firefox-backup() {
-	echo 'Make sure you have uninstalled all old add-ons!'
-	# Clean the cache
-	rm -rf ~/.ff/cache2/*
-}
-
- # Creates a video from a picture and an audio file
-#  $1 – a picture
-#  $2 – an audio file
-#
-ffmpeg-1-picture() {
-	webm_name=`basename "$2"`
-	ffmpeg -y -i "$1" -c:v libvpx-vp9 -b 5000k -an -aq-mode 0 \
-	       -pass 1 -speed 4 -threads 1 -tile-columns 0 -frame-parallel 0 \
-	       -g 9999 -tune stillimage -strict experimental -f webm /dev/null \
-	&& ffmpeg -y -i "$1" -i "$2" -c:v libvpx-vp9 -b:v 5000k -c:a libvorbis -b:a 192k \
-	          -pass 2 -speed 0 -threads 1 -tile-columns 0 -frame-parallel 0 \
-	          -auto-alt-ref 1 -lag-in-frames 25 -tune stillimage -strict experimental "${webm_name%.*}.webm"
-}
-
- # $1 – filename
-#
-update-version() {
-	set -x
-	[ -w "$1" ] || {
-		echo "$1 is not a writeable file!" >&2
-		exit 3
-	}
-	sed -ri "s/^VERSION=(\'|\").*(\'|\")\s*/VERSION='`date +%Y%m%d-%H%M`'/" "$1"
-	set +x
-}
-
-rec-my-desktop-nobar() { rec-my-desktop nobar; }
-rec-my-desktop-nobar-audio() { rec-my-desktop nobar audio; }
-rec-my-desktop-audio() { rec-my-desktop audio; }
-rec-my-desktop-audio-nobar() { rec-my-desktop audio nobar; }
- # Records desktop with ffmpeg
-#  TAKES:
-#    rec-my-desktop [nobar] [audio] [crf0|crf18|bv1m|bv2m|bv3m|bv4m]
-rec-my-desktop() {
-	set -x
-	local adj w h audio bitrate \
-	      crf0=' -b:v 0 -crf 0 ' \
-	      crf18=' -b:v 0 -crf 18' \
-	      bv1m=' -b:v 1000k ' \
-	      bv2m=' -b:v 2000k' \
-	      bv3m=' -b:v 3000k' \
-	      bv4m=' -b:v 4000k'
-	# If we don’t want i3bar to get in the video
-	[ "$1" = nobar ] && { adj='+0,25'; shift; }
-	[ "$1" = audio ] && { audio='-f alsa -ac 2 -i hw:0 -async 1 -acodec pcm_s16le'; shift; }
-	# If we use adjustment, height must be decreased accordingly
-	[ -v adj ] && h=$((HEIGHT - 25)) || h=$HEIGHT  # I set WIDTH and HEIGHT in ~/.preload.sh
-	w=$WIDTH  # width is WIDTH anyway
-	if   [ "$1" = crf0 ]; then bitrate=$crf0
-	elif [ "$1" = crf18 ]; then bitrate=$crf18
-	elif [ "$1" = bv1m ]; then bitrate=$bv1m
-	elif [ "$1" = bv2m ]; then bitrate=$bv2m
-	elif [ "$1" = bv3m ]; then bitrate=$bv3m
-	elif [ "$1" = bv4m ]; then bitrate=$bv4m
-	else
-		[ $h -ge 720 ] && bitrate=$bv2m || bitrate=$bv1m
-	fi
-	ffmpeg -y -f x11grab -s ${w}x$h -framerate 30 -i $DISPLAY$adj -vcodec libx264 $bitrate -preset ultrafast /tmp/output.mkv
-	set +x
-}
 
  # Copies the path to the currently playing song to clipboard.
 #

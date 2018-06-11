@@ -32,13 +32,6 @@ Custom actions for `Thunar` file manager. They include font preview, conversion 
 Also look at
 * [dotfiles/.config/Thunar/uca.xml](https://github.com/deterenkelt/dotfiles/blob/master/.config/Thunar/uca.xml)
 
-### wallpaper_setter.sh
-A daemon to set and adjust wallpapers. It has hotkeys enabling to switch between wallpapers, change folder in which to look for wallpapers, adjust brightness(!) of the wallpaper without altering the original file, change fill mode, etc., and all that in runtime!
-
-Used in
-* [dotfiles/.i3/autostart.sh](https://github.com/deterenkelt/dotfiles/blob/master/.i3/autostart.sh)
-* [dotfiles/.i3/config](https://github.com/deterenkelt/dotfiles/blob/master/.i3/config)
-
 ### watch.sh
 A wrapper for mpv/MPlayer to run videos easy via CLI.
 It has moved to [its own repository](https://github.com/deterenkelt/watchsh).

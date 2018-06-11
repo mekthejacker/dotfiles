@@ -88,6 +88,10 @@ user_pref("extensions.e10sBlockedByAddons", false);
 //  Show sensible connection error pages.
 user_pref("browser.xul.error_pages.expert_bad_cert", true);
 
+// Allow sending multiple requests to server simultaneously
+user_pref("network.http.pipelining", true);
+user_pref("network.http.pipelining.ssl", true);
+
 //
 // --- CACHES ----------------------------------------------------------------
 //

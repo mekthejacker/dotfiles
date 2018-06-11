@@ -25,14 +25,14 @@
 [JPEGThumbnailer]
 Disabled=false
 Priority=3
-Locations=/home/books;/home/edu;/home/hist;/home/picts/design;/home/docs;/home/gamefiles;/home/music;/home/soft_lin;/home/soft_win;/home/video;~dtr/repos;~dtr/work;~dtr/desktop;~dtr;
+Locations=/home/manga;/home/books;/home/edu;/home/hist;/home/picts/design;/home/docs;/home/gamefiles;/home/music;/home/soft_lin;/home/soft_win;/home/video;~dtr/repos;~dtr/work;~dtr/desktop;~dtr;
 MaxFileSize=0
 
 # Supports all type GdkPixbuf supports
 [PixbufThumbnailer]
 Disabled=false
 Priority=5
-Locations=/home/books;/home/edu;/home/hist;/home/picts/design;/home/docs;/home/gamefiles;/home/music;/home/soft_lin;/home/soft_win;/home/video;~dtr/repos;~dtr/work;~dtr/desktop;~dtr;
+Locations=/home/manga;/home/books;/home/edu;/home/hist;/home/picts/design;/home/docs;/home/gamefiles;/home/music;/home/soft_lin;/home/soft_win;/home/video;~dtr/repos;~dtr/work;~dtr/desktop;~dtr;
 MaxFileSize=0
 
 # RAW image files using libopenraw
@@ -105,5 +105,5 @@ MaxFileSize=0
 [DesktopThumbnailer]
 Disabled=false
 Priority=1
-Locations=/home/books;/home/edu;/home/hist;/home/picts/manga;/home/picts/design;/home/docs;/home/gamefiles;/home/music;/home/soft_lin;/home/soft_win;/home/video;~dtr/repos;~dtr/work;~dtr/desktop;~dtr;
+Locations=/home/manga;/home/books;/home/edu;/home/hist;/home/picts/manga;/home/picts/design;/home/docs;/home/gamefiles;/home/music;/home/soft_lin;/home/soft_win;/home/video;~dtr/repos;~dtr/work;~dtr/desktop;~dtr;
 MaxFileSize=0
