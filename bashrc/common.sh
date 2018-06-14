@@ -57,6 +57,9 @@ alias tmux="tmux -u -f ~/.tmux/config -L $USER"
 alias uguu="~/bin/uguu_upload.sh"
 alias xz="pixz"
 alias yout="youtube-dl --write-sub --sub-format best --sub-lang en"
+waifu2x() {
+	waifu2x-converter-cpp --disable-gpu
+}
 
 
  # Git

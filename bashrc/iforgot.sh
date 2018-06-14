@@ -2963,6 +2963,13 @@ iforgot-djvu-tools() {
 
 	Extract lossy tiff:
 	$ ddjvu -format=tiff -quality 96 -page=8  myfile.djvu myfile.tiff
+
+	Create a .djvu page from a colour JPEG
+	$ c44 -slice 80+20+10+10  -dpi 300  input.jpeg  output.djvu
+
+	Create a.djvu page from a monochrome PBM
+	(use imagemagick’s convert to convert to PBM beforehand)
+	$ cjb2 -dpi 300  -lossless  input.pbm  output.djvu
 	EOF
 }
 
@@ -3048,5 +3055,23 @@ iforgot-gentoo-avoid-compiling-these-to-save-time() {
 	*gnome*
 	libreoffice (use libreoffice-bin)
 	firefox (use firefox-bin)
+	EOF
+}
+
+iforgot-waifu2x() {
+	cat <<-EOF
+	waifu2x-converter-cpp  --disable-gpu  -m scale  --scale_ratio 2 \
+	                       -i hurr.jpeg  -o hurr2.jpeg
+
+	waifu2x-converter-cpp  --disable-gpu  -m scale  --scale_ratio 2 \
+	                       -i hurr.jpeg  -o hurr2.jpeg
+
+	EOF
+}
+
+ifrogot-wine-uninstall() {
+	cat <<-EOF
+	wine uninstaller
+	(wrapper will pick up correctly)
 	EOF
 }
