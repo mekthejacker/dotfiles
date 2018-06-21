@@ -31,7 +31,7 @@ table_columns=$(
 )
 total_columns=$(( 1 + ${#jpegs[*]} + 3 ))
 algos=( $(convert -list compress) ) || :
-algos=( JPEG )
+# algos=( JPEG )
 {
 	echo -en  "<SOURCE>\t"
 	echo -en "$(for i in $(seq 1 ${#jpegs[*]}); do echo -ne '–\t'; done)"
