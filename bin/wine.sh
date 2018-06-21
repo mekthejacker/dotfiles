@@ -1,105 +1,144 @@
 #! /usr/bin/env bash
 
-# This script serves three purposes:
-#   - to run wine from another user for safety and usage benefits,
-#     such as dealing with hanging semaphores. Local WINEPREFIXes
-#     are still accessible too;
-#   - unify commands – user chooses between available WINEPREFIX folders,
-#     then WINEARCH and an appropriate wine binary is guessed from that folder;
-#   - automate the setup of a new WINEPREFIX folder.
-# © deterenkelt 2018
-# For the licence see --version output.
+#  wine.sh
+#  Handle multiple wine bottles easy and safely.
+#  © deterenkelt 2018
+#  For the licence see --version output.
 
-# This script assumes three steps, that you should do:
-#   1. That you have created some user (accepted as --wine-user
-#      in this script)
+ # What this script does
 #
-#      Example commmand:
-#      # useradd -m -G audio,video,cdrom,games,plugdev -s /bin/bash wineuser
+#  - Launches wine, winecfg, winetricks and other commands without
+#    prepending the command with a correct wineprefix: simply move the cursor
+#    to the right wine folder and hit enter. The list is moderately highlighted.
+#    (You can still pass WINEPREFIX via environment, when using this script).
 #
-#      Where the ‘wineuser’ is the new fake user,
-#      as which you will be running wine.
+#  - Runs commands as a separate user
+#    What is the benefit?
+#      a) mistakes and malicious programs do not affect your user folders;
+#      b) wine bugs do not affect your user’s environment; to name one,
+#         a poorly exited windows binary may leave uncleared semaphores,
+#         that will prevent this programs to run. Semaphores are created
+#         by wine in the Linux environment, i.e. they belong to the user, that
+#         runs wine, they don’t die when wine closes, they persist between
+#         wine runs. Other programs may create semaphores too, so there’s no
+#         way to identify, which are bad. Thus to clear bad semaphores one
+#         would have to log out or reboot. Running wine applications from
+#         another user allows to clean all its semaphores without worrying
+#         to break the environment of the real user;
+#      c) it’s easier to kill hanging wine processes, when you can run
+#         $ pkill -9 -u wineuser
+#      d) untrustede software may be launched from another user, and trusted –
+#         from the real user winepreefixes – this script works with both.
 #
-#   2. That you’ve set up /etc/sudoers the following way. This is to not type
-#      ‘sudo…’ every time (this script takes the job) and to pass important
-#      variables to wineuser’s environment, such as DISPLAY, XAUTHORITY
-#      or __GL_SYNC_TO_VBLANK.
+#   - Automates the setup of a new WINEPREFIX folder and stuffing it with
+#     libraries.
+
+
+ # What this script requires
 #
-#      Add to /etc/sudoers:
-#        User_Alias WINE_USER = you, and, all, the, others, who, may, run, wine
-#        Defaults:WINE_USER env_reset
-#        Defaults:WINE_USER env_keep += DISPLAY
-#        Defaults:WINE_USER env_keep += LANG
-#        Defaults:WINE_USER env_keep += XAUTHORITY
-#        Defaults:WINE_USER env_keep += WINEARCH
-#        Defaults:WINE_USER env_keep += WINEDEBUG
-#        Defaults:WINE_USER env_keep += WINEPREFIX
-#        Defaults:WINE_USER env_keep += WINEDLLOVERRIDES
-#        Defaults:WINE_USER env_keep += LD_PRELOAD
-#        Defaults:WINE_USER env_keep += __GL_THREADED_OPTIMIZATIONS
-#        Defaults:WINE_USER env_keep += __GL_SYNC_TO_VBLANK
-#        Defaults:WINE_USER env_keep += __GL_YIELD
-#        Defaults:WINE_USER env_keep += SDL_AUDIODRIVER
-#        Defaults:WINE_USER env_keep += CSMT
-#        WINE_USER ALL = (wineuser) NOPASSWD: ALL
+#  1. Create a user, that will run wine instead of you.
+#     (This name shall later be used as the value for --wine-user)
 #
-#      Replace user name(s) in the User_Alias line with the appropriate one(s).
-#      The ‘wineuser’ in the parentheses in the last line should be the name
-#      of the fake user, that you’ve created beforehand. Now you (and this
-#      script) are able to run any command as wineuser:
-#        $ sudo -u wineuser -H …
-#      without password.
+#     Example commmand:
+#     # useradd -g $(id -g myrealuser) \
+#               -m -G users,audio,video,cdrom,games,plugdev \
+#               -s /bin/bash wineuser
 #
-#              | The variables inbetween the first and the last lines
-#              | keep settings for wine, X server and X drivers,
-#              | which otherwise would be lost on a call via sudo.
+#     Where “myrealuser” is the username with which you log in every day.
+#     “wineuser” is the name for the new fake user for running wine in your
+#     place.
 #
-#  3. Your WINEPREFIX folders should start with either ‘.wine32’ or ‘.wine64’.
-#     This is to make sure, what WINEARCH you want and remove any ambiguities,
-#     when it’s time to guess WINEARCH from WINEPREFIX for the script.
-#     Not a big price for the ease of use, huh?
+#     “-g $(id -g myrealuser)” will set the initial group for that user
+#     as your own. This way you will have less troubles, when you’d need
+#     to access myrealuser’s files and folders – just give files the necces-
+#     sary group permissions.
 #
-#  4. Finally, to use wine with this script (and not wine as is), set up your
-#     shells to use it.
-#     - add these lines to your ~/.bashrc and edit the paths:
 #
-#          # This setup uses a dummy user called sszb that holds prefixes,
-#         #  but in order for him to be able to show the windows on our X session,
-#         #  he must be allowed to do this in the first place.
-#         #
-#         xhost +si:localuser:$WINEUSER > /dev/null
-#         alias       wine="$HOME/bin/wine.sh --wine-user sszb --run-as wine"
-#         alias     wine64="$HOME/bin/wine.sh --wine-user sszb --run-as wine64"
-#         alias    winecfg="$HOME/bin/wine.sh --wine-user sszb --run-as winecfg"
-#         alias    regedit="$HOME/bin/wine.sh --wine-user sszb --run-as regedit"
-#         alias winetricks="$HOME/bin/wine.sh --wine-user sszb --run-as winetricks"
-#         alias   killwine="$HOME/bin/wine.sh --wine-user sszb --run-as killwine"
+#  2. Set up /etc/sudoers to make running commands transparent.
+#     This script uses sudo to run wine as another user, so we set permissions
+#       for you, so you wouldn’t need to type password each time.
+#     Your environment should also be protected from leaking into fake user’s.
+#       In order to forbid leaking, the following rules first forbid any vari-
+#       ables, that transit from your environment, then give permissions
+#       per variable – it’s only those variables, that are related to running
+#       Wine properly.
+#     Add to /etc/sudoers
 #
-#       Repalce ‘sszb’ with the user you created before to run wine.
-#       ‘killwine’ is a handy command, that will make sure you get a clean
-#       environment between runs. Look for the note about ‘semaphores’
+#       User_Alias WINE_USER = you, and, all, the, others, who, may, run, wine
+#       Defaults:WINE_USER env_reset
+#       Defaults:WINE_USER env_keep += DISPLAY
+#       Defaults:WINE_USER env_keep += LANG
+#       Defaults:WINE_USER env_keep += XAUTHORITY
+#       Defaults:WINE_USER env_keep += WINEARCH
+#       Defaults:WINE_USER env_keep += WINEDEBUG
+#       Defaults:WINE_USER env_keep += WINEPREFIX
+#       Defaults:WINE_USER env_keep += WINEDLLOVERRIDES
+#       Defaults:WINE_USER env_keep += LD_PRELOAD
+#       Defaults:WINE_USER env_keep += __GL_THREADED_OPTIMIZATIONS
+#       Defaults:WINE_USER env_keep += __GL_SYNC_TO_VBLANK
+#       Defaults:WINE_USER env_keep += __GL_YIELD
+#       Defaults:WINE_USER env_keep += SDL_AUDIODRIVER
+#       Defaults:WINE_USER env_keep += CSMT
+#       WINE_USER ALL = (wineuser) NOPASSWD: ALL
+#
+#     Replace user name(s) in the User_Alias line with the appropriate one(s).
+#       The “wineuser” on the last line should be the name of the fake user.
+#     From now on you should be able to run any command as wineuser without
+#       password.
+#       $ sudo -u wineuser  -H  firefox
+#
+#
+#  3. Create some wineprefixes.
+#     Note, that folders should start with either ‘.wine32’ or ‘.wine64’ –
+#       this will determine, whether it’s 32-bit or 64-bit. The script will
+#       set WINEARCH based on the name.
+#       $ WINEPREFIX=/home/wineuser/.wine32-programs  wineprefix-create
+#
+#
+#  4. Final step – add these lines to your ~/.bashrc and edit the paths:
+#
+#        # This setup uses a dummy user called wineuser that holds prefixes,
+#       #  but in order for him to be able to show the windows on our X session,
+#       #  he must be allowed to do this in the first place.
+#       #
+#       xhost +si:localuser:wineuser > /dev/null
+#       wine()              { $HOME/bin/wine.sh --wine-user wineuser --run-as wine "$@"; }
+#       wine64()            { $HOME/bin/wine.sh --wine-user wineuser --run-as wine64 "$@"; }
+#       wineconsole()       { $HOME/bin/wine.sh --wine-user wineuser --run-as wineconsole "$@"; }
+#       winecfg()           { $HOME/bin/wine.sh --wine-user wineuser --run-as winecfg "$@"; }
+#       regedit()           { $HOME/bin/wine.sh --wine-user wineuser --run-as regedit "$@"; }
+#       winetricks()        { $HOME/bin/wine.sh --wine-user wineuser --run-as winetricks "$@"; }
+#       wineprefix-create() { $HOME/bin/wine.sh --wine-user wineuser --run-as wineprefix-create "$@"; }
+#       killwine()          { $HOME/bin/wine.sh --wine-user wineuser --run-as killwine "$@"; }
+#       export -f wine wine64 wineconsole winecfg regedit winetricks wineprefix-create killwine
+#
+#     Repalce “wineuser” everywhere with the user you have created beforehand.
+#       “killwine” is a handy command, that will make sure you get a CLEAN
+#       environment between runs. Look for the note about “semaphores”
 #       in this file.
-#     - in the ~/.bashrc Add the path used above to PATH:
 #
-#         [ "${PATH//*$HOME\/bin*/}" ] && export PATH="$HOME/bin:$PATH"
+#     Add the path, where you keep this file to PATH in your ~/.bashrc.
+#       The following commands adds ~/bin as the folder with custom scripts.
 #
-#     - Now that you’ve set up the environment, your shells have to re-source
+#       [ "${PATH//*$HOME\/bin*/}" ] && export PATH="$HOME/bin:$PATH"
+#
+#     Now that you’ve set up the environment, your shells have to re-source
 #       the ~/.bashrc or whatever file you placed the settings. If you didn’t
 #       understand, what that means, simply log off and log in again.
-
-
-
- # Output of menu() is more readable than bash’s select, that lumps
-#  several options in 5–15 columns. Also info() and err() save space here.
 #
-#  Find the lib at https://github.com/deterenkelt/bhlls
 #
-NO_LOGGING=t
-. ~/repos/bahelite/bahelite.sh
-# set -x
-set -feE
+#  Enjoy and happy drinking!
+#
+
+
+#  Bulletproof mode on
+set -feEuT
 shopt -s extglob
-VERSION="20170223"
+
+ # Bahelite is a library for error handling, better interface, messages etc.
+#  Find the lib at https://github.com/deterenkelt/bahelite
+. ~/repos/bahelite/bahelite.sh
+VERSION="20180614"
 
 show_help() {
 	cat <<-EOF
@@ -108,7 +147,7 @@ show_help() {
 
 	            USER is the user you created to run wine in your place.
 	    WINE_COMMAND is one of the keys: wine, wine64, winecfg, regedit,
-	                 winetricks, wineprefix-setup, killwine.
+	                 winetricks, wineprefix-create, killwine.
 	     Double dash separates wine.sh own options from the options
 	                 for the actual wine binaries (those in /usr/bin/).
 	        FILE.EXE is a Windows executable, that can be passed optionally.
@@ -132,11 +171,11 @@ show_help() {
 	    Setting up a new wineprefix with the specified name
 	    $ WINEPREFIX=/home/fakeuser/.wine32-some-game ./wine.sh \\
 	                                                  --wine-user fakeuser \\
-	                                                  --run-as wineprefix-setup
+	                                                  --run-as wineprefix-create
 
 	    Prepending the command with WINEPREFIX is
 	    - *optional* for WINE_COMMANDs wine, wine64, winecfg, regedit, winetricks;
-	    - *mandatory* for WINE_COMMAND wineprefix-setup.
+	    - *mandatory* for WINE_COMMAND wineprefix-create.
 	    WINE_COMMAND killwine *ignores* it.
 
 	See the notes in the beginning of the script on how to create the user
@@ -154,36 +193,9 @@ show_version() {
 	EOF
 }
 
-show_error() {
-	local file=$1 line=$2 lineno=$3
-	echo -e "$file: An error occured!\nLine $lineno: $line" >&2
-	notify-send --hint int:transient:1 -t 3000 "${BASH_SOURCE##*/}" "Error: check the console."
-}
+[ -v DISPLAY ] || err 'DISPLAY is unset. Run this script inside of an X server.'
 
- # The reason we need this function is because set +e won’t remove the trap.
-#  So after disabling the errexit shell option, we also need to remove that
-#  trap manually and put it back.
-#
-traponerr() {
-	case "$1" in
-		set)
-			# NB single quotes – to prevent early expansion
-			trap 'show_error "$BASH_SOURCE" "$BASH_COMMAND" "$LINENO"' ERR
-			;;
-		unset)
-			# NB trap '' ERR will ignore the signal.
-			#    trap - ERR will reset command to 'show_error "$BASH_SOURCE…'
-			trap '' ERR
-			;;
-	esac
-}
-traponerr set
-
-
-[ -v DISPLAY ] || {
-	err 'DISPLAY is unset. Are we running outside an X server?'
-	exit 3
-}
+#  https://wiki.winehq.org/Wine_User%27s_Guide#Environment_variables
 
  # In order to get more output from wine, use
 #  WINEDEBUG=warn  or  WINEDEBUG=warn+all.
@@ -197,7 +209,9 @@ export WINEDEBUG="${WINEDEBUG:-fixme+all,err+all}" \
        __GL_SYNC_TO_VBLANK=${__GL_SYNC_TO_VBLANK:-0} \
        __GL_YIELD=${__GL_YIELD:-NOTHING}
 
-
+ # Saves the path to the last chosen wineprefix,
+#  so that next time we could set this path as default.
+#
 write_previous_wprefix() {
 	local file="$HOME/.cache/wine.sh/previous_wprefix"
 	[ -w "${file%/*}" ] || mkdir -p "${file%/*}"
@@ -205,6 +219,8 @@ write_previous_wprefix() {
 	return 0
 }
 
+ # Used in setting default wineprefix, when selecting among several folders.
+#
 read_previous_wprefix() {
 	local file="$HOME/.cache/wine.sh/previous_wprefix"
 	[ -r "$file" ] && echo "$(<"$file")" || return 1
@@ -212,8 +228,8 @@ read_previous_wprefix() {
 }
 
  # If WINEPREFIX wasn’t passed through the environment,
-#  find available WINEPREFIX folders in $HOME and fake user’s
-#  $HOME and make the user choose from them.
+#  find available WINEPREFIX folders in $HOME and wineuser’s
+#  $HOME and make the user choose one of them.
 #
 set_wineprefix() {
 	local prefix_list
@@ -221,7 +237,7 @@ set_wineprefix() {
 		[ -d "$WINEPREFIX" -a -r "$WINEPREFIX" ] || {
 			# If we create a new WINEPREFIX, it indeed does not exist.
 			# However in this function we must validate the folder name.
-			[ "$1" != may_not_exist ] && {
+			[ "${1:-}" != may_not_exist ] && {
 				err "Passed WINEPREFIX is not a readable directory:\n$WINEPREFIX"
 				return 3
 			}
@@ -234,7 +250,7 @@ set_wineprefix() {
 			            | sort)
 			        )
 		if [ ${#prefix_list[@]} -eq 1 ]; then
-			menu "Found one WINEPREFIX:
+			menu -m 2 "Found one WINEPREFIX:
 			      ${prefix_list[0]}
 			      Choose it?" _Yes_ No
 			[ "$CHOSEN" = Yes ] \
@@ -250,7 +266,7 @@ set_wineprefix() {
 				[ "${prefix_list[i]}" = "$previous_wprefix" ] \
 					&& prefix_list[$i]="_${prefix_list[i]}_"
 			done
-			menu 'Choose WINEPREFIX' "${prefix_list[@]}"
+			menu -m list 'Choose WINEPREFIX' "${prefix_list[@]}"
 			WINEPREFIX="/home/$CHOSEN"
 			write_previous_wprefix "$CHOSEN"
 		fi
@@ -277,8 +293,9 @@ set_wineprefix() {
 }
 
 
- # This is a general function to do all the jobs.
-#  [$@] — list of arguments for wine, winetricks etc.
+ # Handles all wine* executables and regedit.
+#  $1 – binary name: “wine”, “wine64”, “winetricks”…
+#  $2..n — list of arguments for that executable.
 #
 __wine() {
 	local run_as="$1" binary sudo="sudo -u $WINEUSER -H"
@@ -296,6 +313,9 @@ __wine() {
 				&& binary='/usr/bin/wine' \
 				|| binary='/usr/bin/wine64'
 			;;
+		wineconsole)
+			binary='/usr/bin/wineconsole'
+			;;
 		winecfg)
 			binary='/usr/bin/winecfg'
 			;;
@@ -306,7 +326,10 @@ __wine() {
 			binary='/usr/bin/regedit'
 			;;
 		winetricks)
-			binary='/usr/bin/winetricks'
+			binary='/usr/bin/winetricks --force'
+			;;
+		winepath)
+			binary='/usr/bin/winepath'
 			;;
 		*)
 			err 'I am not supposed to run as this command.'
@@ -315,77 +338,133 @@ __wine() {
 	[ "$WINEPREFIX_OWNER" = "$USER" ] \
 		&& $binary "$@" \
 		|| $sudo $binary "$@"
-	# Clean emulated wine desktop from icons placed by programs.
-	# killwine() must be able to run without binding to a wineprefix, so these
-	# lines are here, in __wine().
+	#  Clean emulated wine desktop from icons placed by programs.
+	#  killwine() must be able to run without binding to a wineprefix, so these
+	#  lines are here, in __wine().
+	set +f
 	if [ "$WINEPREFIX_OWNER" = "$USER" ]; then
 		/bin/rm $WINEPREFIX/drive_c/users/$WINEPREFIX_OWNER/#msgctxt#directory#Desktop/* \
-		        $WINEPREFIX/drive_c/users/Public/#msgctxt#directory#Desktop/* 2>/dev/null
+		        $WINEPREFIX/drive_c/users/$WINEPREFIX_OWNER/Desktop/*.lnk \
+		        $WINEPREFIX/drive_c/users/Public/Desktop/*.lnk 2>/dev/null
 	else
 		$sudo /bin/rm $WINEPREFIX/drive_c/users/$WINEPREFIX_OWNER/#msgctxt#directory#Desktop/* \
-		              $WINEPREFIX/drive_c/users/Public/#msgctxt#directory#Desktop/* 2>/dev/null
+		              $WINEPREFIX/drive_c/users/$WINEPREFIX_OWNER/Desktop/*.lnk \
+		              $WINEPREFIX/drive_c/users/Public/Desktop/*.lnk 2>/dev/null
 	fi
-	 # guarantee that wine won’t hang and semaphores were cleared
-	#  at the disadvantage, that when an application restarts itself,
-	#  its children process may be killed.
-	#
-	# killwine
-	return
+	set -f
+	return 0
 }
 
 
 killwine() {
 	local i
-	sudo -u $WINEUSER /usr/bin/killall -9 -u $WINEUSER
-	# After wine is closed/killed, semaphores that it created, may still hang
-	# in the OS. Certain programs do not like it and refuse to work. An advan-
-	# tage of running wine from a separate user is also that we can clear
-	# the semaphore list safely, without breaking something in the main user’s
-	# session (if we would run wine locally, e.g. in our own ~/.wine32).
+	sudo /usr/bin/pkill -9 -u $WINEUSER
+	#  After wine is closed/killed, semaphores that it created, may still hang
+	#  in the OS. Certain programs do not like it and refuse to work. An advan-
+	#  tage of running wine from a separate user is also that we can clear the
+	#  semaphore list safely, without breaking something in the main user’s
+	#  session (if we would run wine locally, e.g. in our own ~/.wine32).
 	for i in $(ipcs -s | sed -rn "s/.*\s([0-9]+)\s+$WINEUSER.*/\1/p"); do
 		ipcrm -s $i
 	done
-	return
+	return 0
 }
 
 
-wineprefix-setup() {
+ # Creates a wineprefix in the specified folder and stuffs it with libraries.
+#  Usage:
+#    WINERREFIX=/home/wineuser/.wine32-hurr  wineprefix-create
+#
+#  It is generally advisable to keep at least two bottles: one for programs
+#    and one for games. They may even run different versions of system wine
+#    binaries.
+#  A tip: save a prepared wineprefix to a tar archive and call it
+#    .wine32-stuffed for example. Downloading and installing libraries takes
+#    a significant time, so it’s good to keep an already prepared wineprefix,
+#    when you need a new one. Instead of running this function and starting
+#    from scratch each time – just unpack the prepared one!
+#
+wineprefix-create() {
 	[ -v WINEPREFIX ] || {
 		err "Pass the folder you want to create as
-		     WINEPREFIX=/home/$WINEUSER/.wine32-something wineprefix-setup"
+		     WINEPREFIX=/home/$WINEUSER/.wine32-something wineprefix-create"
 		return 3
 	}
-	set_wineprefix may_not_exist || $?
+	set_wineprefix may_not_exist || return $?
 	# Maybe some day it will work…
 	# shopt -s expand_aliases
 	[ -d "$WINEPREFIX" ] && {
-		menu "$WINEPREFIX still exists. Remove it? [y/N]" Yes _No_
+		menu -m 2 "$WINEPREFIX still exists. Remove it? [y/N]" Yes _No_
 		[ "$CHOSEN" = Yes ] \
 			&& sudo -u $WINEUSER -H rm -rf "$WINEPREFIX" \
 			|| { err 'Aborted'; return 3; }
 	}
+	# infow "1. Checking WINEPREFIX in $WINEPREFIX" \
+	#       "WINEDEBUG=-all sudo -u $WINEUSER -H wine cmd.exe /c echo %ProgramFiles%" \
+	#       force_stderr
 	infow "1. Checking WINEPREFIX in $WINEPREFIX" \
-	      "WINEDEBUG=-all sudo -u $WINEUSER -H wine cmd.exe /c echo %ProgramFiles%" \
+	      "WINEDEBUG=-all WINEPREFIX=$WINEPREFIX wineboot" \
 	      force_stderr
 
 	info "2. Setting wine options"
 	declare -A options=(
-		[csmt]=on  # Multi-threaded command stream
-		[ddr]=opengl # Set DirectDrawRenderer to opengl //gdi
-		[fontsmooth]=gray # Enable subpixel font smoothing //rgb,bgr,disable
-		# GLSL
-		# enabled
-		# disabled on nvidia may be faster
-		[glsl]=disabled # Enable glsl shaders
-		[multisampling]=enabled # Enable Direct3D multisampling //disabled
-		[mwo]=force # Set DirectInput MouseWarpOverride to force //disable,enabled
-		[sound]=alsa # Set sound driver to ALSA //disabled,oss,coreaudio (mac)
-		[strictdrawordering]=disabled # //disabled (may make things faster), fixes severe glitches in DE:HR, Tombraider 2013, Metro 2033 etc.
-		[videomemorysize]=$((`nvidia-settings --query $DISPLAY/VideoRam | sed -nr '2s/.*\s([0-9]+)\.$/\1/p'`/1024)) # in MiB
-		[vsm]=3  # Supported shader model version // <0|1|2|3>
+
+		 # Multi-threaded command stream
+		#  on | off
+		[csmt]=on
+
+		 # Set DirectDrawRenderer to opengl
+		#  opengl | gdi
+		[ddr]=opengl
+
+		 # Enable subpixel font smoothing
+		#  rgb | bgr | disable | gray
+		[fontsmooth]=gray
+
+		 # GLSL
+		#  enabled | disabled
+		#  Disabling is generally not recommended, but on nvidia may be faster.
+		[glsl]=disabled
+
+		 # Enable Direct3D multisampling
+		#  enabled | disabled
+		[multisampling]=enabled
+
+		 # Set DirectInput MouseWarpOverride
+		#  force | disable | enabled
+		[mwo]=force
+
+		 # Set sound driver
+		#  alsa | disabled | oss | coreaudio (mac)
+		[sound]=alsa
+
+		 # Strict order removes glitches. If there are no glitches, disabling
+		#  it makes things faster.
+		#  disabled | enabled
+		[strictdrawordering]=disabled
+
+		 # VRAM size, in MB, that wine reports to applications.
+		#  Doesn’t affect how many ram they really can take. Only some games
+		#  use this.
+		#  default | 512 | 1024 | 2048
+		#  Using “default” needs GLX_MESA_query_renderer
+		[videomemorysize]=$(
+			which nvidia-settings &>/dev/null && {
+				nvidia-settings --query $DISPLAY/VideoRam \
+				| sed -nr '2s/.*\s([0-9]+)\.$/  scale=0; \1 \/ 1024  /p' \
+				| bc -q
+			} || { echo 'default'; }
+		)
+
+		 # Shader versions
+		#  0|1|2|3
+		[vsm]=3
 		[gsm]=3
 		[psm]=3
-		[win7]=  # Windows version // <win31|win95|win98|win2k|winxp|win2k3|vista|win7>
+
+		 # Windows version
+		#  win98 | win2k | winxp | win2k3 | vista | win7 | win8 | win10
+		[winver]=win7
 	)
 	for opt in "${!options[@]}"; do
 		value=${options[$opt]}
@@ -425,39 +504,65 @@ wineprefix-setup() {
 
 	info "3. Installing necessary packages"
 	local packages=(
-		corefonts # Default windows fonts
-		devenum   # Required by many games
-		d3dcompiler_43 # Don’t install the whole ‘directx9’!
-		d3dx9     #        because it will break interaction between those
-		          #        built in wine, which wine _must_ use to work
-		          #        properly (e.g. xinput), and those native
-		          #        installed by the ‘directx9’ command.
-		d3dx10
-		d3dx10_43
-		d3dx11_42
-		d3dx11_43
-		dotnet45  # Required by many windows apps
-		flash     # Adobe Flash plugin
-		#ie8
-		mfc42     # Required by some games
-		#msxml6
-		physx     # Required by games using PhysX
-		quartz    # Required by many games
-		unifont   # This font has all glyphs possible
-		vcrun2008 # Required by many apps
-		vcrun2010 # Required by many apps
-		vcrun2012 # Required by many apps
-		vcrun2015 # Required by many apps
-		xact      # X3DAudio1_7.dll issues
+
+		binkw32
+		flash
+		ie8
+		ie8_kb2936068
+		devenum
+
+		#  Don’t install the whole ‘directx9’!
+		#  because it will break interaction between those
+		#  built in wine, which wine _must_ use to work
+		#  properly (e.g. xinput), and those native
+		#  installed by the ‘directx9’ command.
+		d3dcompiler_43
+		d3dx9
+		# d3dx10
+		# d3dx10_43
+		# d3dx11_42
+		# d3dx11_43
+
+		physx
+		quartz
+
+		# Default windows fonts + cover up for missing glyphs
+		corefonts
+		unifont
+
+		# Required by many apps
+		mfc40
+		mfc42
+		msxml3
+		msxml4
+		msxml6
+		vcrun2003
+		vcrun2005
+		vcrun2008
+		vcrun2010
+		vcrun2012
+		vcrun2013
+		vcrun2015
+		vcrun2017
+		dotnet45
+
+		winhttp
+		wininet
+
+		# X3DAudio1_7.dll issues
+		xact
+
+		xna31
+		xna40
 	)
 	for package in ${packages[@]}; do
 		infow "Installing $package" \
-		      "sudo -u $WINEUSER -H winetricks \"$package\" >/dev/null" \
+		      "WINEPREFIX=$WINEPREFIX sudo -u $WINEUSER -H winetricks \"$package\" >/dev/null" \
 		      force_stderr
 	done
-	type wineprefix-setup-postinstall &>/dev/null \
-		&& WINEPREFIX="$WINEPREFIX" WINEARCH=$WINEARCH wineprefix-setup-postinstall
-	return
+	type wineprefix-create-postinstall &>/dev/null \
+		&& WINEPREFIX="$WINEPREFIX" WINEARCH=$WINEARCH wineprefix-create-postinstall
+	return 0
 }
 
 
@@ -502,10 +607,10 @@ while true; do
 			exit 0
 			;;
 		'--run-as')
-			[[ "$2" =~ ^(wine|wine64|winecfg|regedit|winetricks|wineprefix-setup|killwine)$ ]] \
+			[[ "$2" =~ ^(wine|wine64|wineconsole|winecfg|regedit|winetricks|wineprefix-create|killwine)$ ]] \
 				&& RUN_AS="$2" \
 				|| { err "Possible arguments to --run-as are: wine, wine64, winecfg, regedit,
-				          winetricks, wineprefix-setup, killwine"; }
+				          winetricks, wineprefix-create, killwine"; }
 			shift 2
 			;;
 		'--wine-user')
@@ -526,11 +631,11 @@ while true; do
 done
 
 case "$RUN_AS" in
-	wine|wine64|winecfg|regedit|winetricks)
+	wine|wine64|wineconsole|winecfg|regedit|winetricks)
 		__wine "$RUN_AS" "$@" || exit $?
 		;;
-	wineprefix-setup)
-		wineprefix-setup || exit $?
+	wineprefix-create)
+		wineprefix-create || exit $?
 		;;
 	killwine)
 		killwine || exit $?

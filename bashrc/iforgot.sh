@@ -3075,3 +3075,58 @@ ifrogot-wine-uninstall() {
 	(wrapper will pick up correctly)
 	EOF
 }
+
+iforgot-isolate-process-from-network-access() {
+	zgrep CONFIG_NET_NS=y /proc/config.gz \
+		&& echo "CONFIG_NET_NS=y – OK" \
+		|| echo "Kernel config option CONFIG_NET_NS=y is required." >&2
+	cat <<-EOF
+	From your own user
+	$ unshare -r -n program
+
+	Or, safer
+	(because unshare no longer drops root):
+	$ sudo unshare -n sudo -u "$(whoami)" -g "$(id -g -n)" sh -c \
+        "sudo -K && echo 'disconnected network, spawing subprocess...' && $@"
+
+	As another user
+	$ sudo unshare -n  sudo -u sszb  ping ya.ru
+	EOF
+}
+
+iforgot-wine-commands() {
+	cat <<-EOF
+	CONSOLE
+	    wineconsole
+	    wine console
+
+	EXPLORER
+	    wine explorer /desktop=NAME,1024x768 program.exe
+
+	    For i3
+	    - single window workspace: 1920x1058
+	    - on workspaces with a tabbed container: 1920x1038
+
+	TASKMGR
+	    wine taskmgr
+
+	See also
+	https://wiki.winehq.org/List_of_Commands
+
+	EOF
+}
+
+iforgot-jpeg-to-pdf() {
+	cat <<-EOF
+	To create
+	    $ convert  *.jpg  my-new.pdf
+
+	To extract images
+	    $ pdfimages  -j  my-new.pdf  "my-new"
+
+	To compare
+	    $ ssim.sh  0001.jpg  my-new-0001.jpg
+	    …
+	    ssim=1 dssim=0
+	EOF
+}

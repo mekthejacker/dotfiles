@@ -42,10 +42,6 @@ export MPD_HOST=$HOME/.mpd/socket
 [ "${PATH//*\/usr\/games\/bin*/}" ] && export PATH="$PATH:/usr/games/bin/"
 
 
-
-
-
-
 # Though TERM is kept via SSH’s SendEnv,
 #   rxvt-unicode-256color gives messed colours in emacsclient.
 # Other working replacement may be screen-256color. rxvt-basic works as a monochrome screen

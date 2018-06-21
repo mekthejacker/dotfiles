@@ -325,4 +325,17 @@ fonts-for-vm() {
 	echo
 }
 
+inet-off() { inet-on-off; }
+inet-on() { inet-on-off; }
+inet-on-off() {
+	case "${FUNCNAME[1]}" in
+		inet-on)
+			ip ro add default via 77.243.108.1
+			;;
+		inet-off)
+			ip ro del default via 77.243.108.1
+			;;
+		esac
+}
+
 return 0

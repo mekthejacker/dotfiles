@@ -164,6 +164,7 @@ xset s off
 push_the_bar 'Setting standby and off time'
 # Go to standby after 3 hours and off nine minutes later
 xset dpms $((60*60*3)) 0 $((60*63*3))
+xdg-settings  set default-web-browser  firefox.desktop
 
 echo "101" >$pipe
 exec {pipe_fd}<&-
