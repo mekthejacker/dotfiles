@@ -1,14 +1,22 @@
 man xkbcomp
 
 Export current layout to file:
-  xkbcomp -xkb :0 ./xkbcomp_new.xkb
+    $ xkbcomp -xkb :0 ./xkbcomp_new.xkb
+
 Reexport from xkb to xkm format (text → binary)
-  xkbcomp -xkm ./xkbcomp.xkb ./xkbcomp.xkm
+    $ xkbcomp -xkm ./xkbcomp.xkb ./xkbcomp.xkm
+
 Import layout from file
-  xkbcomp ./xkbcomp.xkm :0
+    $ xkbcomp ./xkbcomp.xkm :0
+
+
+Helpful tools
+    $ xev
+    $ xset q
+    $ xmodmap  -pm
 
 The list of all character names can be found with
-  find /usr/include/X11 -name keysymdef.h
+    $ find /usr/include/X11 -name keysymdef.h
 
 // This type of comment works in .xkb files
 some code // this way, too

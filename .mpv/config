@@ -51,6 +51,7 @@ sub-codepage=enca:ru:en
 ## Disable ass subs for this to take effect
 sub-font='Roboto Medium'
 sub-font-size=50
+sub-gray=yes
 #vo=opengl-hq:scale=ewa_lanczossharp:cscale=ewa_lanczossharp:interpolation:temporal-dither:gamma=0.9:blend-subtitles=yes:target-prim=bt.709:target-trc=srgb
 #vo=opengl-hq:scale=ewa_lanczossharp:cscale=ewa_lanczossharp:interpolation:temporal-dither:gamma=0.9:blend-subtitles=yes:icc-profile="/home/dtr/.env/FULLHD.icm"
 

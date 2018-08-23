@@ -41,6 +41,7 @@ alias imgur="~/bin/imgur_upload.sh"
 #  pinentry doesn’t like scim
 alias gpg="GTK_IM_MODULE= QT_IM_MODULE= gpg"
 alias ls="ls -1h --color=auto"
+master-pdf-editor-linux() { /opt/bin/masterpdfeditor5 "$@"; }
 mpvforcesubs='--sub-font=Roboto --sub-ass-force-style=FontName=Roboto'
 alias mumble="mumble -style adwaita"
 alias re=". ~/.bashrc" # re-source

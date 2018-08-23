@@ -14,9 +14,9 @@ iforgot() {
 		read -p 'What have you forgot, darling? > '
 		local keywords="$REPLY"
 		echo "Thanks, also you can use parameters to this function, like"
-		echo -e "\tiforgot <something> <also this>"
+		echo -e "\tiforgot  <word A>  <word B>"
 	}
-	func_list=(`declare -F | sed -nr 's/^declare -f (iforgot-.*)/\1/p'`)
+	func_list=(`declare -F | sed -nr 's/^declare -fx (iforgot-.*)/\1/p'`)
 	echo
 	for k in $keywords; do
 		for func in ${func_list[@]}; do
@@ -31,22 +31,25 @@ iforgot() {
 		}
 		echo -e "Functions that contain ‘$k’ in their bodies:\n"
 		for func in ${func_list[*]}; do
-			type $func | sed -rn '1d
-			/^iforgot.*'$k'/,/}/d
-			2H
-			/'$k'/H
-			${ g; s/'$k'/'$k'/;t good; Q
-			:good s/\s+/ /g
-			s/\(\)/\n/g
-			s/\n\s/\n/g
-			p
-		}' \
-		| grep -v ^$ \
-		| fold  -s -w $((`tput cols`-8)) \
-		| sed '/^ iforgot/ !s/.*/\t&/g; s/^ //g' \
-		| grep -E "(|$k)"
+			type $func \
+				| sed -rn '1d
+				           /^iforgot.*'$k'/,/}/d
+				           2H
+				           /'$k'/H
+				           ${ g
+				              s/'$k'/'$k'/; t good; Q
+				              :good  s/\s+/ /g
+				              s/\(\)/\n/g
+				              s/\n\s/\n/g
+				              p
+				           }' \
+				| grep -v ^$ \
+				| fold  -s -w $((`tput cols`-8)) \
+				| sed '/^ iforgot/ !s/.*/\t&/g; s/^ //g' \
+				| grep -E "(|$k)"
+		done
 	done
-done
+	return 0
 }
 
 iforgot-restart-daemons-from-the-runlevel-i-am-in() {
@@ -409,7 +412,7 @@ iforgot-tee-usage() {
 	EOF
 }
 
-iforgot-kaomoji-drawing() {
+iforgot-kaomozi-drawing() {
 	cat <<-"EOF"
 	▽△　▲▼    sankaku
 	☆★＊      hoshi
@@ -432,7 +435,7 @@ iforgot-kaomoji-drawing() {
 
 	(•̀ᴗ•́)و    (⁄ ⁄•⁄ω⁄•⁄ ⁄)    (　-᷄ ω -᷅ )     ¯\_(ツ)_/¯
 
-	⊙﹏⊙    (•⊙ω⊙•)
+	⊙﹏⊙    (•⊙ω⊙•)    (๑•̀ㅂ•́)و✧        ٩(๑òωó๑)۶
 
 
 
@@ -936,7 +939,12 @@ cat <<"EOF"
 	but scrot still works. Though a horisontal part that’s out of the visible
 	view, may appear white. If that happens, scroll the browser window.
 	­
-	$ Xephyr :108 -dpi 300 -screen 3413x1920 &   # -resizeable
+	 # Fun options
+	#  -resizeable  to make the window resizeable
+	#  -listen tcp  to listen on tcp port from the network
+	#  -ac          lift restictions on Xauth (Xephyr has troubles sometimes)
+	#
+	$ Xephyr :108 -dpi 300 -screen 3413x1920 &
 	­
 	Alternative.
 	­
@@ -1581,35 +1589,39 @@ iforgot-git-merge-resolve-conflicts() {
 	EOF
 }
 
-iforgot-no-space-left() {
+iforgot-deleted-files-that-hold-space() {
 	cat <<-"EOF"
-	There may be two reasons
+	A deleted file continues to hold space, while there is a process,
+	  that still uses it.
+	To find such files and processes that use them:
 
-	1. Deleted files, that aren’t actually unlinked yet
-	In this case, often met with tmpfs, while du -hsx says that there’s plenty
-	of space, and ‘df’ says there’s none or only a little.
-	There should be processes that still hold these files and prevent their
-	physical removal from the filesystem. Kill these processess, and the space
-	will be freed. How to find such processes?
-	$ lsof | grep /tmp | grep deleted  # | while read pid; do kill -9 $pid; done
+	  - try to show the files, that have <1 links to the filesystem:
+	    $ lsof +L1
 
-	2. Actual files holding up space
-	Find directories with the largest number of files:
-	$ find /home -xdev -printf '%h\n' | sort | uniq -c | sort -k 1 -n
+	  - eeeeeh…
+	    $ lsof -nP +L1 /tmp
+
+	  - on a specific filesystem
+	    $ lsof +aL1 /var/log/
+
+	There may also be real files that hold space up
+	  - find directories with the largest number of files
+	    $ find /home -xdev -printf '%h\n' | sort | uniq -c | sort -k 1 -n
 	It is usually thumbnails, gvfs-metadata and broken mail, which I prefer
 	to clean before I log in, see ~/.preload.sh.
+
 	EOF
 }
 
 iforgot-ssh-pass-a-command() {
 	cat <<-"EOF"
 	Use
-	$ ssh myhost <<<"ls foo; cd bar"
+	    $ ssh myhost <<<"ls foo; cd bar"
 	or heredoc
-	$ ssh myhost <<EOF
-	ls foo
-	cd bar
-	EOF
+	    $ ssh myhost <<EOF
+	    ls foo
+	    cd bar
+	    EOF
 	since
 	$ ssh myhost "ls foo; cd bar"
 	won’t work as expected as well as
@@ -1625,7 +1637,8 @@ iforgot-ssh-nohup-fork-to-background() {
 	If
 	$ ssh myhost <<<"cd bar; (nohup ./a_daemon.sh) &"
 	. . . .
-	hangs, and -f (fork to background) doesn’t work because stdin in not a terminal, specify stdin and stdout for nohup:
+	hangs, and -f (fork to background) doesn’t work because stdin is not
+	a terminal, specify stdin and stdout for nohup:
 	$ ssh myhost <<<"cd bar; (nohup ./a_daemon.sh </dev/null &>/dev/null) &"
 	$
 	EOF
@@ -1896,12 +1909,18 @@ iforgot-imgur-dl-album() {
 
 
 iforgot-logrotate() {
-	cat <<-EOF
+	cat <<-"EOF"
 	Check logrotate scripts
-	logrotate -d
+	    $ logrotate -d
 
-	Force logroate on a specific file
-	logrotate -dvf /etc/logrotate.d/file
+	Force logrotate on a specific file
+	    $ logrotate -dvf /etc/logrotate.d/file
+
+	Logrotate has a status file, where it writes every file’s state.
+	  It is a potential source of weird error messages, if some wrong
+	  files got there, i.e. messages-20001122.xz-20001122.xz.
+	Find the file with
+	    $ man -P "less -p 'logrotate\.status'" logrotate
 
 
 	minsize    rotates only when the file has reached an appropriate size and the set time
@@ -2337,20 +2356,6 @@ iforgot-nginx-who-serves-this-domain() {
 	EOF
 }
 
-iforgot-find-deleted-unlinked-files-that-hold-disk-space() {
-	cat <<-"EOF"
-	The problem is that a file was deleted, but some process continues to write
-	  to that file, `df` shows that 100% is used, but results from `du` do not
-	  sum up to 100% usage.
-
-	Show files that have <1 links to the filesystem:
-	  lsof +L1
-
-	On a specific filesystem:
-	  lsof +aL1 /var/log/
-	EOF
-}
-
 iforgot-ftp-from-commandline() {
 	echo lftp
 }
@@ -2780,7 +2785,7 @@ iforgot-hunspell-dicts() {
 	EOF
 }
 
-iforgot-open-trackers-list() {
+iforgot-trackers-list() {
 	cat <<-EOF
 	udp://tracker.opentrackr.org:1337/announce
 	udp://open.demonii.com:1337
@@ -2796,46 +2801,25 @@ iforgot-open-trackers-list() {
 	udp://tracker.openbittorrent.com:80
 	http://90.180.35.128:6969/annonce
 	udp://90.180.35.128:6969/annonce
-
-
 	udp://tracker.coppersurfer.tk:6969/announce
-
 	udp://p4p.arenabg.com:1337/announce
-
 	udp://tracker.internetwarriors.net:1337/announce
-
 	udp://tracker.skyts.net:6969/announce
-
 	udp://tracker.safe.moe:6969/announce
-
 	udp://tracker.piratepublic.com:1337/announce
-
 	udp://tracker.opentrackr.org:1337/announce
-
 	udp://allesanddro.de:1337/announce
-
 	udp://9.rarbg.to:2710/announce
-
 	udp://tracker.open-internet.nl:6969/announce
-
 	udp://public.popcorn-tracker.org:6969/announce
-
 	udp://inferno.demonoid.pw:3418/announce
-
 	udp://trackerxyz.tk:1337/announce
-
 	udp://tracker4.itzmx.com:2710/announce
-
 	udp://tracker2.christianbro.pw:6969/announce
-
 	udp://tracker1.wasabii.com.tw:6969/announce
-
 	udp://tracker.zer0day.to:1337/announce
-
 	udp://tracker.xku.tv:6969/announce
-
 	udp://tracker.vanitycore.co:6969/announce
-
 	udp://tracker.mg64.net:6969/announce
 	EOF
 }
@@ -3123,10 +3107,124 @@ iforgot-jpeg-to-pdf() {
 
 	To extract images
 	    $ pdfimages  -j  my-new.pdf  "my-new"
+	-f <number> – first page
+	-l <number> – last page
+	-j | -png | -tiff | -jp2 – write images as this format
+	-all – write images as they are
 
 	To compare
 	    $ ssim.sh  0001.jpg  my-new-0001.jpg
 	    …
 	    ssim=1 dssim=0
+	EOF
+}
+
+iforgot-bash-undo() {
+	cat <<-EOF
+	Press C-_ to undo something mistyped on the command line.
+	(before you run it)
+	EOF
+}
+
+iforgot-lxd-usage() {
+	cat <<-EOF
+	Create new container
+	    $ lxc launch images:gentoo ctname
+
+	Delete container
+	    $ lxc delete ctname
+
+	List containers
+	    $ lxc list
+
+	When it ain’t start
+	    $ lxc info --show-log ctname
+
+	Start container
+	    $ lxc start ctname
+
+	Get info
+	    $ lxc info ctname
+
+	Attach to container
+	    $ lxc attach ctname
+	    (use <C-a q> to quit
+	  also
+	    $ lxc exec test bash
+	  better set up ssh
+
+	Stop container
+	    $ lxc stop ctname
+
+	Mount a directory to a container
+	    $ lxc config device add CTNAME SHARENAME disk source=/usr path=/usr
+
+	Provide access to the X server access on the host for the container
+	    $ lxc config device add CTNAME X0 disk path=/tmp/.X11-unix/X0 source=/tmp/.X11-unix/X0
+	    $ lxc config device add CTNAME Xauthority disk path=/home/MY_USE_NAME/.Xauthority source=$XAUTHORITY
+
+	Add host’s graphic card
+	    $ lxc config device add CTNAME MYGPU gpu
+	    $ lxc config device set CTNAME MYGPU uid 1000
+	    $ lxc config device set CTNAME MYGPU gid 1000
+
+	To be able to forward X apps to host’s X server:
+	  On the host:
+	    <launch Xorg WITHOUT -nolisten tcp (or pass -listen tcp)>
+	    <make sure that you close port 6000 + $DISPLAY with iptables from WAN>
+	    $ xhost +ctname
+	  On the container
+	    # eselect opengl list
+	    # eselect opengl set <choose host’s opengl provider>
+	    $ export DISPLAY=MAIN_HOST_NAME_OR_ADDRESS:0
+	    $ LIBGL_DEBUG=verbose glxgears
+
+	Make sure to build mesa without llvm, or you may see
+	    $ LIBGL_DEBUG=verbose glxgears
+	    libGL: OpenDriver: trying /usr/lib64/dri/tls/swrast_dri.so
+	    libGL: OpenDriver: trying /usr/lib64/dri/swrast_dri.so
+	    libGL: dlopen /usr/lib64/dri/swrast_dri.so failed (libLLVMX86Disassembler.so.6: cannot open shared object file: No such file or directory)
+	    libGL error: unable to load driver: swrast_dri.so
+	    libGL error: failed to load driver: swrast
+
+
+	EOF
+}
+
+iforgot-nv-nvidia-nouveau() {
+	cat <<-EOF
+	To use nvidia driver:
+	    1. Change config suffix to .nvidia
+	    2. Add nomodeset nouveau.nomodeset drm.nomodeset to kernel cmdline.
+	    3. Reinstall the driver to bring back udev rules
+
+	To use nouveau driver:
+	    1. Change config suffix to .nouveau
+	    2. Remove any “nomodeset” from kernel cmdline
+	    3. rm /lib/udev/rules.d/99-nvidia.rules
+
+	EOF
+}
+
+iforgot-bib-record(){
+	cat <<-EOF
+	Scott. R. Book title / Tran. from German by C. Curie. — L.: Astonishing
+	Press, 2018. — 223 p.
+	EOF
+}
+
+iforgot-github-allowed-tags-html() {
+	cat <<-EOF
+    a p q br hr h1 h2 h3 h4 h5 h6 h7 h8 img div blockquote
+        ol ul li
+        dl dt dd
+        table thead tbody tfoot caption tr td th
+        figure figcaption
+        details summary
+        ruby rt rp
+    b i var strong em pre samp code tt kbd sup sub s strike
+    ins del
+
+	https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/sanitization_filter.rb#L44-L106
 	EOF
 }

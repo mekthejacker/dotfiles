@@ -55,6 +55,8 @@ map  [index]       <C-q> quit
 map <C-p> feedkeys ":print<Return>"
 #  info
 map i feedkeys ":info<Return>"
+#  Show statusbar
+map <C-b> toggle_statusbar
 
 
 #  Navigation
@@ -117,7 +119,7 @@ map <C-v> search forward
 #  Appearance
 #
 set window-title-basename true
-set guioptions shv
+set guioptions hv
 set statusbar-bg "#303030"
 set statusbar-fg "#d0d0d0"
 set statusbar-v-padding 40

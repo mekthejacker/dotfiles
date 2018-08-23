@@ -311,10 +311,10 @@ case "$1" in
 	glue-ver-*)
 		glue_mode='vertical'
 		;;&
-	glue-hor-png)
+	glue-*-png)
 		glue_format='png'
 		;;
-	glue-hor-jpg)
+	glue-*-jpg)
 		glue_format='jpeg'
 		;;
 	anigif2mp4)

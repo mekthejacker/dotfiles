@@ -30,7 +30,7 @@
 # Base directory relative to which user-specific non-essential (such as cahced
 #   files, sockets, named pipes…) data should be written. Its Unix access mode
 #   MUST be 0700.
-# XDG_CACHE_HOME="~/.cache"
+#XDG_CACHE_HOME="$HOME/.cache"
 
 # Base directory relative to which user-specific runtime files and other file
 #   objects should be placed. Files in the directory MUST not survive reboot

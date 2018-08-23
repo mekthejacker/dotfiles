@@ -71,7 +71,7 @@ export ENV_DEBUG='+'
 [ ! -v DISPLAY -a "`tty`" = /dev/tty2 ] && {
 	# W! startx IGNORES ~/.xserverrc options if something passed beyond -- !
 	# This will use /etc/X11/xorg.conf as a default config
-	exec startx -- -nolisten tcp &>/tmp/envlogs/x # … -- -verbose 5 -logverbose=5
+	exec startx -- -config ./env/xorg.conf.nvidia -listen tcp  &>/tmp/envlogs/x # … -- -verbose 5 -logverbose=5 -nolisten tcp
 	# This was needed when I used to switch between configs.
 	# exec startx -- -config xorg.conf$(<~/.xorg.conf.suffix) -nolisten tcp &>/tmp/envlogs/x
 	# rm ~/.xorg.conf.suffix &>/dev/null

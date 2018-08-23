@@ -224,10 +224,11 @@ alias vm-dq='~/bin/qemu-shell/qmp-shell ~/qmp-sock-vmdebean'
 alias vm-w="qemu-graphic	-smp 1,cores=1,threads=1 -m 1512  \
 	-vga qxl -spice addr=192.168.5.1,port=5903,disable-ticketing \
 	-qmp unix:$HOME/qmp-sock-shindaws,server,nowait \
-	-name 'Win_XP,process=vm-winxp' -rtc base=localtime -usbdevice tablet \
-	-drive file=$HOME/vm_winxp.img,if=ide \
+	-name 'Win_XP,process=vm-winxp' -rtc base=localtime \
+	-drive file=$HOME/vm_winxp.img,if=ide -usb -device usb-tablet \
 	-netdev vde,id=mynet,sock=/tmp/vde.ctl \
 		-device virtio-net-pci,netdev=mynet"
+		# -device usb-tablet,bus=usb-bus.0
 
 ## VDE switch
 ## + VM is a true part of local network.
@@ -337,5 +338,26 @@ inet-on-off() {
 			;;
 		esac
 }
+
+run-fake-x() {
+	Xephyr  -name fake_X  :1  -dpi 101  -screen 1920x1080  &
+
+
+	echo -n Waiting… && sleep 2
+	DISPLAY=:1  i3  -c ~/.env/fake_i3.config &>/dev/null &
+
+	echo Waiting… && sleep 2
+	DISPLAY=:1  hsetroot  -solid \#000000 \
+	                      -alpha 200 \
+	                      -brightness 0.07 \
+	                      -full ~/.env/fake_wallpaper.png
+	read -n1 -p 'Any key to interrupt: > '
+	xdotool  search --classname fake_X  windowclose
+	pkill -f 'Xephyr -name fake_X'
+	echo Waiting… && sleep 5
+}
+
+
+
 
 return 0

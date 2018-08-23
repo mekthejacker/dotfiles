@@ -14,8 +14,51 @@ app_name=${0##*/}
 #   case when running this script
 [ -f "$elog" ] || elog=/dev/null
 
+
+generic_wine_app() {
+	#  To open local files smoothly, paths must be converted
+	local paths=() path virt_desktop
+	[ $# -eq 0 ]  &&  pgrep -u sszb -f "$wineprog_process_name" && {
+		notify-send --hint int:transient:1 \
+		            -t 5000 \
+		            "$wineprog_name"  "Already running!"
+		exit 0
+	}
+	for path in "$@"; do
+		if [ -e "$path" ]; then
+			# For each path, that is a valid path
+			# (mostly to avoid parts of the paths, like “./something.jpg”,
+			#  Thunar and Geeqie let you copy full path, so use them).
+			paths+=(
+				"$(WINEPREFIX=$wineprog_prefix \
+				      sudo -u sszb -H /usr/bin/winepath -w "$path" )"
+			)
+		else
+			notify-send --hint int:transient:1 \
+                        --urgency critical \
+                        -t 5000 \
+                        "$wineprog_name"  "Invalid path: “$path”." \
+            || :
+		fi
+	done
+	[ "$wineprog_needs_virtdesktop" = yes ] && {
+		virt_desktop="explorer /desktop=${wineprog_name//\ /_},1920x1038"
+	}
+	( nohup /bin/bash -c "WINEPREFIX=$wineprog_prefix \
+		sudo -u sszb -H  /usr/bin/wine ${virt_desktop:-} \
+			 '$wineprog_exe_path' \"${paths[@]}\"" ) &
+}
+
 case $app_name in
 	# NB: only actual binaries with absolute paths here!
+	acrobat-reader)
+		wineprog_name='Acrobat Reader'
+		wineprog_process_name='acrord32.exe'
+		wineprog_exe_path='/home/sszb/.wine32-programs/drive_c/Program Files/Adobe/Acrobat Reader DC/Reader/AcroRd32.exe'
+		wineprog_prefix='/home/sszb/.wine32-programs'
+		wineprog_needs_virtdesktop='yes'
+		generic_wine_app "$@"
+		;;
 	firefox)
 		[ -e /usr/bin/firefox-bin ] \
 			&& firefox=/usr/bin/firefox-bin \
@@ -27,34 +70,12 @@ case $app_name in
 		$firefox --profile ~/.ff "$@"
 		;;
 	master-pdf-editor)
-		[ $# -eq 0 ]  &&  pgrep -u sszb -f MasterPDFEditor.exe && {
-			notify-send --hint int:transient:1 \
-			            -t 5000 \
-			            "Master PDF Editor"  "Already running!"
-			exit 0
-		}
-		for path in "$@"; do
-			if [ -e "$path" ]; then
-				# For each path, that is a valid path
-				# (mostly to avoid parts of the paths, like “./something.jpg”,
-				#  Thunar and Geeqie let you copy full path, so use them).
-				mpdf_paths+=(
-					"$(WINEPREFIX=~sszb/.wine32-programs \
-					      sudo -u sszb -H /usr/bin/winepath -w "$path" )"
-				)
-			else
-				notify-send --hint int:transient:1 \
-	                        --urgency critical \
-	                        -t 5000 \
-	                        "Master PDF Editor"  "Invalid path: “$path”." \
-	            || :
-			fi
-		done
-		nohup /bin/bash -c "WINEPREFIX=~sszb/.wine32-programs \
-			sudo -u sszb -H \
-				/usr/bin/wine '/home/sszb/.wine32-programs/drive_c/Program Files/Code Industry/Master PDF Editor 5/MasterPDFEditor.exe' \
-				              \"${mpde_paths[@]}\"" &
-
+		wineprog_name='Master PDF Editor'
+		wineprog_process_name='MasterPDFEditor.exe'
+		wineprog_exe_path='/home/sszb/.wine32-programs/drive_c/Program Files/Code Industry/Master PDF Editor 5/MasterPDFEditor.exe'
+		wineprog_prefix='/home/sszb/.wine32-programs'
+		wineprog_needs_virtdesktop='yes'
+		generic_wine_app "$@"
 		;;
 	mpd)
 		cp ~/.mpd/mpd.conf.common ~/.mpd/mpd.conf
@@ -81,36 +102,12 @@ case $app_name in
 		              # leaving us with a half-baked webm.
 		;;
 	photoshop)
-		#  To open local files smoothly, paths must be converted
-		[ $# -eq 0 ]  &&  pgrep -u sszb -f Photoshop && {
-			notify-send --hint int:transient:1 \
-			            -t 5000 \
-			            "Photoshop"  "Already running!"
-			exit 0
-		}
-		for path in "$@"; do
-			if [ -e "$path" ]; then
-				# For each path, that is a valid path
-				# (mostly to avoid parts of the paths, like “./something.jpg”,
-				#  Thunar and Geeqie let you copy full path, so use them).
-				photoshop_paths+=(
-					"$(WINEPREFIX=~sszb/.wine32-programs \
-					      sudo -u sszb -H /usr/bin/winepath -w "$path" )"
-				)
-			else
-				notify-send --hint int:transient:1 \
-	                        --urgency critical \
-	                        -t 5000 \
-	                        "Photoshop"  "Invalid path: “$path”." \
-	            || :
-			fi
-		done
-		nohup /bin/bash -c "WINEPREFIX=~sszb/.wine32-programs \
-			sudo -u sszb -H \
-				/usr/bin/wine explorer /desktop=Photoshop,1920x1038 \
-				              '/home/sszb/.wine32-programs/drive_c/Program Files/Adobe/Adobe Photoshop CC 2018 (32 Bit)/Photoshop.exe' \
-				              \"${photoshop_paths[@]}\"" &
-
+		wineprog_name='Photoshop'
+		wineprog_process_name='Photoshop'
+		wineprog_exe_path='/home/sszb/.wine32-programs/drive_c/Program Files/Adobe/Adobe Photoshop CC 2018 (32 Bit)/Photoshop.exe'
+		wineprog_prefix='/home/sszb/.wine32-programs'
+		wineprog_needs_virtdesktop='yes'
+		generic_wine_app "$@"
 		 # This is what photoshop outputs, when the window doesn’t show up.
 		#
 		# 003e:warn:keyboard:X11DRV_InitKeyboard vkey 012C is being used by more than one keycode
@@ -125,6 +122,18 @@ case $app_name in
 		# 003c:warn:ntdll:NtQueryAttributesFile L"\\??\\C:\\Program Files\\Adobe\\Adobe Photoshop CC 2018 (32 Bit)\\HLLog.config" not found (c0000034)
 		# 003c:fixme:ver:GetCurrentPackageId (0x34fe24 (nil)): stub
 		# 003c:warn:ntdll:NtQueryAttributesFile L"\\??\\C:\\Program Files\\Adobe\\Adobe Photoshop CC 2018 (32 Bit)\\mscoree.dll" not found (c0000034)
+		;;
+	png22pnm)
+		#  This is for sam2p tool
+		#  It still uses pngtopnm, which was called back then png2pnm,
+		#  there’s probably a typo in the name in the code with two ‘2’.
+		#echo "png22pnm: $@" >/tmp/t
+		local arg
+		for arg in "$@"; do
+			[ "$arg" = -rgba ] && arg='-alpha'
+		done
+		pngtopam "$@"
+		exit 0
 		;;
 	shutdown)
 		#~/.i3/on_quit.sh
@@ -142,3 +151,5 @@ case $app_name in
 		exit 3
 	;;
 esac
+
+exit 0

@@ -600,7 +600,7 @@ getopt_exit_code=$?
 eval set -- "$opts"
 
 while true; do
-	option="$1" # becasue this way it may be used in err()
+	[ "${1:-}" ] && option="$1"  || break
 	case "$option" in
 		-h|'--help')
 			show_help
@@ -626,6 +626,10 @@ while true; do
 		--)
 			shift
 			break
+			;;
+		*)
+			echo "Unknown option: “$option”." >&2
+			exit 5
 			;;
 	esac
 done

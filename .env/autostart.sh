@@ -111,31 +111,32 @@ esac
 #~/bin/wallpaper_setter/wallpaper_setter.sh -w &
 
 urxvtc
-# ┌────┐
-# │    │
-# │    │
-# └────┘
+# ┌───────┐
+# │ urxvt │
+# │       │
+# └───────┘
 i3-msg split v
 urxvtc -hold -title 'htop' -e htop
-# ╔════╗
-# ║    ║
-# ╟────╢
-# ║    ║
-# ╚════╝
+# ╔═══════╗
+# ║ urxvt ║
+# ╟───────╢
+# ║ htop  ║
+# ╚═══════╝
 # Move cursor near the center of the lower urxvtc with htop
 xte "mousemove $(( WIDTH/2 ))  $(( 3*HEIGHT/4 ))"
 xte 'mouseclick 1'  # …and focus it.
-
+sleep .3
 i3-msg split h
 # ╔═════╗ # ╔═══════╗
 # ║     ║ # ║       ║
 # ╟─────╢ # ╠━━━┯━━━╣
-# ║  ⋅  ║ # ║   │   ║  # htop | [iftop container]
+# ║  ⋅  ║ # ║   │   ║
 # ╚═════╝ # ╚═══╧═══╝
 
 urxvtc -hold -title 'Interface bandwidths' -e sudo /usr/bin/bwmon
+
 # ╔═════════════════╗
-# ║                 ║
+# ║      urxvt      ║
 # ╠━━━━━━━━┳━━━━━━━━╣
 # ║  htop  ┃  bwmon ║
 # ╚════════╩════════╝
@@ -144,13 +145,18 @@ xte "mousemove $(( WIDTH/2 ))  $(( HEIGHT/4 ))"
 xte 'mouseclick 1'
 # raise upper empty urxvtc up to ≈5/6 of the height
 i3-msg resize grow height 30 px or 30 ppt
+sleep .3
 i3-msg split h
 case $HOSTNAME in
 	home)
-		(nohup transmission-gtk </dev/null &>/dev/null) &
-		until xdotool search --onlyvisible --pid $!; do
-			sleep 0.3
-		done
+		transmission_pid=$(pgrep -u $USER -f transmission-gtk)
+		if [ -e "/proc/${transmission_pid:-nosuchfile}" ]; then
+			transmission-gtk
+		else
+			(nohup transmission-gtk </dev/null &>/dev/null) &
+			transmission_pid=$!
+		fi
+		xdotool search --sync --onlyvisible --pid "$transmission_pid"
 		;;
 	*)
 		urxvtc -hold -title tmux -e /bin/bash -c "$tmux attach; bash"
@@ -158,32 +164,34 @@ case $HOSTNAME in
 esac
 # ╔═════════════════╗ # ╔════════╤════════╗
 # ║        ⋅        ║ # ║        │        ║
-# ║                 ║ # ║        │        ║
+# ║                 ║ # ║  urxvt │ tr-gtk ║
 # ║                 ║ # ║        │        ║
 # ╠━━━━━━━━┳━━━━━━━━╣ # ║        │        ║
+# ║        ┃        ║ # ║        │        ║
 # ║        ┃        ║ # ╠━━━━━━━━╈━━━━━━━━╣
-# ║        ┃        ║ # ║        ┃        ║
-# ║        ┃        ║ # ║        ┃        ║
+# ║        ┃        ║ # ║  htop  ┃ bwmon  ║
 # ╚════════╩════════╝ # ╚════════╩════════╝
 
 xte "mousemove $(( WIDTH/4 )) $(( HEIGHT/2 ))"
 xte 'mouseclick 1'
+sleep .3
 i3-msg split h
 i3-msg layout tabbed
 urxvtc
 urxvtc
 # ╔════════╤════════╗ # ╔════════╦════════╗
 # ║        │        ║ # ║––+––+––┃        ║
-# ║        │        ║ # ║        ┃        ║
+# ║        │        ║ # ║ur ur ur┃ tr-gtk ║
 # ║   ⋅    │        ║ # ║        ┃        ║
 # ║        │        ║ # ║        ┃        ║
+# ║        │        ║ # ║        ┃        ║
 # ╠━━━━━━━━╈━━━━━━━━╣ # ╠━━━━━━━━╋━━━━━━━━╣
-# ║        ┃        ║ # ║        ┃        ║
-# ║        ┃        ║ # ║        ┃        ║
+# ║        ┃        ║ # ║  htop  ┃ bwmon  ║
 # ╚════════╩════════╝ # ╚════════╩════════╝
 
 xte "mousemove $(( 3*WIDTH/4 )) $(( HEIGHT/2 ))"
 xte 'mouseclick 1'
+sleep .3
 i3-msg split v
 i3-msg layout tabbed
 [ "$HOSTNAME" = home ] && {
@@ -191,30 +199,25 @@ i3-msg layout tabbed
 }
 #urxvtc
 # ╔════════╦════════╗ # ╔════════╦════════╗
-# ║––+––+––┃        ║ # ║––+––+––┃––+––+––║
-# ║        ┃        ║ # ║        ┃        ║
+# ║––+––+––┃        ║ # ║––+––+––┃–––+––––║
+# ║        ┃        ║ # ║ur ur ur┃tmu tran║
 # ║        ┃   ⋅    ║ # ║        ┃        ║
 # ║        ┃        ║ # ║        ┃--+--+  ║ ← tmux panes
+# ║        ┃        ║ # ║        ┃        ║
 # ╠━━━━━━━━╋━━━━━━━━╣ # ╠━━━━━━━━╋━━━━━━━━╣
-# ║        ┃        ║ # ║        ┃        ║
-# ║        ┃        ║ # ║        ┃        ║
+# ║        ┃        ║ # ║  htop  ┃ bwmon  ║
 # ╚════════╩════════╝ # ╚════════╩════════╝
 
 #  Focus the window, just in case
 xte "mousemove $(( 11*WIDTH/12 )) $(( HEIGHT/2 ))"
 xte 'mouseclick 1'
+
 i3-msg move left
-
-
-
-# This is to check whether script is called via hotkey in ~/.env/config.
-[ "$1" = stop_after_main_workspace ] && {
-	pointer_control enable
-	exit 0
-}
 
 pointer_control enable
 
+# This is to check whether script is called via hotkey in ~/.env/config.
+[ "$1" = stop_after_main_workspace ] && exit 0
 
 # Some configs decrypted at ~/bin/run_app.sh
 for app in "${startup_apps[@]}"; do
