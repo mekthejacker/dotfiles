@@ -12,32 +12,34 @@
 #      care about quality of the image, do not use it and use vo=opengl-hq.
 
 [home]
-## Options that are common for any profile
+#  Options that are common for any profile
 [default]
-## Audio track languages
+#  Audio track languages
 alang=ja,jpn,en,eng,de,deu,ru,rus
-## 0ms after window goes fullscreen
+#  Load external audio tracks having video file name
+audio-file-auto=fuzzy
+#  0ms after window goes fullscreen
 cursor-autohide=0
 cursor-autohide-fs-only=yes
-## redraw subs at seeking
+#  redraw subs at seeking
 demuxer-mkv-subtitle-preroll=yes
 force-window=yes
-## precise seeking helps Zehkul’s script
+#  precise seeking helps Zehkul’s script
 hr-seek=yes
 #hr-seek-demuxer-offset=1.5
 hr-seek-framedrop=no
 input-ipc-server=/tmp/mpv-socket
-## Suppress status line messages.
-## mpv like to print a lot when spawned from coproc in watch.sh
+#  Suppress status line messages.
+#  mpv like to print a lot when spawned from coproc in watch.sh
 msg-level=all=info
-## No on-screen controller buttons
+#  No on-screen controller buttons
 osc=no
 osd-duration=3000
 #osd-font=''
-## default: 45 px at Height==720px
+#  default: 45 px at Height==720px
 osd-font-size=30
 osd-fractions=yes
-## Too many unnecessary files. Enabled in wa alias in ~/bashrc/home.sh
+#  Too many unnecessary files. Enabled in wa alias in ~/bashrc/home.sh
 #save-position-on-quit=yes
 #screenshot-directory=
 screenshot-template="%F %P"
@@ -45,10 +47,10 @@ screenshot-format=jpg
 #screenshot-format=png
 #screenshot-png-compression=9
 screenshot-jpeg-quality=96
-## Sub loading is done via watch.sh
-#sub-auto=no
+#  Sub loading is done via watch.sh
+sub-auto=fuzzy
 sub-codepage=enca:ru:en
-## Disable ass subs for this to take effect
+#  Disable ass subs for this to take effect
 sub-font='Roboto Medium'
 sub-font-size=50
 sub-gray=yes

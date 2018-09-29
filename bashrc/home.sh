@@ -88,7 +88,10 @@ wa() {
 	# clb6x10 is installed separately, see the man page for details.
 	#   man -P "less -p '^.*Using a custom'" watch.sh
 	~/bin/watch.sh \
-		--no-hints -e -m "--fs --save-position-on-quit --profile=$HOSTNAME \
+		--no-hints -e -m "--fs \
+		                  --save-position-on-quit \
+		                  --profile=$HOSTNAME \
+		                  --no-sub-auto  --no-audio-file-auto \
 		                  --input-ipc-server=/tmp/mpv-watchsh-socket" \
 		--last-ep --last-ep-command "figlet -t -f $HOME/.fonts/clb6x10 -c" \
 		--last-item-mark '.' \

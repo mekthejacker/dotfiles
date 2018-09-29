@@ -3,12 +3,12 @@
 # run_app.sh
 
 app_name=${0##*/}
-# [ "${ENV_DEBUG/*r*/}" ] || {
+[ -v D ] && {
 	elog="/tmp/envlogs/runapp_$app_name"
 	echo >$elog
 	exec &>$elog
 	set -x
-# }
+}
 # IIRC, output from certain commands has to be redirected explicitly,
 #   hence >>$elog presence after commands. But this may mess usual
 #   case when running this script

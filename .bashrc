@@ -40,6 +40,7 @@ export MPD_HOST=$HOME/.mpd/socket
 [ "${PATH//*$HOME\/bin*/}" ] && export PATH="$HOME/bin:$PATH"
 [ "${PATH//*$HOME\/\.env*/}" ] && export PATH="$HOME/.env:$PATH"
 [ "${PATH//*\/usr\/games\/bin*/}" ] && export PATH="$PATH:/usr/games/bin/"
+export QT_QPA_PLATFORMTHEME=gtk2
 
 
 # Though TERM is kept via SSH’s SendEnv,

@@ -81,6 +81,7 @@ read_rc_file() {
 	done
 	[ -v trash_found ] || blacklist+=('*/.Trash-*')
 	[ -v lostnfound_found ] || blacklist+=('*/lost+found*')
+	return 0
 }
 
 # rc vars are used for pre-checks, so first call must be here,
@@ -386,12 +387,19 @@ upload_files() {
 	local file media_upload media_url
 	for file in "$@"; do
 		echo "    Uploading file: $file"
+		set -x
 		if media_upload=`curl -u "$username:$password" \
 			                  --form "media=@$file" \
 			                  $proto$server$media_upload_url 2>/dev/null`
+			                  # https://pl.smuglo.li/api/statusnet/media/upload
 		then
-			if media_url=`sed -rn '6 s~.*<media_url>(.+)</media_url>.*~\1~p;T;Q1'<<<"$media_upload"`; then
+			if	media_url=$(
+					sed -rn '6 {s~.*<media_url>(.+)</media_url>.*~\1~p;T;Q1}'<<<"$media_upload"
+				)
+			then
 				echo "        Error: no media url." | tee -a "$problem_files" >&2
+				declare -p media_upload
+				set +x
 				return 1
 			else
 				media_urls+=("$media_url")
@@ -430,13 +438,13 @@ while :; do
 	#            What will be sent in the --data of the request
 
 	# Roll for a video instead of a picture.
-	[ -r "$D" ] || {
-		# 1/5 chance to attach a webm/mp4
-		[ ! -v no_media -a `shuf -i 0-4 -n 1` -eq 0 ] && {
-			echo -n ' …with a video!'
-			video=video
-		}
-	}
+	# [ -r "$D" ] || {
+	# 	# 1/5 chance to attach a webm/mp4
+	# 	[ ! -v no_media -a `shuf -i 0-4 -n 1` -eq 0 ] && {
+	# 		echo -n ' …with a video!'
+	# 		video=video
+	# 	}
+	# }
 	unset requested_pattern
 	[ ${#post_each_nth_time[@]} -ne 0 ] && {
 		for n in ${!post_each_nth_time[@]}; do

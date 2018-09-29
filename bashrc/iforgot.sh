@@ -437,6 +437,7 @@ iforgot-kaomozi-drawing() {
 
 	⊙﹏⊙    (•⊙ω⊙•)    (๑•̀ㅂ•́)و✧        ٩(๑òωó๑)۶
 
+	(ง •̀ω•́)ง✧        (๑¯﹀¯๑)えへん！         (´▽`ʃƪ)♡
 
 
 	(つд⊂)    ( ^▽^)σ)~O~)
@@ -3226,5 +3227,32 @@ iforgot-github-allowed-tags-html() {
     ins del
 
 	https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/sanitization_filter.rb#L44-L106
+	EOF
+}
+
+iforgot-dialog-programs() {
+	cat <<-EOF
+	Console
+	  - dialog
+	  - whiptail (package called newt)
+
+	GUI
+	  - zenity – shit.
+	  - Xdialog – more capable, than zenity, but less than yad.
+	  - yad – more capable, than zenity, but still shit.
+	EOF
+}
+
+iforgot-theme-choosers() {
+	cat <<-EOF
+	GTK+2.x
+	  - lxappearance
+
+	QT4
+	  - qtconfig -qt4
+
+	QT5
+	  - use the same “qtconfig -qt4”, then instal qtstyleplugins and export
+	    QT_QPA_PLATFORMTHEME=gtk2
 	EOF
 }

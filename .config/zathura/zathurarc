@@ -118,6 +118,7 @@ map <C-v> search forward
 
 #  Appearance
 #
+set first-page-column 1:1
 set window-title-basename true
 set guioptions hv
 set statusbar-bg "#303030"

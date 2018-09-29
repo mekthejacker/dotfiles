@@ -206,8 +206,10 @@ export WINEDEBUG="${WINEDEBUG:-fixme+all,err+all}" \
        WINEPREFIX \
        SDL_AUDIODRIVER=${SDL_AUDIODRIVER:-alsa} \
        __GL_THREADED_OPTIMIZATIONS=${__GL_THREADED_OPTIMIZATIONS:-1} \
+       mesa_glthread=true \
        __GL_SYNC_TO_VBLANK=${__GL_SYNC_TO_VBLANK:-0} \
-       __GL_YIELD=${__GL_YIELD:-NOTHING}
+       __GL_YIELD=${__GL_YIELD:-NOTHING} \
+       XMODIFIERS=''
 
  # Saves the path to the last chosen wineprefix,
 #  so that next time we could set this path as default.
@@ -271,13 +273,14 @@ set_wineprefix() {
 			write_previous_wprefix "$CHOSEN"
 		fi
 	fi
+	WINEPREFIX=${WINEPREFIX%/}
 	WINEPREFIX_NAME="${WINEPREFIX##*/}"  # .wine32-something or .wine64-smth.
 	WINEPREFIX_OWNER="${WINEPREFIX#/home/}"
-	 # $USER or $WINEUSER.
+	#  $USER or $WINEUSER.
 	#  To delete trash from WINEPREFIX later in __wine().
 	WINEPREFIX_OWNER="${WINEPREFIX_OWNER%/*}"
 	[[ "$WINEPREFIX_OWNER" =~ ^($USER|$WINEUSER)$ ]] || {
-		err 'Couldn’t determine WINEPREFIX_OWNER. Is their \$HOME in /home?'
+		err 'Couldn’t determine WINEPREFIX_OWNER. Is their $HOME in /home?'
 		return 3
 	}
 	[[ "$WINEPREFIX_NAME" =~ ^\.wine32 ]] && WINEARCH=win32
@@ -523,6 +526,7 @@ wineprefix-create() {
 		# d3dx11_42
 		# d3dx11_43
 
+		ffdshow
 		physx
 		quartz
 
